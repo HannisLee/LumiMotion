@@ -1,7 +1,7 @@
 
 # LumiMotion - Improving Gaussian Relighting with Scene Dynamics
 
-[![arXiv](https://img.shields.io/badge/arXiv-Paper-b31b1b.svg)]()
+[![arXiv](https://img.shields.io/badge/arXiv-Paper-b31b1b.svg)](https://arxiv.org/html/2604.10994v1)
 [![Project Page](https://img.shields.io/badge/Project-Page-blue.svg)](https://joaxkal.github.io/LumiMotion/)
 [![Data](https://img.shields.io/badge/Zenodo-Data-blue.svg?logo=zenodo)](https://zenodo.org/records/18894615)  
 
