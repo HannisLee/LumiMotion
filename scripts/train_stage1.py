@@ -26,6 +26,7 @@ import numpy as np
 from PIL import Image
 import torch.nn.functional as F
 from torchvision import transforms
+from scene.photometric_lambertian import PhotometricLambertianRenderer
 
 try:
     from torch.utils.tensorboard import SummaryWriter
@@ -41,8 +42,12 @@ class Trainer:
         self.args = args
         self.opt = opt
         self.pipe = pipe
+        self.render_mode = getattr(pipe, "render_mode", "original")
+        if self.render_mode not in ["original", "photometric_lambertian"]:
+            raise ValueError(f"Unsupported render_mode '{self.render_mode}'.")
         self.testing_iterations = testing_iterations
         self.saving_iterations = saving_iterations
+        self.photometric_renderer = None
 
         self.tb_writer = prepare_output_and_logger(dataset)
         self.deform = DeformModel(deform_type=self.dataset.deform_type, is_blender=self.dataset.is_blender, 
@@ -56,6 +61,11 @@ class Trainer:
                                        fea_dim=gs_fea_dim)
 
         self.scene = Scene(dataset, self.gaussians, load_iteration=None) #originally was -1, we always want fresh start
+        if self.render_mode == "photometric_lambertian":
+            self.gaussians.enable_photometric_albedo()
+            self.photometric_renderer = PhotometricLambertianRenderer(self.scene.all_timesteps, device="cuda")
+            self.photometric_renderer.training_setup(opt)
+        print(f"Render mode: {self.render_mode}")
         self.gaussians.training_setup(opt)
         
         bg_color = [1, 1, 1] if dataset.white_background else [0, 0, 0]
@@ -124,7 +134,8 @@ class Trainer:
             raise NotImplemented
             
         # Render
-        render_pkg_re = render(viewpoint_cam, self.gaussians, self.pipe, self.background, d_xyz, d_rotation, d_scaling, d_opacity=d_opacity, d_color=d_color)
+        render_pkg_re = render(viewpoint_cam, self.gaussians, self.pipe, self.background, d_xyz, d_rotation, d_scaling,
+                               d_opacity=d_opacity, d_color=d_color, photometric_renderer=self.photometric_renderer)
         image, viewspace_point_tensor, visibility_filter, radii = render_pkg_re["render"], render_pkg_re["viewspace_points"], render_pkg_re["visibility_filter"], render_pkg_re["radii"]
     
 
@@ -149,6 +160,16 @@ class Trainer:
         Ll1 = l1_loss(image, gt_image)
         loss_img = (1.0 - self.opt.lambda_dssim) * Ll1 + self.opt.lambda_dssim * (1.0 - ssim(image, gt_image))
         loss = loss_img + normal_loss + dist_loss
+        loss_light_smooth = torch.zeros((), dtype=loss.dtype, device=loss.device)
+        loss_albedo_reg = torch.zeros((), dtype=loss.dtype, device=loss.device)
+
+        if self.render_mode == "photometric_lambertian":
+            if self.opt.lambda_photometric_light_smooth > 0:
+                loss_light_smooth = self.photometric_renderer.light_smoothness_loss()
+                loss = loss + self.opt.lambda_photometric_light_smooth * loss_light_smooth
+            if self.opt.lambda_photometric_albedo_reg > 0:
+                loss_albedo_reg = self.gaussians.photometric_albedo_reg_loss()
+                loss = loss + self.opt.lambda_photometric_albedo_reg * loss_albedo_reg
 
         #mask loss
         if self.opt.gt_alpha_mask_as_scene_mask and viewpoint_cam.gt_alpha_mask is not None:
@@ -200,6 +221,7 @@ class Trainer:
                 self.progress_bar.update(10)
             if self.iteration == self.opt.iterations:
                 self.progress_bar.close()
+            self.log_photometric_stats(render_pkg_re, loss_light_smooth, loss_albedo_reg)
 
             # Keep track of max radii in image-space for pruning
             if self.gaussians.max_radii2D.shape[0] == 0:
@@ -209,9 +231,10 @@ class Trainer:
             # Log and save
             cur_psnr, cur_ssim, cur_lpips, cur_ms_ssim, cur_alex_lpips = training_report(self.tb_writer, self.iteration, Ll1, 
                                                                                          loss, l1_loss, self.iter_start.elapsed_time(self.iter_end), 
-                                                                                         self.testing_iterations, self.scene, render, 
-                                                                                         (self.pipe, self.background), self.deform, 
-                                                                                         self.dataset.load2gpu_on_the_fly, self.progress_bar)
+                                                                                         self.testing_iterations, self.scene, render,
+                                                                                         (self.pipe, self.background), self.deform,
+                                                                                         self.dataset.load2gpu_on_the_fly, self.progress_bar,
+                                                                                         photometric_renderer=self.photometric_renderer)
             if self.iteration in self.testing_iterations:
                 if cur_psnr.item() > self.best_psnr:
                     self.best_psnr = cur_psnr.item()
@@ -225,6 +248,8 @@ class Trainer:
                 print("\n[ITER {}] Saving Gaussians".format(self.iteration))
                 self.scene.save(self.iteration)
                 self.deform.save_weights(self.args.model_path, self.iteration)
+                if self.photometric_renderer is not None:
+                    self.photometric_renderer.save_weights(self.args.model_path, self.iteration)
 
             # Densification
             if self.iteration < self.opt.densify_until_iter:
@@ -248,13 +273,48 @@ class Trainer:
                 self.deform.optimizer.step()
                 self.deform.optimizer.zero_grad()
                 self.deform.update_learning_rate(self.iteration)
+                if self.photometric_renderer is not None:
+                    self.photometric_renderer.optimizer.step()
+                    self.photometric_renderer.optimizer.zero_grad(set_to_none=True)
                 
         self.deform.update(max(0, self.iteration - self.opt.warm_up))
 
         self.progress_bar.set_description("Best PSNR={} in Iteration {}, SSIM={}, LPIPS={}, MS-SSIM={}, ALex-LPIPS={}".format('%.5f' % self.best_psnr, self.best_iteration, '%.5f' % self.best_ssim, '%.5f' % self.best_lpips, '%.5f' % self.best_ms_ssim, '%.5f' % self.best_alex_lpips))
         self.iteration += 1
 
-   
+    def log_photometric_stats(self, render_pkg, loss_light_smooth, loss_albedo_reg):
+        if self.render_mode != "photometric_lambertian" or self.tb_writer is None:
+            return
+        if self.iteration == 1:
+            self.tb_writer.add_text("photometric/render_mode", self.render_mode, self.iteration)
+        if self.iteration % 10 != 0 and self.iteration not in self.testing_iterations:
+            return
+
+        light_dir = render_pkg["photometric_light_dir"].detach()
+        light_rgb = render_pkg["photometric_light_rgb"].detach()
+        albedo = render_pkg["photometric_albedo"].detach()
+        normal = render_pkg["photometric_normal"].detach()
+        ndotl = render_pkg["photometric_ndotl"].detach()
+        color = render_pkg["photometric_color"].detach()
+
+        self.tb_writer.add_scalar("photometric/light_dir_mean", light_dir.mean().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/light_dir_norm", light_dir.norm().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/light_rgb_mean", light_rgb.mean().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/light_rgb_min", light_rgb.min().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/light_rgb_max", light_rgb.max().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/albedo_mean", albedo.mean().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/albedo_min", albedo.min().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/albedo_max", albedo.max().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/normal_norm_mean", normal.norm(dim=-1).mean().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/ndotl_mean", ndotl.mean().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/ndotl_min", ndotl.min().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/ndotl_max", ndotl.max().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/color_mean", color.mean().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/color_min", color.min().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/color_max", color.max().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/loss_light_smooth", loss_light_smooth.detach().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/loss_albedo_reg", loss_albedo_reg.detach().item(), self.iteration)
+
 
 def prepare_output_and_logger(args):
     if not args.model_path:

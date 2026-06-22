@@ -82,6 +82,7 @@ class ModelParams(ParamGroup):
 
 class PipelineParams(ParamGroup):
     def __init__(self, parser):
+        self.render_mode = "original"
         self.convert_SHs_python = False
         self.compute_cov3D_python = False
         self.debug = False
@@ -154,6 +155,10 @@ class OptimizationParams(ParamGroup):
         self.lambda_light=0.0
         self.lambda_light_smooth=0.0
         self.lambda_base_color_smooth=0.0
+        self.photometric_albedo_lr=0.01
+        self.photometric_light_lr=0.01
+        self.lambda_photometric_light_smooth=0.0
+        self.lambda_photometric_albedo_reg=0.0
 
         super().__init__(parser, "Optimization Parameters")
 

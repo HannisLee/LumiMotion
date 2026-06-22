@@ -59,7 +59,8 @@ def prepare_output_and_logger(args):
     return tb_writer
 
 def training_report(tb_writer, iteration, Ll1, loss, l1_loss, elapsed, testing_iterations, scene: Scene, 
-                       renderFunc, renderArgs, deform, load2gpu_on_the_fly, progress_bar):
+                       renderFunc, renderArgs, deform, load2gpu_on_the_fly, progress_bar,
+                       photometric_renderer=None):
         
     if tb_writer:
         tb_writer.add_scalar('train_loss_patches/l1_loss', Ll1.item(), iteration)
@@ -120,7 +121,8 @@ def training_report(tb_writer, iteration, Ll1, loss, l1_loss, elapsed, testing_i
                     
                     render_pkg_reconstruct = renderFunc(viewpoint, scene.gaussians, *renderArgs, 
                                                         d_xyz=d_xyz, d_rotation=d_rotation, d_scaling=d_scaling, 
-                                                        d_opacity=d_opacity, d_color=d_color)
+                                                        d_opacity=d_opacity, d_color=d_color,
+                                                        photometric_renderer=photometric_renderer)
                 
                     image_reconstruct = torch.clamp(render_pkg_reconstruct["render"], 0.0, 1.0)
 
@@ -148,7 +150,8 @@ def training_report(tb_writer, iteration, Ll1, loss, l1_loss, elapsed, testing_i
                         render_pkg_albedo = renderFunc(viewpoint, scene.gaussians, *renderArgs, 
                                                         d_xyz=d_xyz, d_rotation=d_rotation, d_scaling=d_scaling,
                                                         d_opacity=d_opacity, d_color=None,
-                                                        override_color=rgb_precomp_albedo)
+                                                        override_color=rgb_precomp_albedo,
+                                                        photometric_renderer=photometric_renderer)
                         image_albedo = torch.clamp(render_pkg_albedo["render"], 0.0, 1.0)
 
 
@@ -175,9 +178,40 @@ def training_report(tb_writer, iteration, Ll1, loss, l1_loss, elapsed, testing_i
                         render_pkg_albedo = renderFunc(viewpoint, scene.gaussians,*renderArgs, 
                                                 d_xyz=d_xyz, d_rotation=d_rotation, d_scaling=d_scaling,
                                                 d_opacity=d_opacity, d_color=d_color,
-                                                override_color=normals_precomp)
+                                                override_color=normals_precomp,
+                                                photometric_renderer=photometric_renderer)
                         rend_normal = render_pkg_albedo["render"]
                         tb_writer.add_images(config['name'] + "_view_{}_{}/rend_normal".format(viewpoint.image_name_train_light, idx), rend_normal[None], global_step=iteration)
+
+                        if photometric_renderer is not None and "photometric_ndotl" in render_pkg_reconstruct:
+                            tb_writer.add_images(config['name'] + "_view_{}_{}/photometric_render".format(viewpoint.image_name_train_light, idx), image_reconstruct[None], global_step=iteration)
+
+                            photometric_albedo = scene.gaussians.get_photometric_albedo
+                            render_pkg_photometric_albedo = renderFunc(
+                                viewpoint, scene.gaussians, *renderArgs,
+                                d_xyz=d_xyz, d_rotation=d_rotation, d_scaling=d_scaling,
+                                d_opacity=d_opacity, d_color=d_color,
+                                override_color=photometric_albedo,
+                                photometric_renderer=photometric_renderer)
+                            tb_writer.add_images(config['name'] + "_view_{}_{}/photometric_albedo".format(viewpoint.image_name_train_light, idx), torch.clamp(render_pkg_photometric_albedo["render"], 0.0, 1.0)[None], global_step=iteration)
+
+                            shading = render_pkg_reconstruct["photometric_ndotl"].repeat(1, 3)
+                            render_pkg_shading = renderFunc(
+                                viewpoint, scene.gaussians, *renderArgs,
+                                d_xyz=d_xyz, d_rotation=d_rotation, d_scaling=d_scaling,
+                                d_opacity=d_opacity, d_color=d_color,
+                                override_color=shading,
+                                photometric_renderer=photometric_renderer)
+                            tb_writer.add_images(config['name'] + "_view_{}_{}/photometric_shading".format(viewpoint.image_name_train_light, idx), torch.clamp(render_pkg_shading["render"], 0.0, 1.0)[None], global_step=iteration)
+
+                            photometric_normal = render_pkg_reconstruct["photometric_normal"] * 0.5 + 0.5
+                            render_pkg_photometric_normal = renderFunc(
+                                viewpoint, scene.gaussians, *renderArgs,
+                                d_xyz=d_xyz, d_rotation=d_rotation, d_scaling=d_scaling,
+                                d_opacity=d_opacity, d_color=d_color,
+                                override_color=photometric_normal,
+                                photometric_renderer=photometric_renderer)
+                            tb_writer.add_images(config['name'] + "_view_{}_{}/photometric_normal".format(viewpoint.image_name_train_light, idx), torch.clamp(render_pkg_photometric_normal["render"], 0.0, 1.0)[None], global_step=iteration)
                         
                         # render surfel normals
                         surf_normal = render_pkg_albedo["surf_normal"] * 0.5 + 0.5
@@ -319,4 +353,3 @@ def training_report_relight_screen_space(tb_writer, iteration, Ll1, loss, elapse
             tb_writer.add_histogram("scene/opacity_histogram", scene.gaussians.get_opacity, iteration)
             tb_writer.add_scalar('total_points', scene.gaussians.get_xyz.shape[0], iteration)
         torch.cuda.empty_cache()
-
