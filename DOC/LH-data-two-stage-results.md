@@ -63,7 +63,7 @@ opacity_reset_interval = 100000
 min_opacity             = 0.005
 ```
 
-这不会改变原版 renderer、deformation network 或 loss 结构。3300 iteration 稳定性测试先验证禁用 opacity reset 后可以跨过原失败位置；随后正式预跑发现继续 densify 到 20000 会在 normal regularization 启动后造成点数和显存快速膨胀，因此最终将 densification 截止提前到 8000。未截断的失败预跑保留在 `*_uncapped_failed*`，不参与最终指标。
+这不会改变原版 renderer、deformation network 或 loss 结构。3300 iteration 稳定性测试先验证禁用 opacity reset 后可以跨过原失败位置；随后正式预跑发现继续 densify 到 20000 会在 normal regularization 启动后造成点数和显存快速膨胀，因此最终将 densification 截止提前到 8000。未截断的失败预跑不参与最终指标，其 `*_uncapped_failed*` 目录和日志已在确认无用后删除。
 
 ## 5. 训练配置
 

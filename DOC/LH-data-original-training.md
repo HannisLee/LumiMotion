@@ -443,7 +443,7 @@ python -m scripts.train_stage1 \
 
 这三项是当前固定单相机数据采用的稳定性设置。使用仓库默认的 `opacity_reset_interval=3000` 时，实测在 iteration 3000 重置 opacity 后，iteration 3100 的 densify/prune 会把全部 Gaussian 裁掉，随后 rasterizer backward 因 SH 输入变成 `[0, 16, 3]` 而失败。禁用本次训练区间内的 opacity reset 后，3300 iteration 稳定性测试可以跨过该位置。
 
-首次正式运行仍沿用论文脚本的 `densify_until_iter=20000`，但该固定单目数据在 iteration 10000 后出现点数膨胀：cat 从 iteration 5000 的约 19.8k 增长至 325.8k，随后两个场景的显存快速升至 18-31 GB 且仍持续增长。最终运行因此在 normal regularization 启动前将 densification 截止设为 8000。失败运行和日志保留在 `*_uncapped_failed*`，不用于最终指标。
+首次正式运行仍沿用论文脚本的 `densify_until_iter=20000`，但该固定单目数据在 iteration 10000 后出现点数膨胀：cat 从 iteration 5000 的约 19.8k 增长至 325.8k，随后两个场景的显存快速升至 18-31 GB 且仍持续增长。最终运行因此在 normal regularization 启动前将 densification 截止设为 8000。失败预跑不用于最终指标，其 `*_uncapped_failed*` 目录和日志已在确认无用后删除。
 
 ### 9.1 Cat
 
