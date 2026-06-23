@@ -45,7 +45,7 @@ declare -A CONFIGS=(
   ["goldenbay_damwall|mouse"]="w0.005_lossxyz0.001"
 )
 
-OUTPUT_BASE="outputs_sanity_moresep"
+OUTPUT_BASE="output/sanity_moresep"
 
 for KEY in "${!CONFIGS[@]}"; do
     COMBO="${KEY%%|*}"

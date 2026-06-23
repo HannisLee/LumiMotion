@@ -57,6 +57,13 @@ python -m scripts.train_stage2 ...
 
 除非已确认导入路径不会出问题，不要优先使用 `python scripts/foo.py`。
 
+### 输出目录约定
+
+- 所有训练、评估、渲染、日志、checkpoint 和 smoke test 输出必须放在仓库根目录的 `output/` 下。
+- `--model_path` 应使用 `output/<experiment>/...`，脚本中的输出根目录也必须以 `output/` 开头。
+- 不要在仓库根目录新建 `outputs_*`、`results_*` 或其他平行实验输出目录。
+- 数据转换产物仍放在对应数据集目录；只有模型和实验运行产物遵循本约定。
+
 ## 修改原则
 
 - 先读现有调用链，再改代码。
