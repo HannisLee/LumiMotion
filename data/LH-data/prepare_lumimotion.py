@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Convert LH captures into the Blender-style format used by LumiMotion Stage 1."""
+"""Convert LH-data/origin scenes into LumiMotion datasets under LH-data/transfer."""
 
 from __future__ import annotations
 
@@ -19,23 +19,38 @@ IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg"}
 
 
 def parse_args() -> argparse.Namespace:
-    script_root = Path(__file__).resolve().parent
+    lh_root = Path(__file__).resolve().parent
     parser = argparse.ArgumentParser(
         description=(
-            "Convert one or more LH-data scenes to LumiMotion's Blender transforms format. "
-            "With no scene arguments, every direct child containing camera.json is converted."
+            "Convert LH-data/origin scenes to LumiMotion's Blender transforms format under "
+            "LH-data/transfer. With no scene arguments, every valid origin scene is converted."
         )
     )
     parser.add_argument(
         "scenes",
         nargs="*",
         type=Path,
-        help="Scene directories. Relative paths are resolved from the current directory.",
+        help=(
+            "Scene names under --origin-root or explicit scene directories. "
+            "With no values, all direct children of --origin-root are converted."
+        ),
+    )
+    parser.add_argument(
+        "--origin-root",
+        type=Path,
+        default=lh_root / "origin",
+        help="Directory containing original scene folders (default: %(default)s).",
+    )
+    parser.add_argument(
+        "--transfer-root",
+        type=Path,
+        default=lh_root / "transfer",
+        help="Directory receiving converted scene folders (default: %(default)s).",
     )
     parser.add_argument(
         "--output-name",
-        default="lumimotion_original",
-        help="Generated directory name inside each scene (default: %(default)s).",
+        default=None,
+        help="Override the target scene folder name; valid only when converting one scene.",
     )
     parser.add_argument(
         "--test-stride",
@@ -79,12 +94,31 @@ def parse_args() -> argparse.Namespace:
     )
     args = parser.parse_args()
 
+    args.origin_root = args.origin_root.expanduser().resolve()
+    args.transfer_root = args.transfer_root.expanduser().resolve()
+    if not args.origin_root.is_dir():
+        parser.error(f"--origin-root does not exist: {args.origin_root}")
+
     if not args.scenes:
         args.scenes = sorted(
-            path for path in script_root.iterdir() if path.is_dir() and (path / "camera.json").is_file()
+            path
+            for path in args.origin_root.iterdir()
+            if path.is_dir() and (path / "camera.json").is_file()
         )
+    else:
+        resolved_scenes = []
+        for value in args.scenes:
+            candidate = value.expanduser()
+            if not candidate.is_absolute() and not candidate.exists():
+                candidate = args.origin_root / candidate
+            resolved_scenes.append(candidate.resolve())
+        args.scenes = resolved_scenes
     if not args.scenes:
-        parser.error(f"No scenes containing camera.json were found under {script_root}.")
+        parser.error(f"No scenes containing camera.json were found under {args.origin_root}.")
+    if args.output_name is not None and len(args.scenes) != 1:
+        parser.error("--output-name can only be used when converting exactly one scene.")
+    if args.output_name is not None and Path(args.output_name).name != args.output_name:
+        parser.error("--output-name must be a single directory name, not a path.")
     if args.test_stride < 0:
         parser.error("--test-stride must be non-negative.")
     if not 0 <= args.background_threshold <= 255:
@@ -281,7 +315,10 @@ def convert_scene(scene_arg: Path, args: argparse.Namespace) -> dict:
     if args.validate_only:
         return summary
 
-    output_root = scene / args.output_name
+    output_name = args.output_name or scene.name
+    output_root = (args.transfer_root / output_name).resolve()
+    if output_root == scene or scene in output_root.parents:
+        raise ValueError(f"Transfer output must not be inside the origin scene: {output_root}")
     images_root = output_root / "images"
     if output_root.exists() and any(output_root.iterdir()) and not args.overwrite:
         raise ValueError(f"Output is not empty: {output_root}. Pass --overwrite to regenerate it.")

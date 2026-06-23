@@ -1,16 +1,21 @@
 # LH 数据集转换、两阶段训练、评测与渲染
 
-本文档总结如何将 `/home/han.li/reproduce/LumiMotion/data/LH-data` 中的两个场景转换为 LumiMotion 可读取的数据，完成 Stage 1、Stage 2 训练，并进行评测、材质渲染和指定相机视角渲染。
+本文档总结如何将 `/home/han.li/reproduce/LumiMotion/data/LH-data/origin` 中的原始场景转换到 `data/LH-data/transfer`，完成 LumiMotion Stage 1、Stage 2 训练，并进行评测、材质渲染和指定相机视角渲染。
 
 适用场景：
 
-- `cat`
-- `rubber_duck_toy_dataset`
+- `brass_vase`
+- `concrete_cat`
+- `garden_gnome`
+- `rubber_duck_toy`
+
+下文用 `concrete_cat` 和 `rubber_duck_toy` 作为命令示例。历史实验输出中的 `cat_baseline` 对应当前 `concrete_cat`，`rubber_duck_baseline` 对应当前 `rubber_duck_toy`。
 
 完整实验指标与对比图见：
 
 - `DOC/LH-data-two-stage-results.md`
-- `DOC/LH-data-original-training.md`
+
+`DOC/LH-data-original-training.md` 保留了迁移前的历史目录命令；新实验应以本文档的 `origin/` / `transfer/` 命令为准。
 
 ## 1. 环境与输出约定
 
@@ -47,7 +52,7 @@ output/LH-original/cat_baseline_mlp
 每个场景原始目录为：
 
 ```text
-data/LH-data/<scene>/
+data/LH-data/origin/<scene>/
 ├── image/             # 120 帧带真实光照的 RGB/RGBA 图像
 ├── albedo/            # 120 帧 GT albedo PNG
 ├── normal_exr/        # 120 帧 GT normal EXR
@@ -56,7 +61,7 @@ data/LH-data/<scene>/
 └── object_pose.json   # 每帧物体位姿
 ```
 
-两个场景均为：
+当前四个场景均为：
 
 - 120 帧。
 - 原始分辨率 `1280x720`。
@@ -80,7 +85,7 @@ data/LH-data/<scene>/
 - GT normal EXR。
 - GT albedo RGB。
 
-本仓库的 Stage 2 评测脚本会额外读取父目录中的 GT albedo，用于材质定量评测，但 GT albedo 不参与训练。
+本仓库的 Stage 2 评测脚本会从转换数据的 `dataset_manifest.json` 定位 `origin/<scene>/albedo`，用于材质定量评测，但 GT albedo 不参与训练。
 
 ## 3. 数据集转换脚本
 
@@ -88,6 +93,17 @@ data/LH-data/<scene>/
 
 ```text
 data/LH-data/prepare_lumimotion.py
+```
+
+`origin/` 是只读的原始数据区，脚本不会在其中写入训练文件。`transfer/` 是可重新生成的 LumiMotion 数据区。两个目录的典型关系是：
+
+```text
+data/LH-data/
+├── origin/
+│   └── <scene>/       # 原始数据，不修改
+├── transfer/
+│   └── <scene>/       # 转换结果，作为 --source_path
+└── prepare_lumimotion.py
 ```
 
 该脚本会：
@@ -107,11 +123,13 @@ data/LH-data/prepare_lumimotion.py
 python data/LH-data/prepare_lumimotion.py --validate-only
 ```
 
-预期结果：
+当前四个场景的预期结果均为 120 帧、105 个 train 帧、15 个 test 帧和 `1280x720`：
 
 ```text
-cat: 120 frames, 105 train, 15 test, 1280x720
-rubber_duck_toy_dataset: 120 frames, 105 train, 15 test, 1280x720
+brass_vase: 120 frames, 105 train, 15 test, 1280x720
+concrete_cat: 120 frames, 105 train, 15 test, 1280x720
+garden_gnome: 120 frames, 105 train, 15 test, 1280x720
+rubber_duck_toy: 120 frames, 105 train, 15 test, 1280x720
 ```
 
 ### 3.2 转换全部场景
@@ -120,12 +138,19 @@ rubber_duck_toy_dataset: 120 frames, 105 train, 15 test, 1280x720
 python data/LH-data/prepare_lumimotion.py
 ```
 
-不指定场景时，脚本自动扫描 `data/LH-data` 下包含 `camera.json` 的直接子目录。
+不指定场景时，脚本自动扫描 `data/LH-data/origin` 下包含 `camera.json` 的直接子目录，并分别输出到 `data/LH-data/transfer/<scene>`。
 
 ### 3.3 转换单个场景
 
 ```bash
-python data/LH-data/prepare_lumimotion.py data/LH-data/cat
+python data/LH-data/prepare_lumimotion.py concrete_cat
+```
+
+也可以传入完整原始场景路径：
+
+```bash
+python data/LH-data/prepare_lumimotion.py \
+  data/LH-data/origin/concrete_cat
 ```
 
 ### 3.4 已有转换结果时重新生成
@@ -136,19 +161,22 @@ python data/LH-data/prepare_lumimotion.py --overwrite
 
 ### 3.5 使用 albedo alpha 生成 mask
 
-默认使用 RGB 恒定背景生成 mask。若要对照使用 albedo alpha：
+默认使用 RGB 恒定背景生成 mask，这是当前 LH 数据的推荐方式。只有 albedo PNG 的 alpha 通道确实是物体 mask 时，才使用：
 
 ```bash
 python data/LH-data/prepare_lumimotion.py \
+  concrete_cat \
   --mask-source albedo-alpha \
-  --output-name lumimotion_original_albedo_mask
+  --output-name concrete_cat_albedo_mask
 ```
 
 常用参数：
 
 | 参数 | 默认值 | 说明 |
 | --- | --- | --- |
-| `--output-name` | `lumimotion_original` | 每个场景内的转换输出目录名 |
+| `--origin-root` | `data/LH-data/origin` | 原始场景根目录 |
+| `--transfer-root` | `data/LH-data/transfer` | 转换结果根目录 |
+| `--output-name` | 原场景名 | 单场景转换时覆盖目标目录名 |
 | `--test-stride` | `8` | 每第 N 帧作为测试帧，0 表示不划分测试集 |
 | `--mask-source` | `image-background` | mask 来源，可选 RGB 背景、albedo alpha、image alpha |
 | `--background-threshold` | `1` | 与背景色的最大通道差阈值 |
@@ -159,10 +187,10 @@ python data/LH-data/prepare_lumimotion.py \
 
 ## 4. 转换后目录含义
 
-以 cat 为例：
+以 `concrete_cat` 为例：
 
 ```text
-data/LH-data/cat/lumimotion_original/
+data/LH-data/transfer/concrete_cat/
 ├── images/
 │   ├── frame_0001.png
 │   ├── ...
@@ -170,7 +198,7 @@ data/LH-data/cat/lumimotion_original/
 ├── transforms_train.json
 ├── transforms_test.json
 ├── dataset_manifest.json
-└── points3d.ply
+└── points3d.ply             # 首次训练加载后才会生成
 ```
 
 ### 4.1 `images/`
@@ -213,12 +241,14 @@ data/LH-data/cat/lumimotion_original/
 - 每帧前景像素数。
 - 相机和原始 albedo、normal、light、pose 数据的位置。
 
-该文件主要用于追踪转换过程，不直接参与训练。
+该文件主要用于追踪转换过程，不直接参与训练。本分支的 Stage 2 评测脚本会额外读取其中的 `source_metadata.albedo_directory`，以便在 `origin/` 和 `transfer/` 分离后仍能找到 GT albedo。
 
 ### 4.5 `points3d.ply`
 
 - 原始数据没有 COLMAP 点云。
-- LumiMotion 第一次加载时会随机生成初始点云并保存为 `points3d.ply`。
+- 转换脚本不会生成 `points3d.ply`。
+- LumiMotion 第一次训练加载该转换目录时，`scene/dataset_readers.py` 的 Blender loader 会在 `[-1.3, 1.3]^3` 范围内随机生成 100,000 个初始点，同时生成随机初始颜色，然后保存为 `points3d.ply`。
+- 该点云不是从 RGB、normal EXR、albedo 或 `object_pose.json` 重建得到的，也不是转换脚本伪造的真实几何。
 - 后续训练复用该初始点云，保证转换目录结构完整。
 
 ## 5. Stage 1：几何与动态外观训练
@@ -242,7 +272,7 @@ densify_until_iter      = 8000
 
 ```bash
 CUDA_VISIBLE_DEVICES=0 python -m scripts.train_stage1 \
-  --source_path data/LH-data/cat/lumimotion_original \
+  --source_path data/LH-data/transfer/concrete_cat \
   --model_path output/LH-original/cat_baseline \
   --train_light_folder images \
   --is_blender --eval --gt_alpha_mask_as_scene_mask \
@@ -266,7 +296,7 @@ CUDA_VISIBLE_DEVICES=0 python -m scripts.train_stage1 \
 
 ```bash
 CUDA_VISIBLE_DEVICES=1 python -m scripts.train_stage1 \
-  --source_path data/LH-data/rubber_duck_toy_dataset/lumimotion_original \
+  --source_path data/LH-data/transfer/rubber_duck_toy \
   --model_path output/LH-original/rubber_duck_baseline \
   --train_light_folder images \
   --is_blender --eval --gt_alpha_mask_as_scene_mask \
@@ -312,7 +342,7 @@ Stage 2 主要优化：
 
 ```bash
 CUDA_VISIBLE_DEVICES=0 python -m scripts.train_stage2 \
-  --source_path data/LH-data/cat/lumimotion_original \
+  --source_path data/LH-data/transfer/concrete_cat \
   --model_path output/LH-original/cat_baseline \
   --train_light_folder images \
   --is_blender --eval --gt_alpha_mask_as_scene_mask \
@@ -331,7 +361,7 @@ CUDA_VISIBLE_DEVICES=0 python -m scripts.train_stage2 \
 
 ```bash
 CUDA_VISIBLE_DEVICES=1 python -m scripts.train_stage2 \
-  --source_path data/LH-data/rubber_duck_toy_dataset/lumimotion_original \
+  --source_path data/LH-data/transfer/rubber_duck_toy \
   --model_path output/LH-original/rubber_duck_baseline \
   --train_light_folder images \
   --is_blender --eval --gt_alpha_mask_as_scene_mask \
@@ -365,7 +395,7 @@ Cat：
 
 ```bash
 CUDA_VISIBLE_DEVICES=0 python -m scripts.eval_stage1_dynamic \
-  --source_path data/LH-data/cat/lumimotion_original \
+  --source_path data/LH-data/transfer/concrete_cat \
   --model_path output/LH-original/cat_baseline \
   --train_light_folder images \
   --is_blender --eval --resolution 2 \
@@ -375,7 +405,7 @@ CUDA_VISIBLE_DEVICES=0 python -m scripts.eval_stage1_dynamic \
 Duck 只需替换：
 
 ```text
---source_path data/LH-data/rubber_duck_toy_dataset/lumimotion_original
+--source_path data/LH-data/transfer/rubber_duck_toy
 --model_path output/LH-original/rubber_duck_baseline
 ```
 
@@ -403,7 +433,7 @@ Cat：
 
 ```bash
 CUDA_VISIBLE_DEVICES=0 python -m scripts.eval_stage2_dynamic \
-  --source_path data/LH-data/cat/lumimotion_original \
+  --source_path data/LH-data/transfer/concrete_cat \
   --model_path output/LH-original/cat_baseline \
   --train_light_folder images \
   --is_blender --eval --resolution 2 \
@@ -427,10 +457,10 @@ CUDA_VISIBLE_DEVICES=0 python -m scripts.eval_stage2_dynamic \
 - 每帧指标。
 - albedo linear RGB per-channel median scale。
 
-Albedo GT 从转换目录的父目录读取：
+Albedo GT 路径由 `dataset_manifest.json` 中的 `source_metadata.albedo_directory` 提供：
 
 ```text
-data/LH-data/<scene>/albedo/albedo_XXXX.png
+data/LH-data/origin/<scene>/albedo/albedo_XXXX.png
 ```
 
 ### 7.3 当前评测的含义
@@ -453,7 +483,7 @@ data/LH-data/<scene>/albedo/albedo_XXXX.png
 
 ```bash
 CUDA_VISIBLE_DEVICES=0 python -m scripts.render_stage1_insights \
-  --source_path data/LH-data/cat/lumimotion_original \
+  --source_path data/LH-data/transfer/concrete_cat \
   --model_path output/LH-original/cat_baseline \
   --train_light_folder images \
   --is_blender --eval --resolution 2 \
@@ -472,7 +502,7 @@ CUDA_VISIBLE_DEVICES=0 python -m scripts.render_stage1_insights \
 
 ```bash
 CUDA_VISIBLE_DEVICES=0 python -m scripts.render_materials \
-  --source_path data/LH-data/cat/lumimotion_original \
+  --source_path data/LH-data/transfer/concrete_cat \
   --model_path output/LH-original/cat_baseline \
   --train_light_folder images \
   --is_blender --eval --resolution 2 \
@@ -503,18 +533,18 @@ scene.getTestCameras()[:1]
 
 ### 9.2 创建渲染专用数据目录
 
-不要修改训练使用的 `lumimotion_original`。复制一份：
+不要修改训练使用的 `transfer/concrete_cat`。在 `transfer` 下复制一份渲染专用数据：
 
 ```bash
 cp -a \
-  data/LH-data/cat/lumimotion_original \
-  data/LH-data/cat/lumimotion_novel_view
+  data/LH-data/transfer/concrete_cat \
+  data/LH-data/transfer/concrete_cat_view01
 ```
 
 编辑：
 
 ```text
-data/LH-data/cat/lumimotion_novel_view/transforms_test.json
+data/LH-data/transfer/concrete_cat_view01/transforms_test.json
 ```
 
 要求：
@@ -560,7 +590,7 @@ import json
 from pathlib import Path
 import numpy as np
 
-path = Path("data/LH-data/cat/lumimotion_novel_view/transforms_test.json")
+path = Path("data/LH-data/transfer/concrete_cat_view01/transforms_test.json")
 data = json.loads(path.read_text())
 
 # 示例：从物体另一侧观察原点。请按实际场景修改。
@@ -601,7 +631,7 @@ cp -a \
 
 ```bash
 CUDA_VISIBLE_DEVICES=0 python -m scripts.render_stage1_insights \
-  --source_path data/LH-data/cat/lumimotion_novel_view \
+  --source_path data/LH-data/transfer/concrete_cat_view01 \
   --model_path output/LH-novel-view/cat_view01 \
   --train_light_folder images \
   --is_blender --eval --resolution 2 \
@@ -638,7 +668,7 @@ PY
 
 ```bash
 CUDA_VISIBLE_DEVICES=0 python -m scripts.render_relight_with_hdr \
-  --source_path data/LH-data/cat/lumimotion_novel_view \
+  --source_path data/LH-data/transfer/concrete_cat_view01 \
   --model_path output/LH-novel-view/cat_view01 \
   --train_light_folder images \
   --is_blender --eval --resolution 2 \

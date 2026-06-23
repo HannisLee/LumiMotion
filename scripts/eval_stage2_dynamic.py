@@ -69,7 +69,14 @@ def evaluate(
     per_frame = []
     metric_names = ["l1", "psnr", "ssim", "lpips_vgg", "ms_ssim", "lpips_alex"]
     bvh_built = False
-    albedo_root = Path(dataset.source_path).parent / "albedo"
+    source_root = Path(dataset.source_path)
+    albedo_root = source_root.parent / "albedo"
+    manifest_path = source_root / "dataset_manifest.json"
+    if manifest_path.is_file():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest_albedo = manifest.get("source_metadata", {}).get("albedo_directory")
+        if manifest_albedo:
+            albedo_root = Path(manifest_albedo).expanduser()
     albedo_records = []
 
     with torch.no_grad():
