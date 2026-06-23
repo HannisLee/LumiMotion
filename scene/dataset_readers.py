@@ -159,6 +159,7 @@ def readCamerasFromTransforms(path, transformsfile, train_light, white_backgroun
     with open(os.path.join(path, transformsfile)) as json_file:
         contents = json.load(json_file)
         fovx = contents["camera_angle_x"]
+        fovy_from_metadata = contents.get("camera_angle_y")
 
         frames = contents["frames"]
         frames = sorted(frames, key=lambda x: int(os.path.basename(x['file_path']).split('.')[0].split('_')[-1]))
@@ -198,11 +199,16 @@ def readCamerasFromTransforms(path, transformsfile, train_light, white_backgroun
             
             arr_train_light = np.concatenate([arr_train_light, mask], axis=-1)
 
-            image_train_light = Image.fromarray(np.array(arr_train_light * 255.0, dtype=np.byte), "RGBA" if arr_train_light.shape[-1] == 4 else "RGB")
+            image_train_light = Image.fromarray(np.array(arr_train_light * 255.0, dtype=np.uint8), "RGBA" if arr_train_light.shape[-1] == 4 else "RGB")
 
             fovy = focal2fov(fov2focal(fovx, image_train_light.size[0]), image_train_light.size[1])
-            FovY = fovx
-            FovX = fovy
+            if fovy_from_metadata is None:
+                # Preserve the legacy LumiMotion convention for existing datasets.
+                FovY = fovx
+                FovX = fovy
+            else:
+                FovX = fovx
+                FovY = fovy_from_metadata
 
             cam_infos.append(CameraInfo(uid=idx, R=R, T=T, FovY=FovY, FovX=FovX, 
                                         image_train_light=image_train_light, image_path_train_light=image_path_train_light, image_name_train_light=image_name_train_light, 
@@ -231,6 +237,14 @@ def readNerfSyntheticInfo(path, white_background, eval, extension=".png", no_bg=
         test_cam_infos = test_cam_infos
 
     nerf_normalization = getNerfppNorm(train_cam_infos)
+    if nerf_normalization["radius"] <= np.finfo(np.float32).eps:
+        with open(os.path.join(path, "transforms_train.json")) as json_file:
+            train_metadata = json.load(json_file)
+        fallback_radius = float(train_metadata.get("camera_extent", 1.0))
+        if fallback_radius <= 0:
+            raise ValueError("camera_extent must be positive for a fixed-camera Blender dataset.")
+        print(f"Fixed-camera dataset detected; using camera_extent={fallback_radius:.6f}.")
+        nerf_normalization["radius"] = fallback_radius
     # nerf_normalization = {'translation': np.zeros([3], dtype=np.float32), 'radius': 1.}
 
     ply_path = os.path.join(path, "points3d.ply")
