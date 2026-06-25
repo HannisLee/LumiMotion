@@ -496,6 +496,7 @@ class GaussianModel:
         if photometric_albedo is not None:
             self._photometric_albedo = nn.Parameter(torch.tensor(photometric_albedo, dtype=torch.float, device="cuda").requires_grad_(True))
             self._photometric_albedo_init = torch.tensor(photometric_albedo_init, dtype=torch.float, device="cuda")
+            self.use_photometric_albedo = True
 
         self.active_sh_degree = self.max_sh_degree
 

@@ -14,14 +14,16 @@ from tqdm import tqdm
 from arguments import ModelParams, PipelineParams, get_combined_args
 from gaussian_renderer import render
 from scene import DeformModel, GaussianModel, Scene
+from scene.photometric_lambertian import PhotometricLambertianRenderer
 from utils.general_utils import safe_state
 from utils.image_utils import alex_lpips, psnr, ssim as ssim_metric
 
 
 def evaluate(dataset: ModelParams, pipeline: PipelineParams, load_iter: int) -> None:
     dataset.eval = True
-    if getattr(pipeline, "render_mode", "original") != "original":
-        raise ValueError("eval_stage1_dynamic.py currently evaluates render_mode='original' only.")
+    render_mode = getattr(pipeline, "render_mode", "original")
+    if render_mode not in ["original", "photometric_lambertian"]:
+        raise ValueError(f"Unsupported render_mode '{render_mode}'.")
 
     deform = DeformModel(
         deform_type=dataset.deform_type,
@@ -37,6 +39,13 @@ def evaluate(dataset: ModelParams, pipeline: PipelineParams, load_iter: int) -> 
         fea_dim=dataset.hyper_dim,
     )
     scene = Scene(dataset, gaussians, load_iteration=load_iter)
+    photometric_renderer = None
+    if render_mode == "photometric_lambertian":
+        gaussians.enable_photometric_albedo()
+        photometric_renderer = PhotometricLambertianRenderer(scene.all_timesteps, device="cuda")
+        photometric_renderer.load_weights(dataset.model_path, scene.loaded_iter)
+        photometric_renderer.eval()
+
     cameras = scene.getTestCameras()
     if not cameras:
         raise RuntimeError("No test cameras found. Run with --eval and provide transforms_test.json.")
@@ -77,6 +86,7 @@ def evaluate(dataset: ModelParams, pipeline: PipelineParams, load_iter: int) -> 
                 d_values["d_scaling"],
                 d_opacity=d_values["d_opacity"],
                 d_color=d_values["d_color"],
+                photometric_renderer=photometric_renderer,
             )
             prediction = render_pkg["render"].clamp(0.0, 1.0)
             ground_truth = view.original_image_train_light.cuda().clamp(0.0, 1.0)
@@ -88,6 +98,11 @@ def evaluate(dataset: ModelParams, pipeline: PipelineParams, load_iter: int) -> 
             ground_truth = ground_truth * mask + background[:, None, None] * (1.0 - mask)
             error = (prediction - ground_truth).abs()
 
+            if render_mode == "photometric_lambertian":
+                albedo_color = gaussians.get_photometric_albedo
+            else:
+                albedo_color = gaussians.get_albedo
+
             albedo_pkg = render(
                 view,
                 gaussians,
@@ -98,7 +113,8 @@ def evaluate(dataset: ModelParams, pipeline: PipelineParams, load_iter: int) -> 
                 d_values["d_scaling"],
                 d_opacity=d_values["d_opacity"],
                 d_color=None,
-                override_color=gaussians.get_albedo,
+                override_color=albedo_color,
+                photometric_renderer=photometric_renderer,
             )
             normal = (render_pkg["rend_normal_view"] * 0.5 + 0.5).clamp(0.0, 1.0)
 
@@ -141,6 +157,7 @@ def evaluate(dataset: ModelParams, pipeline: PipelineParams, load_iter: int) -> 
     }
     results = {
         "stage": 1,
+        "render_mode": render_mode,
         "iteration": scene.loaded_iter,
         "test_frame_count": len(per_frame),
         "gaussian_count": int(gaussians.get_xyz.shape[0]),
