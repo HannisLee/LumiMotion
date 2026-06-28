@@ -20,12 +20,6 @@
 - `CLAUDE.md`：Claude Code 相关说明。如与本文件冲突，优先遵循用户当前指令和 `AGENTS.md`。
 
 ## Git 约定
-
-通常约定：
-
-- `origin`：用户自己的 GitHub 私有仓库。
-- `upstream`：原作者仓库。
-
 工作前先查看：
 
 ```bash

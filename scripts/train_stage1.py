@@ -94,6 +94,7 @@ class Trainer:
         self.iteration = 1 if self.scene.loaded_iter is None else self.scene.loaded_iter + 1
 
         self.viewpoint_stack = None
+        self.initial_photometric_saved = False
         self.ema_loss_for_log = 0.0
         self.best_psnr = 0.0
         self.best_ssim = 0.0
@@ -109,8 +110,16 @@ class Trainer:
     # no gui mode
     def train(self, iters=5000):
         if iters >= self.iteration:
+            self.save_initial_photometric_weights()
             while self.iteration <= iters:
                 self.train_step()
+
+    def save_initial_photometric_weights(self):
+        if self.initial_photometric_saved or self.photometric_renderer is None:
+            return
+        print("\n[ITER {}] Saving initial photometric weights".format(self.iteration))
+        self.photometric_renderer.save_weights(self.args.model_path, self.iteration)
+        self.initial_photometric_saved = True
     
     def train_step(self):
         self.iter_start.record()
@@ -453,6 +462,14 @@ def prepare_output_and_logger(args):
     return tb_writer
 
 
+def append_missing_iterations(iterations, required_iterations):
+    out = list(iterations)
+    for iteration in required_iterations:
+        if iteration not in out:
+            out.append(iteration)
+    return out
+
+
 if __name__ == "__main__":
     # Set up command line argument parser
     parser = ArgumentParser(description="Training script parameters")
@@ -470,8 +487,11 @@ if __name__ == "__main__":
     parser.add_argument("--load_iter", type=int, default=None)
 
     args = parser.parse_args(sys.argv[1:])
-    args.save_iterations.append(args.iterations)
-    args.test_iterations.append(args.iterations)
+    # Always keep iteration 1 as a checkpoint. In photometric mode the
+    # corresponding photometric.pth is the initialized light/albedo state before
+    # any optimizer update, which is useful for light trajectory diagnostics.
+    args.save_iterations = append_missing_iterations(args.save_iterations, [1, args.iterations])
+    args.test_iterations = append_missing_iterations(args.test_iterations, [args.iterations])
 
 
     if not args.model_path.endswith(args.deform_type):
