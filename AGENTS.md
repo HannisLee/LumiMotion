@@ -64,6 +64,21 @@ python -m scripts.train_stage2 ...
 - 不要在仓库根目录新建 `outputs_*`、`results_*` 或其他平行实验输出目录。
 - 数据转换产物仍放在对应数据集目录；只有模型和实验运行产物遵循本约定。
 
+### Stage1 光源方向导出
+
+`photometric_lambertian` 的光源 checkpoint 在 `output/<exp>/photometric/iteration_<iter>/photometric.pth`。V1 使用 `raw_light_dir`，V2 可能使用 `light_model._raw_light_dir_table` 或 B-spline `light_model._light_ctrl`；渲染实际使用单位化方向。导出六列 CSV：
+
+```bash
+python -m LH_Utils.export_light_directions --model_path output/<exp> --iteration 35000
+```
+
+再用 CSV 解耦画图；如有原始 `lights.json`，传入后会把 `light_pos_world` 相对默认目标点 `[0,0,0]` 单位化并作为 GT 对比：
+
+```bash
+python -m LH_Utils.plot_light_polar --csv output/<exp>/light_directions.csv --lights_json data/LH-data/static/<scene>/lights.json
+python -m LH_Utils.plot_light_timeseries --csv output/<exp>/light_directions.csv --lights_json data/LH-data/static/<scene>/lights.json
+```
+
 ## 修改原则
 
 - 先读现有调用链，再改代码。

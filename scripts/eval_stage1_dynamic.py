@@ -21,8 +21,11 @@ from utils.image_utils import alex_lpips, psnr, ssim as ssim_metric
 
 def evaluate(dataset: ModelParams, pipeline: PipelineParams, load_iter: int) -> None:
     dataset.eval = True
-    render_mode = getattr(pipeline, "render_mode", "original")
-    if render_mode not in ["original", "photometric_lambertian"]:
+    render_mode = getattr(pipeline, "render_mode", "original_sh")
+    if render_mode == "original":
+        render_mode = "original_sh"
+    pipeline.render_mode = render_mode
+    if render_mode not in ["original_sh", "photometric_lambertian"]:
         raise ValueError(f"Unsupported render_mode '{render_mode}'.")
 
     deform = DeformModel(
@@ -42,7 +45,7 @@ def evaluate(dataset: ModelParams, pipeline: PipelineParams, load_iter: int) -> 
     photometric_renderer = None
     if render_mode == "photometric_lambertian":
         gaussians.enable_photometric_albedo()
-        photometric_renderer = PhotometricLambertianRenderer(scene.all_timesteps, device="cuda")
+        photometric_renderer = PhotometricLambertianRenderer.from_args(scene.all_timesteps, pipeline, device="cuda")
         photometric_renderer.load_weights(dataset.model_path, scene.loaded_iter)
         photometric_renderer.eval()
 
@@ -183,6 +186,7 @@ if __name__ == "__main__":
     model = ModelParams(parser)
     pipeline = PipelineParams(parser)
     parser.add_argument("--load_iter", type=int, default=-1)
+    parser.add_argument("--deform-type", dest="deform_type", type=str, default=None)
     parser.add_argument("--quiet", action="store_true")
     args = get_combined_args(parser)
 

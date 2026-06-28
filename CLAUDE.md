@@ -33,6 +33,21 @@ python -m scripts.train_stage1 --source_path ... --model_path ...
 
 本仓库没有测试套件 / lint 配置。`bash_scripts/*.sh` 是用于复现论文结果的规范流水线 —— 在自创命令之前,请先阅读它们以了解确切的标志组合。
 
+### Stage1 光源方向导出
+
+`photometric_lambertian` 的光源 checkpoint 在 `output/<exp>/photometric/iteration_<iter>/photometric.pth`。V1 使用 `raw_light_dir`，V2 可能使用 `light_model._raw_light_dir_table` 或 B-spline `light_model._light_ctrl`；渲染实际使用单位化方向。导出六列 CSV：
+
+```bash
+python -m LH_Utils.export_light_directions --model_path output/<exp> --iteration 35000
+```
+
+再用 CSV 解耦画图；如有原始 `lights.json`，传入后会把 `light_pos_world` 相对默认目标点 `[0,0,0]` 单位化并作为 GT 对比：
+
+```bash
+python -m LH_Utils.plot_light_polar --csv output/<exp>/light_directions.csv --lights_json data/LH-data/static/<scene>/lights.json
+python -m LH_Utils.plot_light_timeseries --csv output/<exp>/light_directions.csv --lights_json data/LH-data/static/<scene>/lights.json
+```
+
 ## 两阶段流水线
 
 每个场景分两阶段训练,写入**同一个** `--model_path`。Stage 2 通过 `--load_iter` 加载 Stage 1 的检查点。

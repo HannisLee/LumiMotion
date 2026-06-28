@@ -18,6 +18,7 @@ import numpy as np
 import cv2
 from utils.sh_utils import eval_sh, SH2RGB, RGB2SH
 from utils.general_utils import build_rotation
+from scene.photometric_lambertian import get_gaussian_normal
 
 def standardize_quaternion(quaternions: torch.Tensor) -> torch.Tensor:
     return torch.where(quaternions[..., 0:1] < 0, -quaternions, quaternions)
@@ -111,7 +112,9 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
     shs = None
     colors_precomp = None
     photometric_outputs = None
-    render_mode = getattr(pipe, "render_mode", "original")
+    render_mode = getattr(pipe, "render_mode", "original_sh")
+    if render_mode == "original":
+        render_mode = "original_sh"
     if override_color is None and render_mode == "photometric_lambertian":
         if photometric_renderer is None:
             raise ValueError("render_mode='photometric_lambertian' requires photometric_renderer.")
@@ -120,7 +123,7 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
             normal_rotations = pc.get_rotation_bias(d_rotation)
             if d_rotation_bias is not None:
                 normal_rotations = quaternion_multiply(d_rotation_bias, normal_rotations)
-        normal_i_t = build_rotation(normal_rotations)[:, :, 2]
+        normal_i_t = get_gaussian_normal(normal_rotations, photometric_renderer.normal_axis)
         photometric_outputs = photometric_renderer(pc.get_photometric_albedo, normal_i_t, viewpoint_camera.fid)
         colors_precomp = photometric_outputs["color"]
     elif override_color is None:
@@ -249,8 +252,8 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
             "photometric_albedo": pc.get_photometric_albedo,
             "photometric_normal": photometric_outputs["normal"],
             "photometric_light_dir": photometric_outputs["light_dir"],
-            "photometric_light_rgb": photometric_outputs["light_rgb"],
             "photometric_ndotl": photometric_outputs["ndotl"],
+            "photometric_shading": photometric_outputs["shading"],
             "photometric_timestep_idx": photometric_outputs["timestep_idx"],
         })
 

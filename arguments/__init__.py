@@ -82,7 +82,7 @@ class ModelParams(ParamGroup):
 
 class PipelineParams(ParamGroup):
     def __init__(self, parser):
-        self.render_mode = "original"
+        self.render_mode = "original_sh"
         self.convert_SHs_python = False
         self.compute_cov3D_python = False
         self.debug = False
@@ -156,9 +156,37 @@ class OptimizationParams(ParamGroup):
         self.lambda_light_smooth=0.0
         self.lambda_base_color_smooth=0.0
         self.photometric_albedo_lr=0.01
-        self.photometric_light_lr=0.01
+        self.photometric_light_lr=0.001
         self.lambda_photometric_light_smooth=0.0
         self.lambda_photometric_albedo_reg=0.0
+        self.photometric_stage="s1d_joint"
+        self.photometric_light_param="bspline"
+        self.photometric_num_ctrl_points=16
+        self.photometric_init_r_xy=0.8
+        self.photometric_init_z=0.6
+        self.photometric_init_phase=0.0
+        self.photometric_init_direction_sign=1
+        self.photometric_normal_axis="+z"
+        self.photometric_use_hemi_prior=False
+        self.photometric_hemi_axis="0,0,1"
+        self.photometric_hemi_margin=0.0
+        self.photometric_multistart_enabled=False
+        self.photometric_multistart_num_phases=8
+        self.photometric_multistart_try_reverse_direction=False
+        self.photometric_multistart_short_iters=1000
+        self.lambda_photometric_light_smooth1=0.0
+        self.lambda_photometric_light_smooth2=0.0
+        self.lambda_photometric_hemi=0.0
+        self.lambda_photometric_albedo_prior=0.0
+        self.photometric_s1c_light_lr=0.001
+        self.photometric_s1c_albedo_lr=0.0
+        self.photometric_s1d_light_lr=0.0001
+        self.photometric_s1d_albedo_lr=0.001
+        self.photometric_s1d_rotation_lr=0.0001
+        self.photometric_s1d_scaling_lr=0.0001
+        self.photometric_s1d_position_lr=0.0
+        self.photometric_s1d_deformation_lr=0.0
+        self.photometric_s1d_opacity_lr=0.0
 
         super().__init__(parser, "Optimization Parameters")
 

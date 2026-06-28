@@ -36,14 +36,24 @@ except ImportError:
     TENSORBOARD_FOUND = False
 
 
+def normalize_render_mode(render_mode):
+    if render_mode == "original":
+        return "original_sh"
+    return render_mode
+
+
 class Trainer:
-    def __init__(self, args, dataset, opt, pipe, testing_iterations, saving_iterations) -> None:
+    def __init__(self, args, dataset, opt, pipe, testing_iterations, saving_iterations, load_iter=None) -> None:
         self.dataset = dataset
         self.args = args
         self.opt = opt
         self.pipe = pipe
-        self.render_mode = getattr(pipe, "render_mode", "original")
-        if self.render_mode not in ["original", "photometric_lambertian"]:
+        self.photometric_stage = getattr(opt, "photometric_stage", "s1d_joint")
+        self.render_mode = normalize_render_mode(getattr(pipe, "render_mode", "original_sh"))
+        if self.photometric_stage == "s1a_original_warmup":
+            self.render_mode = "original_sh"
+        self.pipe.render_mode = self.render_mode
+        if self.render_mode not in ["original_sh", "photometric_lambertian"]:
             raise ValueError(f"Unsupported render_mode '{self.render_mode}'.")
         self.testing_iterations = testing_iterations
         self.saving_iterations = saving_iterations
@@ -53,27 +63,35 @@ class Trainer:
         self.deform = DeformModel(deform_type=self.dataset.deform_type, is_blender=self.dataset.is_blender, 
                                   hyper_dim=self.dataset.hyper_dim,
                                   pred_color=self.dataset.pred_color)
-        deform_loaded = self.deform.load_weights(dataset.model_path, iteration=None) #was -1
+        deform_loaded = self.deform.load_weights(dataset.model_path, iteration=load_iter) if load_iter is not None else False
         self.deform.train_setting(opt)
 
         gs_fea_dim = self.dataset.hyper_dim
         self.gaussians = GaussianModel(dataset.sh_degree, no_binary_separation=self.dataset.no_binary_separation,
                                        fea_dim=gs_fea_dim)
 
-        self.scene = Scene(dataset, self.gaussians, load_iteration=None) #originally was -1, we always want fresh start
+        self.scene = Scene(dataset, self.gaussians, load_iteration=load_iter)
         if self.render_mode == "photometric_lambertian":
             self.gaussians.enable_photometric_albedo()
-            self.photometric_renderer = PhotometricLambertianRenderer(self.scene.all_timesteps, device="cuda")
+            self.photometric_renderer = PhotometricLambertianRenderer.from_args(self.scene.all_timesteps, opt, device="cuda")
+            if load_iter is not None:
+                photometric_path = os.path.join(
+                    dataset.model_path, "photometric", f"iteration_{self.scene.loaded_iter}", "photometric.pth"
+                )
+                if os.path.isfile(photometric_path):
+                    self.photometric_renderer.load_weights(dataset.model_path, self.scene.loaded_iter)
             self.photometric_renderer.training_setup(opt)
         print(f"Render mode: {self.render_mode}")
+        print(f"Photometric stage: {self.photometric_stage}")
         self.gaussians.training_setup(opt)
+        self.apply_photometric_stage_lrs()
         
         bg_color = [1, 1, 1] if dataset.white_background else [0, 0, 0]
         self.background = torch.tensor(bg_color, dtype=torch.float32, device="cuda")
 
         self.iter_start = torch.cuda.Event(enable_timing=True)
         self.iter_end = torch.cuda.Event(enable_timing=True)
-        self.iteration = 1 if self.scene.loaded_iter is None else self.scene.loaded_iter
+        self.iteration = 1 if self.scene.loaded_iter is None else self.scene.loaded_iter + 1
 
         self.viewpoint_stack = None
         self.ema_loss_for_log = 0.0
@@ -83,14 +101,15 @@ class Trainer:
         self.best_lpips = np.inf
         self.best_alex_lpips = np.inf
         self.best_iteration = 0
-        self.progress_bar = tqdm.tqdm(range(opt.iterations), desc="Training progress")
+        remaining_iterations = max(opt.iterations - self.iteration + 1, 0)
+        self.progress_bar = tqdm.tqdm(range(remaining_iterations), desc="Training progress")
         self.smooth_term = get_linear_noise_func(lr_init=0.1, lr_final=1e-15, lr_delay_mult=0.01, max_steps=20000)       
         self.T_current = 0.5
 
     # no gui mode
     def train(self, iters=5000):
-        if iters > 0:
-            for i in tqdm.trange(iters):
+        if iters >= self.iteration:
+            while self.iteration <= iters:
                 self.train_step()
     
     def train_step(self):
@@ -160,16 +179,34 @@ class Trainer:
         Ll1 = l1_loss(image, gt_image)
         loss_img = (1.0 - self.opt.lambda_dssim) * Ll1 + self.opt.lambda_dssim * (1.0 - ssim(image, gt_image))
         loss = loss_img + normal_loss + dist_loss
-        loss_light_smooth = torch.zeros((), dtype=loss.dtype, device=loss.device)
-        loss_albedo_reg = torch.zeros((), dtype=loss.dtype, device=loss.device)
+        loss_light_smooth1 = torch.zeros((), dtype=loss.dtype, device=loss.device)
+        loss_light_smooth2 = torch.zeros((), dtype=loss.dtype, device=loss.device)
+        loss_hemi = torch.zeros((), dtype=loss.dtype, device=loss.device)
+        loss_albedo_prior = torch.zeros((), dtype=loss.dtype, device=loss.device)
 
         if self.render_mode == "photometric_lambertian":
-            if self.opt.lambda_photometric_light_smooth > 0:
-                loss_light_smooth = self.photometric_renderer.light_smoothness_loss()
-                loss = loss + self.opt.lambda_photometric_light_smooth * loss_light_smooth
-            if self.opt.lambda_photometric_albedo_reg > 0:
-                loss_albedo_reg = self.gaussians.photometric_albedo_reg_loss()
-                loss = loss + self.opt.lambda_photometric_albedo_reg * loss_albedo_reg
+            lambda_smooth1 = max(
+                float(getattr(self.opt, "lambda_photometric_light_smooth1", 0.0)),
+                float(getattr(self.opt, "lambda_photometric_light_smooth", 0.0)),
+            )
+            lambda_albedo_prior = max(
+                float(getattr(self.opt, "lambda_photometric_albedo_prior", 0.0)),
+                float(getattr(self.opt, "lambda_photometric_albedo_reg", 0.0)),
+            )
+            if lambda_smooth1 > 0:
+                loss_light_smooth1 = self.photometric_renderer.light_smoothness_loss(order=1)
+                loss = loss + lambda_smooth1 * loss_light_smooth1
+            if self.opt.lambda_photometric_light_smooth2 > 0:
+                loss_light_smooth2 = self.photometric_renderer.light_smoothness_loss(order=2)
+                loss = loss + self.opt.lambda_photometric_light_smooth2 * loss_light_smooth2
+            if self.opt.lambda_photometric_hemi > 0 and self.opt.photometric_use_hemi_prior:
+                loss_hemi = self.photometric_renderer.hemisphere_loss(
+                    self.opt.photometric_hemi_axis, self.opt.photometric_hemi_margin
+                )
+                loss = loss + self.opt.lambda_photometric_hemi * loss_hemi
+            if lambda_albedo_prior > 0:
+                loss_albedo_prior = self.gaussians.photometric_albedo_reg_loss()
+                loss = loss + lambda_albedo_prior * loss_albedo_prior
 
         #mask loss
         if self.opt.gt_alpha_mask_as_scene_mask and viewpoint_cam.gt_alpha_mask is not None:
@@ -191,7 +228,7 @@ class Trainer:
             
             # d color loss
             d_color_reg_loss_weight = self.opt.d_color_reg_loss_weight
-            if (d_color is not None and torch.is_tensor(d_color)):
+            if self.render_mode != "photometric_lambertian" and (d_color is not None and torch.is_tensor(d_color)):
                 
                 shadow_modulation = d_color[:, :3]
 
@@ -222,7 +259,13 @@ class Trainer:
                 self.progress_bar.update(10)
             if self.iteration == self.opt.iterations:
                 self.progress_bar.close()
-            self.log_photometric_stats(render_pkg_re, loss_light_smooth, loss_albedo_reg)
+            self.log_photometric_stats(
+                render_pkg_re,
+                loss_light_smooth1,
+                loss_light_smooth2,
+                loss_hemi,
+                loss_albedo_prior,
+            )
 
             # Keep track of max radii in image-space for pruning
             if self.gaussians.max_radii2D.shape[0] == 0:
@@ -253,7 +296,11 @@ class Trainer:
                     self.photometric_renderer.save_weights(self.args.model_path, self.iteration)
 
             # Densification
-            if self.iteration < self.opt.densify_until_iter:
+            allow_densification = not (
+                self.render_mode == "photometric_lambertian"
+                and self.photometric_stage == "s1c_light_calib"
+            )
+            if allow_densification and self.iteration < self.opt.densify_until_iter:
                 self.gaussians.add_densification_stats(viewspace_point_tensor, visibility_filter)
 
                 if self.iteration > self.opt.densify_from_iter and self.iteration % self.opt.densification_interval == 0:
@@ -268,6 +315,7 @@ class Trainer:
 
             # Optimizer step
             if self.iteration < self.opt.iterations:
+                self.apply_photometric_stage_lrs()
                 self.gaussians.optimizer.step()
                 self.gaussians.update_learning_rate(self.iteration)
                 self.gaussians.optimizer.zero_grad(set_to_none=True)
@@ -275,34 +323,94 @@ class Trainer:
                 self.deform.optimizer.zero_grad()
                 self.deform.update_learning_rate(self.iteration)
                 if self.photometric_renderer is not None:
+                    self.apply_photometric_stage_lrs()
                     self.photometric_renderer.optimizer.step()
                     self.photometric_renderer.optimizer.zero_grad(set_to_none=True)
+                self.apply_photometric_stage_lrs()
                 
         self.deform.update(max(0, self.iteration - self.opt.warm_up))
 
         self.progress_bar.set_description("Best PSNR={} in Iteration {}, SSIM={}, LPIPS={}, MS-SSIM={}, ALex-LPIPS={}".format('%.5f' % self.best_psnr, self.best_iteration, '%.5f' % self.best_ssim, '%.5f' % self.best_lpips, '%.5f' % self.best_ms_ssim, '%.5f' % self.best_alex_lpips))
         self.iteration += 1
 
-    def log_photometric_stats(self, render_pkg, loss_light_smooth, loss_albedo_reg):
+    def apply_photometric_stage_lrs(self):
+        if self.render_mode != "photometric_lambertian":
+            return
+        if self.gaussians.optimizer is None:
+            return
+
+        if self.photometric_stage == "s1c_light_calib":
+            gaussian_lrs = {
+                "xyz": 0.0,
+                "albedo_dc": 0.0,
+                "albedo_rest": 0.0,
+                "opacity": 0.0,
+                "roughness": 0.0,
+                "scaling": 0.0,
+                "rotation": 0.0,
+                "feature": 0.0,
+                "photometric_albedo": self.opt.photometric_s1c_albedo_lr,
+            }
+            deform_lr = 0.0
+            light_lr = self.opt.photometric_s1c_light_lr
+        elif self.photometric_stage == "s1d_joint":
+            gaussian_lrs = {
+                "xyz": self.opt.photometric_s1d_position_lr,
+                "albedo_dc": 0.0,
+                "albedo_rest": 0.0,
+                "opacity": self.opt.photometric_s1d_opacity_lr,
+                "roughness": 0.0,
+                "scaling": self.opt.photometric_s1d_scaling_lr,
+                "rotation": self.opt.photometric_s1d_rotation_lr,
+                "feature": 0.0,
+                "photometric_albedo": self.opt.photometric_s1d_albedo_lr,
+            }
+            deform_lr = self.opt.photometric_s1d_deformation_lr
+            light_lr = self.opt.photometric_s1d_light_lr
+        else:
+            return
+
+        for group in self.gaussians.optimizer.param_groups:
+            if group["name"] in gaussian_lrs:
+                group["lr"] = float(gaussian_lrs[group["name"]])
+        if self.deform.optimizer is not None:
+            for group in self.deform.optimizer.param_groups:
+                group["lr"] = float(deform_lr)
+        if self.photometric_renderer is not None:
+            self.photometric_renderer.set_light_lr(light_lr)
+
+    def log_photometric_stats(
+        self,
+        render_pkg,
+        loss_light_smooth1,
+        loss_light_smooth2,
+        loss_hemi,
+        loss_albedo_prior,
+    ):
         if self.render_mode != "photometric_lambertian" or self.tb_writer is None:
             return
         if self.iteration == 1:
             self.tb_writer.add_text("photometric/render_mode", self.render_mode, self.iteration)
+            self.tb_writer.add_text("photometric/stage", self.photometric_stage, self.iteration)
         if self.iteration % 10 != 0 and self.iteration not in self.testing_iterations:
             return
 
         light_dir = render_pkg["photometric_light_dir"].detach()
-        light_rgb = render_pkg["photometric_light_rgb"].detach()
+        all_light_dirs = self.photometric_renderer.get_all_light_dirs().detach()
         albedo = render_pkg["photometric_albedo"].detach()
         normal = render_pkg["photometric_normal"].detach()
         ndotl = render_pkg["photometric_ndotl"].detach()
+        shading = render_pkg["photometric_shading"].detach()
         color = render_pkg["photometric_color"].detach()
 
         self.tb_writer.add_scalar("photometric/light_dir_mean", light_dir.mean().item(), self.iteration)
         self.tb_writer.add_scalar("photometric/light_dir_norm", light_dir.norm().item(), self.iteration)
-        self.tb_writer.add_scalar("photometric/light_rgb_mean", light_rgb.mean().item(), self.iteration)
-        self.tb_writer.add_scalar("photometric/light_rgb_min", light_rgb.min().item(), self.iteration)
-        self.tb_writer.add_scalar("photometric/light_rgb_max", light_rgb.max().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/light_dir_norm_min", all_light_dirs.norm(dim=-1).min().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/light_dir_norm_max", all_light_dirs.norm(dim=-1).max().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/light_dir_norm_mean_all", all_light_dirs.norm(dim=-1).mean().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/light_dir_x_mean", all_light_dirs[:, 0].mean().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/light_dir_y_mean", all_light_dirs[:, 1].mean().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/light_dir_z_mean", all_light_dirs[:, 2].mean().item(), self.iteration)
         self.tb_writer.add_scalar("photometric/albedo_mean", albedo.mean().item(), self.iteration)
         self.tb_writer.add_scalar("photometric/albedo_min", albedo.min().item(), self.iteration)
         self.tb_writer.add_scalar("photometric/albedo_max", albedo.max().item(), self.iteration)
@@ -310,11 +418,16 @@ class Trainer:
         self.tb_writer.add_scalar("photometric/ndotl_mean", ndotl.mean().item(), self.iteration)
         self.tb_writer.add_scalar("photometric/ndotl_min", ndotl.min().item(), self.iteration)
         self.tb_writer.add_scalar("photometric/ndotl_max", ndotl.max().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/shading_mean", shading.mean().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/shading_min", shading.min().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/shading_max", shading.max().item(), self.iteration)
         self.tb_writer.add_scalar("photometric/color_mean", color.mean().item(), self.iteration)
         self.tb_writer.add_scalar("photometric/color_min", color.min().item(), self.iteration)
         self.tb_writer.add_scalar("photometric/color_max", color.max().item(), self.iteration)
-        self.tb_writer.add_scalar("photometric/loss_light_smooth", loss_light_smooth.detach().item(), self.iteration)
-        self.tb_writer.add_scalar("photometric/loss_albedo_reg", loss_albedo_reg.detach().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/loss_light_smooth1", loss_light_smooth1.detach().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/loss_light_smooth2", loss_light_smooth2.detach().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/loss_hemi", loss_hemi.detach().item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/loss_albedo_prior", loss_albedo_prior.detach().item(), self.iteration)
 
 
 def prepare_output_and_logger(args):
@@ -354,6 +467,7 @@ if __name__ == "__main__":
     parser.add_argument("--save_iterations", nargs="+", type=int, default=[1, 1000, 10000, 20000]+ list(range(10000, 100_0001, 10000)))
     parser.add_argument("--quiet", action="store_true")
     parser.add_argument("--deform-type", type=str, default='mlp')
+    parser.add_argument("--load_iter", type=int, default=None)
 
     args = parser.parse_args(sys.argv[1:])
     args.save_iterations.append(args.iterations)
@@ -367,7 +481,9 @@ if __name__ == "__main__":
     safe_state(args.quiet)
 
     torch.autograd.set_detect_anomaly(args.detect_anomaly)
-    trainer = Trainer(args=args, dataset=lp.extract(args), opt=op.extract(args), pipe=pp.extract(args),testing_iterations=args.test_iterations, saving_iterations=args.save_iterations)
+    trainer = Trainer(args=args, dataset=lp.extract(args), opt=op.extract(args), pipe=pp.extract(args),
+                      testing_iterations=args.test_iterations, saving_iterations=args.save_iterations,
+                      load_iter=args.load_iter)
 
 
     trainer.train(args.iterations)
