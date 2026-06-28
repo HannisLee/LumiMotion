@@ -181,3 +181,4 @@ light direction norm ≈ 1
 
 - [DOC/LH-static-stage1-V2.md](DOC/LH-static-stage1-V2.md)：V2 总体架构、训练命令、评测命令和 smoke test 结果。
 - [DOC/LH-static-stage1-V2-Code.md](DOC/LH-static-stage1-V2-Code.md)：V2 代码路径、核心类函数、loss、checkpoint 和工具细节。
+- [DOC/LH-static-stage1-V2-LH-staticv2-results.md](DOC/LH-static-stage1-V2-LH-staticv2-results.md)：新服务器 `minakshi` 上 `output/LH-staticv2` 的完整 LH-static V2 训练、评测和光源可视化结果。

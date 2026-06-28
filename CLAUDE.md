@@ -14,6 +14,32 @@ conda activate lumimotion-cu129
 ```
 README 中记录的是另一个 `lumimotion` 环境(Python 3.8 + CUDA 12.1 + torch 2.1.0)。这里实际使用的是 cu129 变体。
 
+### 新服务器环境：minakshi
+
+新服务器 `minakshi` 在 commit `52d085c` 上已跑通，使用独立环境 **`lumimotion-cu126`**，不要覆盖旧服务器的 `lumimotion-cu129`：
+
+```bash
+conda activate lumimotion-cu126
+```
+
+环境要点：
+
+- GPU：5 张 NVIDIA RTX 6000 Ada Generation，driver `560.28.03`。
+- PyTorch：`2.1.0`，`pytorch-cuda=12.1`，`torch.version.cuda=12.1`。
+- 编译工具：conda `cuda-toolkit=12.1`、`cmake`、`ninja`，系统 `/usr/bin/gcc-11` / `/usr/bin/g++-11`。
+- NumPy 固定为 `1.24.4`；`setuptools` 固定为 `<70`，否则 PyTorch 2.1 的 C++ extension 可能找不到 `pkg_resources`。
+- native 扩展已在该环境中编译安装：`diff_surfel_rasterization`、`simple_knn`、`surfel_tracer`、`nvdiffrast`。
+
+在 `minakshi` 上重编 CUDA/native 扩展时，conda 激活脚本可能默认设置 `NVCC_PREPEND_FLAGS` 到 base conda 的 GCC 14，CUDA 12.1 不兼容。编译前必须覆盖为系统 g++ 11：
+
+```bash
+export NVCC_PREPEND_FLAGS=" -ccbin=/usr/bin/g++-11"
+export CC=/usr/bin/gcc-11
+export CXX=/usr/bin/g++-11
+export CUDAHOSTCXX=/usr/bin/g++-11
+export TORCH_CUDA_ARCH_LIST="8.9"
+```
+
 ## 原生依赖与构建顺序
 
 训练可用之前,必须按顺序构建/安装三个原生扩展(见 `readme.md` §2)。顺序和**确切版本**都很重要:
