@@ -185,8 +185,9 @@ class Trainer:
 
         if self.iteration > self.opt.warm_up:
 
-            # d_xyz loss
-            loss += ((d_xyz**2).mean())*self.opt.d_xyz_loss_weight 
+            # d_xyz loss is only meaningful when the deformation model returns tensor offsets.
+            if self.opt.d_xyz_loss_weight > 0 and torch.is_tensor(d_xyz):
+                loss += ((d_xyz**2).mean()) * self.opt.d_xyz_loss_weight
             
             # d color loss
             d_color_reg_loss_weight = self.opt.d_color_reg_loss_weight

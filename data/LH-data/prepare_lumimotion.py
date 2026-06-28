@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Convert LH-data/origin scenes into LumiMotion datasets under LH-data/transfer."""
+"""Convert LH-data scenes into LumiMotion Blender-format datasets."""
 
 from __future__ import annotations
 
@@ -230,7 +230,7 @@ def validate_frame_sets(
     albedos: dict[int, Path],
     normals: dict[int, Path],
     lights: dict,
-    poses: dict,
+    poses: dict | None,
 ) -> list[int]:
     frame_ids = sorted(images)
     expected = set(frame_ids)
@@ -238,8 +238,9 @@ def validate_frame_sets(
         "albedo": set(albedos),
         "normal_exr": set(normals),
         "lights.json": {int(key) for key in lights},
-        "object_pose.json": {int(key) for key in poses.get("frames", {})},
     }
+    if poses is not None:
+        comparisons["object_pose.json"] = {int(key) for key in poses.get("frames", {})}
     for label, actual in comparisons.items():
         missing = sorted(expected - actual)
         extra = sorted(actual - expected)
@@ -255,13 +256,13 @@ def convert_scene(scene_arg: Path, args: argparse.Namespace) -> dict:
     camera_path = scene / "camera.json"
     lights_path = scene / "lights.json"
     poses_path = scene / "object_pose.json"
-    for required in (camera_path, lights_path, poses_path):
+    for required in (camera_path, lights_path):
         if not required.is_file():
             raise ValueError(f"Required metadata is missing: {required}")
 
     camera = read_json(camera_path)
     lights = read_json(lights_path)
-    poses = read_json(poses_path)
+    poses = read_json(poses_path) if poses_path.is_file() else None
     images = index_files(scene / "image", IMAGE_EXTENSIONS)
     albedos = index_files(scene / "albedo", IMAGE_EXTENSIONS)
     normals = index_files(scene / "normal_exr", {".exr"})
@@ -306,6 +307,7 @@ def convert_scene(scene_arg: Path, args: argparse.Namespace) -> dict:
         "test_frames": len(test_ids),
         "resolution": [width, height],
         "fixed_camera": bool(camera.get("fixed_camera", False)),
+        "has_object_pose": poses is not None,
         "fov_x_rad": fov_x,
         "fov_y_rad": fov_y,
         "mask_source": args.mask_source,
@@ -387,7 +389,7 @@ def convert_scene(scene_arg: Path, args: argparse.Namespace) -> dict:
         "source_metadata": {
             "camera": str(camera_path),
             "lights": str(lights_path),
-            "object_pose": str(poses_path),
+            "object_pose": str(poses_path) if poses is not None else None,
             "albedo_directory": str(scene / "albedo"),
             "normal_exr_directory": str(scene / "normal_exr"),
         },
