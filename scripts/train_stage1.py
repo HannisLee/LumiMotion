@@ -72,6 +72,7 @@ class Trainer:
 
         self.scene = Scene(dataset, self.gaussians, load_iteration=load_iter)
         if self.render_mode == "photometric_lambertian":
+            # photometric 模式先启用每点 diffuse albedo，再创建独立的 directional light renderer。
             self.gaussians.enable_photometric_albedo()
             self.photometric_renderer = PhotometricLambertianRenderer.from_args(self.scene.all_timesteps, opt, device="cuda")
             if load_iter is not None:
@@ -79,6 +80,7 @@ class Trainer:
                     dataset.model_path, "photometric", f"iteration_{self.scene.loaded_iter}", "photometric.pth"
                 )
                 if os.path.isfile(photometric_path):
+                    # resume 时如果存在 photometric checkpoint，同步恢复 light/albedo 相关配置。
                     self.photometric_renderer.load_weights(dataset.model_path, self.scene.loaded_iter)
             self.photometric_renderer.training_setup(opt)
         print(f"Render mode: {self.render_mode}")
@@ -117,6 +119,7 @@ class Trainer:
     def save_initial_photometric_weights(self):
         if self.initial_photometric_saved or self.photometric_renderer is None:
             return
+        # 保存优化前的初始 light trajectory，方便和训练后结果、GT lights.json 做对比。
         print("\n[ITER {}] Saving initial photometric weights".format(self.iteration))
         self.photometric_renderer.save_weights(self.args.model_path, self.iteration)
         self.initial_photometric_saved = True
@@ -194,6 +197,7 @@ class Trainer:
         loss_albedo_prior = torch.zeros((), dtype=loss.dtype, device=loss.device)
 
         if self.render_mode == "photometric_lambertian":
+            # photometric light 正则只在 Lambertian 路径启用；旧参数名作为兼容别名保留。
             lambda_smooth1 = max(
                 float(getattr(self.opt, "lambda_photometric_light_smooth1", 0.0)),
                 float(getattr(self.opt, "lambda_photometric_light_smooth", 0.0)),
@@ -203,17 +207,21 @@ class Trainer:
                 float(getattr(self.opt, "lambda_photometric_albedo_reg", 0.0)),
             )
             if lambda_smooth1 > 0:
+                # 一阶 L2 smooth：抑制相邻帧 light direction 的快速跳变。
                 loss_light_smooth1 = self.photometric_renderer.light_smoothness_loss(order=1)
                 loss = loss + lambda_smooth1 * loss_light_smooth1
             if self.opt.lambda_photometric_light_smooth2 > 0:
+                # 二阶 L2 smooth：抑制 light trajectory 曲率抖动。
                 loss_light_smooth2 = self.photometric_renderer.light_smoothness_loss(order=2)
                 loss = loss + self.opt.lambda_photometric_light_smooth2 * loss_light_smooth2
             if self.opt.lambda_photometric_hemi > 0 and self.opt.photometric_use_hemi_prior:
+                # 半球 prior 防止方向光跑到物体下半球或不合理方向。
                 loss_hemi = self.photometric_renderer.hemisphere_loss(
                     self.opt.photometric_hemi_axis, self.opt.photometric_hemi_margin
                 )
                 loss = loss + self.opt.lambda_photometric_hemi * loss_hemi
             if lambda_albedo_prior > 0:
+                # albedo prior 约束 diffuse albedo 不要过快偏离 SH 初始化颜色。
                 loss_albedo_prior = self.gaussians.photometric_albedo_reg_loss()
                 loss = loss + lambda_albedo_prior * loss_albedo_prior
 
@@ -309,6 +317,7 @@ class Trainer:
                 self.render_mode == "photometric_lambertian"
                 and self.photometric_stage == "s1c_light_calib"
             )
+            # S1C 是 light-only calibration，禁止 densification/pruning 改动几何拓扑。
             if allow_densification and self.iteration < self.opt.densify_until_iter:
                 self.gaussians.add_densification_stats(viewspace_point_tensor, visibility_filter)
 
@@ -349,6 +358,7 @@ class Trainer:
             return
 
         if self.photometric_stage == "s1c_light_calib":
+            # S1C：冻结几何/SH/形变，只允许 light 和可选 photometric albedo 做校准。
             gaussian_lrs = {
                 "xyz": 0.0,
                 "albedo_dc": 0.0,
@@ -363,6 +373,7 @@ class Trainer:
             deform_lr = 0.0
             light_lr = self.opt.photometric_s1c_light_lr
         elif self.photometric_stage == "s1d_joint":
+            # S1D：小学习率联合微调 light、photometric albedo、rotation/scale 等少量参数。
             gaussian_lrs = {
                 "xyz": self.opt.photometric_s1d_position_lr,
                 "albedo_dc": 0.0,
@@ -386,6 +397,7 @@ class Trainer:
             for group in self.deform.optimizer.param_groups:
                 group["lr"] = float(deform_lr)
         if self.photometric_renderer is not None:
+            # light optimizer 独立于 Gaussian/deform optimizer，需要单独设置学习率。
             self.photometric_renderer.set_light_lr(light_lr)
 
     def log_photometric_stats(
@@ -404,6 +416,7 @@ class Trainer:
         if self.iteration % 10 != 0 and self.iteration not in self.testing_iterations:
             return
 
+        # 记录 light direction、Lambertian shading 和各项 photometric regularizer，便于排查光照漂移。
         light_dir = render_pkg["photometric_light_dir"].detach()
         all_light_dirs = self.photometric_renderer.get_all_light_dirs().detach()
         albedo = render_pkg["photometric_albedo"].detach()

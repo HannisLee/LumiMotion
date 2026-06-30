@@ -16,6 +16,7 @@ from utils.general_utils import build_rotation
 
 
 def _as_timestep_tensor(timesteps: Any, device: str | torch.device) -> torch.Tensor:
+    # Scene 中的 timestep 可能是 dict(fid -> index)，这里统一转成按 index 排序的一维 tensor。
     if isinstance(timesteps, dict):
         ordered = [fid for fid, _ in sorted(timesteps.items(), key=lambda item: item[1])]
         values = [float(fid.detach().reshape(-1)[0].item()) for fid in ordered]
@@ -29,6 +30,7 @@ def _as_timestep_tensor(timesteps: Any, device: str | torch.device) -> torch.Ten
 
 
 def parse_axis(axis: str | torch.Tensor, device: torch.device | str) -> torch.Tensor:
+    # 支持 "+z" 这类命名轴，也支持 "0,0,1" 或 tensor，统一归一化后返回。
     if torch.is_tensor(axis):
         out = axis.to(device=device, dtype=torch.float32).flatten()
     elif isinstance(axis, str):
@@ -65,6 +67,7 @@ def circle_upper_hemisphere_init(
     direction_sign: int = 1,
 ) -> torch.Tensor:
     """Return smooth circular upper-hemisphere light directions for initialization."""
+    # V2/V3 都用圆形上半球轨迹作为 light 初始化，phase 用于尝试不同起点。
     total = max(int(total_timesteps), 1)
     times = times.to(dtype=torch.float32)
     r_xy = float(r_xy)
@@ -136,6 +139,7 @@ class DirectionalLightModel(nn.Module):
         self.init_direction_sign = 1 if int(init_direction_sign) >= 0 else -1
 
         if self.light_param == "per_frame":
+            # per-frame 版本：每个 timestep 直接学习一个 raw light direction。
             frame_times = torch.arange(self.num_timesteps, dtype=torch.float32, device=timestep_tensor.device)
             init_dirs = circle_upper_hemisphere_init(
                 frame_times,
@@ -148,6 +152,7 @@ class DirectionalLightModel(nn.Module):
             self._raw_light_dir_table = nn.Parameter(init_dirs)
             self._light_ctrl = None
         else:
+            # B-spline 版本：只学习 K 个 control points，再插值得到每帧光照方向。
             ctrl_times = torch.linspace(
                 0,
                 max(self.num_timesteps - 1, 0),
@@ -183,6 +188,7 @@ class DirectionalLightModel(nn.Module):
         r_xy: float | None = None,
         z: float | None = None,
     ) -> None:
+        # multistart 或手动重置 phase 时调用；只重置 light 参数，不动 Gaussian/albedo。
         phase = self.init_phase if phase is None else float(phase)
         direction_sign = self.init_direction_sign if direction_sign is None else int(direction_sign)
         r_xy = self.init_r_xy if r_xy is None else float(r_xy)
@@ -208,6 +214,8 @@ class DirectionalLightModel(nn.Module):
         self.init_direction_sign = 1 if int(direction_sign) >= 0 else -1
 
     def _bspline_raw_dirs(self) -> torch.Tensor:
+        # 根据 control points 生成所有 timestep 的 raw light direction。
+        # 这里使用 uniform cubic B-spline basis，最后在 get_all_light_dirs 中再 normalize。
         ctrl = self._light_ctrl
         if self.num_timesteps == 1:
             return ctrl[:1]
@@ -242,9 +250,11 @@ class DirectionalLightModel(nn.Module):
         return self._bspline_raw_dirs()
 
     def get_all_light_dirs(self) -> torch.Tensor:
+        # 渲染实际使用单位化方向；raw 参数只负责提供可学习自由度。
         return F.normalize(self.get_all_raw_light_dirs(), dim=-1)
 
     def timestep_index(self, fid: torch.Tensor) -> torch.Tensor:
+        # 相机 fid 不一定是连续整数，用最近邻匹配到初始化时记录的 timestep 表。
         fid_values = fid.detach().to(self.timesteps.device).float().reshape(-1)
         distances = torch.abs(fid_values[:, None] - self.timesteps[None, :])
         return torch.argmin(distances, dim=1).long()
@@ -256,6 +266,7 @@ class DirectionalLightModel(nn.Module):
         return out[0] if out.shape[0] == 1 else out
 
     def smoothness_loss(self, order: int = 1) -> torch.Tensor:
+        # order=1 约束相邻帧方向变化；order=2 约束二阶曲率，抑制轨迹抖动。
         light_dirs = self.get_all_light_dirs()
         if order == 1:
             if light_dirs.shape[0] < 2:
@@ -268,6 +279,7 @@ class DirectionalLightModel(nn.Module):
         raise ValueError(f"Unsupported smoothness order {order}.")
 
     def hemisphere_loss(self, hemi_axis: str, hemi_margin: float = 0.0) -> torch.Tensor:
+        # upper-hemisphere prior：惩罚 light direction 落到指定半球之外的部分。
         light_dirs = self.get_all_light_dirs()
         axis = parse_axis(hemi_axis, light_dirs.device)
         dot = (light_dirs * axis[None, :]).sum(dim=-1)
@@ -294,6 +306,7 @@ class PhotometricLambertianRenderer(nn.Module):
         self.hemi_axis = hemi_axis
         self.hemi_margin = float(hemi_margin)
         self.device_name = str(device)
+        # Renderer 持有独立 light model，Gaussian 只提供 albedo/normal。
         self.light_model = DirectionalLightModel(
             timesteps,
             light_param=light_param,
@@ -309,6 +322,7 @@ class PhotometricLambertianRenderer(nn.Module):
 
     @classmethod
     def from_args(cls, timesteps, training_args, device: str | torch.device = "cuda"):
+        # 训练参数集中在 arguments/__init__.py；这里只做安全 getattr 以兼容旧 cfg_args。
         return cls(
             timesteps,
             light_param=getattr(training_args, "photometric_light_param", "bspline"),
@@ -335,6 +349,7 @@ class PhotometricLambertianRenderer(nn.Module):
         return out
 
     def rebuild_light_model_from_config(self, config: dict[str, Any]) -> None:
+        # 加载 checkpoint 时若 light 参数化不同，需要先按 config 重建 light model 再 load state_dict。
         self.light_model = DirectionalLightModel(
             self.light_model.timesteps,
             light_param=config.get("light_param", self.light_model.light_param),
@@ -347,6 +362,7 @@ class PhotometricLambertianRenderer(nn.Module):
         )
 
     def training_setup(self, training_args):
+        # light 单独一个 Adam optimizer，便于 S1C/S1D 阶段只调 light 学习率。
         lr = getattr(training_args, "photometric_light_lr", 1e-3)
         params = [{"params": self.light_model.parameters(), "lr": lr, "name": "photometric_light"}]
         self.optimizer = torch.optim.Adam(params, lr=0.0, eps=1e-15)
@@ -373,6 +389,7 @@ class PhotometricLambertianRenderer(nn.Module):
         )
 
     def forward(self, albedo: torch.Tensor, normal: torch.Tensor, fid: torch.Tensor) -> dict[str, torch.Tensor]:
+        # Lambertian 路径：每帧取一个 directional light，使用 clamp(dot(n,l),0) 作为 shading。
         light_dir_t = self.light_model(fid)
         if light_dir_t.ndim == 2:
             light_dir_t = light_dir_t[0]
@@ -392,6 +409,7 @@ class PhotometricLambertianRenderer(nn.Module):
         }
 
     def capture(self) -> dict[str, Any]:
+        # photometric checkpoint 同时保存权重、timestep、config 和 multistart 元信息。
         return {
             "state_dict": self.state_dict(),
             "timesteps": self.light_model.timesteps.detach().cpu(),
@@ -414,6 +432,7 @@ class PhotometricLambertianRenderer(nn.Module):
         state_dict = dict(model_args.get("state_dict", model_args))
         # Legacy V1 checkpoints used a flat raw_light_dir tensor.
         if "raw_light_dir" in state_dict and "light_model._raw_light_dir_table" not in state_dict:
+            # 兼容 V1 checkpoint：把旧 flat raw_light_dir 映射到 V2 的 per-frame table 名称。
             if self.light_model.light_param != "per_frame":
                 self.rebuild_light_model_from_config({"light_param": "per_frame"})
             state_dict["light_model._raw_light_dir_table"] = state_dict.pop("raw_light_dir")
@@ -422,6 +441,7 @@ class PhotometricLambertianRenderer(nn.Module):
         self.multistart_metadata = dict(model_args.get("multistart", {}))
 
     def light_trajectory_dict(self) -> dict[str, Any]:
+        # 导出 raw 和 normalize 后的 direction，方便后处理画图和对比 GT lights.json。
         raw = self.get_all_raw_light_dirs().detach().cpu().float()
         dirs = self.get_all_light_dirs().detach().cpu().float()
         timesteps = self.light_model.timesteps.detach().cpu().float()

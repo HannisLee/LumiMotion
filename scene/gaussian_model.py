@@ -73,6 +73,8 @@ class GaussianModel:
 
         self.fea_dim = fea_dim
         self.feature = torch.empty(0)
+        # PS/Lambertian 模式专用 albedo：默认关闭，只有进入 photometric 训练时才启用。
+        # _photometric_albedo 存 raw logits，渲染时 sigmoid 到 [0,1]；init 用于 albedo prior。
         self.use_photometric_albedo = False
         self._photometric_albedo = torch.empty(0)
         self._photometric_albedo_init = torch.empty(0)
@@ -140,6 +142,7 @@ class GaussianModel:
         new_gs._rotation = nn.Parameter(gs._rotation)
         new_gs._opacity = nn.Parameter(gs._opacity)
         new_gs.feature = nn.Parameter(gs.feature)
+        # clone GaussianModel 时同步 photometric albedo 状态，避免工具/渲染中丢失 PS 参数。
         if getattr(gs, "_photometric_albedo", torch.empty(0)).numel() > 0:
             new_gs._photometric_albedo = nn.Parameter(gs._photometric_albedo)
             new_gs._photometric_albedo_init = gs._photometric_albedo_init
@@ -177,6 +180,7 @@ class GaussianModel:
 
     @property
     def get_photometric_albedo(self):
+        # 未启用 PS albedo 时回退到原 SH DC 颜色，保证非 photometric 路径兼容。
         if self._photometric_albedo.numel() == 0:
             albedo = self.get_albedo
             return albedo if albedo.dim() == 2 else albedo[None]
@@ -189,6 +193,8 @@ class GaussianModel:
         return self._photometric_albedo_init
 
     def enable_photometric_albedo(self, init_albedo=None):
+        # 首次进入 photometric 模式时，用当前 SH DC 颜色初始化 diffuse albedo。
+        # 若 checkpoint 已有 PS albedo，则沿用既有值，避免破坏续训。
         if init_albedo is None:
             if self._photometric_albedo.numel() > 0:
                 init_albedo = torch.sigmoid(self._photometric_albedo.detach())
@@ -208,6 +214,7 @@ class GaussianModel:
         self.use_photometric_albedo = True
 
     def photometric_albedo_reg_loss(self):
+        # 约束 PS albedo 不要快速偏离初始颜色，降低 light/albedo 分解不稳定性。
         if not self.use_photometric_albedo:
             return torch.zeros((), dtype=self.get_xyz.dtype, device=self.get_xyz.device)
         return torch.abs(self.get_photometric_albedo - self.get_photometric_albedo_init).mean()
@@ -353,6 +360,7 @@ class GaussianModel:
         for i in range(self._rotation.shape[1]):
             l.append('rot_{}'.format(i))
         if self.use_photometric_albedo:
+            # photometric albedo 独立成 optimizer group，便于 S1C/S1D 分阶段控制学习率。
             for i in range(3):
                 l.append('photometric_albedo_raw_{}'.format(i))
             for i in range(3):
@@ -386,6 +394,7 @@ class GaussianModel:
         elements = np.empty(xyz.shape[0], dtype=dtype_full)
         attributes = np.concatenate((xyz, normals, albedo_dc, albedo_dc_stage1, albedo_rest, albedo_dc, opacities, roughness, scale, rotation), axis=1)
         if self.use_photometric_albedo:
+            # PLY 中同时保存 raw logits 和初始 albedo，方便续训时恢复 prior 参考值。
             photometric_albedo = self._photometric_albedo.detach().cpu().numpy()
             photometric_albedo_init = self.get_photometric_albedo_init.detach().cpu().numpy()
             attributes = np.concatenate((attributes, photometric_albedo, photometric_albedo_init), axis=1)
@@ -463,6 +472,7 @@ class GaussianModel:
 
         photometric_albedo = None
         photometric_albedo_init = None
+        # 旧 PLY 没有 photometric_albedo 字段时保持兼容；有字段时恢复 PS albedo 及其 prior 参考。
         photometric_names = [p.name for p in plydata.elements[0].properties if p.name.startswith("photometric_albedo_raw")]
         if len(photometric_names) == 3:
             photometric_names = sorted(photometric_names, key=lambda x: int(x.split('_')[-1]))
@@ -477,6 +487,7 @@ class GaussianModel:
                 for idx, attr_name in enumerate(photometric_init_names):
                     photometric_albedo_init[:, idx] = np.asarray(plydata.elements[0][attr_name])
             else:
+                # 兼容只保存 raw logits 的中间 checkpoint：用 sigmoid(raw) 作为 init prior。
                 photometric_albedo_init = 1.0 / (1.0 + np.exp(-photometric_albedo))
 
 
@@ -547,6 +558,7 @@ class GaussianModel:
         self._scaling = optimizable_tensors["scaling"]
         self._rotation = optimizable_tensors["rotation"]
         if self.use_photometric_albedo:
+            # 保存 raw logits 而不是 sigmoid 后颜色，避免 checkpoint 往返造成数值语义变化。
             self._photometric_albedo = optimizable_tensors["photometric_albedo"]
             self._photometric_albedo_init = self._photometric_albedo_init[valid_points_mask]
 
@@ -599,6 +611,7 @@ class GaussianModel:
         if self.fea_dim > 0:
             d["feature"] = new_feature
         if self.use_photometric_albedo:
+            # prune Gaussian 时，photometric albedo 和 init prior 必须使用同一个 mask 保持逐点对应。
             d["photometric_albedo"] = new_photometric_albedo
 
         optimizable_tensors = self.cat_tensors_to_optimizer(d)
@@ -610,6 +623,7 @@ class GaussianModel:
         self._scaling = optimizable_tensors["scaling"]
         self._rotation = optimizable_tensors["rotation"]
         if self.use_photometric_albedo:
+            # densify 新点时，把父点的 PS albedo 一起接进 optimizer。
             self._photometric_albedo = optimizable_tensors["photometric_albedo"]
             self._photometric_albedo_init = torch.cat((self._photometric_albedo_init, new_photometric_albedo_init), dim=0)
 
@@ -647,6 +661,7 @@ class GaussianModel:
         new_roughness = self._roughness[selected_pts_mask].repeat(N, 1)
 
         new_feature = self.feature[selected_pts_mask].repeat(N, 1) if self.fea_dim > 0 else None
+        # split 复制父点的 photometric albedo；后续正式优化再让子点分化。
         new_photometric_albedo = self._photometric_albedo[selected_pts_mask].repeat(N, 1) if self.use_photometric_albedo else None
         new_photometric_albedo_init = self._photometric_albedo_init[selected_pts_mask].repeat(N, 1) if self.use_photometric_albedo else None
 
@@ -676,6 +691,7 @@ class GaussianModel:
         new_rotation = self._rotation[selected_pts_mask]
 
         new_feature = self.feature[selected_pts_mask] if self.fea_dim > 0  else None
+        # clone 直接继承被克隆点的 PS albedo 和 init prior。
         new_photometric_albedo = self._photometric_albedo[selected_pts_mask] if self.use_photometric_albedo else None
         new_photometric_albedo_init = self._photometric_albedo_init[selected_pts_mask] if self.use_photometric_albedo else None
 
