@@ -1,4 +1,4 @@
-"""Stage 1 V2 directional-light Lambertian photometric renderer."""
+"""Stage 1 V3 directional-light Lambertian photometric renderer."""
 
 from __future__ import annotations
 
@@ -108,13 +108,12 @@ def get_gaussian_normal(rotation_t: torch.Tensor, normal_axis: str = "+z") -> to
 
 
 class DirectionalLightModel(nn.Module):
-    """Learnable per-frame directional light with per-frame or B-spline controls."""
+    """Learnable per-frame directional light table."""
 
     def __init__(
         self,
         timesteps,
-        light_param: str = "bspline",
-        num_ctrl_points: int = 16,
+        light_param: str = "per_frame",
         init_r_xy: float = 0.8,
         init_z: float = 0.6,
         init_phase: float = 0.0,
@@ -123,53 +122,31 @@ class DirectionalLightModel(nn.Module):
     ):
         super().__init__()
         self.light_param = str(light_param)
-        if self.light_param not in {"per_frame", "bspline"}:
-            raise ValueError("photometric light_param must be 'per_frame' or 'bspline'.")
+        if self.light_param != "per_frame":
+            raise ValueError("Stage1 V3 photometric light_param is fixed to 'per_frame'.")
 
         timestep_tensor = _as_timestep_tensor(timesteps, device)
         self.register_buffer("timesteps", timestep_tensor)
         self.num_timesteps = int(timestep_tensor.numel())
-        self.num_ctrl_points = max(4, int(num_ctrl_points))
         self.init_r_xy = float(init_r_xy)
         self.init_z = float(init_z)
         self.init_phase = float(init_phase)
         self.init_direction_sign = 1 if int(init_direction_sign) >= 0 else -1
 
-        if self.light_param == "per_frame":
-            frame_times = torch.arange(self.num_timesteps, dtype=torch.float32, device=timestep_tensor.device)
-            init_dirs = circle_upper_hemisphere_init(
-                frame_times,
-                self.num_timesteps,
-                self.init_r_xy,
-                self.init_z,
-                self.init_phase,
-                self.init_direction_sign,
-            )
-            self._raw_light_dir_table = nn.Parameter(init_dirs)
-            self._light_ctrl = None
-        else:
-            ctrl_times = torch.linspace(
-                0,
-                max(self.num_timesteps - 1, 0),
-                self.num_ctrl_points,
-                dtype=torch.float32,
-                device=timestep_tensor.device,
-            )
-            init_ctrl = circle_upper_hemisphere_init(
-                ctrl_times,
-                self.num_timesteps,
-                self.init_r_xy,
-                self.init_z,
-                self.init_phase,
-                self.init_direction_sign,
-            )
-            self._light_ctrl = nn.Parameter(init_ctrl)
-            self._raw_light_dir_table = None
+        frame_times = torch.arange(self.num_timesteps, dtype=torch.float32, device=timestep_tensor.device)
+        init_dirs = circle_upper_hemisphere_init(
+            frame_times,
+            self.num_timesteps,
+            self.init_r_xy,
+            self.init_z,
+            self.init_phase,
+            self.init_direction_sign,
+        )
+        self._raw_light_dir_table = nn.Parameter(init_dirs)
 
     def config_dict(self) -> dict[str, Any]:
         return {
             "light_param": self.light_param,
-            "num_ctrl_points": self.num_ctrl_points,
             "init_r_xy": self.init_r_xy,
             "init_z": self.init_z,
             "init_phase": self.init_phase,
@@ -188,58 +165,15 @@ class DirectionalLightModel(nn.Module):
         r_xy = self.init_r_xy if r_xy is None else float(r_xy)
         z = self.init_z if z is None else float(z)
         with torch.no_grad():
-            if self.light_param == "per_frame":
-                times = torch.arange(self.num_timesteps, dtype=torch.float32, device=self.timesteps.device)
-                self._raw_light_dir_table.copy_(
-                    circle_upper_hemisphere_init(times, self.num_timesteps, r_xy, z, phase, direction_sign)
-                )
-            else:
-                ctrl_times = torch.linspace(
-                    0,
-                    max(self.num_timesteps - 1, 0),
-                    self.num_ctrl_points,
-                    dtype=torch.float32,
-                    device=self.timesteps.device,
-                )
-                self._light_ctrl.copy_(
-                    circle_upper_hemisphere_init(ctrl_times, self.num_timesteps, r_xy, z, phase, direction_sign)
-                )
+            times = torch.arange(self.num_timesteps, dtype=torch.float32, device=self.timesteps.device)
+            self._raw_light_dir_table.copy_(
+                circle_upper_hemisphere_init(times, self.num_timesteps, r_xy, z, phase, direction_sign)
+            )
         self.init_phase = phase
         self.init_direction_sign = 1 if int(direction_sign) >= 0 else -1
 
-    def _bspline_raw_dirs(self) -> torch.Tensor:
-        ctrl = self._light_ctrl
-        if self.num_timesteps == 1:
-            return ctrl[:1]
-
-        positions = torch.linspace(
-            0,
-            max(self.num_ctrl_points - 1, 0),
-            self.num_timesteps,
-            dtype=ctrl.dtype,
-            device=ctrl.device,
-        )
-        idx = torch.floor(positions).long().clamp(0, self.num_ctrl_points - 2)
-        u = (positions - idx.to(positions.dtype)).clamp(0.0, 1.0)
-
-        padded = torch.cat((ctrl[:1].expand(3, -1), ctrl, ctrl[-1:].expand(3, -1)), dim=0)
-        p0 = padded[idx]
-        p1 = padded[idx + 1]
-        p2 = padded[idx + 2]
-        p3 = padded[idx + 3]
-
-        u2 = u * u
-        u3 = u2 * u
-        b0 = ((1.0 - u) ** 3) / 6.0
-        b1 = (3.0 * u3 - 6.0 * u2 + 4.0) / 6.0
-        b2 = (-3.0 * u3 + 3.0 * u2 + 3.0 * u + 1.0) / 6.0
-        b3 = u3 / 6.0
-        return b0[:, None] * p0 + b1[:, None] * p1 + b2[:, None] * p2 + b3[:, None] * p3
-
     def get_all_raw_light_dirs(self) -> torch.Tensor:
-        if self.light_param == "per_frame":
-            return self._raw_light_dir_table
-        return self._bspline_raw_dirs()
+        return self._raw_light_dir_table
 
     def get_all_light_dirs(self) -> torch.Tensor:
         return F.normalize(self.get_all_raw_light_dirs(), dim=-1)
@@ -260,12 +194,14 @@ class DirectionalLightModel(nn.Module):
         if order == 1:
             if light_dirs.shape[0] < 2:
                 return light_dirs.new_zeros(())
-            return (light_dirs[1:] - light_dirs[:-1]).pow(2).mean()
-        if order == 2:
+            diff = light_dirs[1:] - light_dirs[:-1]
+        elif order == 2:
             if light_dirs.shape[0] < 3:
                 return light_dirs.new_zeros(())
-            return (light_dirs[2:] - 2.0 * light_dirs[1:-1] + light_dirs[:-2]).pow(2).mean()
-        raise ValueError(f"Unsupported smoothness order {order}.")
+            diff = light_dirs[2:] - 2.0 * light_dirs[1:-1] + light_dirs[:-2]
+        else:
+            raise ValueError(f"Unsupported light smoothness order {order}; expected 1 or 2.")
+        return diff.pow(2).mean()
 
     def hemisphere_loss(self, hemi_axis: str, hemi_margin: float = 0.0) -> torch.Tensor:
         light_dirs = self.get_all_light_dirs()
@@ -278,8 +214,7 @@ class PhotometricLambertianRenderer(nn.Module):
     def __init__(
         self,
         timesteps,
-        light_param: str = "bspline",
-        num_ctrl_points: int = 16,
+        light_param: str = "per_frame",
         init_r_xy: float = 0.8,
         init_z: float = 0.6,
         init_phase: float = 0.0,
@@ -297,7 +232,6 @@ class PhotometricLambertianRenderer(nn.Module):
         self.light_model = DirectionalLightModel(
             timesteps,
             light_param=light_param,
-            num_ctrl_points=num_ctrl_points,
             init_r_xy=init_r_xy,
             init_z=init_z,
             init_phase=init_phase,
@@ -311,8 +245,7 @@ class PhotometricLambertianRenderer(nn.Module):
     def from_args(cls, timesteps, training_args, device: str | torch.device = "cuda"):
         return cls(
             timesteps,
-            light_param=getattr(training_args, "photometric_light_param", "bspline"),
-            num_ctrl_points=getattr(training_args, "photometric_num_ctrl_points", 16),
+            light_param=getattr(training_args, "photometric_light_param", "per_frame"),
             init_r_xy=getattr(training_args, "photometric_init_r_xy", 0.8),
             init_z=getattr(training_args, "photometric_init_z", 0.6),
             init_phase=getattr(training_args, "photometric_init_phase", 0.0),
@@ -338,7 +271,6 @@ class PhotometricLambertianRenderer(nn.Module):
         self.light_model = DirectionalLightModel(
             self.light_model.timesteps,
             light_param=config.get("light_param", self.light_model.light_param),
-            num_ctrl_points=config.get("num_ctrl_points", self.light_model.num_ctrl_points),
             init_r_xy=config.get("init_r_xy", self.light_model.init_r_xy),
             init_z=config.get("init_z", self.light_model.init_z),
             init_phase=config.get("init_phase", self.light_model.init_phase),
@@ -395,7 +327,7 @@ class PhotometricLambertianRenderer(nn.Module):
         return {
             "state_dict": self.state_dict(),
             "timesteps": self.light_model.timesteps.detach().cpu(),
-            "photometric_version": "stage1_v2_directional_uniform_light",
+            "photometric_version": "stage1_v3_directional_per_frame_light",
             "config": self.config_dict(),
             "multistart": self.multistart_metadata,
         }
@@ -406,9 +338,7 @@ class PhotometricLambertianRenderer(nn.Module):
             self.normal_axis = config.get("normal_axis", self.normal_axis)
             self.hemi_axis = config.get("hemi_axis", self.hemi_axis)
             self.hemi_margin = float(config.get("hemi_margin", self.hemi_margin))
-            if config.get("light_param") != self.light_model.light_param or int(
-                config.get("num_ctrl_points", self.light_model.num_ctrl_points)
-            ) != self.light_model.num_ctrl_points:
+            if config.get("light_param", self.light_model.light_param) != self.light_model.light_param:
                 self.rebuild_light_model_from_config(config)
 
         state_dict = dict(model_args.get("state_dict", model_args))
@@ -426,7 +356,7 @@ class PhotometricLambertianRenderer(nn.Module):
         dirs = self.get_all_light_dirs().detach().cpu().float()
         timesteps = self.light_model.timesteps.detach().cpu().float()
         return {
-            "photometric_version": "stage1_v2_directional_uniform_light",
+            "photometric_version": "stage1_v3_directional_per_frame_light",
             "config": self.config_dict(),
             "frames": [
                 {

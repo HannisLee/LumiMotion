@@ -160,7 +160,7 @@ class OptimizationParams(ParamGroup):
         self.lambda_photometric_light_smooth=0.0
         self.lambda_photometric_albedo_reg=0.0
         self.photometric_stage="s1d_joint"
-        self.photometric_light_param="bspline"
+        self.photometric_light_param="per_frame"
         self.photometric_num_ctrl_points=16
         self.photometric_init_r_xy=0.8
         self.photometric_init_z=0.6
@@ -171,7 +171,7 @@ class OptimizationParams(ParamGroup):
         self.photometric_hemi_axis="0,0,1"
         self.photometric_hemi_margin=0.0
         self.photometric_multistart_enabled=False
-        self.photometric_multistart_num_phases=8
+        self.photometric_multistart_num_phases=16
         self.photometric_multistart_try_reverse_direction=False
         self.photometric_multistart_short_iters=1000
         self.lambda_photometric_light_smooth1=0.0
