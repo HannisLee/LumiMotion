@@ -1,6 +1,7 @@
 # CLAUDE.md
 
 本文件是 AI coding agents 在本仓库工作的入口说明。LumiMotion 的训练流程、数据结构、代码地图和参数陷阱请见 `lumimotion.md`。
+输出请使用中文
 
 ## 工作定位
 

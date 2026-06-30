@@ -1,6 +1,8 @@
 # AGENTS.md
 
 本文件是 AI coding agents 在本仓库工作的入口说明。LumiMotion 的训练流程、数据结构、代码地图和参数陷阱请见 `lumimotion.md`。
+回答都请使用中文
+
 
 ## 工作定位
 
@@ -33,6 +35,61 @@ git remote -v
 - 不要回滚与当前任务无关的本地改动。
 - 如果工作树中存在混合改动，只提交与当前任务直接相关的文件。
 - baseline 文档或代码改动应使用清晰、原子化的提交。
+
+### 分支与代码归属
+
+当前 Stage1 光照实验分支采用“模型实验分支 + 通用工具分支”的结构：
+
+- `PS-stage1-V2`：Stage1 V2 模型实验分支，只放 V2 相关的模型、训练、渲染或参数逻辑差异。
+- `PS-stage1-V3`：Stage1 V3 模型实验分支，只放 V3 相关的模型、训练、渲染或参数逻辑差异。
+- `PS-tools-common`：通用工具分支，放所有可被 V2/V3 共同使用的工具、诊断、导出、画图和分析脚本。
+
+路径归属原则：
+
+- 模型实验代码优先归入模型分支，例如 `scene/`、`scripts/train_stage*.py`、`arguments/` 中会改变训练、渲染、优化或 checkpoint 行为的改动。
+- 通用工具代码优先归入 `PS-tools-common`，例如 `LH_Utils/` 下的 light direction 导出、画图、loss 诊断、CSV/JSON 分析脚本等。
+- 通用文档和工作流说明可归入 `PS-tools-common`，例如 `AGENTS.md`、`CLAUDE.md`、`lumimotion.md` 中不绑定某个模型版本的说明。
+- 某个模型版本专用的说明、命令或实验记录，可以留在对应 `PS-stage1-*` 分支，但提交信息必须说明版本范围。
+
+工作方式：
+
+```bash
+# 修改通用工具时，先切到通用工具分支
+git switch PS-tools-common
+# edit LH_Utils/... or shared docs
+git add LH_Utils AGENTS.md CLAUDE.md lumimotion.md
+git commit -m "tools: update shared light diagnostics"
+
+# 同步通用工具到模型分支
+git switch PS-stage1-V2
+git merge PS-tools-common
+
+git switch PS-stage1-V3
+git merge PS-tools-common
+```
+
+如果已经在 `PS-stage1-*` 分支上误改了通用工具，不要直接把工具改动混进模型提交。优先单独提交或转移到 `PS-tools-common`，再 merge 回模型分支：
+
+```bash
+# 只暂存通用工具，避免混入模型改动
+git add LH_Utils AGENTS.md CLAUDE.md lumimotion.md
+git commit -m "tools: update shared utility"
+
+# 之后把该工具提交同步到 PS-tools-common，再从 PS-tools-common 同步到其他模型分支
+```
+
+比较 V2/V3 模型差异时，应排除通用工具路径，优先只看模型相关目录：
+
+```bash
+git diff PS-stage1-V2..PS-stage1-V3 -- scene scripts arguments
+```
+
+提交拆分建议：
+
+- `tools:` 前缀用于 `LH_Utils/`、导出/画图/诊断脚本和通用工作流文档。
+- `model:` 前缀用于会改变模型结构、训练行为、渲染行为、loss 或 checkpoint 语义的改动。
+- `docs:` 前缀用于只改说明文档且不改变代码行为的改动。
+- 同一次工作中同时有工具和模型改动时，必须拆成两个提交，避免模型分支之间的对比被通用工具噪声污染。
 
 ## 运行约定
 
