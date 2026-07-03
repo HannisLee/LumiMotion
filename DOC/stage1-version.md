@@ -2,15 +2,9 @@
 
 本文只记录 Stage1 `photometric_lambertian` 路线中的核心改动。具体命令、参数和实验结果仍以各版本专门文档为准。
 
-## 文档入口
-
-| 版本 | 参考分支 | 主要文档 | 代码/实验定位 |
-| --- | --- | --- | --- |
-| V1 | `PS-stage1-V1` | `DOC/LH-static-stage1V1.md`、`DOC/Archive/version01.md` | 最小 photometric Lambertian Stage1 baseline |
-| V2 | `PS-stage1-V2` | `DOC/LH-static-stage1-V2.md`、`DOC/stage1-V2-Code_spec.md` | photometric initialization、分阶段训练、两种 light 参数化 |
-| V3 / V3.1 | `PS-stage1-V3` | `DOC/stage1-V3.1-参数.md` | 删除曲线参数化，回到 per-frame light table，并加入 16 相位 multistart |
-
 ## V1：最小 Lambertian photometric baseline
+
+参考分支-目前没有
 
 V1 的目标是先把 LumiMotion Stage1 的 appearance 路径替换成一个可选的 Lambertian photometric 路径，同时尽量不动原始 baseline。
 
@@ -32,6 +26,8 @@ color_i_t = albedo_i * light_rgb_t * max(0, normal_i_t dot light_dir_t)
 V1 的意义是打通“RGB 图像 -> Lambertian color -> Stage1 训练”的最小闭环，但 light/albedo/normal 的可辨识性和初始化稳定性还很弱。
 
 ## V2：photometric initialization 版本
+
+参考分支-PS-stage1-V2
 
 V2 在 V1 的基础上，把 photometric light 建模和训练流程系统化。V2 可以理解成两个子形态。
 
@@ -87,6 +83,8 @@ light_dirs = normalize(raw_light_dirs)
 
 ## V3 / V3.1：删除曲线，回到 per-frame + 正则
 
+参考分支-PS-stage1-V3
+
 V3 的目标是取消 V2-b 中的 B-spline 曲线假设，让光照轨迹回到逐帧可学习，但保留 V2 中有效的初始化、正则和诊断能力。
 
 核心改动：
@@ -115,13 +113,3 @@ light_dir_t = normalize(_raw_light_dir_table[t])
 
 V3 的预期收益是提高不规则真实光照轨迹的拟合能力；代价是需要依赖 smooth1/smooth2 和 multistart 控制逐帧抖动与起点不确定性。
 
-## 快速对比
-
-| 项目 | V1 | V2.1 per-frame | V2.2 B-spline | V3 / V3.1 |
-| --- | --- | --- | --- | --- |
-| light 参数化 | per-frame raw dir，早期含 RGB intensity | per-frame raw dir table | B-spline control points | per-frame raw dir table |
-| light intensity | 早期可学习 `light_rgb_t` | 固定 1 | 固定 1 | 固定 1 |
-| 曲线/control points | 无 | 无 | 有 | 无 |
-| smooth | 最小版本 | 一阶/二阶 L2 | 一阶/二阶 L2 | 一阶/二阶 L2 |
-| multistart | 无 | 工具级/实验性 | 独立工具 `select_light_init` | 训练前内置 16 phase multistart |
-| 主要风险 | 分解不稳定 | 逐帧抖动 | 曲线容量限制 | 逐帧抖动，需要正则控制 |
