@@ -159,21 +159,18 @@ class OptimizationParams(ParamGroup):
         self.photometric_light_lr=0.001
         self.lambda_photometric_light_smooth=0.0
         self.lambda_photometric_albedo_reg=0.0
-        self.photometric_stage="s1d_joint"
+        self.photometric_stage="s1d_albedo_decompose"
         self.photometric_light_param="per_frame"
-        self.photometric_num_ctrl_points=16
-        self.photometric_init_r_xy=0.8
-        self.photometric_init_z=0.6
-        self.photometric_init_phase=0.0
-        self.photometric_init_direction_sign=1
+        self.photometric_camera_ellipse_horizontal=0.7
+        self.photometric_camera_ellipse_vertical=0.35
+        self.photometric_camera_ellipse_back=1.0
+        self.photometric_camera_ellipse_phase=0.0
+        self.photometric_camera_ellipse_direction_sign=1
+        self.photometric_camera_ellipse_span=6.283185307179586
         self.photometric_normal_axis="+z"
         self.photometric_use_hemi_prior=False
         self.photometric_hemi_axis="0,0,1"
         self.photometric_hemi_margin=0.0
-        self.photometric_multistart_enabled=False
-        self.photometric_multistart_num_phases=16
-        self.photometric_multistart_try_reverse_direction=False
-        self.photometric_multistart_short_iters=1000
         self.lambda_photometric_light_smooth1=0.0
         self.lambda_photometric_light_smooth2=0.0
         self.lambda_photometric_hemi=0.0
@@ -187,6 +184,10 @@ class OptimizationParams(ParamGroup):
         self.photometric_s1d_position_lr=0.0
         self.photometric_s1d_deformation_lr=0.0
         self.photometric_s1d_opacity_lr=0.0
+        self.photometric_s1e_light_lr=0.00005
+        self.photometric_s1e_albedo_lr=0.0005
+        self.photometric_s1e_rotation_lr=0.00001
+        self.photometric_s1e_scaling_lr=0.00001
 
         super().__init__(parser, "Optimization Parameters")
 

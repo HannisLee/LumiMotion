@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import math
 import os
 from typing import Any
 
@@ -56,35 +55,6 @@ def parse_axis(axis: str | torch.Tensor, device: torch.device | str) -> torch.Te
     return F.normalize(out, dim=0)
 
 
-def circle_upper_hemisphere_init(
-    times: torch.Tensor,
-    total_timesteps: int,
-    r_xy: float = 0.8,
-    z: float | None = 0.6,
-    phase: float = 0.0,
-    direction_sign: int = 1,
-) -> torch.Tensor:
-    """Return smooth circular upper-hemisphere light directions for initialization."""
-    total = max(int(total_timesteps), 1)
-    times = times.to(dtype=torch.float32)
-    r_xy = float(r_xy)
-    if z is None:
-        z_value = math.sqrt(max(1.0 - r_xy * r_xy, 0.0))
-    else:
-        z_value = float(z)
-    sign = 1.0 if int(direction_sign) >= 0 else -1.0
-    theta = sign * 2.0 * math.pi * times / float(total) + float(phase)
-    dirs = torch.stack(
-        (
-            r_xy * torch.cos(theta),
-            r_xy * torch.sin(theta),
-            torch.full_like(theta, z_value),
-        ),
-        dim=-1,
-    )
-    return F.normalize(dirs, dim=-1)
-
-
 def get_gaussian_normal(rotation_t: torch.Tensor, normal_axis: str = "+z") -> torch.Tensor:
     """Compute 2DGS surface normals from dynamic Gaussian rotations.
 
@@ -114,10 +84,6 @@ class DirectionalLightModel(nn.Module):
         self,
         timesteps,
         light_param: str = "per_frame",
-        init_r_xy: float = 0.8,
-        init_z: float = 0.6,
-        init_phase: float = 0.0,
-        init_direction_sign: int = 1,
         device: str | torch.device = "cuda",
     ):
         super().__init__()
@@ -128,49 +94,44 @@ class DirectionalLightModel(nn.Module):
         timestep_tensor = _as_timestep_tensor(timesteps, device)
         self.register_buffer("timesteps", timestep_tensor)
         self.num_timesteps = int(timestep_tensor.numel())
-        self.init_r_xy = float(init_r_xy)
-        self.init_z = float(init_z)
-        self.init_phase = float(init_phase)
-        self.init_direction_sign = 1 if int(init_direction_sign) >= 0 else -1
-
-        frame_times = torch.arange(self.num_timesteps, dtype=torch.float32, device=timestep_tensor.device)
-        init_dirs = circle_upper_hemisphere_init(
-            frame_times,
-            self.num_timesteps,
-            self.init_r_xy,
-            self.init_z,
-            self.init_phase,
-            self.init_direction_sign,
+        init_dirs = torch.tensor((0.0, 0.0, 1.0), dtype=torch.float32, device=timestep_tensor.device).repeat(
+            self.num_timesteps, 1
         )
         self._raw_light_dir_table = nn.Parameter(init_dirs)
 
     def config_dict(self) -> dict[str, Any]:
         return {
             "light_param": self.light_param,
-            "init_r_xy": self.init_r_xy,
-            "init_z": self.init_z,
-            "init_phase": self.init_phase,
-            "init_direction_sign": self.init_direction_sign,
         }
 
-    def reset_circle_init(
+    def initialize_camera_back_ellipse(
         self,
-        phase: float | None = None,
-        direction_sign: int | None = None,
-        r_xy: float | None = None,
-        z: float | None = None,
+        camera_right: torch.Tensor,
+        camera_up: torch.Tensor,
+        camera_forward: torch.Tensor,
+        horizontal_radius: float,
+        vertical_radius: float,
+        back_offset: float,
+        phase: float,
+        direction_sign: int,
+        span: float,
     ) -> None:
-        phase = self.init_phase if phase is None else float(phase)
-        direction_sign = self.init_direction_sign if direction_sign is None else int(direction_sign)
-        r_xy = self.init_r_xy if r_xy is None else float(r_xy)
-        z = self.init_z if z is None else float(z)
+        """Initialize per-frame light directions on an ellipse behind a fixed camera."""
+        device = self.timesteps.device
+        dtype = self._raw_light_dir_table.dtype
+        right = F.normalize(camera_right.to(device=device, dtype=dtype), dim=0)
+        up = F.normalize(camera_up.to(device=device, dtype=dtype), dim=0)
+        back = -F.normalize(camera_forward.to(device=device, dtype=dtype), dim=0)
+        total = max(self.num_timesteps - 1, 1)
+        time = torch.arange(self.num_timesteps, dtype=dtype, device=device) / float(total)
+        theta = float(phase) + (1.0 if int(direction_sign) >= 0 else -1.0) * float(span) * time
+        raw_dirs = (
+            float(horizontal_radius) * torch.cos(theta)[:, None] * right[None, :]
+            + float(vertical_radius) * torch.sin(theta)[:, None] * up[None, :]
+            + float(back_offset) * back[None, :]
+        )
         with torch.no_grad():
-            times = torch.arange(self.num_timesteps, dtype=torch.float32, device=self.timesteps.device)
-            self._raw_light_dir_table.copy_(
-                circle_upper_hemisphere_init(times, self.num_timesteps, r_xy, z, phase, direction_sign)
-            )
-        self.init_phase = phase
-        self.init_direction_sign = 1 if int(direction_sign) >= 0 else -1
+            self._raw_light_dir_table.copy_(F.normalize(raw_dirs, dim=-1))
 
     def get_all_raw_light_dirs(self) -> torch.Tensor:
         return self._raw_light_dir_table
@@ -215,10 +176,6 @@ class PhotometricLambertianRenderer(nn.Module):
         self,
         timesteps,
         light_param: str = "per_frame",
-        init_r_xy: float = 0.8,
-        init_z: float = 0.6,
-        init_phase: float = 0.0,
-        init_direction_sign: int = 1,
         normal_axis: str = "+z",
         hemi_axis: str = "0,0,1",
         hemi_margin: float = 0.0,
@@ -232,24 +189,16 @@ class PhotometricLambertianRenderer(nn.Module):
         self.light_model = DirectionalLightModel(
             timesteps,
             light_param=light_param,
-            init_r_xy=init_r_xy,
-            init_z=init_z,
-            init_phase=init_phase,
-            init_direction_sign=init_direction_sign,
             device=device,
         )
         self.optimizer = None
-        self.multistart_metadata: dict[str, Any] = {}
+        self.initialization_metadata: dict[str, Any] = {}
 
     @classmethod
     def from_args(cls, timesteps, training_args, device: str | torch.device = "cuda"):
         return cls(
             timesteps,
             light_param=getattr(training_args, "photometric_light_param", "per_frame"),
-            init_r_xy=getattr(training_args, "photometric_init_r_xy", 0.8),
-            init_z=getattr(training_args, "photometric_init_z", 0.6),
-            init_phase=getattr(training_args, "photometric_init_phase", 0.0),
-            init_direction_sign=getattr(training_args, "photometric_init_direction_sign", 1),
             normal_axis=getattr(training_args, "photometric_normal_axis", "+z"),
             hemi_axis=getattr(training_args, "photometric_hemi_axis", "0,0,1"),
             hemi_margin=getattr(training_args, "photometric_hemi_margin", 0.0),
@@ -271,10 +220,6 @@ class PhotometricLambertianRenderer(nn.Module):
         self.light_model = DirectionalLightModel(
             self.light_model.timesteps,
             light_param=config.get("light_param", self.light_model.light_param),
-            init_r_xy=config.get("init_r_xy", self.light_model.init_r_xy),
-            init_z=config.get("init_z", self.light_model.init_z),
-            init_phase=config.get("init_phase", self.light_model.init_phase),
-            init_direction_sign=config.get("init_direction_sign", self.light_model.init_direction_sign),
             device=self.light_model.timesteps.device,
         )
 
@@ -304,6 +249,39 @@ class PhotometricLambertianRenderer(nn.Module):
             self.hemi_margin if hemi_margin is None else hemi_margin,
         )
 
+    def initialize_camera_back_ellipse(
+        self,
+        camera_right: torch.Tensor,
+        camera_up: torch.Tensor,
+        camera_forward: torch.Tensor,
+        horizontal_radius: float,
+        vertical_radius: float,
+        back_offset: float,
+        phase: float,
+        direction_sign: int,
+        span: float,
+    ) -> None:
+        self.light_model.initialize_camera_back_ellipse(
+            camera_right,
+            camera_up,
+            camera_forward,
+            horizontal_radius,
+            vertical_radius,
+            back_offset,
+            phase,
+            direction_sign,
+            span,
+        )
+        self.initialization_metadata = {
+            "type": "camera_back_ellipse",
+            "horizontal_radius": float(horizontal_radius),
+            "vertical_radius": float(vertical_radius),
+            "back_offset": float(back_offset),
+            "phase": float(phase),
+            "direction_sign": 1 if int(direction_sign) >= 0 else -1,
+            "span": float(span),
+        }
+
     def forward(self, albedo: torch.Tensor, normal: torch.Tensor, fid: torch.Tensor) -> dict[str, torch.Tensor]:
         light_dir_t = self.light_model(fid)
         if light_dir_t.ndim == 2:
@@ -327,9 +305,9 @@ class PhotometricLambertianRenderer(nn.Module):
         return {
             "state_dict": self.state_dict(),
             "timesteps": self.light_model.timesteps.detach().cpu(),
-            "photometric_version": "stage1_v3_directional_per_frame_light",
+            "photometric_version": "stage1_v5_directional_per_frame_camera_back_ellipse",
             "config": self.config_dict(),
-            "multistart": self.multistart_metadata,
+            "initialization": self.initialization_metadata,
         }
 
     def restore(self, model_args: dict[str, Any]) -> None:
@@ -349,15 +327,16 @@ class PhotometricLambertianRenderer(nn.Module):
             state_dict["light_model._raw_light_dir_table"] = state_dict.pop("raw_light_dir")
         state_dict.pop("raw_light_rgb", None)
         self.load_state_dict(state_dict, strict=False)
-        self.multistart_metadata = dict(model_args.get("multistart", {}))
+        self.initialization_metadata = dict(model_args.get("initialization", {}))
 
     def light_trajectory_dict(self) -> dict[str, Any]:
         raw = self.get_all_raw_light_dirs().detach().cpu().float()
         dirs = self.get_all_light_dirs().detach().cpu().float()
         timesteps = self.light_model.timesteps.detach().cpu().float()
         return {
-            "photometric_version": "stage1_v3_directional_per_frame_light",
+            "photometric_version": "stage1_v5_directional_per_frame_camera_back_ellipse",
             "config": self.config_dict(),
+            "initialization": self.initialization_metadata,
             "frames": [
                 {
                     "index": int(i),

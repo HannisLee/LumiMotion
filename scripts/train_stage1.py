@@ -42,6 +42,19 @@ def normalize_render_mode(render_mode):
     return render_mode
 
 
+ORIGINAL_SH_STAGES = {
+    "s1a_original_warmup",
+    "s1a_geometry_warmup",
+    "s1b_geometry_settle",
+}
+V5_GEOMETRY_FROZEN_STAGES = {
+    "s1b_geometry_settle",
+    "s1c_light_calib",
+    "s1d_albedo_decompose",
+    "s1e_joint_refine",
+}
+
+
 class Trainer:
     def __init__(self, args, dataset, opt, pipe, testing_iterations, saving_iterations, load_iter=None) -> None:
         self.dataset = dataset
@@ -50,7 +63,7 @@ class Trainer:
         self.pipe = pipe
         self.photometric_stage = getattr(opt, "photometric_stage", "s1d_joint")
         self.render_mode = normalize_render_mode(getattr(pipe, "render_mode", "original_sh"))
-        if self.photometric_stage == "s1a_original_warmup":
+        if self.photometric_stage in ORIGINAL_SH_STAGES:
             self.render_mode = "original_sh"
         self.pipe.render_mode = self.render_mode
         if self.render_mode not in ["original_sh", "photometric_lambertian"]:
@@ -59,7 +72,6 @@ class Trainer:
         self.saving_iterations = saving_iterations
         self.photometric_renderer = None
         self.photometric_checkpoint_loaded = False
-        self.photometric_multistart_done = False
 
         self.tb_writer = prepare_output_and_logger(dataset)
         self.deform = DeformModel(deform_type=self.dataset.deform_type, is_blender=self.dataset.is_blender, 
@@ -84,6 +96,7 @@ class Trainer:
                     self.photometric_renderer.load_weights(dataset.model_path, self.scene.loaded_iter)
                     self.photometric_checkpoint_loaded = True
             self.photometric_renderer.training_setup(opt)
+            self.initialize_v5_camera_back_ellipse()
         print(f"Render mode: {self.render_mode}")
         print(f"Photometric stage: {self.photometric_stage}")
         self.gaussians.training_setup(opt)
@@ -113,214 +126,46 @@ class Trainer:
     # no gui mode
     def train(self, iters=5000):
         if iters >= self.iteration:
-            self.run_photometric_multistart()
             self.save_initial_photometric_weights()
             while self.iteration <= iters:
                 self.train_step()
 
-    @staticmethod
-    def _set_optimizer_requires_grad(optimizer, requires_grad: bool):
-        if optimizer is None:
-            return []
-        states = []
-        seen = set()
-        for group in optimizer.param_groups:
-            for param in group["params"]:
-                if param is None or id(param) in seen:
-                    continue
-                seen.add(id(param))
-                states.append((param, param.requires_grad))
-                param.requires_grad_(requires_grad)
-        return states
-
-    @staticmethod
-    def _restore_requires_grad(states):
-        for param, requires_grad in states:
-            param.requires_grad_(requires_grad)
-
-    def _photometric_multistart_loss(self, viewpoint_cam, trial_iteration: int):
-        time_interval = 1 / len(self.scene.all_timesteps)
-        fid = viewpoint_cam.fid
-
-        if self.deform.name == 'mlp' or self.deform.name == 'static':
-            if trial_iteration < self.opt.warm_up:
-                d_xyz, d_rotation, d_scaling, d_opacity, d_color = 0.0, 0.0, 0.0, 0.0, 0.0
-            else:
-                N = self.gaussians.get_xyz.shape[0]
-                time_input = fid.unsqueeze(0).expand(N, -1)
-                ast_noise = 0 if self.dataset.is_blender else torch.randn(1, 1, device='cuda').expand(N, -1) * time_interval * self.smooth_term(trial_iteration)
-                d_values = self.deform.step(
-                    self.gaussians.get_xyz,
-                    time_input + ast_noise,
-                    iteration=trial_iteration,
-                    feature=self.gaussians.get_binary_feature(eval=False, T=self.T_current),
-                    camera_center=viewpoint_cam.camera_center,
-                )
-                d_xyz, d_rotation, d_scaling, d_opacity, d_color = (
-                    d_values['d_xyz'],
-                    d_values['d_rotation'],
-                    d_values['d_scaling'],
-                    d_values['d_opacity'],
-                    d_values['d_color'],
-                )
-        else:
-            raise NotImplemented
-
-        render_pkg_re = render(
-            viewpoint_cam,
-            self.gaussians,
-            self.pipe,
-            self.background,
-            d_xyz,
-            d_rotation,
-            d_scaling,
-            d_opacity=d_opacity,
-            d_color=d_color,
-            photometric_renderer=self.photometric_renderer,
-        )
-        image = render_pkg_re["render"]
-        gt_image = viewpoint_cam.original_image_train_light.cuda()
-        if self.dataset.white_background and viewpoint_cam.gt_alpha_mask is not None and self.opt.gt_alpha_mask_as_scene_mask:
-            gt_alpha_mask = viewpoint_cam.gt_alpha_mask.cuda()
-            gt_image = gt_alpha_mask * gt_image + (1 - gt_alpha_mask) * self.background[:, None, None]
-
-        Ll1 = l1_loss(image, gt_image)
-        loss = (1.0 - self.opt.lambda_dssim) * Ll1 + self.opt.lambda_dssim * (1.0 - ssim(image, gt_image))
-
-        lambda_smooth1 = max(
-            float(getattr(self.opt, "lambda_photometric_light_smooth1", 0.0)),
-            float(getattr(self.opt, "lambda_photometric_light_smooth", 0.0)),
-        )
-        if lambda_smooth1 > 0:
-            loss = loss + lambda_smooth1 * self.photometric_renderer.light_smoothness_loss(order=1)
-        if self.opt.lambda_photometric_light_smooth2 > 0:
-            loss = loss + self.opt.lambda_photometric_light_smooth2 * self.photometric_renderer.light_smoothness_loss(order=2)
-        if self.opt.lambda_photometric_hemi > 0 and self.opt.photometric_use_hemi_prior:
-            loss = loss + self.opt.lambda_photometric_hemi * self.photometric_renderer.hemisphere_loss(
-                self.opt.photometric_hemi_axis, self.opt.photometric_hemi_margin
-            )
-        return loss
-
-    def run_photometric_multistart(self):
-        if self.photometric_multistart_done:
+    def initialize_v5_camera_back_ellipse(self):
+        if self.photometric_stage != "s1c_light_calib" or self.photometric_checkpoint_loaded:
             return
-        self.photometric_multistart_done = True
-        if self.render_mode != "photometric_lambertian" or self.photometric_renderer is None:
-            return
-        if self.photometric_checkpoint_loaded:
-            print("[photometric multistart] skip: loaded existing photometric checkpoint")
-            return
-        if not getattr(self.opt, "photometric_multistart_enabled", False):
-            return
-
         train_cameras = self.scene.getTrainCameras()
-        if len(train_cameras) == 0:
-            print("[photometric multistart] skip: no training cameras")
-            return
+        if not train_cameras:
+            raise RuntimeError("S1C camera-back ellipse initialization requires at least one training camera.")
 
-        num_phases = max(1, int(getattr(self.opt, "photometric_multistart_num_phases", 16)))
-        short_iters = max(0, int(getattr(self.opt, "photometric_multistart_short_iters", 1000)))
-        base_phase = float(getattr(self.opt, "photometric_init_phase", 0.0))
-        base_sign = 1 if int(getattr(self.opt, "photometric_init_direction_sign", 1)) >= 0 else -1
-        signs = [base_sign]
-        if getattr(self.opt, "photometric_multistart_try_reverse_direction", False):
-            signs.append(-base_sign)
+        camera = train_cameras[0]
+        rays = camera.rays_d_hw
+        center_y = camera.image_height // 2
+        center_x = camera.image_width // 2
+        forward = torch.nn.functional.normalize(rays[center_y, center_x], dim=0)
+        right_sample = rays[center_y, min(center_x + 1, camera.image_width - 1)]
+        left_sample = rays[center_y, max(center_x - 1, 0)]
+        right = right_sample - left_sample
+        right = right - torch.dot(right, forward) * forward
+        right = torch.nn.functional.normalize(right, dim=0)
+        up = torch.nn.functional.normalize(torch.cross(forward, right, dim=0), dim=0)
 
-        phases = [base_phase + 2.0 * np.pi * phase_idx / float(num_phases) for phase_idx in range(num_phases)]
-        candidates = [(phase, sign) for sign in signs for phase in phases]
-        sample_count = max(short_iters, 1)
-        camera_indices = [idx % len(train_cameras) for idx in range(sample_count)]
-        score_window = max(1, min(sample_count, max(short_iters // 10, 1)))
-
-        print(
-            f"[photometric multistart] candidates={len(candidates)}, "
-            f"short_iters={short_iters}, score_window={score_window}"
+        self.photometric_renderer.initialize_camera_back_ellipse(
+            right,
+            up,
+            forward,
+            self.opt.photometric_camera_ellipse_horizontal,
+            self.opt.photometric_camera_ellipse_vertical,
+            self.opt.photometric_camera_ellipse_back,
+            self.opt.photometric_camera_ellipse_phase,
+            self.opt.photometric_camera_ellipse_direction_sign,
+            self.opt.photometric_camera_ellipse_span,
         )
-
-        freeze_states = []
-        freeze_states.extend(self._set_optimizer_requires_grad(self.gaussians.optimizer, False))
-        freeze_states.extend(self._set_optimizer_requires_grad(self.deform.optimizer, False))
-
-        best_score = None
-        best_state = None
-        best_meta = None
-        candidate_scores = []
-        try:
-            for candidate_idx, (phase, direction_sign) in enumerate(candidates):
-                self.photometric_renderer.light_model.reset_circle_init(phase=phase, direction_sign=direction_sign)
-                self.photometric_renderer.training_setup(self.opt)
-                self.photometric_renderer.set_light_lr(getattr(self.opt, "photometric_s1c_light_lr", self.opt.photometric_light_lr))
-                losses = []
-
-                for local_iter, cam_idx in enumerate(camera_indices):
-                    viewpoint_cam = train_cameras[cam_idx]
-                    if self.dataset.load2gpu_on_the_fly:
-                        viewpoint_cam.load2device()
-                    loss = self._photometric_multistart_loss(viewpoint_cam, self.iteration + local_iter)
-                    if short_iters > 0:
-                        self.photometric_renderer.optimizer.zero_grad(set_to_none=True)
-                        loss.backward()
-                        self.photometric_renderer.optimizer.step()
-                    losses.append(float(loss.detach().item()))
-                    if self.dataset.load2gpu_on_the_fly:
-                        viewpoint_cam.load2device('cpu')
-
-                score = float(np.mean(losses[-score_window:]))
-                score_item = {
-                    "candidate": candidate_idx,
-                    "phase": float(phase),
-                    "direction_sign": int(direction_sign),
-                    "score": score,
-                }
-                candidate_scores.append(score_item)
-                print(
-                    "[photometric multistart] "
-                    f"{candidate_idx + 1}/{len(candidates)} phase={phase:.6f} "
-                    f"sign={direction_sign:+d} score={score:.6f}"
-                )
-                if best_score is None or score < best_score:
-                    best_score = score
-                    best_state = {
-                        key: value.detach().clone()
-                        for key, value in self.photometric_renderer.state_dict().items()
-                    }
-                    best_meta = score_item
-        finally:
-            self._restore_requires_grad(freeze_states)
-            if self.gaussians.optimizer is not None:
-                self.gaussians.optimizer.zero_grad(set_to_none=True)
-            if self.deform.optimizer is not None:
-                self.deform.optimizer.zero_grad(set_to_none=True)
-            if self.photometric_renderer.optimizer is not None:
-                self.photometric_renderer.optimizer.zero_grad(set_to_none=True)
-
-        if best_state is None or best_meta is None:
-            print("[photometric multistart] no valid candidate; keep current initialization")
-            return
-
-        self.photometric_renderer.load_state_dict(best_state, strict=True)
-        self.photometric_renderer.light_model.init_phase = float(best_meta["phase"])
-        self.photometric_renderer.light_model.init_direction_sign = int(best_meta["direction_sign"])
-        self.photometric_renderer.multistart_metadata = {
-            "enabled": True,
-            "num_phases": num_phases,
-            "try_reverse_direction": bool(getattr(self.opt, "photometric_multistart_try_reverse_direction", False)),
-            "short_iters": short_iters,
-            "score_window": score_window,
-            "best": best_meta,
-            "candidates": candidate_scores,
-        }
-        self.photometric_renderer.training_setup(self.opt)
-        self.apply_photometric_stage_lrs()
         print(
-            "[photometric multistart] selected "
-            f"phase={best_meta['phase']:.6f} sign={best_meta['direction_sign']:+d} "
-            f"score={best_meta['score']:.6f}"
+            "[photometric init] camera-back ellipse "
+            f"a={self.opt.photometric_camera_ellipse_horizontal} "
+            f"b={self.opt.photometric_camera_ellipse_vertical} "
+            f"back={self.opt.photometric_camera_ellipse_back}"
         )
-        if self.tb_writer is not None:
-            self.tb_writer.add_scalar("photometric/multistart_best_score", best_meta["score"], self.iteration)
-            self.tb_writer.add_scalar("photometric/multistart_best_phase", best_meta["phase"], self.iteration)
-            self.tb_writer.add_scalar("photometric/multistart_best_direction_sign", best_meta["direction_sign"], self.iteration)
 
     def save_initial_photometric_weights(self):
         if self.initial_photometric_saved or self.photometric_renderer is None:
@@ -513,10 +358,7 @@ class Trainer:
                     self.photometric_renderer.save_weights(self.args.model_path, self.iteration)
 
             # Densification
-            allow_densification = not (
-                self.render_mode == "photometric_lambertian"
-                and self.photometric_stage == "s1c_light_calib"
-            )
+            allow_densification = self.photometric_stage not in V5_GEOMETRY_FROZEN_STAGES
             if allow_densification and self.iteration < self.opt.densify_until_iter:
                 self.gaussians.add_densification_stats(viewspace_point_tensor, visibility_filter)
 
@@ -570,6 +412,34 @@ class Trainer:
             }
             deform_lr = 0.0
             light_lr = self.opt.photometric_s1c_light_lr
+        elif self.photometric_stage == "s1d_albedo_decompose":
+            gaussian_lrs = {
+                "xyz": 0.0,
+                "albedo_dc": 0.0,
+                "albedo_rest": 0.0,
+                "opacity": 0.0,
+                "roughness": 0.0,
+                "scaling": 0.0,
+                "rotation": 0.0,
+                "feature": 0.0,
+                "photometric_albedo": self.opt.photometric_s1d_albedo_lr,
+            }
+            deform_lr = 0.0
+            light_lr = self.opt.photometric_s1d_light_lr
+        elif self.photometric_stage == "s1e_joint_refine":
+            gaussian_lrs = {
+                "xyz": 0.0,
+                "albedo_dc": 0.0,
+                "albedo_rest": 0.0,
+                "opacity": 0.0,
+                "roughness": 0.0,
+                "scaling": self.opt.photometric_s1e_scaling_lr,
+                "rotation": self.opt.photometric_s1e_rotation_lr,
+                "feature": 0.0,
+                "photometric_albedo": self.opt.photometric_s1e_albedo_lr,
+            }
+            deform_lr = 0.0
+            light_lr = self.opt.photometric_s1e_light_lr
         elif self.photometric_stage == "s1d_joint":
             gaussian_lrs = {
                 "xyz": self.opt.photometric_s1d_position_lr,
