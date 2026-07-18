@@ -36,7 +36,7 @@ except ImportError:
 
 
 class Trainer:
-    def __init__(self, args, dataset, opt, pipe, testing_iterations, saving_iterations) -> None:
+    def __init__(self, args, dataset, opt, pipe, testing_iterations, saving_iterations, load_iteration=None) -> None:
         self.dataset = dataset
         self.args = args
         self.opt = opt
@@ -48,14 +48,19 @@ class Trainer:
         self.deform = DeformModel(deform_type=self.dataset.deform_type, is_blender=self.dataset.is_blender, 
                                   hyper_dim=self.dataset.hyper_dim,
                                   pred_color=self.dataset.pred_color)
-        deform_loaded = self.deform.load_weights(dataset.model_path, iteration=None) #was -1
+        if load_iteration is not None:
+            deform_loaded = self.deform.load_weights(dataset.model_path, iteration=load_iteration)
+            if not deform_loaded:
+                raise FileNotFoundError(
+                    f"Missing deformation checkpoint for iteration {load_iteration} in {dataset.model_path}"
+                )
         self.deform.train_setting(opt)
 
         gs_fea_dim = self.dataset.hyper_dim
         self.gaussians = GaussianModel(dataset.sh_degree, no_binary_separation=self.dataset.no_binary_separation,
                                        fea_dim=gs_fea_dim)
 
-        self.scene = Scene(dataset, self.gaussians, load_iteration=None) #originally was -1, we always want fresh start
+        self.scene = Scene(dataset, self.gaussians, load_iteration=load_iteration)
         self.gaussians.training_setup(opt)
         
         bg_color = [1, 1, 1] if dataset.white_background else [0, 0, 0]
@@ -63,7 +68,7 @@ class Trainer:
 
         self.iter_start = torch.cuda.Event(enable_timing=True)
         self.iter_end = torch.cuda.Event(enable_timing=True)
-        self.iteration = 1 if self.scene.loaded_iter is None else self.scene.loaded_iter
+        self.iteration = 1 if self.scene.loaded_iter is None else self.scene.loaded_iter + 1
 
         self.viewpoint_stack = None
         self.ema_loss_for_log = 0.0
@@ -73,7 +78,9 @@ class Trainer:
         self.best_lpips = np.inf
         self.best_alex_lpips = np.inf
         self.best_iteration = 0
-        self.progress_bar = tqdm.tqdm(range(opt.iterations), desc="Training progress")
+        self.progress_bar = tqdm.tqdm(
+            range(max(opt.iterations - self.iteration + 1, 0)), desc="Training progress"
+        )
         self.smooth_term = get_linear_noise_func(lr_init=0.1, lr_final=1e-15, lr_delay_mult=0.01, max_steps=20000)       
         self.T_current = 0.5
 
@@ -233,12 +240,29 @@ class Trainer:
                 if self.iteration > self.opt.densify_from_iter and self.iteration % self.opt.densification_interval == 0:
                     print("Gaussian numberBEFORE PRUNE", len(self.gaussians.get_xyz))
                     size_threshold = 20 if self.iteration > self.opt.opacity_reset_interval else None
-                    self.gaussians.densify_and_prune(self.opt.densify_grad_threshold, self.opt.min_opacity, self.scene.cameras_extent, size_threshold)
+                    below_cap = self.opt.max_gaussians <= 0 or len(self.gaussians.get_xyz) < self.opt.max_gaussians
+                    if below_cap:
+                        self.gaussians.densify_and_prune(self.opt.densify_grad_threshold, self.opt.min_opacity, self.scene.cameras_extent, size_threshold)
+                    else:
+                        pruned = self.gaussians.prune_only(self.opt.min_opacity, self.scene.cameras_extent, size_threshold)
+                        print(f"Gaussian cap reached; skipped densification and pruned {pruned}")
                     print("Gaussian numberAFTER PRUNE", len(self.gaussians.get_xyz))
 
                 if self.iteration % self.opt.opacity_reset_interval == 0 or (
                         self.dataset.white_background and self.iteration == self.opt.densify_from_iter):
-                    self.gaussians.reset_opacity()
+                    self.gaussians.reset_opacity(self.opt.min_opacity)
+
+            prune_only_active = (
+                self.opt.prune_from_iter >= 0
+                and self.iteration >= self.opt.prune_from_iter
+                and (self.opt.prune_until_iter < 0 or self.iteration < self.opt.prune_until_iter)
+                and self.iteration >= self.opt.densify_until_iter
+                and self.iteration % self.opt.pruning_interval == 0
+            )
+            if prune_only_active:
+                before_prune = len(self.gaussians.get_xyz)
+                pruned = self.gaussians.prune_only(self.opt.min_opacity, self.scene.cameras_extent, 20)
+                print(f"Gaussian prune-only {before_prune} -> {len(self.gaussians.get_xyz)} (pruned {pruned})")
 
             # Optimizer step
             if self.iteration < self.opt.iterations:
@@ -293,6 +317,10 @@ if __name__ == "__main__":
     parser.add_argument("--save_iterations", nargs="+", type=int, default=[1, 1000, 10000, 20000]+ list(range(10000, 100_0001, 10000)))
     parser.add_argument("--quiet", action="store_true")
     parser.add_argument("--deform-type", type=str, default='mlp')
+    parser.add_argument(
+        "--load_iteration", type=int, default=None,
+        help="Resume from a saved Gaussian/deformation iteration; omitted for a fresh run.",
+    )
 
     args = parser.parse_args(sys.argv[1:])
     args.save_iterations.append(args.iterations)
@@ -306,10 +334,10 @@ if __name__ == "__main__":
     safe_state(args.quiet)
 
     torch.autograd.set_detect_anomaly(args.detect_anomaly)
-    trainer = Trainer(args=args, dataset=lp.extract(args), opt=op.extract(args), pipe=pp.extract(args),testing_iterations=args.test_iterations, saving_iterations=args.save_iterations)
+    trainer = Trainer(args=args, dataset=lp.extract(args), opt=op.extract(args), pipe=pp.extract(args),testing_iterations=args.test_iterations, saving_iterations=args.save_iterations, load_iteration=args.load_iteration)
 
 
-    trainer.train(args.iterations)
+    trainer.train(max(args.iterations - trainer.iteration + 1, 0))
     
     # All done
     print("\nTraining complete.")

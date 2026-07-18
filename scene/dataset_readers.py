@@ -28,7 +28,6 @@ from plyfile import PlyData, PlyElement
 from .SMCReader import SMCReader
 from utils.sh_utils import SH2RGB
 from scene.gaussian_model import BasicPointCloud
-import open3d as o3d
 from tqdm import tqdm
 from utils.graphics_utils import getProjectionMatrix_DNA
 
@@ -158,7 +157,6 @@ def readCamerasFromTransforms(path, transformsfile, train_light, white_backgroun
 
     with open(os.path.join(path, transformsfile)) as json_file:
         contents = json.load(json_file)
-        fovx = contents["camera_angle_x"]
 
         frames = contents["frames"]
         frames = sorted(frames, key=lambda x: int(os.path.basename(x['file_path']).split('.')[0].split('_')[-1]))
@@ -198,11 +196,26 @@ def readCamerasFromTransforms(path, transformsfile, train_light, white_backgroun
             
             arr_train_light = np.concatenate([arr_train_light, mask], axis=-1)
 
-            image_train_light = Image.fromarray(np.array(arr_train_light * 255.0, dtype=np.byte), "RGBA" if arr_train_light.shape[-1] == 4 else "RGB")
+            image_train_light = Image.fromarray(np.array(arr_train_light * 255.0, dtype=np.uint8), "RGBA" if arr_train_light.shape[-1] == 4 else "RGB")
 
-            fovy = focal2fov(fov2focal(fovx, image_train_light.size[0]), image_train_light.size[1])
-            FovY = fovx
-            FovX = fovy
+            frame_fovx = frame.get("camera_angle_x", contents.get("camera_angle_x"))
+            frame_fovy = frame.get("camera_angle_y", contents.get("camera_angle_y"))
+            frame_fl_x = frame.get("fl_x", contents.get("fl_x"))
+            frame_fl_y = frame.get("fl_y", contents.get("fl_y"))
+
+            if frame_fl_x is not None and frame_fl_x > 0:
+                FovX = focal2fov(frame_fl_x, image_train_light.size[0])
+            elif frame_fovx is not None:
+                FovX = frame_fovx
+            else:
+                raise ValueError(f"Missing horizontal FOV/focal length in {transformsfile} frame {idx}")
+
+            if frame_fl_y is not None and frame_fl_y > 0:
+                FovY = focal2fov(frame_fl_y, image_train_light.size[1])
+            elif frame_fovy is not None:
+                FovY = frame_fovy
+            else:
+                FovY = focal2fov(fov2focal(FovX, image_train_light.size[0]), image_train_light.size[1])
 
             cam_infos.append(CameraInfo(uid=idx, R=R, T=T, FovY=FovY, FovX=FovX, 
                                         image_train_light=image_train_light, image_path_train_light=image_path_train_light, image_name_train_light=image_name_train_light, 
@@ -486,6 +499,11 @@ def read_ply_to_numpy(ply_path):
         rgb (Nx3 np.ndarray): RGB values in uint8
         dummy (None): placeholder to match (xyz, rgb, _) pattern
     """
+    # Open3D is only needed by this DNA-rendering helper.  Import it lazily so
+    # Blender training/evaluation does not have to load the large Open3D CUDA
+    # extension from the shared filesystem at process startup.
+    import open3d as o3d
+
     pcd = o3d.io.read_point_cloud(ply_path)
     xyz = np.asarray(pcd.points)
     rgb = (np.asarray(pcd.colors) * 255).astype(np.uint8)

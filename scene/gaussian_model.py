@@ -339,8 +339,12 @@ class GaussianModel:
         el = PlyElement.describe(elements, 'vertex')
         PlyData([el]).write(path)
 
-    def reset_opacity(self):
-        opacities_new = inverse_sigmoid(torch.min(self.get_opacity, torch.ones_like(self.get_opacity) * 0.01))
+    def reset_opacity(self, min_opacity=0.01):
+        # Keep reset opacities strictly above the subsequent pruning threshold.
+        # Otherwise a reset followed by densification can numerically prune every
+        # Gaussian when both values are 0.01.
+        reset_opacity = max(0.01, 2.0 * min_opacity)
+        opacities_new = inverse_sigmoid(torch.min(self.get_opacity, torch.ones_like(self.get_opacity) * reset_opacity))
         optimizable_tensors = self.replace_tensor_to_optimizer(opacities_new, "opacity")
         self._opacity = optimizable_tensors["opacity"]
     
@@ -602,6 +606,18 @@ class GaussianModel:
         self.prune_points(prune_mask)
 
         torch.cuda.empty_cache()
+
+    def prune_only(self, min_opacity, extent, max_screen_size=20):
+        """Prune weak or oversized Gaussians without cloning or splitting."""
+        prune_mask = (self.get_opacity < min_opacity).squeeze()
+        if max_screen_size:
+            big_points_vs = self.max_radii2D > max_screen_size
+            big_points_ws = self.get_scaling.max(dim=1).values > 0.1 * extent
+            prune_mask = torch.logical_or(torch.logical_or(prune_mask, big_points_vs), big_points_ws)
+        pruned = int(prune_mask.sum().item())
+        self.prune_points(prune_mask)
+        torch.cuda.empty_cache()
+        return pruned
 
     def add_densification_stats(self, viewspace_point_tensor, update_filter):
         self.xyz_gradient_accum[update_filter] += torch.norm(viewspace_point_tensor.grad[update_filter, :2], dim=-1, keepdim=True)

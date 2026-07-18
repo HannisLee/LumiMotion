@@ -125,6 +125,12 @@ class OptimizationParams(ParamGroup):
         self.densify_from_iter = 500
         self.densify_until_iter = 15_000 #50_000
         self.densify_grad_threshold = 0.0002
+        # Optional Stage1 guardrails. Negative values preserve the baseline
+        # behavior, where pruning stops together with densification.
+        self.prune_from_iter = -1
+        self.prune_until_iter = -1
+        self.pruning_interval = 1000
+        self.max_gaussians = -1
         self.oneupSHdegree_step = 1000
         self.min_opacity = 0.01
         self.start_normal_reg = 8000
