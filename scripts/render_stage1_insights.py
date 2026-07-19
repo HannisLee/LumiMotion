@@ -18,6 +18,7 @@ from utils.general_utils import safe_state
 from argparse import ArgumentParser
 from arguments import ModelParams, PipelineParams, get_combined_args
 from scene import Scene, GaussianModel, DeformModel
+from scene.photometric_lambertian import PhotometricLambertianRenderer
 import imageio
 import cv2
 import re
@@ -40,6 +41,21 @@ def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter):
                                  fea_dim=gs_fea_dim)
 
         scene = Scene(dataset, gaussians, load_iteration=load_iter)
+        render_mode = getattr(pipeline, "render_mode", "original_sh")
+        if render_mode == "original":
+            render_mode = "original_sh"
+        if render_mode not in {"original_sh", "photometric_lambertian"}:
+            raise ValueError(f"Unsupported render mode: {render_mode}")
+        pipeline.render_mode = render_mode
+        photometric_renderer = None
+        if render_mode == "photometric_lambertian":
+            if not gaussians.use_photometric_albedo:
+                gaussians.enable_photometric_albedo()
+            photometric_renderer = PhotometricLambertianRenderer(
+                scene.all_timesteps, device="cuda"
+            )
+            photometric_renderer.load_weights(dataset.model_path, scene.loaded_iter)
+            photometric_renderer.eval()
 
         original_train_cameras = scene.getTrainCameras()
         all_timesteps = scene.all_timesteps
@@ -92,7 +108,7 @@ def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter):
                 #full render
                 render_pkg = render(view, gaussians, pipeline, background, \
                                     d_xyz, d_rotation, d_scaling, d_opacity=d_opacity, d_color=d_color, \
-                                    )
+                                    photometric_renderer=photometric_renderer)
                 rendering = render_pkg["render"]
 
                 torchvision.utils.save_image(rendering.clamp(0.0,1.0), os.path.join(render_path, 'full_t{}_cam{}'.format(timestep_idx, render_name) + ".png"))
@@ -104,6 +120,10 @@ def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter):
 
                 ## alpha render
                 alpha_rend = render_pkg["rend_alpha"]
+                torchvision.utils.save_image(
+                    alpha_rend.clamp(0.0, 1.0),
+                    os.path.join(render_path, 'alpha_t{}_cam{}'.format(timestep_idx, render_name) + ".png"),
+                )
                 # torchvision.utils.save_image(rendering.clamp(0.0,1.0), os.path.join(render_path, 'full_{}'.format(timestep_idx) + ".png"))
                 img_np = alpha_rend.permute(1, 2, 0).cpu().numpy()
                 img_np = (img_np * 255).clip(0, 255).astype(np.uint8)
@@ -121,7 +141,8 @@ def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter):
                 ## show small gaussians
                 render_pkg = render(view, gaussians, pipeline, background, \
                                     d_xyz, d_rotation, 0, d_opacity=d_opacity, d_color=d_color, \
-                                    clamp_scale_for_vis=True)
+                                    clamp_scale_for_vis=True,
+                                    photometric_renderer=photometric_renderer)
                 rendering = render_pkg["render"]
                 # torchvision.utils.save_image(rendering.clamp(0.0,1.0), os.path.join(render_path, 'gaussians_small_{}'.format(timestep_idx) + ".png"))
                 img_np = rendering.permute(1, 2, 0).cpu().numpy()
@@ -133,7 +154,10 @@ def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter):
                 ##albedo- show color with no mlp-modifications and no sh1-3
                 render_pkg = render(view, gaussians, pipeline, background, \
                                     d_xyz, d_rotation, d_scaling, d_opacity=d_opacity, d_color=None, \
-                                    override_color=gaussians.get_albedo)
+                                    override_color=(gaussians.get_photometric_albedo
+                                                    if photometric_renderer is not None
+                                                    else gaussians.get_albedo),
+                                    photometric_renderer=photometric_renderer)
                 rendering = render_pkg["render"]
                 # torchvision.utils.save_image(rendering.clamp(0.0,1.0), os.path.join(render_path, 'albedo_{}'.format(timestep_idx) + ".png"))
                 img_np = rendering.permute(1, 2, 0).cpu().numpy()
@@ -149,7 +173,8 @@ def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter):
 
                 render_pkg = render(view, gaussians, pipeline, background, \
                                     d_xyz, d_rotation, 0, d_opacity=d_opacity, d_color=d_color, \
-                                    clamp_scale_for_vis=True, override_color = sep_color)
+                                    clamp_scale_for_vis=True, override_color = sep_color,
+                                    photometric_renderer=photometric_renderer)
                 rendering = render_pkg["render"]
                 torchvision.utils.save_image(rendering.clamp(0.0,1.0), os.path.join(render_path, 'separation_small_t{}_cam{}'.format(timestep_idx, render_name) + ".png"))
                 img_np = rendering.permute(1, 2, 0).cpu().numpy()
@@ -164,7 +189,8 @@ def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter):
 
                 render_pkg = render(view, gaussians, pipeline, background, \
                                     d_xyz, d_rotation, 0, d_opacity=d_opacity, d_color=d_color, \
-                                    clamp_scale_for_vis=False, override_color = sep_color)
+                                    clamp_scale_for_vis=False, override_color = sep_color,
+                                    photometric_renderer=photometric_renderer)
                 rendering = render_pkg["render"]
                 torchvision.utils.save_image(rendering.clamp(0.0,1.0), os.path.join(render_path, 'separation_large_t{}_cam{}'.format(timestep_idx, render_name) + ".png"))
                 img_np = rendering.permute(1, 2, 0).cpu().numpy()

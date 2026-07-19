@@ -82,6 +82,9 @@ class ModelParams(ParamGroup):
 
 class PipelineParams(ParamGroup):
     def __init__(self, parser):
+        # Shared default stays on the paper/baseline path. train_stage1 overrides
+        # this parser default to photometric_lambertian on the perlight branch.
+        self.render_mode = "original_sh"
         self.convert_SHs_python = False
         self.compute_cov3D_python = False
         self.debug = False
@@ -125,6 +128,12 @@ class OptimizationParams(ParamGroup):
         self.densify_from_iter = 500
         self.densify_until_iter = 15_000 #50_000
         self.densify_grad_threshold = 0.0002
+        # Optional Stage1 guardrails. Negative values preserve the baseline
+        # behavior, where pruning stops together with densification.
+        self.prune_from_iter = -1
+        self.prune_until_iter = -1
+        self.pruning_interval = 1000
+        self.max_gaussians = -1
         self.oneupSHdegree_step = 1000
         self.min_opacity = 0.01
         self.start_normal_reg = 8000
@@ -154,6 +163,21 @@ class OptimizationParams(ParamGroup):
         self.lambda_light=0.0
         self.lambda_light_smooth=0.0
         self.lambda_base_color_smooth=0.0
+
+        # Stage 1 per-frame directional-light Lambertian rendering. A selected
+        # photometric run keeps the original SH renderer through iteration
+        # photometric_start_iter - 1, then switches in a single training process.
+        self.photometric_start_iter = 10_001
+        self.photometric_albedo_lr = 0.001
+        self.photometric_light_lr = 0.0001
+        self.lambda_photometric_light_smooth1 = 0.001
+        self.photometric_normal_axis = "+z"
+        self.photometric_camera_ellipse_horizontal = 0.7
+        self.photometric_camera_ellipse_vertical = 0.35
+        self.photometric_camera_ellipse_back = 1.0
+        self.photometric_camera_ellipse_phase = 0.0
+        self.photometric_camera_ellipse_direction_sign = 1
+        self.photometric_camera_ellipse_span = 6.283185307179586
 
         super().__init__(parser, "Optimization Parameters")
 

@@ -17,6 +17,7 @@ from utils.point_utils import depth_to_normal
 import numpy as np
 import cv2
 from utils.sh_utils import eval_sh, SH2RGB, RGB2SH
+from scene.photometric_lambertian import get_gaussian_normal
 
 def standardize_quaternion(quaternions: torch.Tensor) -> torch.Tensor:
     return torch.where(quaternions[..., 0:1] < 0, -quaternions, quaternions)
@@ -35,12 +36,13 @@ def quaternion_multiply(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
     return standardize_quaternion(ab)
 
 
-def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor, 
+def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
            d_xyz, d_rotation, d_scaling, d_opacity=None, d_color=None, scaling_modifier=1.0, 
            override_color=None, detach_xyz=False, 
            detach_scale=False, detach_rot=False, detach_opacity=False, scale_const=None, 
-           d_rotation_bias=None, depth_filtering=False, 
-           raster_settings_override = None, clamp_scale_for_vis = False):
+           d_rotation_bias=None, depth_filtering=False,
+           raster_settings_override = None, clamp_scale_for_vis = False,
+           photometric_renderer=None):
     """
     Render the scene. 
     
@@ -109,7 +111,24 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
     # from SHs in Python, do it. If not, then SH -> RGB conversion will be done by rasterizer.
     shs = None
     colors_precomp = None
-    if override_color is None:
+    photometric_outputs = None
+    render_mode = getattr(pipe, "render_mode", "original_sh")
+    if render_mode == "original":
+        render_mode = "original_sh"
+    if override_color is None and render_mode == "photometric_lambertian":
+        if photometric_renderer is None:
+            raise ValueError("photometric_lambertian rendering requires a photometric_renderer")
+        normal_rotations = rotations
+        if normal_rotations is None:
+            normal_rotations = pc.get_rotation_bias(d_rotation)
+            if d_rotation_bias is not None:
+                normal_rotations = quaternion_multiply(d_rotation_bias, normal_rotations)
+        normal_i_t = get_gaussian_normal(normal_rotations, photometric_renderer.normal_axis)
+        photometric_outputs = photometric_renderer(
+            pc.get_photometric_albedo, normal_i_t, viewpoint_camera.fid
+        )
+        colors_precomp = photometric_outputs["color"]
+    elif override_color is None:
         if d_color is not None and type(d_color) is not float:
             shadowed_modulation = d_color[:,None, :3].clamp_max(1.0)
             final_color = RGB2SH(SH2RGB(pc.get_features[:, :1]) * (1 - shadowed_modulation))
@@ -229,5 +248,15 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
             'surf_point': surf_point,
             "bg_color": bg
     })
+    if photometric_outputs is not None:
+        rets.update({
+            "photometric_color": photometric_outputs["color"],
+            "photometric_albedo": pc.get_photometric_albedo,
+            "photometric_normal": photometric_outputs["normal"],
+            "photometric_light_dir": photometric_outputs["light_dir"],
+            "photometric_ndotl": photometric_outputs["ndotl"],
+            "photometric_shading": photometric_outputs["shading"],
+            "photometric_timestep_idx": photometric_outputs["timestep_idx"],
+        })
 
     return rets

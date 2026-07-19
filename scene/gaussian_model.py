@@ -73,6 +73,9 @@ class GaussianModel:
 
         self.fea_dim = fea_dim
         self.feature = torch.empty(0)
+        self.use_photometric_albedo = False
+        self._photometric_albedo = torch.empty(0)
+        self._photometric_albedo_init = torch.empty(0)
 
         self.optimizer = None
 
@@ -137,6 +140,10 @@ class GaussianModel:
         new_gs._rotation = nn.Parameter(gs._rotation)
         new_gs._opacity = nn.Parameter(gs._opacity)
         new_gs.feature = nn.Parameter(gs.feature)
+        if getattr(gs, "_photometric_albedo", torch.empty(0)).numel() > 0:
+            new_gs._photometric_albedo = nn.Parameter(gs._photometric_albedo)
+            new_gs._photometric_albedo_init = gs._photometric_albedo_init
+            new_gs.use_photometric_albedo = gs.use_photometric_albedo
         new_gs.max_radii2D = torch.zeros((new_gs.get_xyz.shape[0]), device="cuda")
         return new_gs
 
@@ -167,6 +174,59 @@ class GaussianModel:
     @property
     def get_albedo(self):
         return torch.clamp(SH2RGB(self._albedo_dc.squeeze()), 0.03, 0.97)
+
+    @property
+    def get_photometric_albedo(self):
+        if self._photometric_albedo.numel() == 0:
+            albedo = self.get_albedo
+            return albedo if albedo.ndim == 2 else albedo[None]
+        return torch.sigmoid(self._photometric_albedo)
+
+    @property
+    def get_photometric_albedo_init(self):
+        if self._photometric_albedo_init.numel() == 0:
+            return self.get_photometric_albedo.detach()
+        return self._photometric_albedo_init
+
+    def enable_photometric_albedo(self, init_albedo=None):
+        if init_albedo is None:
+            if self._photometric_albedo.numel() > 0:
+                init_albedo = torch.sigmoid(self._photometric_albedo.detach())
+            else:
+                init_albedo = self.get_albedo.detach()
+        if init_albedo.ndim == 1:
+            init_albedo = init_albedo[None]
+        init_albedo = init_albedo.to(self.get_xyz.device).float().clamp(1e-4, 1.0 - 1e-4)
+        if self._photometric_albedo.numel() == 0 or self._photometric_albedo.shape != init_albedo.shape:
+            self._photometric_albedo = nn.Parameter(inverse_sigmoid(init_albedo).requires_grad_(True))
+        elif not isinstance(self._photometric_albedo, nn.Parameter):
+            self._photometric_albedo = nn.Parameter(self._photometric_albedo.requires_grad_(True))
+        if self._photometric_albedo_init.numel() == 0 or self._photometric_albedo_init.shape != init_albedo.shape:
+            self._photometric_albedo_init = init_albedo.detach().clone()
+        self.use_photometric_albedo = True
+
+    def reset_photometric_albedo_from_sh(self):
+        """Initialize diffuse albedo from the SH/DC colors at the mode switch."""
+        init_albedo = self.get_albedo.detach()
+        if init_albedo.ndim == 1:
+            init_albedo = init_albedo[None]
+        init_albedo = init_albedo.clamp(1e-4, 1.0 - 1e-4)
+        if self._photometric_albedo.shape != init_albedo.shape:
+            raise RuntimeError(
+                "Photometric albedo shape changed outside densification: "
+                f"{tuple(self._photometric_albedo.shape)} vs {tuple(init_albedo.shape)}"
+            )
+        with torch.no_grad():
+            self._photometric_albedo.copy_(inverse_sigmoid(init_albedo))
+            self._photometric_albedo_init = init_albedo.clone()
+
+    def set_photometric_albedo_lr(self, learning_rate):
+        if self.optimizer is None:
+            return
+        for group in self.optimizer.param_groups:
+            if group["name"] == "photometric_albedo":
+                group["lr"] = float(learning_rate)
+
 
 
     @property
@@ -274,6 +334,10 @@ class GaussianModel:
             l.append(
                 {'params': [self.feature], 'lr': training_args.feature_lr, 'name': 'feature'}
             )
+        if self.use_photometric_albedo:
+            l.append(
+                {'params': [self._photometric_albedo], 'lr': 0.0, 'name': 'photometric_albedo'}
+            )
 
         self.optimizer = torch.optim.Adam(l, lr=0.0, eps=1e-15)
         self.xyz_scheduler_args = get_expon_lr_func(lr_init=training_args.position_lr_init * self.spatial_lr_scale, lr_final=training_args.position_lr_final * self.spatial_lr_scale, lr_delay_mult=training_args.position_lr_delay_mult, max_steps=training_args.position_lr_max_steps)
@@ -304,6 +368,11 @@ class GaussianModel:
             l.append('scale_{}'.format(i))
         for i in range(self._rotation.shape[1]):
             l.append('rot_{}'.format(i))
+        if self.use_photometric_albedo:
+            for i in range(3):
+                l.append('photometric_albedo_raw_{}'.format(i))
+            for i in range(3):
+                l.append('photometric_albedo_init_{}'.format(i))
         for i in range(self.fea_dim):
             l.append('fea_{}'.format(i))
         return l
@@ -332,6 +401,12 @@ class GaussianModel:
 
         elements = np.empty(xyz.shape[0], dtype=dtype_full)
         attributes = np.concatenate((xyz, normals, albedo_dc, albedo_dc_stage1, albedo_rest, albedo_dc, opacities, roughness, scale, rotation), axis=1)
+        if self.use_photometric_albedo:
+            attributes = np.concatenate((
+                attributes,
+                self._photometric_albedo.detach().cpu().numpy(),
+                self.get_photometric_albedo_init.detach().cpu().numpy(),
+            ), axis=1)
         if self.fea_dim > 0:
             feature = self.feature.detach().cpu().numpy()
             attributes = np.concatenate((attributes, feature), axis=1)
@@ -339,8 +414,12 @@ class GaussianModel:
         el = PlyElement.describe(elements, 'vertex')
         PlyData([el]).write(path)
 
-    def reset_opacity(self):
-        opacities_new = inverse_sigmoid(torch.min(self.get_opacity, torch.ones_like(self.get_opacity) * 0.01))
+    def reset_opacity(self, min_opacity=0.01):
+        # Keep reset opacities strictly above the subsequent pruning threshold.
+        # Otherwise a reset followed by densification can numerically prune every
+        # Gaussian when both values are 0.01.
+        reset_opacity = max(0.01, 2.0 * min_opacity)
+        opacities_new = inverse_sigmoid(torch.min(self.get_opacity, torch.ones_like(self.get_opacity) * reset_opacity))
         optimizable_tensors = self.replace_tensor_to_optimizer(opacities_new, "opacity")
         self._opacity = optimizable_tensors["opacity"]
     
@@ -404,6 +483,23 @@ class GaussianModel:
         for idx, attr_name in enumerate(fea_names):
             feas[:, idx] = np.asarray(plydata.elements[0][attr_name])
 
+        photometric_albedo = None
+        photometric_albedo_init = None
+        raw_names = [p.name for p in plydata.elements[0].properties if p.name.startswith("photometric_albedo_raw_")]
+        if len(raw_names) == 3:
+            raw_names = sorted(raw_names, key=lambda name: int(name.split('_')[-1]))
+            photometric_albedo = np.stack(
+                [np.asarray(plydata.elements[0][name]) for name in raw_names], axis=1
+            )
+            init_names = [p.name for p in plydata.elements[0].properties if p.name.startswith("photometric_albedo_init_")]
+            if len(init_names) == 3:
+                init_names = sorted(init_names, key=lambda name: int(name.split('_')[-1]))
+                photometric_albedo_init = np.stack(
+                    [np.asarray(plydata.elements[0][name]) for name in init_names], axis=1
+                )
+            else:
+                photometric_albedo_init = 1.0 / (1.0 + np.exp(-photometric_albedo))
+
 
 
         self._xyz = nn.Parameter(torch.tensor(xyz, dtype=torch.float, device="cuda").requires_grad_(True))
@@ -415,6 +511,15 @@ class GaussianModel:
         self._scaling = nn.Parameter(torch.tensor(scales, dtype=torch.float, device="cuda").requires_grad_(True))
         self._roughness = nn.Parameter(torch.tensor(roughness, dtype=torch.float, device="cuda").requires_grad_(True))
         self._rotation = nn.Parameter(torch.tensor(rots, dtype=torch.float, device="cuda").requires_grad_(True))
+
+        if photometric_albedo is not None:
+            self._photometric_albedo = nn.Parameter(
+                torch.tensor(photometric_albedo, dtype=torch.float, device="cuda").requires_grad_(True)
+            )
+            self._photometric_albedo_init = torch.tensor(
+                photometric_albedo_init, dtype=torch.float, device="cuda"
+            )
+            self.use_photometric_albedo = True
 
         if self.fea_dim > 0:
             self.feature = nn.Parameter(torch.tensor(feas, dtype=torch.float, device="cuda").requires_grad_(True))
@@ -467,6 +572,9 @@ class GaussianModel:
         self._roughness = optimizable_tensors["roughness"]
         self._scaling = optimizable_tensors["scaling"]
         self._rotation = optimizable_tensors["rotation"]
+        if self.use_photometric_albedo:
+            self._photometric_albedo = optimizable_tensors["photometric_albedo"]
+            self._photometric_albedo_init = self._photometric_albedo_init[valid_points_mask]
 
         if self.fea_dim > 0:
             self.feature = optimizable_tensors["feature"]
@@ -503,7 +611,9 @@ class GaussianModel:
         return optimizable_tensors
 
 
-    def densification_postfix(self, new_xyz, new_albedo_dc, new_albedo_rest, new_opacities, new_roughness, new_scaling, new_rotation, new_feature=None):
+    def densification_postfix(self, new_xyz, new_albedo_dc, new_albedo_rest, new_opacities,
+                              new_roughness, new_scaling, new_rotation, new_feature=None,
+                              new_photometric_albedo=None, new_photometric_albedo_init=None):
         d = {"xyz": new_xyz,
             "albedo_dc": new_albedo_dc,
             "albedo_rest": new_albedo_rest,
@@ -514,6 +624,8 @@ class GaussianModel:
         
         if self.fea_dim > 0:
             d["feature"] = new_feature
+        if self.use_photometric_albedo:
+            d["photometric_albedo"] = new_photometric_albedo
 
         optimizable_tensors = self.cat_tensors_to_optimizer(d)
         self._xyz = optimizable_tensors["xyz"]
@@ -523,6 +635,11 @@ class GaussianModel:
         self._roughness = optimizable_tensors["roughness"]
         self._scaling = optimizable_tensors["scaling"]
         self._rotation = optimizable_tensors["rotation"]
+        if self.use_photometric_albedo:
+            self._photometric_albedo = optimizable_tensors["photometric_albedo"]
+            self._photometric_albedo_init = torch.cat(
+                (self._photometric_albedo_init, new_photometric_albedo_init), dim=0
+            )
 
         if self.fea_dim > 0:
             self.feature = optimizable_tensors["feature"]
@@ -558,8 +675,12 @@ class GaussianModel:
         new_roughness = self._roughness[selected_pts_mask].repeat(N, 1)
 
         new_feature = self.feature[selected_pts_mask].repeat(N, 1) if self.fea_dim > 0 else None
-        
-        self.densification_postfix(new_xyz, new_albedo_dc, new_albedo_rest, new_opacity, new_roughness, new_scaling, new_rotation, new_feature)
+        new_photometric_albedo = self._photometric_albedo[selected_pts_mask].repeat(N, 1) if self.use_photometric_albedo else None
+        new_photometric_albedo_init = self._photometric_albedo_init[selected_pts_mask].repeat(N, 1) if self.use_photometric_albedo else None
+
+        self.densification_postfix(new_xyz, new_albedo_dc, new_albedo_rest, new_opacity,
+                                   new_roughness, new_scaling, new_rotation, new_feature,
+                                   new_photometric_albedo, new_photometric_albedo_init)
 
         if not without_prune:
             prune_filter = torch.cat(
@@ -583,9 +704,13 @@ class GaussianModel:
         new_rotation = self._rotation[selected_pts_mask]
 
         new_feature = self.feature[selected_pts_mask] if self.fea_dim > 0  else None
+        new_photometric_albedo = self._photometric_albedo[selected_pts_mask] if self.use_photometric_albedo else None
+        new_photometric_albedo_init = self._photometric_albedo_init[selected_pts_mask] if self.use_photometric_albedo else None
 
         self.densification_postfix(new_xyz,
-                                   new_albedo_dc, new_albedo_rest, new_opacities, new_roughness, new_scaling, new_rotation, new_feature)
+                                   new_albedo_dc, new_albedo_rest, new_opacities, new_roughness,
+                                   new_scaling, new_rotation, new_feature,
+                                   new_photometric_albedo, new_photometric_albedo_init)
 
     def densify_and_prune(self, max_grad, min_opacity, extent, max_screen_size):
         grads = self.xyz_gradient_accum / self.denom
@@ -602,6 +727,18 @@ class GaussianModel:
         self.prune_points(prune_mask)
 
         torch.cuda.empty_cache()
+
+    def prune_only(self, min_opacity, extent, max_screen_size=20):
+        """Prune weak or oversized Gaussians without cloning or splitting."""
+        prune_mask = (self.get_opacity < min_opacity).squeeze()
+        if max_screen_size:
+            big_points_vs = self.max_radii2D > max_screen_size
+            big_points_ws = self.get_scaling.max(dim=1).values > 0.1 * extent
+            prune_mask = torch.logical_or(torch.logical_or(prune_mask, big_points_vs), big_points_ws)
+        pruned = int(prune_mask.sum().item())
+        self.prune_points(prune_mask)
+        torch.cuda.empty_cache()
+        return pruned
 
     def add_densification_stats(self, viewspace_point_tensor, update_filter):
         self.xyz_gradient_accum[update_filter] += torch.norm(viewspace_point_tensor.grad[update_filter, :2], dim=-1, keepdim=True)
