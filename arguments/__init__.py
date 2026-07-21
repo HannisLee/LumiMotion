@@ -170,8 +170,16 @@ class OptimizationParams(ParamGroup):
         self.photometric_start_iter = 10_001
         self.photometric_albedo_lr = 0.001
         self.photometric_light_lr = 0.0001
+        # Optional piecewise-constant schedule expressed as start_iter:lr
+        # entries, for example "1:0.003,10001:0.0003,30001:0.0001".
+        # An empty string preserves the constant photometric_light_lr path.
+        self.photometric_light_lr_schedule = ""
         self.lambda_photometric_light_smooth1 = 0.001
         self.photometric_normal_axis = "+z"
+        # V2 traces a virtual light-position ellipse from the first training
+        # camera in world XZ. Pass v1 explicitly for the legacy initialization.
+        self.photometric_light_init_version = "v2"
+        self.photometric_light_init_v2_axis_ratio = 0.5
         self.photometric_camera_ellipse_horizontal = 0.7
         self.photometric_camera_ellipse_vertical = 0.35
         self.photometric_camera_ellipse_back = 1.0

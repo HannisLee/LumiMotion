@@ -14,6 +14,10 @@ import torch.nn.functional as F
 from utils.general_utils import build_rotation
 
 
+PHOTOMETRIC_VERSION = "stage1_perlight_v2_light_to_surface_ray"
+DIRECTION_CONVENTION = "light_to_surface"
+
+
 def _as_timestep_tensor(timesteps: Any, device: str | torch.device) -> torch.Tensor:
     if isinstance(timesteps, dict):
         ordered = [fid for fid, _ in sorted(timesteps.items(), key=lambda item: item[1])]
@@ -69,7 +73,7 @@ def get_gaussian_normal(rotation_t: torch.Tensor, normal_axis: str = "+z") -> to
 
 
 class DirectionalLightModel(nn.Module):
-    """A freely learnable unit direction for every scene timestep."""
+    """A freely learnable light-to-surface unit ray for every scene timestep."""
 
     def __init__(self, timesteps: Any, device: str | torch.device = "cuda"):
         super().__init__()
@@ -98,18 +102,88 @@ class DirectionalLightModel(nn.Module):
         dtype = self._raw_light_dir_table.dtype
         right = F.normalize(camera_right.to(device=device, dtype=dtype), dim=0)
         up = F.normalize(camera_up.to(device=device, dtype=dtype), dim=0)
-        back = -F.normalize(camera_forward.to(device=device, dtype=dtype), dim=0)
+        toward_object = F.normalize(camera_forward.to(device=device, dtype=dtype), dim=0)
         denominator = max(self.num_timesteps - 1, 1)
         time = torch.arange(self.num_timesteps, device=device, dtype=dtype) / float(denominator)
         sign = 1.0 if int(direction_sign) >= 0 else -1.0
         theta = float(phase) + sign * float(span) * time
+        # The light position is behind the camera relative to the object:
+        #   object_to_light = a*cos(theta)*right + b*sin(theta)*up - back*forward.
+        # Store the physical propagation direction from that light to the object.
         raw = (
-            float(horizontal_radius) * torch.cos(theta)[:, None] * right[None]
-            + float(vertical_radius) * torch.sin(theta)[:, None] * up[None]
-            + float(back_offset) * back[None]
+            -float(horizontal_radius) * torch.cos(theta)[:, None] * right[None]
+            - float(vertical_radius) * torch.sin(theta)[:, None] * up[None]
+            + float(back_offset) * toward_object[None]
         )
         with torch.no_grad():
             self._raw_light_dir_table.copy_(F.normalize(raw, dim=-1))
+
+    def initialize_camera_pose_xz_ellipse(
+        self,
+        camera_center: torch.Tensor,
+        object_center: torch.Tensor,
+        axis_ratio: float,
+    ) -> dict[str, torch.Tensor | float]:
+        """Initialize rays from a closed world-XZ light-position ellipse."""
+        device = self.timesteps.device
+        dtype = self._raw_light_dir_table.dtype
+        camera = camera_center.to(device=device, dtype=dtype).flatten()
+        center = object_center.to(device=device, dtype=dtype).flatten()
+        if camera.numel() != 3 or center.numel() != 3:
+            raise ValueError("Camera and object centers must each contain three values.")
+        ratio = float(axis_ratio)
+        if ratio <= 0.0:
+            raise ValueError("V2 ellipse axis ratio must be positive.")
+
+        radial_xz = camera - center
+        radial_xz = radial_xz.clone()
+        radial_xz[1] = 0.0
+        major_radius = torch.linalg.vector_norm(radial_xz)
+        eps = torch.finfo(dtype).eps * 16.0
+        if major_radius.item() <= eps:
+            raise ValueError(
+                "V2 ellipse requires a non-zero camera-to-object distance in world XZ."
+            )
+        major_axis = radial_xz / major_radius
+        minor_axis = torch.stack(
+            (-major_axis[2], major_axis.new_zeros(()), major_axis[0])
+        )
+        if minor_axis[2].item() < 0.0:
+            minor_axis = -minor_axis
+        if minor_axis[2].abs().item() <= eps:
+            raise ValueError(
+                "V2 ellipse cannot initially rise in world Z when the camera-to-object "
+                "XZ vector is parallel to world Z."
+            )
+        minor_radius = major_radius * ratio
+
+        denominator = max(self.num_timesteps - 1, 1)
+        time = torch.arange(self.num_timesteps, device=device, dtype=dtype) / float(denominator)
+        theta = (2.0 * torch.pi) * time
+        plane_center = center.clone()
+        plane_center[1] = camera[1]
+        positions = (
+            plane_center[None]
+            + major_radius * torch.cos(theta)[:, None] * major_axis[None]
+            + minor_radius * torch.sin(theta)[:, None] * minor_axis[None]
+        )
+        raw = center[None] - positions
+        raw_norm = torch.linalg.vector_norm(raw, dim=-1)
+        if raw_norm.min().item() <= eps:
+            raise ValueError("V2 ellipse places a virtual light at the object center.")
+        directions = F.normalize(raw, dim=-1)
+        with torch.no_grad():
+            self._raw_light_dir_table.copy_(directions)
+        return {
+            "camera_center": camera.detach().clone(),
+            "object_center": center.detach().clone(),
+            "plane_center": plane_center.detach().clone(),
+            "major_axis": major_axis.detach().clone(),
+            "minor_axis": minor_axis.detach().clone(),
+            "major_radius": float(major_radius.item()),
+            "minor_radius": float(minor_radius.item()),
+            "positions": positions.detach().clone(),
+        }
 
     def get_all_raw_light_dirs(self) -> torch.Tensor:
         return self._raw_light_dir_table
@@ -191,12 +265,40 @@ class PhotometricLambertianRenderer(nn.Module):
         )
         self.initialization_metadata = {
             "type": "camera_back_ellipse",
+            "initialization_version": "v1",
+            "direction_convention": DIRECTION_CONVENTION,
             "horizontal_radius": float(horizontal_radius),
             "vertical_radius": float(vertical_radius),
             "back_offset": float(back_offset),
             "phase": float(phase),
             "direction_sign": 1 if int(direction_sign) >= 0 else -1,
             "span": float(span),
+        }
+
+    def initialize_camera_pose_xz_ellipse(
+        self,
+        camera_center: torch.Tensor,
+        object_center: torch.Tensor,
+        axis_ratio: float,
+    ) -> None:
+        trajectory = self.light_model.initialize_camera_pose_xz_ellipse(
+            camera_center,
+            object_center,
+            axis_ratio,
+        )
+        self.initialization_metadata = {
+            "type": "camera_pose_xz_ellipse",
+            "initialization_version": "v2",
+            "direction_convention": DIRECTION_CONVENTION,
+            "camera_center": trajectory["camera_center"].cpu().tolist(),
+            "object_center": trajectory["object_center"].cpu().tolist(),
+            "plane_center": trajectory["plane_center"].cpu().tolist(),
+            "major_axis": trajectory["major_axis"].cpu().tolist(),
+            "minor_axis": trajectory["minor_axis"].cpu().tolist(),
+            "major_radius": trajectory["major_radius"],
+            "minor_radius": trajectory["minor_radius"],
+            "axis_ratio": float(axis_ratio),
+            "span": float(2.0 * np.pi),
         }
 
     def get_all_raw_light_dirs(self) -> torch.Tensor:
@@ -209,18 +311,23 @@ class PhotometricLambertianRenderer(nn.Module):
         return self.light_model.first_order_smoothness_loss()
 
     def forward(self, albedo: torch.Tensor, normal: torch.Tensor, frame_id: torch.Tensor) -> dict[str, torch.Tensor]:
-        light_dir = self.light_model(frame_id)
-        if light_dir.ndim == 2:
-            light_dir = light_dir[0]
+        ray_dir = self.light_model(frame_id)
+        if ray_dir.ndim == 2:
+            ray_dir = ray_dir[0]
         normal = F.normalize(normal, dim=-1)
-        light_dir = F.normalize(light_dir, dim=-1)
-        ndotl = (normal * light_dir[None]).sum(dim=-1, keepdim=True)
+        ray_dir = F.normalize(ray_dir, dim=-1)
+        surface_to_light_dir = -ray_dir
+        ndotl = (normal * surface_to_light_dir[None]).sum(dim=-1, keepdim=True)
         shading = ndotl.clamp_min(0.0)
         return {
             "color": (albedo * shading).clamp(0.0, 1.0),
             "albedo": albedo,
             "normal": normal,
-            "light_dir": light_dir,
+            # Keep light_dir as an alias for callers, but its v2 convention is
+            # explicitly the physical light-to-surface propagation direction.
+            "light_dir": ray_dir,
+            "ray_dir": ray_dir,
+            "surface_to_light_dir": surface_to_light_dir,
             "ndotl": ndotl,
             "shading": shading,
             "timestep_idx": self.light_model.timestep_index(frame_id)[0],
@@ -230,8 +337,12 @@ class PhotometricLambertianRenderer(nn.Module):
         return {
             "state_dict": self.state_dict(),
             "timesteps": self.light_model.timesteps.detach().cpu(),
-            "photometric_version": "stage1_perlight_v1_directional_camera_back_ellipse",
-            "config": {"normal_axis": self.normal_axis, "light_param": "per_frame"},
+            "photometric_version": PHOTOMETRIC_VERSION,
+            "config": {
+                "normal_axis": self.normal_axis,
+                "light_param": "per_frame",
+                "direction_convention": DIRECTION_CONVENTION,
+            },
             "initialization": self.initialization_metadata,
         }
 
@@ -242,15 +353,29 @@ class PhotometricLambertianRenderer(nn.Module):
         if "raw_light_dir" in state_dict and "light_model._raw_light_dir_table" not in state_dict:
             state_dict["light_model._raw_light_dir_table"] = state_dict.pop("raw_light_dir")
         state_dict.pop("raw_light_rgb", None)
+        direction_convention = config.get("direction_convention")
+        if direction_convention != DIRECTION_CONVENTION:
+            raw_key = "light_model._raw_light_dir_table"
+            if raw_key in state_dict:
+                # v1 stored surface-to-light vectors. Negating them preserves
+                # the rendered Lambertian shading under the v2 ray convention.
+                state_dict[raw_key] = -state_dict[raw_key]
         self.load_state_dict(state_dict, strict=False)
         self.initialization_metadata = dict(state.get("initialization", {}))
+        if "initialization_version" not in self.initialization_metadata:
+            init_type = self.initialization_metadata.get("type")
+            self.initialization_metadata["initialization_version"] = (
+                "v2" if init_type == "camera_pose_xz_ellipse" else "v1"
+            )
+        self.initialization_metadata["direction_convention"] = DIRECTION_CONVENTION
 
     def light_trajectory_dict(self) -> dict[str, Any]:
         raw = self.get_all_raw_light_dirs().detach().cpu().float()
         directions = self.get_all_light_dirs().detach().cpu().float()
         times = self.light_model.timesteps.detach().cpu().float()
         return {
-            "photometric_version": "stage1_perlight_v1_directional_camera_back_ellipse",
+            "photometric_version": PHOTOMETRIC_VERSION,
+            "direction_convention": DIRECTION_CONVENTION,
             "initialization": self.initialization_metadata,
             "frames": [
                 {
@@ -258,6 +383,7 @@ class PhotometricLambertianRenderer(nn.Module):
                     "fid": float(times[index]),
                     "raw": raw[index].tolist(),
                     "direction": directions[index].tolist(),
+                    "ray_direction_light_to_surface": directions[index].tolist(),
                 }
                 for index in range(directions.shape[0])
             ],

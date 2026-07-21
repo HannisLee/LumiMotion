@@ -36,6 +36,31 @@ except ImportError:
     TENSORBOARD_FOUND = False
 
 
+def parse_photometric_light_lr_schedule(spec):
+    """Parse a piecewise-constant start-iteration light-LR schedule."""
+    text = str(spec or "").strip()
+    if not text:
+        return ()
+    schedule = []
+    for entry in text.split(","):
+        parts = entry.strip().split(":")
+        if len(parts) != 2:
+            raise ValueError(
+                "photometric_light_lr_schedule entries must use start_iter:lr, "
+                f"got {entry!r}."
+            )
+        start_iteration = int(parts[0])
+        learning_rate = float(parts[1])
+        if start_iteration < 1:
+            raise ValueError("Light-LR schedule start iterations must be >= 1.")
+        if learning_rate < 0.0:
+            raise ValueError("Light-LR schedule values must be non-negative.")
+        schedule.append((start_iteration, learning_rate))
+    if any(current[0] >= following[0] for current, following in zip(schedule, schedule[1:])):
+        raise ValueError("Light-LR schedule start iterations must be strictly increasing.")
+    return tuple(schedule)
+
+
 class Trainer:
     def __init__(self, args, dataset, opt, pipe, testing_iterations, saving_iterations, load_iteration=None) -> None:
         self.dataset = dataset
@@ -51,6 +76,18 @@ class Trainer:
         self.saving_iterations = saving_iterations
         self.photometric_renderer = None
         self.photometric_initialized = False
+        self.photometric_light_init_version = str(
+            getattr(opt, "photometric_light_init_version", "v2")
+        ).strip().lower()
+        if self.photometric_light_init_version not in {"v1", "v2"}:
+            raise ValueError(
+                "photometric_light_init_version must be 'v1' or 'v2', got "
+                f"{self.photometric_light_init_version!r}."
+            )
+        self.photometric_light_lr_schedule = parse_photometric_light_lr_schedule(
+            getattr(opt, "photometric_light_lr_schedule", "")
+        )
+        self._last_photometric_light_lr = None
 
         self.tb_writer = prepare_output_and_logger(dataset)
         self.deform = DeformModel(deform_type=self.dataset.deform_type, is_blender=self.dataset.is_blender, 
@@ -70,6 +107,9 @@ class Trainer:
 
         self.scene = Scene(dataset, self.gaussians, load_iteration=load_iteration)
         if self.requested_render_mode == "photometric_lambertian":
+            self.photometric_object_center = (
+                self.gaussians.get_xyz.detach().mean(dim=0).clone()
+            )
             # Allocate the albedo group before optimizer construction so it also
             # follows any densification performed during the SH warm-up.
             if not self.gaussians.use_photometric_albedo:
@@ -113,6 +153,14 @@ class Trainer:
             and self.iteration >= self.opt.photometric_start_iter
         )
 
+    def photometric_light_lr(self):
+        learning_rate = float(self.opt.photometric_light_lr)
+        for start_iteration, scheduled_lr in self.photometric_light_lr_schedule:
+            if self.iteration < start_iteration:
+                break
+            learning_rate = scheduled_lr
+        return learning_rate
+
     def initialize_camera_back_ellipse(self):
         train_cameras = self.scene.getTrainCameras()
         if not train_cameras:
@@ -139,12 +187,41 @@ class Trainer:
             self.opt.photometric_camera_ellipse_span,
         )
         print(
-            "[photometric init] camera-back ellipse "
+            "[photometric init] V1 camera-back ellipse "
             f"at iteration {self.iteration}: "
             f"a={self.opt.photometric_camera_ellipse_horizontal}, "
             f"b={self.opt.photometric_camera_ellipse_vertical}, "
             f"back={self.opt.photometric_camera_ellipse_back}"
         )
+
+    def initialize_camera_pose_xz_ellipse(self):
+        train_cameras = self.scene.getTrainCameras()
+        if not train_cameras:
+            raise RuntimeError("V2 light initialization requires a training camera.")
+        camera_center = train_cameras[0].camera_center.to(
+            device=self.photometric_object_center.device,
+            dtype=self.photometric_object_center.dtype,
+        )
+        axis_ratio = float(self.opt.photometric_light_init_v2_axis_ratio)
+        self.photometric_renderer.initialize_camera_pose_xz_ellipse(
+            camera_center,
+            self.photometric_object_center,
+            axis_ratio,
+        )
+        metadata = self.photometric_renderer.initialization_metadata
+        print(
+            "[photometric init] V2 camera-pose world-XZ ellipse "
+            f"at iteration {self.iteration}: "
+            f"axis_ratio={axis_ratio}, "
+            f"major_radius={metadata['major_radius']:.6g}, "
+            f"minor_radius={metadata['minor_radius']:.6g}"
+        )
+
+    def initialize_photometric_light(self):
+        if self.photometric_light_init_version == "v1":
+            self.initialize_camera_back_ellipse()
+        else:
+            self.initialize_camera_pose_xz_ellipse()
 
     def update_photometric_state(self):
         active = self.photometric_active
@@ -153,14 +230,16 @@ class Trainer:
             return
         if active and not self.photometric_initialized:
             self.gaussians.reset_photometric_albedo_from_sh()
-            self.initialize_camera_back_ellipse()
+            self.initialize_photometric_light()
             self.photometric_initialized = True
         self.gaussians.set_photometric_albedo_lr(
             self.opt.photometric_albedo_lr if active else 0.0
         )
-        self.photometric_renderer.set_light_lr(
-            self.opt.photometric_light_lr if active else 0.0
-        )
+        light_lr = self.photometric_light_lr() if active else 0.0
+        self.photometric_renderer.set_light_lr(light_lr)
+        if light_lr != self._last_photometric_light_lr:
+            print(f"[photometric light lr] iteration {self.iteration}: {light_lr:.10g}")
+            self._last_photometric_light_lr = light_lr
         # SH coefficients are no longer in the Lambertian RGB graph.
         if active:
             for group in self.gaussians.optimizer.param_groups:
@@ -172,6 +251,7 @@ class Trainer:
             return
         directions = self.photometric_renderer.get_all_light_dirs()
         self.tb_writer.add_scalar("photometric/light_smooth1", smooth_loss.item(), self.iteration)
+        self.tb_writer.add_scalar("photometric/light_lr", self.photometric_light_lr(), self.iteration)
         self.tb_writer.add_scalar("photometric/light_norm_mean", directions.norm(dim=-1).mean().item(), self.iteration)
         self.tb_writer.add_scalar("photometric/albedo_mean", self.gaussians.get_photometric_albedo.mean().item(), self.iteration)
         self.tb_writer.add_scalar("photometric/ndotl_mean", render_pkg["photometric_ndotl"].mean().item(), self.iteration)
