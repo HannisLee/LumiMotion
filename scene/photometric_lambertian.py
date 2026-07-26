@@ -72,6 +72,27 @@ def get_gaussian_normal(rotation_t: torch.Tensor, normal_axis: str = "+z") -> to
     return F.normalize(torch.matmul(rotation_matrix, axis.view(3, 1)).squeeze(-1), dim=-1)
 
 
+def orient_normal_toward_camera(
+    normal: torch.Tensor,
+    position: torch.Tensor,
+    camera_center: torch.Tensor,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Resolve the 2D Gaussian normal sign using the rasterizer's view-facing rule."""
+    if normal.shape != position.shape or normal.shape[-1] != 3:
+        raise ValueError(
+            "normal and position must have matching [...,3] shapes, got "
+            f"{tuple(normal.shape)} and {tuple(position.shape)}."
+        )
+    center = camera_center.to(device=normal.device, dtype=normal.dtype)
+    if center.numel() != 3:
+        raise ValueError(f"camera_center must contain three values, got {tuple(center.shape)}.")
+    center = center.reshape(*([1] * (normal.ndim - 1)), 3)
+    normal = F.normalize(normal, dim=-1)
+    camera_facing = (normal * (center - position)).sum(dim=-1, keepdim=True) >= 0
+    oriented = normal * torch.where(camera_facing, 1.0, -1.0)
+    return oriented, camera_facing
+
+
 class DirectionalLightModel(nn.Module):
     """A freely learnable light-to-surface unit ray for every scene timestep."""
 

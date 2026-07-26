@@ -17,7 +17,7 @@ from utils.point_utils import depth_to_normal
 import numpy as np
 import cv2
 from utils.sh_utils import eval_sh, SH2RGB, RGB2SH
-from scene.photometric_lambertian import get_gaussian_normal
+from scene.photometric_lambertian import get_gaussian_normal, orient_normal_toward_camera
 
 def standardize_quaternion(quaternions: torch.Tensor) -> torch.Tensor:
     return torch.where(quaternions[..., 0:1] < 0, -quaternions, quaternions)
@@ -123,10 +123,19 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
             normal_rotations = pc.get_rotation_bias(d_rotation)
             if d_rotation_bias is not None:
                 normal_rotations = quaternion_multiply(d_rotation_bias, normal_rotations)
-        normal_i_t = get_gaussian_normal(normal_rotations, photometric_renderer.normal_axis)
+        normal_i_t_raw = get_gaussian_normal(
+            normal_rotations, photometric_renderer.normal_axis
+        )
+        normal_i_t, normal_camera_facing = orient_normal_toward_camera(
+            normal_i_t_raw,
+            means3D,
+            viewpoint_camera.camera_center,
+        )
         photometric_outputs = photometric_renderer(
             pc.get_photometric_albedo, normal_i_t, viewpoint_camera.fid
         )
+        photometric_outputs["normal_raw"] = normal_i_t_raw
+        photometric_outputs["normal_camera_facing"] = normal_camera_facing
         colors_precomp = photometric_outputs["color"]
     elif override_color is None:
         if d_color is not None and type(d_color) is not float:
@@ -253,6 +262,8 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
             "photometric_color": photometric_outputs["color"],
             "photometric_albedo": pc.get_photometric_albedo,
             "photometric_normal": photometric_outputs["normal"],
+            "photometric_normal_raw": photometric_outputs["normal_raw"],
+            "photometric_normal_camera_facing": photometric_outputs["normal_camera_facing"],
             "photometric_light_dir": photometric_outputs["light_dir"],
             "photometric_ray_dir": photometric_outputs["ray_dir"],
             "photometric_surface_to_light_dir": photometric_outputs["surface_to_light_dir"],
