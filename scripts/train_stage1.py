@@ -98,7 +98,45 @@ class Trainer:
         self.photometric_gt_lights_path = str(
             getattr(opt, "photometric_gt_lights_path", "")
         ).strip()
+        self.photometric_staged_training = bool(
+            getattr(opt, "photometric_staged_training", False)
+        )
+        self.photometric_deform_unfreeze_iter = int(
+            getattr(opt, "photometric_deform_unfreeze_iter", 22_000)
+        )
+        self.photometric_rotation_unfreeze_iter = int(
+            getattr(opt, "photometric_rotation_unfreeze_iter", 30_000)
+        )
+        self.photometric_deform_lr_scale_after_unfreeze = float(
+            getattr(opt, "photometric_deform_lr_scale_after_unfreeze", 0.1)
+        )
+        self.photometric_rotation_lr_scale_after_unfreeze = float(
+            getattr(opt, "photometric_rotation_lr_scale_after_unfreeze", 0.1)
+        )
+        if self.photometric_staged_training:
+            if self.photometric_deform_unfreeze_iter < opt.photometric_start_iter:
+                raise ValueError(
+                    "photometric_deform_unfreeze_iter must be greater than or "
+                    "equal to photometric_start_iter."
+                )
+            if (
+                self.photometric_rotation_unfreeze_iter
+                < self.photometric_deform_unfreeze_iter
+            ):
+                raise ValueError(
+                    "photometric_rotation_unfreeze_iter must be greater than or "
+                    "equal to photometric_deform_unfreeze_iter."
+                )
+            if self.photometric_deform_lr_scale_after_unfreeze < 0:
+                raise ValueError(
+                    "photometric_deform_lr_scale_after_unfreeze must be non-negative."
+                )
+            if self.photometric_rotation_lr_scale_after_unfreeze < 0:
+                raise ValueError(
+                    "photometric_rotation_lr_scale_after_unfreeze must be non-negative."
+                )
         self._last_photometric_light_lr = None
+        self._last_photometric_training_stage = None
 
         self.tb_writer = prepare_output_and_logger(dataset)
         self.deform = DeformModel(deform_type=self.dataset.deform_type, is_blender=self.dataset.is_blender, 
@@ -268,6 +306,48 @@ class Trainer:
             for group in self.gaussians.optimizer.param_groups:
                 if group["name"] in {"albedo_dc", "albedo_rest", "albedo_dc_stage1"}:
                     group["lr"] = 0.0
+        self.apply_photometric_training_schedule()
+
+    def apply_photometric_training_schedule(self):
+        if not self.photometric_active or not self.photometric_staged_training:
+            return
+
+        if self.iteration < self.photometric_deform_unfreeze_iter:
+            stage = "albedo_only"
+        elif self.iteration < self.photometric_rotation_unfreeze_iter:
+            stage = "albedo_deformation"
+        else:
+            stage = "albedo_deformation_rotation"
+
+        rotation_lr = 0.0
+        if stage == "albedo_deformation_rotation":
+            rotation_lr = (
+                float(self.opt.rotation_lr)
+                * self.photometric_rotation_lr_scale_after_unfreeze
+            )
+
+        for group in self.gaussians.optimizer.param_groups:
+            name = group["name"]
+            if name == "photometric_albedo":
+                continue
+            group["lr"] = rotation_lr if name == "rotation" else 0.0
+
+        deform_lr = 0.0
+        if stage != "albedo_only":
+            deform_lr = (
+                float(self.deform.deform_scheduler_args(self.iteration))
+                * self.photometric_deform_lr_scale_after_unfreeze
+            )
+        for group in self.deform.optimizer.param_groups:
+            group["lr"] = deform_lr
+
+        if stage != self._last_photometric_training_stage:
+            print(
+                "[photometric training stage] "
+                f"iteration {self.iteration}: {stage}; "
+                f"deform_lr={deform_lr:.10g}; rotation_lr={rotation_lr:.10g}"
+            )
+            self._last_photometric_training_stage = stage
 
     def log_photometric_stats(self, render_pkg, smooth_loss):
         if self.tb_writer is None or not self.photometric_active:

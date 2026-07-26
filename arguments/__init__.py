@@ -170,6 +170,14 @@ class OptimizationParams(ParamGroup):
         self.photometric_start_iter = 10_001
         self.photometric_albedo_lr = 0.001
         self.photometric_light_lr = 0.0001
+        # Optional delayed-training ablation. Once photometric rendering starts,
+        # keep every Gaussian group except photometric albedo frozen; unfreeze
+        # deformation and Gaussian rotation at the absolute iterations below.
+        self.photometric_staged_training = False
+        self.photometric_deform_unfreeze_iter = 22_000
+        self.photometric_rotation_unfreeze_iter = 30_000
+        self.photometric_deform_lr_scale_after_unfreeze = 0.1
+        self.photometric_rotation_lr_scale_after_unfreeze = 0.1
         # learned_directional preserves the original per-frame learned rays.
         # gt_point uses fixed per-frame world-space light positions from JSON.
         self.photometric_light_mode = "learned_directional"
