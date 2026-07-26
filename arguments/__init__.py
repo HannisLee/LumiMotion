@@ -170,6 +170,10 @@ class OptimizationParams(ParamGroup):
         self.photometric_start_iter = 10_001
         self.photometric_albedo_lr = 0.001
         self.photometric_light_lr = 0.0001
+        # learned_directional preserves the original per-frame learned rays.
+        # gt_point uses fixed per-frame world-space light positions from JSON.
+        self.photometric_light_mode = "learned_directional"
+        self.photometric_gt_lights_path = ""
         # Optional piecewise-constant schedule expressed as start_iter:lr
         # entries, for example "1:0.003,10001:0.0003,30001:0.0001".
         # An empty string preserves the constant photometric_light_lr path.

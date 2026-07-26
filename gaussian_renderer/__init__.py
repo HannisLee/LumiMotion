@@ -132,7 +132,10 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
             viewpoint_camera.camera_center,
         )
         photometric_outputs = photometric_renderer(
-            pc.get_photometric_albedo, normal_i_t, viewpoint_camera.fid
+            pc.get_photometric_albedo,
+            normal_i_t,
+            viewpoint_camera.fid,
+            position=means3D,
         )
         photometric_outputs["normal_raw"] = normal_i_t_raw
         photometric_outputs["normal_camera_facing"] = normal_camera_facing

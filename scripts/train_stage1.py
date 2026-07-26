@@ -87,6 +87,17 @@ class Trainer:
         self.photometric_light_lr_schedule = parse_photometric_light_lr_schedule(
             getattr(opt, "photometric_light_lr_schedule", "")
         )
+        self.photometric_light_mode = str(
+            getattr(opt, "photometric_light_mode", "learned_directional")
+        ).strip().lower()
+        if self.photometric_light_mode not in {"learned_directional", "gt_point"}:
+            raise ValueError(
+                "photometric_light_mode must be learned_directional or gt_point, got "
+                f"{self.photometric_light_mode!r}."
+            )
+        self.photometric_gt_lights_path = str(
+            getattr(opt, "photometric_gt_lights_path", "")
+        ).strip()
         self._last_photometric_light_lr = None
 
         self.tb_writer = prepare_output_and_logger(dataset)
@@ -154,6 +165,8 @@ class Trainer:
         )
 
     def photometric_light_lr(self):
+        if self.photometric_light_mode == "gt_point":
+            return 0.0
         learning_rate = float(self.opt.photometric_light_lr)
         for start_iteration, scheduled_lr in self.photometric_light_lr_schedule:
             if self.iteration < start_iteration:
@@ -218,7 +231,17 @@ class Trainer:
         )
 
     def initialize_photometric_light(self):
-        if self.photometric_light_init_version == "v1":
+        if self.photometric_light_mode == "gt_point":
+            self.photometric_renderer.initialize_gt_point_lights(
+                self.photometric_gt_lights_path,
+                self.photometric_object_center,
+            )
+            print(
+                "[photometric init] fixed GT point lights "
+                f"at iteration {self.iteration}: "
+                f"{os.path.abspath(self.photometric_gt_lights_path)}"
+            )
+        elif self.photometric_light_init_version == "v1":
             self.initialize_camera_back_ellipse()
         else:
             self.initialize_camera_pose_xz_ellipse()
@@ -462,7 +485,7 @@ class Trainer:
                 self.deform.optimizer.step()
                 self.deform.optimizer.zero_grad()
                 self.deform.update_learning_rate(self.iteration)
-                if self.photometric_active:
+                if self.photometric_active and self.photometric_renderer.learns_light:
                     self.photometric_renderer.optimizer.step()
                     self.photometric_renderer.optimizer.zero_grad(set_to_none=True)
                 

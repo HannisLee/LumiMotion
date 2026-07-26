@@ -14,8 +14,9 @@ import torch.nn.functional as F
 from utils.general_utils import build_rotation
 
 
-PHOTOMETRIC_VERSION = "stage1_perlight_v2_light_to_surface_ray"
+PHOTOMETRIC_VERSION = "stage1_perlight_v3_camera_facing_gt_point"
 DIRECTION_CONVENTION = "light_to_surface"
+LIGHT_MODES = {"learned_directional", "gt_point"}
 
 
 def _as_timestep_tensor(timesteps: Any, device: str | torch.device) -> torch.Tensor:
@@ -230,10 +231,25 @@ class DirectionalLightModel(nn.Module):
 class PhotometricLambertianRenderer(nn.Module):
     """Compute per-Gaussian diffuse colors before rasterization."""
 
-    def __init__(self, timesteps: Any, normal_axis: str = "+z", device: str | torch.device = "cuda"):
+    def __init__(
+        self,
+        timesteps: Any,
+        normal_axis: str = "+z",
+        light_mode: str = "learned_directional",
+        device: str | torch.device = "cuda",
+    ):
         super().__init__()
         self.normal_axis = normal_axis
+        self.light_mode = str(light_mode).strip().lower()
+        if self.light_mode not in LIGHT_MODES:
+            raise ValueError(
+                f"light_mode must be one of {sorted(LIGHT_MODES)}, got {light_mode!r}."
+            )
         self.light_model = DirectionalLightModel(timesteps, device=device)
+        self.register_buffer(
+            "gt_light_positions",
+            torch.empty((0, 3), dtype=torch.float32, device=device),
+        )
         self.optimizer = None
         self.initialization_metadata: dict[str, Any] = {}
 
@@ -242,10 +258,18 @@ class PhotometricLambertianRenderer(nn.Module):
         return cls(
             timesteps,
             normal_axis=getattr(args, "photometric_normal_axis", "+z"),
+            light_mode=getattr(args, "photometric_light_mode", "learned_directional"),
             device=device,
         )
 
+    @property
+    def learns_light(self) -> bool:
+        return self.light_mode == "learned_directional"
+
     def training_setup(self, args: Any) -> None:
+        if not self.learns_light:
+            self.optimizer = None
+            return
         self.optimizer = torch.optim.Adam(
             [{
                 "params": self.light_model.parameters(),
@@ -259,7 +283,49 @@ class PhotometricLambertianRenderer(nn.Module):
     def set_light_lr(self, learning_rate: float) -> None:
         if self.optimizer is not None:
             for group in self.optimizer.param_groups:
-                group["lr"] = float(learning_rate)
+                group["lr"] = float(learning_rate) if self.learns_light else 0.0
+
+    def initialize_gt_point_lights(
+        self,
+        lights_path: str,
+        reference_center: torch.Tensor,
+    ) -> None:
+        if not lights_path:
+            raise ValueError("gt_point light mode requires photometric_gt_lights_path.")
+        with open(lights_path, "r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+        ordered = [payload[key] for key in sorted(payload, key=lambda value: int(value))]
+        positions = torch.tensor(
+            [entry["light_pos_world"] for entry in ordered],
+            dtype=self.light_model.timesteps.dtype,
+            device=self.light_model.timesteps.device,
+        )
+        if positions.shape != (self.light_model.num_timesteps, 3):
+            raise ValueError(
+                "GT light count must match scene timesteps: "
+                f"got {tuple(positions.shape)}, expected "
+                f"({self.light_model.num_timesteps}, 3)."
+            )
+        center = reference_center.to(
+            device=positions.device,
+            dtype=positions.dtype,
+        ).flatten()
+        if center.numel() != 3:
+            raise ValueError("reference_center must contain three values.")
+        reference_rays = F.normalize(center[None] - positions, dim=-1)
+        self.gt_light_positions = positions
+        with torch.no_grad():
+            self.light_model._raw_light_dir_table.copy_(reference_rays)
+        self.light_model._raw_light_dir_table.requires_grad_(False)
+        self.initialization_metadata = {
+            "type": "gt_point_lights",
+            "light_mode": self.light_mode,
+            "direction_convention": DIRECTION_CONVENTION,
+            "lights_path": os.path.abspath(lights_path),
+            "reference_center": center.detach().cpu().tolist(),
+            "source_light_type": "area_center_as_point",
+            "uses_distance_attenuation": False,
+        }
 
     def initialize_camera_back_ellipse(
         self,
@@ -329,16 +395,36 @@ class PhotometricLambertianRenderer(nn.Module):
         return self.light_model.get_all_light_dirs()
 
     def light_smoothness_loss(self) -> torch.Tensor:
+        if not self.learns_light:
+            return self.light_model.timesteps.new_zeros(())
         return self.light_model.first_order_smoothness_loss()
 
-    def forward(self, albedo: torch.Tensor, normal: torch.Tensor, frame_id: torch.Tensor) -> dict[str, torch.Tensor]:
-        ray_dir = self.light_model(frame_id)
-        if ray_dir.ndim == 2:
-            ray_dir = ray_dir[0]
+    def forward(
+        self,
+        albedo: torch.Tensor,
+        normal: torch.Tensor,
+        frame_id: torch.Tensor,
+        position: torch.Tensor | None = None,
+    ) -> dict[str, torch.Tensor]:
+        timestep_idx = self.light_model.timestep_index(frame_id)[0]
         normal = F.normalize(normal, dim=-1)
-        ray_dir = F.normalize(ray_dir, dim=-1)
-        surface_to_light_dir = -ray_dir
-        ndotl = (normal * surface_to_light_dir[None]).sum(dim=-1, keepdim=True)
+        if self.light_mode == "gt_point":
+            if position is None or position.shape != normal.shape:
+                raise ValueError(
+                    "gt_point light mode requires position with the same shape as normal."
+                )
+            if self.gt_light_positions.shape != (self.light_model.num_timesteps, 3):
+                raise RuntimeError("GT point lights have not been initialized.")
+            light_position = self.gt_light_positions[timestep_idx]
+            surface_to_light_dir = F.normalize(light_position[None] - position, dim=-1)
+            ray_dir = -surface_to_light_dir
+        else:
+            ray_dir = self.light_model(frame_id)
+            if ray_dir.ndim == 2:
+                ray_dir = ray_dir[0]
+            ray_dir = F.normalize(ray_dir, dim=-1)
+            surface_to_light_dir = -ray_dir
+        ndotl = (normal * surface_to_light_dir).sum(dim=-1, keepdim=True)
         shading = ndotl.clamp_min(0.0)
         return {
             "color": (albedo * shading).clamp(0.0, 1.0),
@@ -351,7 +437,7 @@ class PhotometricLambertianRenderer(nn.Module):
             "surface_to_light_dir": surface_to_light_dir,
             "ndotl": ndotl,
             "shading": shading,
-            "timestep_idx": self.light_model.timestep_index(frame_id)[0],
+            "timestep_idx": timestep_idx,
         }
 
     def capture(self) -> dict[str, Any]:
@@ -361,7 +447,12 @@ class PhotometricLambertianRenderer(nn.Module):
             "photometric_version": PHOTOMETRIC_VERSION,
             "config": {
                 "normal_axis": self.normal_axis,
-                "light_param": "per_frame",
+                "light_param": (
+                    "fixed_gt_point_position"
+                    if self.light_mode == "gt_point"
+                    else "per_frame"
+                ),
+                "light_mode": self.light_mode,
                 "direction_convention": DIRECTION_CONVENTION,
             },
             "initialization": self.initialization_metadata,
@@ -370,6 +461,9 @@ class PhotometricLambertianRenderer(nn.Module):
     def restore(self, state: dict[str, Any]) -> None:
         config = state.get("config", {})
         self.normal_axis = config.get("normal_axis", self.normal_axis)
+        self.light_mode = config.get("light_mode", "learned_directional")
+        if self.light_mode not in LIGHT_MODES:
+            raise ValueError(f"Unsupported checkpoint light mode: {self.light_mode!r}.")
         state_dict = dict(state.get("state_dict", state))
         if "raw_light_dir" in state_dict and "light_model._raw_light_dir_table" not in state_dict:
             state_dict["light_model._raw_light_dir_table"] = state_dict.pop("raw_light_dir")
@@ -381,7 +475,14 @@ class PhotometricLambertianRenderer(nn.Module):
                 # v1 stored surface-to-light vectors. Negating them preserves
                 # the rendered Lambertian shading under the v2 ray convention.
                 state_dict[raw_key] = -state_dict[raw_key]
+        gt_positions = state_dict.get("gt_light_positions")
+        if gt_positions is not None:
+            self.gt_light_positions = gt_positions.to(
+                device=self.light_model.timesteps.device,
+                dtype=self.light_model.timesteps.dtype,
+            )
         self.load_state_dict(state_dict, strict=False)
+        self.light_model._raw_light_dir_table.requires_grad_(self.learns_light)
         self.initialization_metadata = dict(state.get("initialization", {}))
         if "initialization_version" not in self.initialization_metadata:
             init_type = self.initialization_metadata.get("type")
@@ -396,6 +497,7 @@ class PhotometricLambertianRenderer(nn.Module):
         times = self.light_model.timesteps.detach().cpu().float()
         return {
             "photometric_version": PHOTOMETRIC_VERSION,
+            "light_mode": self.light_mode,
             "direction_convention": DIRECTION_CONVENTION,
             "initialization": self.initialization_metadata,
             "frames": [
@@ -405,6 +507,16 @@ class PhotometricLambertianRenderer(nn.Module):
                     "raw": raw[index].tolist(),
                     "direction": directions[index].tolist(),
                     "ray_direction_light_to_surface": directions[index].tolist(),
+                    **(
+                        {
+                            "light_position_world": self.gt_light_positions[index]
+                            .detach()
+                            .cpu()
+                            .tolist()
+                        }
+                        if self.light_mode == "gt_point"
+                        else {}
+                    ),
                 }
                 for index in range(directions.shape[0])
             ],
