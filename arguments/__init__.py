@@ -199,6 +199,39 @@ class OptimizationParams(ParamGroup):
         self.photometric_camera_ellipse_direction_sign = 1
         self.photometric_camera_ellipse_span = 6.283185307179586
 
+        # Constrained per-light PBR ablation. This is a separate render mode;
+        # all defaults above continue to define photometric_lambertian.
+        self.photometric_pbr_light_samples_train = 4
+        self.photometric_pbr_light_samples_eval = 8
+        self.photometric_pbr_light_residual_angle_deg = 10.0
+        self.photometric_pbr_normal_residual_angle_deg = 10.0
+        self.photometric_pbr_residual_log_scale = 0.2
+        self.photometric_pbr_environment_init = 0.05
+        self.photometric_pbr_angular_radius_init_deg = 2.0
+        self.photometric_pbr_angular_radius_max_deg = 12.0
+        # Integers make both features explicitly ablatable from the CLI.
+        self.photometric_pbr_visibility = 1
+        self.photometric_pbr_visibility_backend = "local_knn"
+        self.photometric_pbr_shadow_neighbors = 16
+        self.photometric_pbr_shadow_strength = 0.5
+        self.photometric_pbr_shadow_distance_factor = 6.0
+        self.photometric_pbr_residual = 1
+        self.photometric_pbr_exposure_lr = 0.001
+        self.photometric_pbr_environment_lr = 0.001
+        self.photometric_pbr_normal_lr = 0.0001
+        self.photometric_pbr_residual_lr = 0.0001
+        self.photometric_pbr_roughness_lr = 0.0005
+        self.photometric_pbr_loss_mse = 1.0
+        self.photometric_pbr_loss_l1_fg = 0.2
+        self.photometric_pbr_loss_dssim_fg = 0.1
+        self.photometric_pbr_loss_log_linear = 0.05
+        self.lambda_photometric_light_smooth2 = 0.01
+        self.lambda_photometric_pbr_exposure = 0.001
+        self.lambda_photometric_pbr_normal = 0.01
+        self.lambda_photometric_pbr_roughness = 0.001
+        self.lambda_photometric_pbr_environment = 0.0001
+        self.lambda_photometric_pbr_residual = 0.01
+
         super().__init__(parser, "Optimization Parameters")
 
 

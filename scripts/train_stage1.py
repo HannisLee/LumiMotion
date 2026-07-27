@@ -27,6 +27,10 @@ from PIL import Image
 import torch.nn.functional as F
 from torchvision import transforms
 from scene.photometric_lambertian import PhotometricLambertianRenderer
+from scene.photometric_perlight_pbr import (
+    PhotometricPerLightPBRRenderer,
+    srgb_to_linear,
+)
 
 try:
     from torch.utils.tensorboard import SummaryWriter
@@ -70,7 +74,11 @@ class Trainer:
         self.requested_render_mode = getattr(pipe, "render_mode", "photometric_lambertian")
         if self.requested_render_mode == "original":
             self.requested_render_mode = "original_sh"
-        if self.requested_render_mode not in {"original_sh", "photometric_lambertian"}:
+        if self.requested_render_mode not in {
+            "original_sh",
+            "photometric_lambertian",
+            "photometric_perlight_pbr",
+        }:
             raise ValueError(f"Unsupported render mode: {self.requested_render_mode}")
         self.testing_iterations = testing_iterations
         self.saving_iterations = saving_iterations
@@ -94,6 +102,23 @@ class Trainer:
             raise ValueError(
                 "photometric_light_mode must be learned_directional or gt_point, got "
                 f"{self.photometric_light_mode!r}."
+            )
+        if (
+            self.requested_render_mode == "photometric_perlight_pbr"
+            and self.photometric_light_mode != "learned_directional"
+        ):
+            raise ValueError(
+                "photometric_perlight_pbr is a learned per-light experiment; "
+                "GT point lights are diagnostics only."
+            )
+        if (
+            self.requested_render_mode == "photometric_perlight_pbr"
+            and opt.photometric_start_iter < opt.densify_until_iter
+        ):
+            raise ValueError(
+                "photometric_perlight_pbr requires photometric_start_iter >= "
+                "densify_until_iter so its per-Gaussian normal residual keeps "
+                "a stable checkpoint shape."
             )
         self.photometric_gt_lights_path = str(
             getattr(opt, "photometric_gt_lights_path", "")
@@ -155,7 +180,10 @@ class Trainer:
                                        fea_dim=gs_fea_dim)
 
         self.scene = Scene(dataset, self.gaussians, load_iteration=load_iteration)
-        if self.requested_render_mode == "photometric_lambertian":
+        if self.requested_render_mode in {
+            "photometric_lambertian",
+            "photometric_perlight_pbr",
+        }:
             self.photometric_object_center = (
                 self.gaussians.get_xyz.detach().mean(dim=0).clone()
             )
@@ -163,13 +191,28 @@ class Trainer:
             # follows any densification performed during the SH warm-up.
             if not self.gaussians.use_photometric_albedo:
                 self.gaussians.enable_photometric_albedo()
-            self.photometric_renderer = PhotometricLambertianRenderer.from_args(
-                self.scene.all_timesteps, opt, device="cuda"
-            )
+            if self.requested_render_mode == "photometric_perlight_pbr":
+                self.photometric_renderer = PhotometricPerLightPBRRenderer.from_args(
+                    self.scene.all_timesteps,
+                    num_gaussians=self.gaussians.get_xyz.shape[0],
+                    args=opt,
+                    device="cuda",
+                )
+            else:
+                self.photometric_renderer = PhotometricLambertianRenderer.from_args(
+                    self.scene.all_timesteps, opt, device="cuda"
+                )
             loaded_iter = self.scene.loaded_iter
             if loaded_iter is not None and loaded_iter >= self.opt.photometric_start_iter:
                 self.photometric_renderer.load_weights(dataset.model_path, loaded_iter)
                 self.photometric_initialized = True
+            if (
+                self.requested_render_mode == "photometric_perlight_pbr"
+                and self.photometric_renderer.requires_local_visibility
+            ):
+                self.photometric_renderer.initialize_shadow_neighbors(
+                    self.gaussians.get_xyz
+                )
             self.photometric_renderer.training_setup(opt)
         self.gaussians.training_setup(opt)
         
@@ -198,8 +241,18 @@ class Trainer:
     @property
     def photometric_active(self):
         return (
-            self.requested_render_mode == "photometric_lambertian"
+            self.requested_render_mode in {
+                "photometric_lambertian",
+                "photometric_perlight_pbr",
+            }
             and self.iteration >= self.opt.photometric_start_iter
+        )
+
+    @property
+    def pbr_active(self):
+        return (
+            self.requested_render_mode == "photometric_perlight_pbr"
+            and self.photometric_active
         )
 
     def photometric_light_lr(self):
@@ -286,7 +339,7 @@ class Trainer:
 
     def update_photometric_state(self):
         active = self.photometric_active
-        self.pipe.render_mode = "photometric_lambertian" if active else "original_sh"
+        self.pipe.render_mode = self.requested_render_mode if active else "original_sh"
         if self.photometric_renderer is None:
             return
         if active and not self.photometric_initialized:
@@ -297,7 +350,12 @@ class Trainer:
             self.opt.photometric_albedo_lr if active else 0.0
         )
         light_lr = self.photometric_light_lr() if active else 0.0
-        self.photometric_renderer.set_light_lr(light_lr)
+        if self.requested_render_mode == "photometric_perlight_pbr":
+            self.photometric_renderer.set_learning_rates(
+                self.opt, active=active, light_lr=light_lr
+            )
+        else:
+            self.photometric_renderer.set_light_lr(light_lr)
         if light_lr != self._last_photometric_light_lr:
             print(f"[photometric light lr] iteration {self.iteration}: {light_lr:.10g}")
             self._last_photometric_light_lr = light_lr
@@ -306,7 +364,30 @@ class Trainer:
             for group in self.gaussians.optimizer.param_groups:
                 if group["name"] in {"albedo_dc", "albedo_rest", "albedo_dc_stage1"}:
                     group["lr"] = 0.0
-        self.apply_photometric_training_schedule()
+        if self.pbr_active:
+            self.apply_pbr_training_schedule()
+        else:
+            self.apply_photometric_training_schedule()
+
+    def apply_pbr_training_schedule(self):
+        """Keep Stage1 geometry fixed; optimize only material and light terms."""
+        for group in self.gaussians.optimizer.param_groups:
+            if group["name"] == "photometric_albedo":
+                group["lr"] = float(self.opt.photometric_albedo_lr)
+            elif group["name"] == "roughness":
+                group["lr"] = float(self.opt.photometric_pbr_roughness_lr)
+            else:
+                group["lr"] = 0.0
+        for group in self.deform.optimizer.param_groups:
+            group["lr"] = 0.0
+        if self._last_photometric_training_stage != "pbr_fixed_geometry":
+            print(
+                "[photometric training stage] "
+                f"iteration {self.iteration}: pbr_fixed_geometry; "
+                f"albedo_lr={self.opt.photometric_albedo_lr:.10g}; "
+                f"roughness_lr={self.opt.photometric_pbr_roughness_lr:.10g}"
+            )
+            self._last_photometric_training_stage = "pbr_fixed_geometry"
 
     def apply_photometric_training_schedule(self):
         if not self.photometric_active or not self.photometric_staged_training:
@@ -359,6 +440,27 @@ class Trainer:
         self.tb_writer.add_scalar("photometric/albedo_mean", self.gaussians.get_photometric_albedo.mean().item(), self.iteration)
         self.tb_writer.add_scalar("photometric/ndotl_mean", render_pkg["photometric_ndotl"].mean().item(), self.iteration)
         self.tb_writer.add_scalar("photometric/shading_mean", render_pkg["photometric_shading"].mean().item(), self.iteration)
+        if self.pbr_active:
+            self.tb_writer.add_scalar(
+                "photometric_pbr/visibility_mean",
+                render_pkg["photometric_visibility"].mean().item(),
+                self.iteration,
+            )
+            self.tb_writer.add_scalar(
+                "photometric_pbr/specular_mean",
+                render_pkg["photometric_direct_specular_linear"].mean().item(),
+                self.iteration,
+            )
+            self.tb_writer.add_scalar(
+                "photometric_pbr/environment_mean",
+                render_pkg["photometric_environment_linear"].mean().item(),
+                self.iteration,
+            )
+            self.tb_writer.add_scalar(
+                "photometric_pbr/roughness_mean",
+                render_pkg["photometric_roughness"].mean().item(),
+                self.iteration,
+            )
 
     # no gui mode
     def train(self, iters=5000):
@@ -417,8 +519,16 @@ class Trainer:
     
 
 
-        lambda_normal = 0.02 if self.iteration > self.opt.start_normal_reg else 0.0
-        lambda_dist = self.opt.lambda_dist if self.iteration > self.opt.start_normal_reg else 0.0
+        lambda_normal = (
+            0.02
+            if self.iteration > self.opt.start_normal_reg and not self.pbr_active
+            else 0.0
+        )
+        lambda_dist = (
+            self.opt.lambda_dist
+            if self.iteration > self.opt.start_normal_reg and not self.pbr_active
+            else 0.0
+        )
         rend_dist = render_pkg_re["rend_dist"]
         rend_normal  = render_pkg_re['rend_normal']
         surf_normal = render_pkg_re['surf_normal']
@@ -430,31 +540,99 @@ class Trainer:
         
         # Loss
         gt_image = viewpoint_cam.original_image_train_light.cuda()
-        if self.dataset.white_background and viewpoint_cam.gt_alpha_mask is not None and self.opt.gt_alpha_mask_as_scene_mask:
+        if (
+            not self.pbr_active
+            and self.dataset.white_background
+            and viewpoint_cam.gt_alpha_mask is not None
+            and self.opt.gt_alpha_mask_as_scene_mask
+        ):
             gt_alpha_mask = viewpoint_cam.gt_alpha_mask.cuda()
             gt_image = gt_alpha_mask * gt_image + (1 - gt_alpha_mask) * self.background[:, None, None]
 
         Ll1 = l1_loss(image, gt_image)
-        loss_img = (1.0 - self.opt.lambda_dssim) * Ll1 + self.opt.lambda_dssim * (1.0 - ssim(image, gt_image))
+        pbr_loss_terms = {}
+        if self.pbr_active:
+            # Geometry is fixed, so its detached rendered alpha is a stable
+            # foreground weight without introducing GT mask supervision.
+            foreground_mask = render_pkg_re["rend_alpha"].detach().clamp(0.0, 1.0)
+            if foreground_mask.ndim == 2:
+                foreground_mask = foreground_mask.unsqueeze(0)
+            foreground_denominator = (
+                foreground_mask.sum() * image.shape[0]
+            ).clamp_min(1.0)
+            rgb_mse = F.mse_loss(image, gt_image)
+            foreground_l1 = (
+                (image - gt_image).abs() * foreground_mask
+            ).sum() / foreground_denominator
+            foreground_dssim = 1.0 - ssim(
+                image * foreground_mask,
+                gt_image * foreground_mask,
+            )
+            gt_linear = srgb_to_linear(gt_image)
+            log_linear = torch.sqrt(
+                (
+                    torch.log1p(render_pkg_re["render_linear"])
+                    - torch.log1p(gt_linear)
+                ).pow(2.0)
+                + 1e-6
+            ).mean()
+            pbr_loss_terms.update(
+                rgb_mse=rgb_mse,
+                foreground_l1=foreground_l1,
+                foreground_dssim=foreground_dssim,
+                log_linear=log_linear,
+            )
+            loss_img = (
+                self.opt.photometric_pbr_loss_mse * rgb_mse
+                + self.opt.photometric_pbr_loss_l1_fg * foreground_l1
+                + self.opt.photometric_pbr_loss_dssim_fg * foreground_dssim
+                + self.opt.photometric_pbr_loss_log_linear * log_linear
+            )
+        else:
+            loss_img = (
+                (1.0 - self.opt.lambda_dssim) * Ll1
+                + self.opt.lambda_dssim * (1.0 - ssim(image, gt_image))
+            )
         loss = loss_img + normal_loss + dist_loss
         light_smooth_loss = torch.zeros((), dtype=loss.dtype, device=loss.device)
         if self.photometric_active:
             light_smooth_loss = self.photometric_renderer.light_smoothness_loss()
             loss = loss + self.opt.lambda_photometric_light_smooth1 * light_smooth_loss
+        if self.pbr_active:
+            regularizers = self.photometric_renderer.regularization_losses(
+                self.gaussians.get_rough
+            )
+            regularizer_weights = {
+                "light_smooth2": self.opt.lambda_photometric_light_smooth2,
+                "exposure": self.opt.lambda_photometric_pbr_exposure,
+                "normal_residual": self.opt.lambda_photometric_pbr_normal,
+                "roughness_prior": self.opt.lambda_photometric_pbr_roughness,
+                "environment_energy": self.opt.lambda_photometric_pbr_environment,
+                "residual": self.opt.lambda_photometric_pbr_residual,
+            }
+            for name, weight in regularizer_weights.items():
+                loss = loss + float(weight) * regularizers[name]
+            pbr_loss_terms.update(
+                {f"regularizer_{name}": value for name, value in regularizers.items()}
+            )
 
         #mask loss
-        if self.opt.gt_alpha_mask_as_scene_mask and viewpoint_cam.gt_alpha_mask is not None:
+        if (
+            not self.pbr_active
+            and self.opt.gt_alpha_mask_as_scene_mask
+            and viewpoint_cam.gt_alpha_mask is not None
+        ):
             gt_alpha_mask = viewpoint_cam.gt_alpha_mask.cuda()
             alpha_loss = F.binary_cross_entropy(render_pkg_re['rend_alpha'][:, None, None], gt_alpha_mask.unsqueeze(1).unsqueeze(1))
             loss += alpha_loss*self.opt.lambda_alpha_loss
 
-        else:
+        elif not self.pbr_active:
             simulated_mask = torch.ones_like(render_pkg_re['rend_alpha'][:, None, None])
             alpha_loss = F.binary_cross_entropy(render_pkg_re['rend_alpha'][:, None, None], simulated_mask)
             loss += alpha_loss * 0.001
 
 
-        if self.iteration > self.opt.warm_up:
+        if self.iteration > self.opt.warm_up and not self.pbr_active:
 
             # d_xyz loss is absent during scalar warm-up/static deformation.
             if torch.is_tensor(d_xyz) and self.opt.d_xyz_loss_weight > 0:
@@ -494,6 +672,13 @@ class Trainer:
             if self.iteration == self.opt.iterations:
                 self.progress_bar.close()
             self.log_photometric_stats(render_pkg_re, light_smooth_loss)
+            if self.tb_writer is not None and self.pbr_active:
+                for name, value in pbr_loss_terms.items():
+                    self.tb_writer.add_scalar(
+                        f"photometric_pbr_loss/{name}",
+                        value.item(),
+                        self.iteration,
+                    )
 
             # Keep track of max radii in image-space for pruning
             if self.gaussians.max_radii2D.shape[0] == 0:
@@ -623,7 +808,13 @@ if __name__ == "__main__":
 
     args = parser.parse_args(sys.argv[1:])
     required_iterations = [args.iterations]
-    if args.render_mode == "photometric_lambertian" and args.photometric_start_iter <= args.iterations:
+    if (
+        args.render_mode in {
+            "photometric_lambertian",
+            "photometric_perlight_pbr",
+        }
+        and args.photometric_start_iter <= args.iterations
+    ):
         required_iterations.append(args.photometric_start_iter)
     args.save_iterations = sorted(set(
         iteration for iteration in args.save_iterations + required_iterations

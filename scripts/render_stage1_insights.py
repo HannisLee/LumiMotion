@@ -19,6 +19,10 @@ from argparse import ArgumentParser
 from arguments import ModelParams, PipelineParams, get_combined_args
 from scene import Scene, GaussianModel, DeformModel
 from scene.photometric_lambertian import PhotometricLambertianRenderer
+from scene.photometric_perlight_pbr import (
+    PhotometricPerLightPBRRenderer,
+    linear_to_srgb,
+)
 import imageio
 import cv2
 import re
@@ -27,7 +31,7 @@ import numpy as np
 import torchvision
 
 
-def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter):
+def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter, max_timesteps=-1):
     with torch.no_grad():
     
         dataset.eval = True
@@ -44,17 +48,38 @@ def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter):
         render_mode = getattr(pipeline, "render_mode", "original_sh")
         if render_mode == "original":
             render_mode = "original_sh"
-        if render_mode not in {"original_sh", "photometric_lambertian"}:
+        if render_mode not in {
+            "original_sh",
+            "photometric_lambertian",
+            "photometric_perlight_pbr",
+        }:
             raise ValueError(f"Unsupported render mode: {render_mode}")
         pipeline.render_mode = render_mode
         photometric_renderer = None
-        if render_mode == "photometric_lambertian":
+        if render_mode in {
+            "photometric_lambertian",
+            "photometric_perlight_pbr",
+        }:
             if not gaussians.use_photometric_albedo:
                 gaussians.enable_photometric_albedo()
-            photometric_renderer = PhotometricLambertianRenderer(
-                scene.all_timesteps, device="cuda"
-            )
+            if render_mode == "photometric_perlight_pbr":
+                photometric_renderer = PhotometricPerLightPBRRenderer(
+                    scene.all_timesteps,
+                    num_gaussians=gaussians.get_xyz.shape[0],
+                    device="cuda",
+                )
+            else:
+                photometric_renderer = PhotometricLambertianRenderer(
+                    scene.all_timesteps, device="cuda"
+                )
             photometric_renderer.load_weights(dataset.model_path, scene.loaded_iter)
+            if (
+                render_mode == "photometric_perlight_pbr"
+                and photometric_renderer.requires_local_visibility
+            ):
+                photometric_renderer.initialize_shadow_neighbors(
+                    gaussians.get_xyz
+                )
             photometric_renderer.eval()
 
         original_train_cameras = scene.getTrainCameras()
@@ -62,6 +87,9 @@ def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter):
 
         bg_color = [1, 1, 1] if dataset.white_background else [0, 0, 0]
         background = torch.tensor(bg_color, dtype=torch.float32, device="cuda")
+        diagnostic_background = torch.zeros(
+            3, dtype=torch.float32, device="cuda"
+        )
 
         # for synthetic scenes 5:6 train cameras have nice view
         # cameras = scene.getTrainCameras()[5:6]
@@ -93,7 +121,10 @@ def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter):
             render_name = view.image_name_train_light
 
             
-            for interp_fid, timestep_idx in tqdm.tqdm(list(all_timesteps.items())[:]):
+            timestep_items = list(all_timesteps.items())
+            if max_timesteps > 0:
+                timestep_items = timestep_items[:max_timesteps]
+            for interp_fid, timestep_idx in tqdm.tqdm(timestep_items):
 
                 N = gaussians.get_xyz.shape[0]
 
@@ -116,6 +147,62 @@ def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter):
                 img_np = (img_np * 255).clip(0, 255).astype(np.uint8)
                 img_np = np.ascontiguousarray(img_np)
                 full_render_imgs.append(img_np)
+
+                if render_mode == "photometric_perlight_pbr":
+                    residual_low = np.exp(-photometric_renderer.residual_log_scale)
+                    residual_high = np.exp(photometric_renderer.residual_log_scale)
+                    pbr_diagnostics = {
+                        "pbr_diffuse": linear_to_srgb(
+                            render_pkg["photometric_direct_diffuse_linear"]
+                        ),
+                        "pbr_specular": linear_to_srgb(
+                            render_pkg["photometric_direct_specular_linear"]
+                        ),
+                        "pbr_environment": linear_to_srgb(
+                            render_pkg["photometric_environment_linear"]
+                        ),
+                        "pbr_visibility": render_pkg[
+                            "photometric_visibility"
+                        ].expand(-1, 3),
+                        "pbr_roughness": render_pkg[
+                            "photometric_roughness"
+                        ].expand(-1, 3),
+                        "pbr_normal": (
+                            render_pkg["photometric_normal"] * 0.5 + 0.5
+                        ),
+                        "pbr_normal_residual": (
+                            render_pkg["photometric_normal_residual_angle"]
+                            / photometric_renderer.normal_residual_angle_degrees
+                        ).clamp(0.0, 1.0).expand(-1, 3),
+                        "pbr_residual": (
+                            (
+                                render_pkg["photometric_residual_multiplier"]
+                                - residual_low
+                            )
+                            / max(residual_high - residual_low, 1e-6)
+                        ).clamp(0.0, 1.0),
+                    }
+                    for diagnostic_name, diagnostic_color in pbr_diagnostics.items():
+                        diagnostic_pkg = render(
+                            view,
+                            gaussians,
+                            pipeline,
+                            diagnostic_background,
+                            d_xyz,
+                            d_rotation,
+                            d_scaling,
+                            d_opacity=d_opacity,
+                            d_color=None,
+                            override_color=diagnostic_color,
+                            photometric_renderer=photometric_renderer,
+                        )
+                        torchvision.utils.save_image(
+                            diagnostic_pkg["render"].clamp(0.0, 1.0),
+                            os.path.join(
+                                render_path,
+                                f"{diagnostic_name}_t{timestep_idx}_cam{render_name}.png",
+                            ),
+                        )
                 
 
                 ## alpha render
@@ -269,6 +356,12 @@ if __name__ == "__main__":
 
     parser.add_argument('--load_iter', type=int, default=-1, help="Iteration to load.")
     parser.add_argument("--iteration", default=-1, type=int)
+    parser.add_argument(
+        "--max_timesteps",
+        default=-1,
+        type=int,
+        help="Optional prefix length for smoke tests; negative renders all timesteps.",
+    )
     parser.add_argument("--quiet", action="store_true")
 
 
@@ -277,4 +370,9 @@ if __name__ == "__main__":
 
     # Initialize system state (RNG)
     safe_state(args.quiet)
-    render_set(model.extract(args), pipeline.extract(args), args.load_iter)
+    render_set(
+        model.extract(args),
+        pipeline.extract(args),
+        args.load_iter,
+        max_timesteps=args.max_timesteps,
+    )

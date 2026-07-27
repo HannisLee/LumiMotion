@@ -18,6 +18,10 @@ import numpy as np
 import cv2
 from utils.sh_utils import eval_sh, SH2RGB, RGB2SH
 from scene.photometric_lambertian import get_gaussian_normal, orient_normal_toward_camera
+from scene.photometric_perlight_pbr import (
+    PhotometricPerLightPBRRenderer,
+    linear_to_srgb,
+)
 
 def standardize_quaternion(quaternions: torch.Tensor) -> torch.Tensor:
     return torch.where(quaternions[..., 0:1] < 0, -quaternions, quaternions)
@@ -112,12 +116,17 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
     shs = None
     colors_precomp = None
     photometric_outputs = None
+    pbr_linear_render = False
+    rendered_image_linear = None
     render_mode = getattr(pipe, "render_mode", "original_sh")
     if render_mode == "original":
         render_mode = "original_sh"
-    if override_color is None and render_mode == "photometric_lambertian":
+    if override_color is None and render_mode in {
+        "photometric_lambertian",
+        "photometric_perlight_pbr",
+    }:
         if photometric_renderer is None:
-            raise ValueError("photometric_lambertian rendering requires a photometric_renderer")
+            raise ValueError(f"{render_mode} rendering requires a photometric_renderer")
         normal_rotations = rotations
         if normal_rotations is None:
             normal_rotations = pc.get_rotation_bias(d_rotation)
@@ -131,15 +140,95 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
             means3D,
             viewpoint_camera.camera_center,
         )
-        photometric_outputs = photometric_renderer(
-            pc.get_photometric_albedo,
-            normal_i_t,
-            viewpoint_camera.fid,
-            position=means3D,
-        )
+        if render_mode == "photometric_perlight_pbr":
+            if not isinstance(photometric_renderer, PhotometricPerLightPBRRenderer):
+                raise TypeError(
+                    "photometric_perlight_pbr requires "
+                    "PhotometricPerLightPBRRenderer."
+                )
+            sample_directions, _ = photometric_renderer.sample_surface_to_light_dirs(
+                viewpoint_camera.fid
+            )
+            visibility = None
+            if photometric_renderer.requires_local_visibility:
+                visibility = photometric_renderer.compute_local_visibility(
+                    means3D,
+                    pc.get_scaling + d_scaling,
+                    opacity,
+                    sample_directions,
+                )
+            elif photometric_renderer.requires_bvh:
+                # Geometry is fixed in this experiment. Match native Stage2's
+                # BVH path by building/tracing without an autograd graph; the
+                # learned light still receives gradients through the BRDF.
+                if (opacity <= pc.alpha_min).any():
+                    invalid_count = int((opacity <= pc.alpha_min).sum().item())
+                    raise RuntimeError(
+                        "PBR BVH visibility cannot safely build native bounds: "
+                        f"{invalid_count} Gaussians have opacity <= "
+                        f"alpha_min ({pc.alpha_min}). Use the default "
+                        "local_knn backend or prune the checkpoint first."
+                    )
+                with torch.no_grad():
+                    if photometric_renderer.bvh_ready:
+                        pc.update_bvh(
+                            d_rotation=d_rotation,
+                            d_xyz=d_xyz,
+                            d_scaling=d_scaling,
+                        )
+                    else:
+                        pc.build_bvh(
+                            d_rotation=d_rotation,
+                            d_xyz=d_xyz,
+                            d_scaling=d_scaling,
+                        )
+                        photometric_renderer.mark_bvh_ready()
+                    trace_scales = pc.get_scaling + d_scaling
+                    trace_rotations = pc.get_rotation_bias(d_rotation)
+                    if d_rotation_bias is not None:
+                        trace_rotations = quaternion_multiply(
+                            d_rotation_bias,
+                            trace_rotations,
+                        )
+                    rays_d = sample_directions.detach()[None].expand(
+                        means3D.shape[0], -1, -1
+                    )
+                    rays_o = (
+                        means3D[:, None]
+                        + rays_d * float(getattr(pipe, "light_t_min", 0.1))
+                    )
+                    trace_outputs = pc.trace(
+                        rays_o,
+                        rays_d,
+                        camera_center=viewpoint_camera.camera_center,
+                        xyz=means3D,
+                        scales=trace_scales,
+                        rotation=trace_rotations,
+                        opacity=opacity,
+                    )
+                    visibility = (1.0 - trace_outputs["alpha"]).unsqueeze(-1)
+            photometric_outputs = photometric_renderer(
+                pc.get_photometric_albedo,
+                normal_i_t,
+                viewpoint_camera.fid,
+                position=means3D,
+                camera_center=viewpoint_camera.camera_center,
+                roughness=pc.get_rough,
+                surface_to_light_samples=sample_directions,
+                visibility=visibility,
+            )
+            colors_precomp = photometric_outputs["color_linear"]
+            pbr_linear_render = True
+        else:
+            photometric_outputs = photometric_renderer(
+                pc.get_photometric_albedo,
+                normal_i_t,
+                viewpoint_camera.fid,
+                position=means3D,
+            )
+            colors_precomp = photometric_outputs["color"]
         photometric_outputs["normal_raw"] = normal_i_t_raw
         photometric_outputs["normal_camera_facing"] = normal_camera_facing
-        colors_precomp = photometric_outputs["color"]
     elif override_color is None:
         if d_color is not None and type(d_color) is not float:
             shadowed_modulation = d_color[:,None, :3].clamp_max(1.0)
@@ -193,6 +282,9 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
     )
 
     rendered_image, radii, allmap = output
+    if pbr_linear_render:
+        rendered_image_linear = rendered_image
+        rendered_image = linear_to_srgb(rendered_image)
     
     # Those Gaussians that were frustum culled or had a radius of 0 were not visible.
     # They will be excluded from value updates used in the splitting criteria.
@@ -274,5 +366,19 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
             "photometric_shading": photometric_outputs["shading"],
             "photometric_timestep_idx": photometric_outputs["timestep_idx"],
         })
+        if pbr_linear_render:
+            rets.update({
+                "render_linear": rendered_image_linear,
+                "photometric_color_linear": photometric_outputs["color_linear"],
+                "photometric_albedo_linear": photometric_outputs["albedo_linear"],
+                "photometric_direct_diffuse_linear": photometric_outputs["direct_diffuse_linear"],
+                "photometric_direct_specular_linear": photometric_outputs["direct_specular_linear"],
+                "photometric_environment_linear": photometric_outputs["environment_linear"],
+                "photometric_visibility": photometric_outputs["visibility"],
+                "photometric_roughness": photometric_outputs["roughness"],
+                "photometric_normal_residual_angle": photometric_outputs["normal_residual_angle"],
+                "photometric_residual_multiplier": photometric_outputs["residual_multiplier"],
+                "photometric_surface_to_light_samples": photometric_outputs["surface_to_light_samples"],
+            })
 
     return rets

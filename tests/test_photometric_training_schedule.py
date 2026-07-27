@@ -76,6 +76,47 @@ class PhotometricTrainingScheduleTest(unittest.TestCase):
         self.assertEqual(lrs["xyz"], 0.0)
         self.assertEqual(lrs["feature"], 0.0)
 
+    def test_pbr_schedule_keeps_geometry_and_deformation_fixed(self):
+        trainer = Trainer.__new__(Trainer)
+        trainer.iteration = 35_001
+        trainer._last_photometric_training_stage = None
+        trainer.opt = SimpleNamespace(
+            photometric_albedo_lr=0.001,
+            photometric_pbr_roughness_lr=0.0005,
+        )
+        trainer.gaussians = SimpleNamespace(
+            optimizer=_Optimizer(
+                [
+                    "xyz",
+                    "rotation",
+                    "scaling",
+                    "opacity",
+                    "roughness",
+                    "photometric_albedo",
+                ]
+            )
+        )
+        trainer.deform = SimpleNamespace(
+            optimizer=_Optimizer(["mlp", "mlp_color"])
+        )
+
+        trainer.apply_pbr_training_schedule()
+
+        self.assertEqual(
+            self.group_lrs(trainer.gaussians.optimizer),
+            {
+                "xyz": 0.0,
+                "rotation": 0.0,
+                "scaling": 0.0,
+                "opacity": 0.0,
+                "roughness": 0.0005,
+                "photometric_albedo": 0.001,
+            },
+        )
+        self.assertTrue(
+            all(group["lr"] == 0.0 for group in trainer.deform.optimizer.param_groups)
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
