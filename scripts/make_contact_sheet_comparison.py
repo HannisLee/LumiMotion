@@ -11,14 +11,16 @@ from PIL import Image, ImageDraw, ImageFont
 CATEGORIES = {
     "rgb": ("eval_rgb_contact_sheet.png",),
     "normal": (
-        "eval_photometric_normal_contact_sheet.png",
         "eval_normals_contact_sheet.png",
         "normals_contact_sheet.png",
     ),
+    "photometric_normal": ("eval_photometric_normal_contact_sheet.png",),
     "alpha": ("alpha_render_contact_sheet.png",),
     "albedo": ("eval_albedo_contact_sheet.png",),
     "shading": ("eval_shading_contact_sheet.png",),
     "ndotl": ("eval_ndotl_contact_sheet.png",),
+    "separation_small": ("eval_separation_small_contact_sheet.png",),
+    "separation_large": ("eval_separation_large_contact_sheet.png",),
 }
 
 
