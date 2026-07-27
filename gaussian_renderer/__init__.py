@@ -17,7 +17,6 @@ from utils.point_utils import depth_to_normal
 import numpy as np
 import cv2
 from utils.sh_utils import eval_sh, SH2RGB, RGB2SH
-from scene.photometric_lambertian import get_gaussian_normal, orient_normal_toward_camera
 
 def standardize_quaternion(quaternions: torch.Tensor) -> torch.Tensor:
     return torch.where(quaternions[..., 0:1] < 0, -quaternions, quaternions)
@@ -111,35 +110,17 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
     # from SHs in Python, do it. If not, then SH -> RGB conversion will be done by rasterizer.
     shs = None
     colors_precomp = None
-    photometric_outputs = None
+    photometric_active = False
     render_mode = getattr(pipe, "render_mode", "original_sh")
     if render_mode == "original":
         render_mode = "original_sh"
     if override_color is None and render_mode == "photometric_lambertian":
         if photometric_renderer is None:
             raise ValueError("photometric_lambertian rendering requires a photometric_renderer")
-        normal_rotations = rotations
-        if normal_rotations is None:
-            normal_rotations = pc.get_rotation_bias(d_rotation)
-            if d_rotation_bias is not None:
-                normal_rotations = quaternion_multiply(d_rotation_bias, normal_rotations)
-        normal_i_t_raw = get_gaussian_normal(
-            normal_rotations, photometric_renderer.normal_axis
-        )
-        normal_i_t, normal_camera_facing = orient_normal_toward_camera(
-            normal_i_t_raw,
-            means3D,
-            viewpoint_camera.camera_center,
-        )
-        photometric_outputs = photometric_renderer(
-            pc.get_photometric_albedo,
-            normal_i_t,
-            viewpoint_camera.fid,
-            position=means3D,
-        )
-        photometric_outputs["normal_raw"] = normal_i_t_raw
-        photometric_outputs["normal_camera_facing"] = normal_camera_facing
-        colors_precomp = photometric_outputs["color"]
+        # Rasterize intrinsic albedo first. Lambertian shading is applied to
+        # pixel-space albedo/normal/depth after the rasterizer returns.
+        colors_precomp = pc.get_photometric_albedo
+        photometric_active = True
     elif override_color is None:
         if d_color is not None and type(d_color) is not float:
             shadowed_modulation = d_color[:,None, :3].clamp_max(1.0)
@@ -229,7 +210,13 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
 
     # get expected depth map
     render_depth_expected = allmap[0:1]
-    render_depth_expected = (render_depth_expected / render_alpha)
+    if photometric_active:
+        # Deferred point lighting consumes the reconstructed surface position
+        # in the RGB graph. Keep alpha=0 background pixels from creating NaN
+        # gradients in that path; leave the original SH path unchanged.
+        render_depth_expected = render_depth_expected / render_alpha.clamp_min(1e-6)
+    else:
+        render_depth_expected = render_depth_expected / render_alpha
     render_depth_expected = torch.nan_to_num(render_depth_expected, 0, 0)
     
     # get depth distortion map
@@ -250,6 +237,20 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
     surf_normal = surf_normal * (render_alpha).detach()
     surf_normal = surf_normal*mask
 
+    photometric_outputs = None
+    if photometric_active:
+        photometric_outputs = photometric_renderer(
+            rendered_image,
+            render_normal,
+            render_alpha,
+            surf_point,
+            viewpoint_camera.camera_center,
+            bg,
+            viewpoint_camera.fid,
+        )
+        rendered_image = photometric_outputs["color"]
+        rets["render"] = rendered_image
+
     rets.update({
             'rend_alpha': render_alpha,
             'rend_normal': render_normal,
@@ -264,14 +265,17 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
         rets.update({
             "photometric_color": photometric_outputs["color"],
             "photometric_albedo": pc.get_photometric_albedo,
+            "photometric_albedo_map": photometric_outputs["albedo"],
             "photometric_normal": photometric_outputs["normal"],
-            "photometric_normal_raw": photometric_outputs["normal_raw"],
             "photometric_normal_camera_facing": photometric_outputs["normal_camera_facing"],
+            "photometric_normal_map": photometric_outputs["normal"],
             "photometric_light_dir": photometric_outputs["light_dir"],
             "photometric_ray_dir": photometric_outputs["ray_dir"],
             "photometric_surface_to_light_dir": photometric_outputs["surface_to_light_dir"],
             "photometric_ndotl": photometric_outputs["ndotl"],
+            "photometric_ndotl_map": photometric_outputs["ndotl"],
             "photometric_shading": photometric_outputs["shading"],
+            "photometric_shading_map": photometric_outputs["shading"],
             "photometric_timestep_idx": photometric_outputs["timestep_idx"],
         })
 
