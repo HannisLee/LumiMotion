@@ -12,7 +12,6 @@
 import torch
 import os
 from os import makedirs
-import json
 import torch.nn.functional as F
 from gaussian_renderer import render
 from utils.general_utils import safe_state
@@ -26,91 +25,6 @@ import re
 import tqdm
 import numpy as np
 import torchvision
-
-
-def _tensor_to_uint8(image):
-    image = image.detach().clamp(0.0, 1.0).permute(1, 2, 0).cpu().numpy()
-    return np.ascontiguousarray((image * 255.0).round().astype(np.uint8))
-
-
-def _save_contact_sheet(images, output_path):
-    if not images:
-        return
-    indices = [0, (len(images) - 1) // 2, len(images) - 1]
-    selected = []
-    for index in indices:
-        image = images[index]
-        if image.ndim == 2:
-            image = image[:, :, None]
-        if image.shape[2] == 1:
-            image = np.repeat(image, 3, axis=2)
-        selected.append(image)
-    imageio.imwrite(output_path, np.concatenate(selected, axis=1))
-
-
-def _write_alpha_stats(alpha_values, output_path):
-    stack = np.stack(alpha_values)
-    temporal_diff = (
-        float(np.abs(stack[1:] - stack[:-1]).mean())
-        if stack.shape[0] > 1
-        else 0.0
-    )
-    indices = [0, (stack.shape[0] - 1) // 2, stack.shape[0] - 1]
-    payload = {
-        "frames": int(stack.shape[0]),
-        "alpha_mean": {
-            "mean": float(stack.mean(axis=(1, 2)).mean()),
-            "min": float(stack.mean(axis=(1, 2)).min()),
-            "max": float(stack.mean(axis=(1, 2)).max()),
-        },
-        "coverage_gt_0.01": {
-            "mean": float((stack > 0.01).mean(axis=(1, 2)).mean()),
-            "min": float((stack > 0.01).mean(axis=(1, 2)).min()),
-            "max": float((stack > 0.01).mean(axis=(1, 2)).max()),
-        },
-        "coverage_gt_0.25": {
-            "mean": float((stack > 0.25).mean(axis=(1, 2)).mean()),
-            "min": float((stack > 0.25).mean(axis=(1, 2)).min()),
-            "max": float((stack > 0.25).mean(axis=(1, 2)).max()),
-        },
-        "temporal_abs_diff_mean": temporal_diff,
-        "representative": {
-            str(index): {
-                "alpha_mean": float(stack[index].mean()),
-                "coverage_gt_0.25": float((stack[index] > 0.25).mean()),
-            }
-            for index in indices
-        },
-    }
-    with open(output_path, "w", encoding="utf-8") as handle:
-        json.dump(payload, handle, indent=2)
-
-
-def _write_normal_depth_metrics(
-    values,
-    valid_pixels,
-    iteration,
-    camera_name,
-    output_path,
-):
-    indices = [0, (len(values) - 1) // 2, len(values) - 1]
-    payload = {
-        "iteration": int(iteration),
-        "camera": camera_name,
-        "alpha_threshold": 0.25,
-        "frame_mean_angle_deg": values,
-        "all_frames_mean_of_means_deg": float(np.mean(values)),
-        "representative": {
-            str(index): float(values[index])
-            for index in indices
-        },
-        "representative_mean_deg": float(
-            np.mean([values[index] for index in indices])
-        ),
-        "valid_pixels": valid_pixels,
-    }
-    with open(output_path, "w", encoding="utf-8") as handle:
-        json.dump(payload, handle, indent=2)
 
 
 def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter):
@@ -162,7 +76,6 @@ def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter):
                                             "ours_{}".format(scene.loaded_iter))
         render_path = os.path.join(render_path_parent)
         makedirs(render_path, exist_ok=True)
-        experiment_path = os.path.dirname(os.path.normpath(dataset.model_path))
 
         for render_idx, view in enumerate(cameras):
 
@@ -176,12 +89,6 @@ def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter):
             separate_gaussians_imgs = []
             separate_gaussians_large_imgs = []
             normals_imgs = []
-            photometric_normals_imgs = []
-            shading_imgs = []
-            ndotl_imgs = []
-            alpha_values = []
-            normal_depth_angles = []
-            normal_depth_valid_pixels = []
 
             render_name = view.image_name_train_light
 
@@ -205,48 +112,14 @@ def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter):
                 rendering = render_pkg["render"]
 
                 torchvision.utils.save_image(rendering.clamp(0.0,1.0), os.path.join(render_path, 'full_t{}_cam{}'.format(timestep_idx, render_name) + ".png"))
-                full_render_imgs.append(_tensor_to_uint8(rendering))
-
-                normal_a = F.normalize(render_pkg["rend_normal"], dim=0)
-                normal_b = F.normalize(render_pkg["surf_normal"], dim=0)
-                normal_dot = (normal_a * normal_b).sum(dim=0).clamp(-1.0, 1.0)
-                normal_valid = (
-                    (render_pkg["rend_alpha"][0] > 0.25)
-                    & (render_pkg["rend_normal"].norm(dim=0) > 1e-6)
-                    & (render_pkg["surf_normal"].norm(dim=0) > 1e-6)
-                )
-                normal_depth_valid_pixels.append(int(normal_valid.sum().item()))
-                if normal_valid.any():
-                    normal_angle = torch.rad2deg(
-                        torch.acos(normal_dot[normal_valid])
-                    ).mean()
-                    normal_depth_angles.append(float(normal_angle.item()))
-                else:
-                    normal_depth_angles.append(float("nan"))
-
-                if photometric_renderer is not None:
-                    alpha_for_vis = render_pkg["rend_alpha"]
-                    photometric_normal_vis = (
-                        render_pkg["photometric_normal_map"] * 0.5 + 0.5
-                    ) * alpha_for_vis
-                    shading_vis = (
-                        render_pkg["photometric_shading_map"]
-                        .expand(3, -1, -1)
-                        * alpha_for_vis
-                    )
-                    ndotl_vis = (
-                        render_pkg["photometric_ndotl_map"] * 0.5 + 0.5
-                    ).expand(3, -1, -1) * alpha_for_vis
-                    photometric_normals_imgs.append(
-                        _tensor_to_uint8(photometric_normal_vis)
-                    )
-                    shading_imgs.append(_tensor_to_uint8(shading_vis))
-                    ndotl_imgs.append(_tensor_to_uint8(ndotl_vis))
+                img_np = rendering.permute(1, 2, 0).cpu().numpy()
+                img_np = (img_np * 255).clip(0, 255).astype(np.uint8)
+                img_np = np.ascontiguousarray(img_np)
+                full_render_imgs.append(img_np)
                 
 
                 ## alpha render
                 alpha_rend = render_pkg["rend_alpha"]
-                alpha_values.append(alpha_rend[0].detach().cpu().numpy())
                 torchvision.utils.save_image(
                     alpha_rend.clamp(0.0, 1.0),
                     os.path.join(render_path, 'alpha_t{}_cam{}'.format(timestep_idx, render_name) + ".png"),
@@ -328,65 +201,6 @@ def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter):
             if dataset.load2gpu_on_the_fly:
                     view.load2device('cpu')
 
-            _save_contact_sheet(
-                full_render_imgs,
-                os.path.join(experiment_path, "eval_rgb_contact_sheet.png"),
-            )
-            _save_contact_sheet(
-                alpha_imgs,
-                os.path.join(experiment_path, "alpha_render_contact_sheet.png"),
-            )
-            _save_contact_sheet(
-                normals_imgs,
-                os.path.join(experiment_path, "eval_normals_contact_sheet.png"),
-            )
-            _save_contact_sheet(
-                albedo_imgs,
-                os.path.join(experiment_path, "eval_albedo_contact_sheet.png"),
-            )
-            _save_contact_sheet(
-                separate_gaussians_imgs,
-                os.path.join(
-                    experiment_path,
-                    "eval_separation_small_contact_sheet.png",
-                ),
-            )
-            _save_contact_sheet(
-                separate_gaussians_large_imgs,
-                os.path.join(
-                    experiment_path,
-                    "eval_separation_large_contact_sheet.png",
-                ),
-            )
-            _save_contact_sheet(
-                photometric_normals_imgs,
-                os.path.join(
-                    experiment_path,
-                    "eval_photometric_normal_contact_sheet.png",
-                ),
-            )
-            _save_contact_sheet(
-                shading_imgs,
-                os.path.join(experiment_path, "eval_shading_contact_sheet.png"),
-            )
-            _save_contact_sheet(
-                ndotl_imgs,
-                os.path.join(experiment_path, "eval_ndotl_contact_sheet.png"),
-            )
-            _write_alpha_stats(
-                alpha_values,
-                os.path.join(experiment_path, "alpha_render_stats.json"),
-            )
-            _write_normal_depth_metrics(
-                normal_depth_angles,
-                normal_depth_valid_pixels,
-                scene.loaded_iter,
-                render_name,
-                os.path.join(
-                    experiment_path,
-                    f"normal_depth_metrics_{scene.loaded_iter}.json",
-                ),
-            )
 
             # Save videos
             vid_name = f"full_render_cam{render_name}"
