@@ -1,4 +1,4 @@
-"""Deferred per-pixel Lambertian rendering for Stage 1."""
+"""Per-frame directional-light Lambertian rendering for Stage 1."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ import torch.nn.functional as F
 from utils.general_utils import build_rotation
 
 
-PHOTOMETRIC_VERSION = "stage1_perlight_v4_deferred_lambertian"
+PHOTOMETRIC_VERSION = "stage1_perlight_v3_camera_facing_gt_point"
 DIRECTION_CONVENTION = "light_to_surface"
 LIGHT_MODES = {"learned_directional", "gt_point"}
 
@@ -229,7 +229,7 @@ class DirectionalLightModel(nn.Module):
 
 
 class PhotometricLambertianRenderer(nn.Module):
-    """Shade rasterized albedo and geometry with a per-frame light."""
+    """Compute per-Gaussian diffuse colors before rasterization."""
 
     def __init__(
         self,
@@ -401,100 +401,35 @@ class PhotometricLambertianRenderer(nn.Module):
 
     def forward(
         self,
-        rendered_albedo: torch.Tensor,
-        accumulated_world_normal: torch.Tensor,
-        alpha: torch.Tensor,
-        surface_position: torch.Tensor,
-        camera_center: torch.Tensor,
-        bg_color: torch.Tensor,
+        albedo: torch.Tensor,
+        normal: torch.Tensor,
         frame_id: torch.Tensor,
-        eps: float = 1e-6,
+        position: torch.Tensor | None = None,
     ) -> dict[str, torch.Tensor]:
-        """Apply Lambertian shading after rasterization.
-
-        All image-space tensors use channel-first layout. ``rendered_albedo`` is
-        the rasterizer output including its background, while
-        ``accumulated_world_normal`` is the alpha-weighted normal accumulation.
-        """
-        if rendered_albedo.ndim != 3 or rendered_albedo.shape[0] != 3:
-            raise ValueError(
-                "rendered_albedo must have shape [3,H,W], got "
-                f"{tuple(rendered_albedo.shape)}."
-            )
-        image_shape = rendered_albedo.shape[1:]
-        expected_shapes = {
-            "accumulated_world_normal": (3, *image_shape),
-            "alpha": (1, *image_shape),
-            "surface_position": (3, *image_shape),
-        }
-        actual_tensors = {
-            "accumulated_world_normal": accumulated_world_normal,
-            "alpha": alpha,
-            "surface_position": surface_position,
-        }
-        for name, expected_shape in expected_shapes.items():
-            if tuple(actual_tensors[name].shape) != expected_shape:
-                raise ValueError(
-                    f"{name} must have shape {expected_shape}, got "
-                    f"{tuple(actual_tensors[name].shape)}."
-                )
-        if eps <= 0.0:
-            raise ValueError(f"eps must be positive, got {eps}.")
-
-        background = bg_color.to(
-            device=rendered_albedo.device,
-            dtype=rendered_albedo.dtype,
-        ).flatten()
-        if background.numel() != 3:
-            raise ValueError(
-                f"bg_color must contain three values, got {tuple(background.shape)}."
-            )
-        background = background[:, None, None]
-        alpha = alpha.to(dtype=rendered_albedo.dtype)
-        safe_alpha = alpha.clamp_min(float(eps))
-
-        albedo_pixel = (
-            rendered_albedo - background * (1.0 - alpha)
-        ) / safe_alpha
-        normal_pixel = F.normalize(
-            accumulated_world_normal / safe_alpha,
-            dim=0,
-            eps=float(eps),
-        )
-        normal_hwc, camera_facing = orient_normal_toward_camera(
-            normal_pixel.permute(1, 2, 0),
-            surface_position.permute(1, 2, 0),
-            camera_center,
-        )
-        normal_pixel = normal_hwc.permute(2, 0, 1)
-
         timestep_idx = self.light_model.timestep_index(frame_id)[0]
+        normal = F.normalize(normal, dim=-1)
         if self.light_mode == "gt_point":
+            if position is None or position.shape != normal.shape:
+                raise ValueError(
+                    "gt_point light mode requires position with the same shape as normal."
+                )
             if self.gt_light_positions.shape != (self.light_model.num_timesteps, 3):
                 raise RuntimeError("GT point lights have not been initialized.")
             light_position = self.gt_light_positions[timestep_idx]
-            surface_to_light_dir = F.normalize(
-                light_position[:, None, None] - surface_position,
-                dim=0,
-                eps=float(eps),
-            )
+            surface_to_light_dir = F.normalize(light_position[None] - position, dim=-1)
             ray_dir = -surface_to_light_dir
         else:
             ray_dir = self.light_model(frame_id)
             if ray_dir.ndim == 2:
                 ray_dir = ray_dir[0]
             ray_dir = F.normalize(ray_dir, dim=-1)
-            surface_to_light_dir = -ray_dir[:, None, None].expand_as(normal_pixel)
-        ndotl = (normal_pixel * surface_to_light_dir).sum(dim=0, keepdim=True)
+            surface_to_light_dir = -ray_dir
+        ndotl = (normal * surface_to_light_dir).sum(dim=-1, keepdim=True)
         shading = ndotl.clamp_min(0.0)
-        foreground = albedo_pixel * shading
-        rendered = foreground * alpha + background * (1.0 - alpha)
         return {
-            "color": rendered,
-            "foreground": foreground,
-            "albedo": albedo_pixel,
-            "normal": normal_pixel,
-            "normal_camera_facing": camera_facing.permute(2, 0, 1),
+            "color": (albedo * shading).clamp(0.0, 1.0),
+            "albedo": albedo,
+            "normal": normal,
             # Keep light_dir as an alias for callers, but its v2 convention is
             # explicitly the physical light-to-surface propagation direction.
             "light_dir": ray_dir,
