@@ -112,6 +112,34 @@ class PhotometricLambertianTest(unittest.TestCase):
             output["surface_to_light_dir"],
             torch.tensor([[0.0, 0.0, 1.0]]),
         )
+        torch.testing.assert_close(
+            output["color"],
+            torch.full((1, 3), 1.0 / (4.0 * math.pi)),
+        )
+        torch.testing.assert_close(output["light_distance"], torch.tensor([[2.0]]))
+        torch.testing.assert_close(output["light_attenuation"], torch.tensor([[0.25]]))
+
+    def test_gt_point_light_preserves_fixed_intensity_and_rgb_color(self):
+        renderer = PhotometricLambertianRenderer(
+            [0.0],
+            light_mode="gt_point",
+            gt_light_intensity=2.0,
+            gt_light_color="0.25,0.5,1.0",
+            device="cpu",
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "lights.json"
+            path.write_text(json.dumps({"0001": {"light_pos_world": [0, 0, 1]}}))
+            renderer.initialize_gt_point_lights(str(path), torch.zeros(3))
+        output = renderer(
+            torch.ones((1, 3)),
+            torch.tensor([[0.0, 0.0, 1.0]]),
+            torch.tensor([0.0]),
+            position=torch.zeros((1, 3)),
+        )
+        torch.testing.assert_close(
+            output["color"], torch.tensor([[0.5, 1.0, 2.0]]) / math.pi
+        )
 
 
 if __name__ == "__main__":

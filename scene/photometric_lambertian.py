@@ -14,7 +14,7 @@ import torch.nn.functional as F
 from utils.general_utils import build_rotation
 
 
-PHOTOMETRIC_VERSION = "stage1_perlight_v3_camera_facing_gt_point"
+PHOTOMETRIC_VERSION = "stage1_perlight_v4_physical_gt_point"
 DIRECTION_CONVENTION = "light_to_surface"
 LIGHT_MODES = {"learned_directional", "gt_point"}
 
@@ -54,6 +54,18 @@ def parse_axis(axis: str | torch.Tensor, device: str | torch.device) -> torch.Te
     if out.numel() != 3:
         raise ValueError(f"Normal axis must have three elements, got {tuple(out.shape)}.")
     return F.normalize(out, dim=0)
+
+
+def parse_light_color(color: str | torch.Tensor, device: str | torch.device) -> torch.Tensor:
+    """Parse an RGB radiance multiplier without treating it as a direction."""
+    if torch.is_tensor(color):
+        result = color.to(device=device, dtype=torch.float32).flatten()
+    else:
+        values = [float(part) for part in str(color).replace(",", " ").split()]
+        result = torch.tensor(values, dtype=torch.float32, device=device)
+    if result.numel() != 3 or not torch.isfinite(result).all() or torch.any(result < 0.0):
+        raise ValueError("gt_light_color must contain three finite non-negative values.")
+    return result
 
 
 def get_gaussian_normal(rotation_t: torch.Tensor, normal_axis: str = "+z") -> torch.Tensor:
@@ -236,6 +248,8 @@ class PhotometricLambertianRenderer(nn.Module):
         timesteps: Any,
         normal_axis: str = "+z",
         light_mode: str = "learned_directional",
+        gt_light_intensity: float = 1.0,
+        gt_light_color: str | torch.Tensor = "1.0,1.0,1.0",
         device: str | torch.device = "cuda",
     ):
         super().__init__()
@@ -246,6 +260,14 @@ class PhotometricLambertianRenderer(nn.Module):
                 f"light_mode must be one of {sorted(LIGHT_MODES)}, got {light_mode!r}."
             )
         self.light_model = DirectionalLightModel(timesteps, device=device)
+        intensity = float(gt_light_intensity)
+        if not np.isfinite(intensity) or intensity <= 0.0:
+            raise ValueError("gt_light_intensity must be finite and positive.")
+        color = parse_light_color(gt_light_color, device)
+        # Keep radiometric controls explicit and checkpointed, while this GT
+        # experiment intentionally fixes them instead of learning an exposure.
+        self.register_buffer("gt_light_intensity", torch.tensor(intensity, dtype=torch.float32, device=device))
+        self.register_buffer("gt_light_color", color)
         self.register_buffer(
             "gt_light_positions",
             torch.empty((0, 3), dtype=torch.float32, device=device),
@@ -259,6 +281,8 @@ class PhotometricLambertianRenderer(nn.Module):
             timesteps,
             normal_axis=getattr(args, "photometric_normal_axis", "+z"),
             light_mode=getattr(args, "photometric_light_mode", "learned_directional"),
+            gt_light_intensity=getattr(args, "photometric_gt_light_intensity", 1.0),
+            gt_light_color=getattr(args, "photometric_gt_light_color", "1.0,1.0,1.0"),
             device=device,
         )
 
@@ -324,7 +348,9 @@ class PhotometricLambertianRenderer(nn.Module):
             "lights_path": os.path.abspath(lights_path),
             "reference_center": center.detach().cpu().tolist(),
             "source_light_type": "area_center_as_point",
-            "uses_distance_attenuation": False,
+            "uses_distance_attenuation": True,
+            "light_intensity": float(self.gt_light_intensity.item()),
+            "light_color": self.gt_light_color.detach().cpu().tolist(),
         }
 
     def initialize_camera_back_ellipse(
@@ -416,18 +442,32 @@ class PhotometricLambertianRenderer(nn.Module):
             if self.gt_light_positions.shape != (self.light_model.num_timesteps, 3):
                 raise RuntimeError("GT point lights have not been initialized.")
             light_position = self.gt_light_positions[timestep_idx]
-            surface_to_light_dir = F.normalize(light_position[None] - position, dim=-1)
+            light_vector = light_position[None] - position
+            light_distance = torch.linalg.vector_norm(light_vector, dim=-1, keepdim=True)
+            surface_to_light_dir = light_vector / light_distance.clamp_min(1e-6)
             ray_dir = -surface_to_light_dir
+            attenuation = light_distance.clamp_min(1e-6).reciprocal().pow(2)
+            irradiance = attenuation * self.gt_light_intensity * self.gt_light_color[None]
         else:
             ray_dir = self.light_model(frame_id)
             if ray_dir.ndim == 2:
                 ray_dir = ray_dir[0]
             ray_dir = F.normalize(ray_dir, dim=-1)
             surface_to_light_dir = -ray_dir
+            light_distance = torch.full_like(normal[:, :1], float("inf"))
+            attenuation = torch.ones_like(light_distance)
+            irradiance = torch.ones_like(albedo)
         ndotl = (normal * surface_to_light_dir).sum(dim=-1, keepdim=True)
         shading = ndotl.clamp_min(0.0)
+        # Directional-light legacy mode remains A * NdotL. GT point light uses
+        # the Lambert BRDF (rho / pi) with inverse-square irradiance.
+        color = (
+            albedo * shading
+            if self.light_mode != "gt_point"
+            else (albedo / np.pi) * irradiance * shading
+        )
         return {
-            "color": (albedo * shading).clamp(0.0, 1.0),
+            "color": color.clamp(0.0, 1.0),
             "albedo": albedo,
             "normal": normal,
             # Keep light_dir as an alias for callers, but its v2 convention is
@@ -437,6 +477,10 @@ class PhotometricLambertianRenderer(nn.Module):
             "surface_to_light_dir": surface_to_light_dir,
             "ndotl": ndotl,
             "shading": shading,
+            "light_distance": light_distance,
+            "light_attenuation": attenuation,
+            "light_intensity": self.gt_light_intensity,
+            "light_color": self.gt_light_color,
             "timestep_idx": timestep_idx,
         }
 
@@ -454,6 +498,8 @@ class PhotometricLambertianRenderer(nn.Module):
                 ),
                 "light_mode": self.light_mode,
                 "direction_convention": DIRECTION_CONVENTION,
+                "gt_light_intensity": float(self.gt_light_intensity.item()),
+                "gt_light_color": self.gt_light_color.detach().cpu().tolist(),
             },
             "initialization": self.initialization_metadata,
         }

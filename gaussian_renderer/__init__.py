@@ -366,6 +366,13 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
             "photometric_shading": photometric_outputs["shading"],
             "photometric_timestep_idx": photometric_outputs["timestep_idx"],
         })
+        if "light_distance" in photometric_outputs:
+            rets.update({
+                "photometric_light_distance": photometric_outputs["light_distance"],
+                "photometric_light_attenuation": photometric_outputs["light_attenuation"],
+                "photometric_light_intensity": photometric_outputs["light_intensity"],
+                "photometric_light_color": photometric_outputs["light_color"],
+            })
         if pbr_linear_render:
             rets.update({
                 "render_linear": rendered_image_linear,

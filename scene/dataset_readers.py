@@ -59,6 +59,23 @@ class SceneInfo(NamedTuple):
     all_timesteps: Optional[list] = None
 
 
+def blender_c2w_to_camera_extrinsics(transform_matrix):
+    """Convert a standard Blender/NeRF C2W into this rasterizer's R/T form.
+
+    Blender camera axes are right/up/back = (+X, +Y, +Z), whereas the
+    rasterizer uses right/down/forward = (+X, -Y, -Z).  `R` carries this
+    rotation change and `T` must be transformed by the same camera-space
+    convention.  Keeping the old unsigned translation mirrors camera centers
+    and breaks correspondence with source-world light positions.
+    """
+    w2c_source = np.linalg.inv(np.asarray(transform_matrix, dtype=np.float64))
+    R = -np.transpose(w2c_source[:3, :3])
+    R[:, 0] = -R[:, 0]
+    T = w2c_source[:3, 3].copy()
+    T[1:] *= -1.0
+    return R, T
+
+
 def getNerfppNorm(cam_info, apply=False):
     def get_center_and_diag(cam_centers):
         cam_centers = np.hstack(cam_centers)
@@ -172,10 +189,7 @@ def readCamerasFromTransforms(path, transformsfile, train_light, white_backgroun
             if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(os.path.join(path, train_light, frame["file_path"]))), 'rgba')):
                 cam_name_train_light = os.path.join(os.path.dirname(os.path.dirname(os.path.join(path, train_light, frame["file_path"]))), 'rgba', os.path.basename(frame['file_path'])).replace('.jpg', '.png')
 
-            matrix = np.linalg.inv(np.array(frame["transform_matrix"]))
-            R = -np.transpose(matrix[:3, :3])
-            R[:, 0] = -R[:, 0]
-            T = -matrix[:3, 3]
+            R, T = blender_c2w_to_camera_extrinsics(frame["transform_matrix"])
 
             image_path_train_light = os.path.join(path, cam_name_train_light)
             image_name_train_light = Path(cam_name_train_light).stem

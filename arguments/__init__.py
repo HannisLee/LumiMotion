@@ -182,6 +182,11 @@ class OptimizationParams(ParamGroup):
         # gt_point uses fixed per-frame world-space light positions from JSON.
         self.photometric_light_mode = "learned_directional"
         self.photometric_gt_lights_path = ""
+        # Fixed radiometric controls for GT point-light Lambertian experiments.
+        # The default is a unit white emitter; positions still come per-frame
+        # from photometric_gt_lights_path.
+        self.photometric_gt_light_intensity = 1.0
+        self.photometric_gt_light_color = "1.0,1.0,1.0"
         # Optional piecewise-constant schedule expressed as start_iter:lr
         # entries, for example "1:0.003,10001:0.0003,30001:0.0001".
         # An empty string preserves the constant photometric_light_lr path.

@@ -440,6 +440,27 @@ class Trainer:
         self.tb_writer.add_scalar("photometric/albedo_mean", self.gaussians.get_photometric_albedo.mean().item(), self.iteration)
         self.tb_writer.add_scalar("photometric/ndotl_mean", render_pkg["photometric_ndotl"].mean().item(), self.iteration)
         self.tb_writer.add_scalar("photometric/shading_mean", render_pkg["photometric_shading"].mean().item(), self.iteration)
+        if self.photometric_light_mode == "gt_point":
+            self.tb_writer.add_scalar(
+                "photometric/gt_light_distance_mean",
+                render_pkg["photometric_light_distance"].mean().item(),
+                self.iteration,
+            )
+            self.tb_writer.add_scalar(
+                "photometric/gt_light_attenuation_mean",
+                render_pkg["photometric_light_attenuation"].mean().item(),
+                self.iteration,
+            )
+            self.tb_writer.add_scalar(
+                "photometric/gt_light_intensity",
+                render_pkg["photometric_light_intensity"].item(),
+                self.iteration,
+            )
+            self.tb_writer.add_scalar(
+                "photometric/gt_light_color_mean",
+                render_pkg["photometric_light_color"].mean().item(),
+                self.iteration,
+            )
         if self.pbr_active:
             self.tb_writer.add_scalar(
                 "photometric_pbr/visibility_mean",
