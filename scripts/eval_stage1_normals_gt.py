@@ -4,10 +4,14 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 from argparse import ArgumentParser
 from pathlib import Path
 
+# The project environment ships OpenCV with OpenEXR support disabled unless
+# this opt-in is present before importing cv2.
+os.environ.setdefault("OPENCV_IO_ENABLE_OPENEXR", "1")
 import cv2
 import numpy as np
 import torch
