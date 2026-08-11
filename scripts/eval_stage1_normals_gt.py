@@ -4,16 +4,12 @@
 from __future__ import annotations
 
 import json
-import os
 import re
 from argparse import ArgumentParser
 from pathlib import Path
 
-# The project environment ships OpenCV with OpenEXR support disabled unless
-# this opt-in is present before importing cv2.
-os.environ.setdefault("OPENCV_IO_ENABLE_OPENEXR", "1")
-import cv2
 import numpy as np
+import OpenEXR
 import torch
 import torch.nn.functional as F
 import torchvision
@@ -56,12 +52,19 @@ def _frame_records(source_path: Path) -> tuple[list[dict], list[dict]]:
     return records[0], records[1]
 
 
-def _load_gt_normal(path: Path, height: int, width: int) -> torch.Tensor:
-    # OpenCV returns OpenEXR channels as BGR; the source contract is RGB float [-1,1].
-    image = cv2.imread(str(path), cv2.IMREAD_UNCHANGED)
-    if image is None or image.ndim != 3 or image.shape[2] < 3:
-        raise ValueError(f"Expected a three-channel EXR normal image: {path}")
-    image = np.ascontiguousarray(image[..., :3][..., ::-1])
+def _load_gt_normal(path: Path, height: int, width: int) -> tuple[torch.Tensor, torch.Tensor]:
+    """Load LH EXR normal channels with OpenEXR instead of OpenCV.
+
+    The project OpenCV build cannot decode EXR. LH exports `Normal.X/Y/Z`,
+    while RGB EXRs remain supported as a fallback for compatible datasets.
+    """
+    channels = OpenEXR.File(str(path)).parts[0].channels
+    names = ("Normal.X", "Normal.Y", "Normal.Z")
+    if not all(name in channels for name in names):
+        names = ("R", "G", "B")
+    if not all(name in channels for name in names):
+        raise ValueError(f"Expected Normal.X/Y/Z or RGB channels in {path}, got {list(channels)}")
+    image = np.stack([channels[name].pixels for name in names], axis=-1)
     normal = torch.from_numpy(image).permute(2, 0, 1).float()
     normal = F.interpolate(normal[None], size=(height, width), mode="bilinear", align_corners=False)[0]
     valid = normal.norm(dim=0, keepdim=True) > 1e-6
