@@ -143,6 +143,54 @@ def load_light_checkpoint(path: str | Path) -> LightCheckpoint:
     )
 
 
+def load_gt_lights_directory(dataset_dir: str | Path) -> LightCheckpoint:
+    """Load GT point-light positions directly from a transferred dataset.
+
+    The transfer manifest keeps the original ``lights.json`` path.  This
+    avoids requiring a learned photometric checkpoint for GT-only plots.
+    """
+    dataset_path = Path(dataset_dir).expanduser().resolve()
+    manifest_path = dataset_path / "dataset_manifest.json"
+    light_path = dataset_path / "lights.json"
+    if manifest_path.is_file():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        source = manifest.get("source_metadata", {}).get("lights")
+        if source:
+            source_path = Path(source)
+            candidates = [source_path, Path(str(source).replace("/mnt/workspace/users/han.li/lumimotion/", str(Path.cwd()) + "/"))]
+            light_path = next((candidate for candidate in candidates if candidate.is_file()), light_path)
+    if not light_path.is_file():
+        raise FileNotFoundError(f"GT lights.json not found below {dataset_path}")
+    payload = json.loads(light_path.read_text(encoding="utf-8"))
+    entries = sorted(payload.items(), key=lambda item: int(item[0]))
+    positions = _to_numpy([entry["light_pos_world"] for _, entry in entries], "GT light positions")
+    center = np.zeros(3, dtype=np.float64)
+    reference_center = manifest.get("reference_center") if manifest_path.is_file() else None
+    if reference_center is not None:
+        center = _to_numpy(reference_center, "reference center").reshape(3)
+    vectors = center[None, :] - positions
+    distances = np.linalg.norm(vectors, axis=1)
+    directions = vectors / distances[:, None]
+    return LightCheckpoint(dataset_path, directions, np.arange(len(entries)), positions, center, "lights.json", "gt_point")
+
+
+def make_gt_only_comparison(gt: LightCheckpoint) -> dict[str, Any]:
+    distances = np.linalg.norm(gt.reference_center[None, :] - gt.gt_positions, axis=1)
+    return {
+        "center": gt.reference_center,
+        "timesteps": gt.timesteps,
+        "learned_directions": gt.directions,
+        "gt_directions": gt.directions,
+        "gt_positions": gt.gt_positions,
+        "learned_virtual_positions": gt.gt_positions,
+        "gt_distances": distances,
+        "virtual_radius": float(np.median(distances)),
+        "angular_errors": np.zeros_like(distances),
+        "angular_errors_deg": np.zeros_like(distances),
+        "gt_only": True,
+    }
+
+
 def parse_representative_frames(value: str, num_frames: int) -> tuple[int, ...]:
     frames = tuple(int(part.strip()) for part in value.split(",") if part.strip())
     if not frames:
@@ -289,9 +337,10 @@ def _draw_world_space_view(
     num_frames = comparison["timesteps"].shape[0]
     colors = plt.cm.turbo(np.linspace(0.05, 0.95, num_frames))
     gt_positions = comparison["gt_positions"]
-    learned_positions = comparison["learned_virtual_positions"]
     _add_direction_trajectory(axis, gt_positions, colors, "GT light position", "^")
-    _add_direction_trajectory(axis, learned_positions, colors, "Learned virtual source", "o")
+    if not comparison.get("gt_only"):
+        learned_positions = comparison["learned_virtual_positions"]
+        _add_direction_trajectory(axis, learned_positions, colors, "Learned virtual source", "o")
     center = comparison["center"]
     axis.scatter(
         center[0], center[1], center[2], c="#111111", marker="*", s=110,
@@ -300,9 +349,10 @@ def _draw_world_space_view(
     _add_representative_world_arrows(
         axis, gt_positions, center, frames, "#e76f51", "GT light→center",
     )
-    _add_representative_world_arrows(
-        axis, learned_positions, center, frames, "#2878b5", "Learned virtual→center",
-    )
+    if not comparison.get("gt_only"):
+        _add_representative_world_arrows(
+            axis, learned_positions, center, frames, "#2878b5", "Learned virtual→center",
+        )
     _set_world_space_limits(axis, comparison)
     axis.set_xlabel("World X")
     axis.set_ylabel("World Y")
@@ -329,7 +379,8 @@ def _draw_unit_sphere_view(
     colors = plt.cm.turbo(np.linspace(0.05, 0.95, num_frames))
     _add_unit_sphere(axis)
     _add_direction_trajectory(axis, comparison["gt_directions"], colors, "GT direction", "^")
-    _add_direction_trajectory(axis, comparison["learned_directions"], colors, "Learned direction", "o")
+    if not comparison.get("gt_only"):
+        _add_direction_trajectory(axis, comparison["learned_directions"], colors, "Learned direction", "o")
     axis.scatter(
         0.0, 0.0, 0.0, c="#111111", marker="*", s=110, depthshade=False,
         label="Unit-sphere origin",
@@ -337,9 +388,10 @@ def _draw_unit_sphere_view(
     _add_representative_direction_arrows(
         axis, comparison["gt_directions"], frames, "#e76f51", "GT light→surface",
     )
-    _add_representative_direction_arrows(
-        axis, comparison["learned_directions"], frames, "#2878b5", "Learned light→surface",
-    )
+    if not comparison.get("gt_only"):
+        _add_representative_direction_arrows(
+            axis, comparison["learned_directions"], frames, "#2878b5", "Learned light→surface",
+        )
     _set_unit_sphere_limits(axis)
     axis.set_xlabel("Direction X")
     axis.set_ylabel("Direction Y")
@@ -578,8 +630,9 @@ def write_readme(output_path: Path, args: argparse.Namespace, metrics: dict[str,
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--learned-photometric", required=True, help="Path to learned-light photometric.pth")
-    parser.add_argument("--gt-photometric", required=True, help="Path to GT-point-light photometric.pth")
+    parser.add_argument("--learned-photometric", help="Path to learned-light photometric.pth")
+    parser.add_argument("--gt-photometric", help="Path to GT-point-light photometric.pth")
+    parser.add_argument("--gt-data-dir", help="Transferred dataset directory; plot GT light directions only")
     parser.add_argument("--point-cloud", help="Deprecated compatibility option; unit-sphere visualization does not use geometry")
     parser.add_argument("--output-dir", required=True, help="Directory for PNG, HTML, JSON and README")
     parser.add_argument("--sample-points", type=int, default=5000, help="Deprecated compatibility option")
@@ -592,9 +645,16 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    learned = load_light_checkpoint(args.learned_photometric)
-    gt = load_light_checkpoint(args.gt_photometric)
-    comparison = compare_light_trajectories(learned, gt)
+    if args.gt_data_dir:
+        gt = load_gt_lights_directory(args.gt_data_dir)
+        learned = gt
+        comparison = make_gt_only_comparison(gt)
+    else:
+        if not args.learned_photometric or not args.gt_photometric:
+            raise SystemExit("请提供 --gt-data-dir，或同时提供 --learned-photometric 和 --gt-photometric")
+        learned = load_light_checkpoint(args.learned_photometric)
+        gt = load_light_checkpoint(args.gt_photometric)
+        comparison = compare_light_trajectories(learned, gt)
     frames = parse_representative_frames(args.representative_frames, comparison["timesteps"].shape[0])
     output_dir = Path(args.output_dir).expanduser().resolve()
     output_dir.mkdir(parents=True, exist_ok=True)

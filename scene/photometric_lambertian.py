@@ -14,9 +14,30 @@ import torch.nn.functional as F
 from utils.general_utils import build_rotation
 
 
-PHOTOMETRIC_VERSION = "stage1_perlight_v4_physical_gt_point"
+PHOTOMETRIC_VERSION = "stage1_perlight_v5_linear_lambertian"
 DIRECTION_CONVENTION = "light_to_surface"
-LIGHT_MODES = {"learned_directional", "gt_point"}
+LIGHT_MODES = {"learned_directional", "gt_directional", "gt_point"}
+
+
+def srgb_to_linear(value: torch.Tensor) -> torch.Tensor:
+    """Convert bounded sRGB albedo values to linear RGB for physical shading."""
+    value = value.clamp(0.0, 1.0)
+    return torch.where(
+        value <= 0.04045,
+        value / 12.92,
+        ((value + 0.055) / 1.055).pow(2.4),
+    )
+
+
+def linear_to_srgb(value: torch.Tensor, clip: bool = True) -> torch.Tensor:
+    """Convert non-negative linear RGB to display/training sRGB."""
+    value = value.clamp_min(0.0)
+    result = torch.where(
+        value <= 0.0031308,
+        12.92 * value,
+        1.055 * value.clamp_min(0.0031308).pow(1.0 / 2.4) - 0.055,
+    )
+    return result.clamp(0.0, 1.0) if clip else result
 
 
 def _as_timestep_tensor(timesteps: Any, device: str | torch.device) -> torch.Tensor:
@@ -83,6 +104,62 @@ def get_gaussian_normal(rotation_t: torch.Tensor, normal_axis: str = "+z") -> to
         )
     axis = parse_axis(normal_axis, rotation_matrix.device)
     return F.normalize(torch.matmul(rotation_matrix, axis.view(3, 1)).squeeze(-1), dim=-1)
+
+
+def _quaternion_rotation_matrix(quaternion: torch.Tensor) -> torch.Tensor:
+    """Device-preserving differentiable quaternion-to-matrix conversion."""
+    w, x, y, z = F.normalize(quaternion, dim=-1).unbind(dim=-1)
+    values = (
+        1 - 2 * (y * y + z * z),
+        2 * (x * y - w * z),
+        2 * (x * z + w * y),
+        2 * (x * y + w * z),
+        1 - 2 * (x * x + z * z),
+        2 * (y * z - w * x),
+        2 * (x * z - w * y),
+        2 * (y * z + w * x),
+        1 - 2 * (x * x + y * y),
+    )
+    return torch.stack(values, dim=-1).reshape(*quaternion.shape[:-1], 3, 3)
+
+
+def deform_independent_normal(
+    canonical_normal: torch.Tensor,
+    canonical_rotation: torch.Tensor,
+    deformed_rotation: torch.Tensor,
+) -> torch.Tensor:
+    """Apply only the GS deformation rotation to an independent canonical normal.
+
+    The canonical normal is a separately optimized parameter.  The relative
+    rotation ``R_deformed @ R_canonical.T`` lets it follow a fixed dynamic GS
+    deformation without reusing the canonical GS rotation as the shading-normal
+    parameter.
+    """
+    if canonical_normal.ndim != 2 or canonical_normal.shape[-1] != 3:
+        raise ValueError(
+            "canonical_normal must have shape [N,3], got "
+            f"{tuple(canonical_normal.shape)}."
+        )
+    if canonical_rotation.shape != deformed_rotation.shape:
+        raise ValueError(
+            "canonical_rotation and deformed_rotation must have matching shapes, got "
+            f"{tuple(canonical_rotation.shape)} and {tuple(deformed_rotation.shape)}."
+        )
+    if canonical_rotation.ndim != 2 or canonical_rotation.shape[-1] != 4:
+        raise ValueError(
+            "rotations must contain quaternions with shape [N,4], got "
+            f"{tuple(canonical_rotation.shape)}."
+        )
+    if canonical_rotation.shape[0] != canonical_normal.shape[0]:
+        raise ValueError("normal and rotation counts must match.")
+    canonical_matrix = _quaternion_rotation_matrix(canonical_rotation)
+    deformed_matrix = _quaternion_rotation_matrix(deformed_rotation)
+    relative_matrix = deformed_matrix @ canonical_matrix.transpose(1, 2)
+    transformed = torch.bmm(
+        relative_matrix,
+        F.normalize(canonical_normal, dim=-1).unsqueeze(-1),
+    ).squeeze(-1)
+    return F.normalize(transformed, dim=-1)
 
 
 def orient_normal_toward_camera(
@@ -264,8 +341,8 @@ class PhotometricLambertianRenderer(nn.Module):
         if not np.isfinite(intensity) or intensity <= 0.0:
             raise ValueError("gt_light_intensity must be finite and positive.")
         color = parse_light_color(gt_light_color, device)
-        # Keep radiometric controls explicit and checkpointed, while this GT
-        # experiment intentionally fixes them instead of learning an exposure.
+        # This is irradiance for directional modes and source intensity before
+        # inverse-square attenuation for GT point mode. It is fixed and checkpointed.
         self.register_buffer("gt_light_intensity", torch.tensor(intensity, dtype=torch.float32, device=device))
         self.register_buffer("gt_light_color", color)
         self.register_buffer(
@@ -281,7 +358,7 @@ class PhotometricLambertianRenderer(nn.Module):
             timesteps,
             normal_axis=getattr(args, "photometric_normal_axis", "+z"),
             light_mode=getattr(args, "photometric_light_mode", "learned_directional"),
-            gt_light_intensity=getattr(args, "photometric_gt_light_intensity", 1.0),
+            gt_light_intensity=getattr(args, "photometric_gt_light_intensity", 5.5),
             gt_light_color=getattr(args, "photometric_gt_light_color", "1.0,1.0,1.0"),
             device=device,
         )
@@ -309,13 +386,14 @@ class PhotometricLambertianRenderer(nn.Module):
             for group in self.optimizer.param_groups:
                 group["lr"] = float(learning_rate) if self.learns_light else 0.0
 
-    def initialize_gt_point_lights(
+    def _load_gt_light_positions(
         self,
         lights_path: str,
-        reference_center: torch.Tensor,
-    ) -> None:
+    ) -> torch.Tensor:
         if not lights_path:
-            raise ValueError("gt_point light mode requires photometric_gt_lights_path.")
+            raise ValueError(
+                f"{self.light_mode} light mode requires photometric_gt_lights_path."
+            )
         with open(lights_path, "r", encoding="utf-8") as handle:
             payload = json.load(handle)
         ordered = [payload[key] for key in sorted(payload, key=lambda value: int(value))]
@@ -330,6 +408,13 @@ class PhotometricLambertianRenderer(nn.Module):
                 f"got {tuple(positions.shape)}, expected "
                 f"({self.light_model.num_timesteps}, 3)."
             )
+        return positions
+
+    def _initialize_gt_reference_rays(
+        self,
+        positions: torch.Tensor,
+        reference_center: torch.Tensor,
+    ) -> torch.Tensor:
         center = reference_center.to(
             device=positions.device,
             dtype=positions.dtype,
@@ -341,6 +426,40 @@ class PhotometricLambertianRenderer(nn.Module):
         with torch.no_grad():
             self.light_model._raw_light_dir_table.copy_(reference_rays)
         self.light_model._raw_light_dir_table.requires_grad_(False)
+        return center
+
+    def initialize_gt_directional_lights(
+        self,
+        lights_path: str,
+        reference_center: torch.Tensor,
+    ) -> None:
+        """Fix one GT-derived world-space direction per timestep.
+
+        The dataset light position is used only once to form a propagation ray
+        from the light toward a fixed scene reference center. Shading then uses
+        that direction for every Gaussian and deliberately ignores distance.
+        """
+        positions = self._load_gt_light_positions(lights_path)
+        center = self._initialize_gt_reference_rays(positions, reference_center)
+        self.initialization_metadata = {
+            "type": "gt_directional_lights",
+            "light_mode": self.light_mode,
+            "direction_convention": DIRECTION_CONVENTION,
+            "lights_path": os.path.abspath(lights_path),
+            "reference_center": center.detach().cpu().tolist(),
+            "source_light_type": "area_center_direction_only",
+            "uses_distance_attenuation": False,
+            "light_intensity": float(self.gt_light_intensity.item()),
+            "light_color": self.gt_light_color.detach().cpu().tolist(),
+        }
+
+    def initialize_gt_point_lights(
+        self,
+        lights_path: str,
+        reference_center: torch.Tensor,
+    ) -> None:
+        positions = self._load_gt_light_positions(lights_path)
+        center = self._initialize_gt_reference_rays(positions, reference_center)
         self.initialization_metadata = {
             "type": "gt_point_lights",
             "light_mode": self.light_mode,
@@ -456,19 +575,18 @@ class PhotometricLambertianRenderer(nn.Module):
             surface_to_light_dir = -ray_dir
             light_distance = torch.full_like(normal[:, :1], float("inf"))
             attenuation = torch.ones_like(light_distance)
-            irradiance = torch.ones_like(albedo)
+            irradiance = self.gt_light_intensity * self.gt_light_color[None]
         ndotl = (normal * surface_to_light_dir).sum(dim=-1, keepdim=True)
         shading = ndotl.clamp_min(0.0)
-        # Directional-light legacy mode remains A * NdotL. GT point light uses
-        # the Lambert BRDF (rho / pi) with inverse-square irradiance.
-        color = (
-            albedo * shading
-            if self.light_mode != "gt_point"
-            else (albedo / np.pi) * irradiance * shading
-        )
+        albedo_linear = srgb_to_linear(albedo)
+        color_linear = (albedo_linear / np.pi) * irradiance * shading
         return {
-            "color": color.clamp(0.0, 1.0),
+            # color is diagnostic only. The renderer splats color_linear and
+            # performs the single sRGB conversion after alpha compositing.
+            "color": linear_to_srgb(color_linear),
+            "color_linear": color_linear,
             "albedo": albedo,
+            "albedo_linear": albedo_linear,
             "normal": normal,
             # Keep light_dir as an alias for callers, but its v2 convention is
             # explicitly the physical light-to-surface propagation direction.
@@ -494,7 +612,11 @@ class PhotometricLambertianRenderer(nn.Module):
                 "light_param": (
                     "fixed_gt_point_position"
                     if self.light_mode == "gt_point"
-                    else "per_frame"
+                    else (
+                        "fixed_gt_direction"
+                        if self.light_mode == "gt_directional"
+                        else "per_frame"
+                    )
                 ),
                 "light_mode": self.light_mode,
                 "direction_convention": DIRECTION_CONVENTION,
@@ -560,7 +682,7 @@ class PhotometricLambertianRenderer(nn.Module):
                             .cpu()
                             .tolist()
                         }
-                        if self.light_mode == "gt_point"
+                        if self.light_mode in {"gt_directional", "gt_point"}
                         else {}
                     ),
                 }

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LumiMotion Per-Light 3D 查看器</title>
+<link rel="stylesheet" href="css/style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/three.module.js"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar">
+    <h1>Per-Light 3D 查看器</h1>
+    <p class="hint">查看三维场景、perlight 光线轨迹（JSON）、训练光线（.pth 导出）与 PLY 点云。</p>
+
+    <section>
+      <h2>数据加载</h2>
+      <div class="btn-row">
+        <button id="btn-load-json">导入光线 JSON</button>
+        <button id="btn-load-ply">导入 PLY 点云</button>
+      </div>
+      <p class="hint">支持拖拽文件到 3D 视口。perlight.json / light_dirs.json / lights.json 均可。</p>
+      <p class="hint">.pth 无法被浏览器直接解析，请先运行：<br><code>python tools/export_photometric_pth.py &lt;photometric.pth&gt;</code></p>
+      <input type="file" id="file-json" accept=".json,application/json" multiple hidden>
+      <input type="file" id="file-ply" accept=".ply" multiple hidden>
+    </section>
+
+    <section>
+      <h2>数据集点云</h2>
+      <div class="slider-row">
+        <label for="dataset-select">数据集</label>
+        <select id="dataset-select" style="flex: 1"><option value="">（未选择）</option></select>
+      </div>
+      <p class="hint">初始点云来自 data/LH-data/transfer-dynamic/&lt;数据集&gt;/points3d.ply。新增数据集后运行 <code>python tools/update_dataset_index.py</code> 刷新列表。</p>
+    </section>
+
+    <section>
+      <h2>光线数据集</h2>
+      <ul id="light-list" class="item-list"></ul>
+    </section>
+
+    <section>
+      <h2>点云</h2>
+      <ul id="ply-list" class="item-list"></ul>
+      <div class="slider-row">
+        <label for="point-size">点大小</label>
+        <input type="range" id="point-size" min="0.001" max="0.05" step="0.001" value="0.008">
+      </div>
+    </section>
+
+    <section>
+      <h2>显示选项</h2>
+      <div class="check-row">
+        <label><input type="radio" name="up-axis" value="z" checked> Z 轴朝上（Blender）</label>
+        <label><input type="radio" name="up-axis" value="y"> Y 轴朝上</label>
+      </div>
+      <div class="check-row">
+        <label><input type="radio" name="display-mode" value="sphere" checked> 单位球方向</label>
+        <label><input type="radio" name="display-mode" value="world"> 世界坐标位置</label>
+      </div>
+      <div class="slider-row">
+        <label for="sphere-radius">球半径</label>
+        <input type="range" id="sphere-radius" min="0.1" max="5" step="0.05" value="1">
+      </div>
+      <div class="slider-row">
+        <label for="trail-length">轨迹长度</label>
+        <input type="range" id="trail-length" min="0" max="200" step="1" value="60">
+      </div>
+      <div class="check-row">
+        <label><input type="checkbox" id="show-sphere" checked> 显示参考球</label>
+        <label><input type="checkbox" id="show-grid" checked> 显示网格</label>
+      </div>
+      <div class="btn-row">
+        <button id="btn-fit">适配视角</button>
+        <button id="btn-clear">清空数据</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>当前帧信息</h2>
+      <div id="frame-info" class="info-panel">未加载光线数据</div>
+    </section>
+
+    <section>
+      <h2>数据集元信息</h2>
+      <div id="meta-info" class="info-panel">点击左侧列表项查看。</div>
+    </section>
+  </aside>
+
+  <main id="viewport">
+    <div id="drop-overlay">释放文件以加载</div>
+    <div id="toast"></div>
+  </main>
+
+  <footer id="timeline">
+    <button id="btn-play">播放</button>
+    <input type="range" id="frame-slider" min="0" max="0" step="1" value="0">
+    <span id="frame-label">0 / 0</span>
+    <label for="play-speed">速度</label>
+    <select id="play-speed">
+      <option value="0.5">0.5x</option>
+      <option value="1" selected>1x</option>
+      <option value="2">2x</option>
+      <option value="4">4x</option>
+      <option value="8">8x</option>
+    </select>
+    <label><input type="checkbox" id="loop-play" checked> 循环</label>
+  </footer>
+</div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

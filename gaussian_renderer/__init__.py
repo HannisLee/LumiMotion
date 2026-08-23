@@ -17,10 +17,14 @@ from utils.point_utils import depth_to_normal
 import numpy as np
 import cv2
 from utils.sh_utils import eval_sh, SH2RGB, RGB2SH
-from scene.photometric_lambertian import get_gaussian_normal, orient_normal_toward_camera
+from scene.photometric_lambertian import (
+    deform_independent_normal,
+    get_gaussian_normal,
+    linear_to_srgb,
+    orient_normal_toward_camera,
+)
 from scene.photometric_perlight_pbr import (
     PhotometricPerLightPBRRenderer,
-    linear_to_srgb,
 )
 
 def standardize_quaternion(quaternions: torch.Tensor) -> torch.Tensor:
@@ -116,6 +120,7 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
     shs = None
     colors_precomp = None
     photometric_outputs = None
+    photometric_linear_render = False
     pbr_linear_render = False
     rendered_image_linear = None
     render_mode = getattr(pipe, "render_mode", "original_sh")
@@ -132,9 +137,19 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
             normal_rotations = pc.get_rotation_bias(d_rotation)
             if d_rotation_bias is not None:
                 normal_rotations = quaternion_multiply(d_rotation_bias, normal_rotations)
-        normal_i_t_raw = get_gaussian_normal(
-            normal_rotations, photometric_renderer.normal_axis
-        )
+        if (
+            render_mode == "photometric_lambertian"
+            and getattr(pc, "use_photometric_normal", False)
+        ):
+            normal_i_t_raw = deform_independent_normal(
+                pc.get_photometric_normal,
+                pc.get_rotation,
+                normal_rotations,
+            )
+        else:
+            normal_i_t_raw = get_gaussian_normal(
+                normal_rotations, photometric_renderer.normal_axis
+            )
         normal_i_t, normal_camera_facing = orient_normal_toward_camera(
             normal_i_t_raw,
             means3D,
@@ -218,6 +233,7 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
                 visibility=visibility,
             )
             colors_precomp = photometric_outputs["color_linear"]
+            photometric_linear_render = True
             pbr_linear_render = True
         else:
             photometric_outputs = photometric_renderer(
@@ -226,7 +242,8 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
                 viewpoint_camera.fid,
                 position=means3D,
             )
-            colors_precomp = photometric_outputs["color"]
+            colors_precomp = photometric_outputs["color_linear"]
+            photometric_linear_render = True
         photometric_outputs["normal_raw"] = normal_i_t_raw
         photometric_outputs["normal_camera_facing"] = normal_camera_facing
     elif override_color is None:
@@ -282,7 +299,7 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
     )
 
     rendered_image, radii, allmap = output
-    if pbr_linear_render:
+    if photometric_linear_render:
         rendered_image_linear = rendered_image
         rendered_image = linear_to_srgb(rendered_image)
     
@@ -312,8 +329,9 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
     render_normal = render_normal*mask
 
     # get normal map view space
-    render_normal_view = allmap[2:5]
-    render_normal_view = -render_normal_view*mask
+    # Native 2DGS already returns the raster normal in runtime view convention.
+    # Do not negate it a second time here.
+    render_normal_view = allmap[2:5] * mask
     
     # get median depth map
     render_depth_median = allmap[5:6]
@@ -366,6 +384,12 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
             "photometric_shading": photometric_outputs["shading"],
             "photometric_timestep_idx": photometric_outputs["timestep_idx"],
         })
+        if photometric_linear_render:
+            rets.update({
+                "render_linear": rendered_image_linear,
+                "photometric_color_linear": photometric_outputs["color_linear"],
+                "photometric_albedo_linear": photometric_outputs["albedo_linear"],
+            })
         if "light_distance" in photometric_outputs:
             rets.update({
                 "photometric_light_distance": photometric_outputs["light_distance"],
@@ -375,9 +399,6 @@ def render(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
             })
         if pbr_linear_render:
             rets.update({
-                "render_linear": rendered_image_linear,
-                "photometric_color_linear": photometric_outputs["color_linear"],
-                "photometric_albedo_linear": photometric_outputs["albedo_linear"],
                 "photometric_direct_diffuse_linear": photometric_outputs["direct_diffuse_linear"],
                 "photometric_direct_specular_linear": photometric_outputs["direct_specular_linear"],
                 "photometric_environment_linear": photometric_outputs["environment_linear"],

@@ -169,6 +169,45 @@ class OptimizationParams(ParamGroup):
         # photometric_start_iter - 1, then switches in a single training process.
         self.photometric_start_iter = 10_001
         self.photometric_albedo_lr = 0.001
+        # Independent Lambertian shading-normal parameter. It is initialized
+        # from the GS normal at the photometric mode switch and does not affect
+        # Gaussian covariance or raster coverage.
+        self.photometric_normal_lr = 0.001
+        # Optional material-identification schedule. A value <= 0 keeps the
+        # historical behavior: normal starts with the photometric phase and
+        # albedo remains trainable. Setting both boundaries to the same later
+        # iteration produces an albedo-only calibration phase followed by a
+        # normal-only phase without changing geometry or light.
+        self.photometric_normal_start_iter = -1
+        self.photometric_albedo_freeze_iter = -1
+        # Trust-region prior around the independent normal initialization.
+        # This is not GT-normal supervision; zero preserves the baseline.
+        self.lambda_photometric_normal_init = 0.0
+        # N0 oracle diagnostics. Defaults preserve every existing experiment.
+        # The EXR normals are Blender world-space passes and supervise the
+        # alpha-normalized rendered independent normal map directly.
+        self.photometric_gt_normal_dir = ""
+        self.lambda_photometric_gt_normal = 0.0
+        self.photometric_gt_normal_alpha_threshold = 0.5
+        self.photometric_gt_normal_log_interval = 25
+        # Live consistency between the independent shading normal and the
+        # depth-derived geometry normal of the same frame. Serves as the
+        # geometry anchor when GT-normal supervision is not used.
+        self.lambda_photometric_normal_live = 0.0
+        self.photometric_normal_live_start_iter = 500
+        self.photometric_normal_live_alpha_threshold = 0.5
+        # Static-scene multi-view reprojection consistency for the
+        # independent normal: a static surface point must keep the same
+        # world normal when reprojected into another training camera.
+        self.lambda_photometric_normal_mv = 0.0
+        self.photometric_normal_mv_start_iter = 1000
+        self.photometric_normal_mv_ramp_iters = 2000
+        self.photometric_normal_mv_alpha_threshold = 0.5
+        self.photometric_normal_mv_depth_tol = 0.1
+        self.photometric_normal_mv_interval = 1
+        # Set to zero only for the N0 representation/raster/evaluator oracle;
+        # ordinary photometric training keeps the historical RGB weight 1.
+        self.photometric_rgb_loss_weight = 1.0
         self.photometric_light_lr = 0.0001
         # Optional delayed-training ablation. Once photometric rendering starts,
         # keep every Gaussian group except photometric albedo frozen; unfreeze
@@ -179,13 +218,16 @@ class OptimizationParams(ParamGroup):
         self.photometric_deform_lr_scale_after_unfreeze = 0.1
         self.photometric_rotation_lr_scale_after_unfreeze = 0.1
         # learned_directional preserves the original per-frame learned rays.
-        # gt_point uses fixed per-frame world-space light positions from JSON.
+        # gt_directional converts GT positions to fixed per-frame directions at
+        # the scene center, with no distance attenuation. gt_point shades from
+        # fixed per-frame world-space light positions with inverse-square falloff.
         self.photometric_light_mode = "learned_directional"
         self.photometric_gt_lights_path = ""
-        # Fixed radiometric controls for GT point-light Lambertian experiments.
-        # The default is a unit white emitter; positions still come per-frame
-        # from photometric_gt_lights_path.
-        self.photometric_gt_light_intensity = 1.0
+        # Fixed Lambertian irradiance. The directional default is calibrated on
+        # only_clothV3 world-space GT RGB/albedo/normal passes. GT point runs
+        # must override it with a separately calibrated pre-attenuation source
+        # intensity.
+        self.photometric_gt_light_intensity = 5.5
         self.photometric_gt_light_color = "1.0,1.0,1.0"
         # Optional piecewise-constant schedule expressed as start_iter:lr
         # entries, for example "1:0.003,10001:0.0003,30001:0.0001".

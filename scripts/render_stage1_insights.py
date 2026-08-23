@@ -11,7 +11,9 @@
 #
 import torch
 import os
+import json
 from os import makedirs
+from pathlib import Path
 import torch.nn.functional as F
 from gaussian_renderer import render
 from utils.general_utils import safe_state
@@ -31,7 +33,49 @@ import numpy as np
 import torchvision
 
 
-def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter, max_timesteps=-1):
+def _write_contact_sheet(images, output_path):
+    if not images:
+        return
+    indices = sorted({0, len(images) // 2, len(images) - 1})
+    selected = []
+    for index in indices:
+        image = images[index]
+        if image.ndim == 2:
+            image = image[..., None]
+        if image.shape[-1] == 1:
+            image = np.repeat(image, 3, axis=-1)
+        selected.append(image)
+    sheet = np.concatenate(selected, axis=1)
+    cv2.imwrite(str(output_path), cv2.cvtColor(sheet, cv2.COLOR_RGB2BGR))
+
+
+def _alpha_stats(images):
+    normalized = [image.astype(np.float32)[..., 0] / 255.0 for image in images]
+    coverage = [float(image.mean()) for image in normalized]
+    temporal_difference = [
+        float(np.abs(current - previous).mean())
+        for previous, current in zip(normalized, normalized[1:])
+    ]
+    return {
+        "frames": len(images),
+        "coverage_mean": float(np.mean(coverage)),
+        "coverage_min": float(np.min(coverage)),
+        "coverage_max": float(np.max(coverage)),
+        "temporal_abs_difference_mean": (
+            float(np.mean(temporal_difference)) if temporal_difference else 0.0
+        ),
+    }
+
+
+def render_set(
+    dataset: ModelParams,
+    pipeline: PipelineParams,
+    load_iter,
+    max_timesteps=-1,
+    output_dir="",
+    photometric_light_mode_override="",
+    photometric_light_intensity_override=-1.0,
+):
     with torch.no_grad():
     
         dataset.eval = True
@@ -73,6 +117,26 @@ def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter, max_ti
                     scene.all_timesteps, device="cuda"
                 )
             photometric_renderer.load_weights(dataset.model_path, scene.loaded_iter)
+            if photometric_light_mode_override:
+                if render_mode != "photometric_lambertian":
+                    raise ValueError(
+                        "Photometric light-mode override only supports Lambertian renders."
+                    )
+                photometric_renderer.light_mode = photometric_light_mode_override
+            if photometric_light_intensity_override > 0.0:
+                if render_mode != "photometric_lambertian":
+                    raise ValueError(
+                        "Photometric intensity override only supports Lambertian renders."
+                    )
+                photometric_renderer.gt_light_intensity.fill_(
+                    photometric_light_intensity_override
+                )
+            if photometric_light_mode_override or photometric_light_intensity_override > 0.0:
+                print(
+                    "[photometric evaluation override] "
+                    f"mode={photometric_renderer.light_mode}; "
+                    f"intensity={photometric_renderer.gt_light_intensity.item():.6g}"
+                )
             if (
                 render_mode == "photometric_perlight_pbr"
                 and photometric_renderer.requires_local_visibility
@@ -100,8 +164,15 @@ def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter, max_ti
 
         assert len(cameras) > 0
 
-        render_path_parent = os.path.join(dataset.model_path, "renders_stage1_insights",
-                                            "ours_{}".format(scene.loaded_iter))
+        render_path_parent = (
+            os.path.abspath(output_dir)
+            if output_dir
+            else os.path.join(
+                dataset.model_path,
+                "renders_stage1_insights",
+                "ours_{}".format(scene.loaded_iter),
+            )
+        )
         render_path = os.path.join(render_path_parent)
         makedirs(render_path, exist_ok=True)
 
@@ -289,6 +360,56 @@ def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter, max_ti
                     view.load2device('cpu')
 
 
+            _write_contact_sheet(
+                full_render_imgs,
+                Path(render_path) / "eval_rgb_contact_sheet.png",
+            )
+            _write_contact_sheet(
+                alpha_imgs,
+                Path(render_path) / "alpha_render_contact_sheet.png",
+            )
+            _write_contact_sheet(
+                normals_imgs,
+                Path(render_path) / "normals_contact_sheet.png",
+            )
+            _write_contact_sheet(
+                separate_gaussians_imgs,
+                Path(render_path) / "separation_small_contact_sheet.png",
+            )
+            _write_contact_sheet(
+                separate_gaussians_large_imgs,
+                Path(render_path) / "separation_large_contact_sheet.png",
+            )
+            (Path(render_path) / "alpha_render_stats.json").write_text(
+                json.dumps(_alpha_stats(alpha_imgs), indent=2) + "\n",
+                encoding="utf-8",
+            )
+            input_alpha_paths = sorted(
+                (Path(dataset.source_path) / "alpha").glob("*.png")
+            )
+            if input_alpha_paths:
+                input_alpha_imgs = []
+                target_height, target_width = alpha_imgs[0].shape[:2]
+                for path in input_alpha_paths:
+                    image = cv2.imread(str(path), cv2.IMREAD_GRAYSCALE)
+                    if image is None:
+                        raise ValueError(f"Failed to read input alpha {path}")
+                    image = cv2.resize(
+                        image,
+                        (target_width, target_height),
+                        interpolation=cv2.INTER_AREA,
+                    )
+                    input_alpha_imgs.append(image[..., None])
+                _write_contact_sheet(
+                    input_alpha_imgs,
+                    Path(render_path) / "alpha_input_contact_sheet.png",
+                )
+                (Path(render_path) / "alpha_input_stats.json").write_text(
+                    json.dumps(_alpha_stats(input_alpha_imgs), indent=2) + "\n",
+                    encoding="utf-8",
+                )
+
+
             # Save videos
             vid_name = f"full_render_cam{render_name}"
             output_video_path = os.path.join(render_path, f"{vid_name}.mp4")
@@ -362,6 +483,23 @@ if __name__ == "__main__":
         type=int,
         help="Optional prefix length for smoke tests; negative renders all timesteps.",
     )
+    parser.add_argument(
+        "--output_dir",
+        default="",
+        help="Optional explicit render directory; preserves existing insight renders.",
+    )
+    parser.add_argument(
+        "--photometric_light_mode_override",
+        default="",
+        choices=("", "learned_directional", "gt_directional", "gt_point"),
+        help="Evaluation-only Lambertian mode override; does not modify checkpoints.",
+    )
+    parser.add_argument(
+        "--photometric_light_intensity_override",
+        default=-1.0,
+        type=float,
+        help="Evaluation-only positive Lambertian intensity override.",
+    )
     parser.add_argument("--quiet", action="store_true")
 
 
@@ -375,4 +513,7 @@ if __name__ == "__main__":
         pipeline.extract(args),
         args.load_iter,
         max_timesteps=args.max_timesteps,
+        output_dir=args.output_dir,
+        photometric_light_mode_override=args.photometric_light_mode_override,
+        photometric_light_intensity_override=args.photometric_light_intensity_override,
     )
