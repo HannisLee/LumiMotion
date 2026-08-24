@@ -123,6 +123,9 @@ class OptimizationParams(ParamGroup):
         self.rotation_lr = 0.001
         self.percent_dense = 0.01
         self.lambda_dssim = 0.2
+        # Stage1 损失组合预设，见 scripts/loss.py 的 LOSS_PRESETS。
+        # auto 保持历史行为：各损失项完全由下方 lambda/开关参数驱动。
+        self.loss_preset = "auto"
         self.densification_interval = 100 #100
         self.opacity_reset_interval = 3000 #3000
         self.densify_from_iter = 500
@@ -138,6 +141,10 @@ class OptimizationParams(ParamGroup):
         self.min_opacity = 0.01
         self.start_normal_reg = 8000
         self.lambda_dist = 1000
+        # GS 几何自一致法线项 1-cos(rend_normal, surf_normal) 的权重，与
+        # distortion 共享 start_normal_reg 门控。默认 0.02 保持全部历史实验
+        # 行为；置 0 可在不影响 distortion 的前提下单独消融该项。
+        self.lambda_gs_normal = 0.02
 
         self.deform_lr_scale = 1.
         self.gt_alpha_mask_as_scene_mask = False

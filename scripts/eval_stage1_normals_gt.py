@@ -75,11 +75,17 @@ def main() -> None:
         mode = getattr(pipeline.extract(args), "render_mode", "photometric_lambertian")
         pipeline_args = pipeline.extract(args)
         pipeline_args.render_mode = "photometric_lambertian" if mode == "original" else mode
-        if pipeline_args.render_mode != "photometric_lambertian":
-            raise ValueError("This evaluator targets photometric_lambertian checkpoints only.")
-        renderer = PhotometricLambertianRenderer(scene.all_timesteps, device="cuda")
-        renderer.load_weights(dataset.model_path, scene.loaded_iter)
-        renderer.eval()
+        if pipeline_args.render_mode not in {"original_sh", "photometric_lambertian"}:
+            raise ValueError(
+                "This evaluator supports original_sh or photometric_lambertian checkpoints."
+            )
+        renderer = None
+        if pipeline_args.render_mode == "photometric_lambertian":
+            renderer = PhotometricLambertianRenderer(
+                scene.all_timesteps, device="cuda"
+            )
+            renderer.load_weights(dataset.model_path, scene.loaded_iter)
+            renderer.eval()
         background = torch.zeros(3, dtype=torch.float32, device="cuda")
         train_records, test_records = _frame_records(Path(dataset.source_path))
         camera_records = list(zip(scene.getTrainCameras(), train_records)) + list(zip(scene.getTestCameras(), test_records))

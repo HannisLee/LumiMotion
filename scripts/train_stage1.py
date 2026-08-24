@@ -15,7 +15,8 @@ import os
 import torch
 from pathlib import Path
 from random import randint
-from utils.loss_utils import l1_loss, ssim
+from utils.loss_utils import l1_loss
+from scripts.loss import apply_loss_preset, compute_stage1_loss
 from gaussian_renderer import render
 import sys
 from scene import Scene, GaussianModel, DeformModel
@@ -26,11 +27,8 @@ from utils.gt_normal_utils import (
     source_frame_by_image_name,
 )
 from utils.normal_eval_utils import (
-    alpha_normalized_normal_map,
-    masked_normal_cosine_loss,
     normal_angular_error_degrees,
 )
-from utils.point_utils import depths_to_points
 import uuid
 import tqdm
 from argparse import ArgumentParser, Namespace
@@ -46,7 +44,6 @@ from scene.photometric_lambertian import (
 )
 from scene.photometric_perlight_pbr import (
     PhotometricPerLightPBRRenderer,
-    srgb_to_linear,
 )
 
 try:
@@ -499,226 +496,6 @@ class Trainer:
             and self.photometric_active
         )
 
-    def render_world_normal_map(
-        self,
-        viewpoint_cam,
-        render_pkg: dict,
-        d_xyz,
-        d_rotation,
-        d_scaling,
-        d_opacity=None,
-        d_color=None,
-    ) -> tuple[torch.Tensor, torch.Tensor]:
-        """Render the world-space independent normal as override color.
-
-        Returns the decoded unit world normal map [3,H,W] and the rendered
-        alpha [1,H,W]. Uses photometric_normal_raw (world-space) so maps from
-        different cameras are directly comparable.
-        """
-        encoded_normal = render_pkg["photometric_normal_raw"] * 0.5 + 0.5
-        normal_rendered = render(
-            viewpoint_cam,
-            self.gaussians,
-            self.pipe,
-            self.background,
-            d_xyz,
-            d_rotation,
-            d_scaling,
-            d_opacity=d_opacity,
-            d_color=d_color,
-            override_color=encoded_normal,
-        )
-        predicted_normal = alpha_normalized_normal_map(
-            normal_rendered["render"], normal_rendered["rend_alpha"]
-        )
-        return predicted_normal, normal_rendered["rend_alpha"]
-
-    def normal_consistency_losses(
-        self,
-        viewpoint_cam,
-        render_pkg_re: dict,
-        d_xyz,
-        d_rotation,
-        d_scaling,
-        d_opacity,
-        d_color,
-    ) -> dict[str, torch.Tensor]:
-        """GT-free normal consistency terms for the independent normal.
-
-        - photometric_normal_live: cosine between the independent normal map
-          and the depth-derived geometry normal of the same frame.
-        - photometric_normal_mv: static-scene multi-view reprojection cosine.
-          The world normal of a static surface point must agree when the
-          current-frame depth is reprojected into a randomly drawn partner
-          training camera.
-        """
-        losses: dict[str, torch.Tensor] = {}
-        live_active = (
-            self.photometric_normal_live_enabled
-            and self.iteration >= self.photometric_normal_live_start_iter
-        )
-        mv_active = (
-            self.photometric_normal_mv_enabled
-            and self.iteration >= self.photometric_normal_mv_start_iter
-            and self.iteration % max(self.photometric_normal_mv_interval, 1) == 0
-        )
-        if not (live_active or mv_active):
-            return losses
-
-        predicted_normal, normal_alpha = self.render_world_normal_map(
-            viewpoint_cam,
-            render_pkg_re,
-            d_xyz,
-            d_rotation,
-            d_scaling,
-            d_opacity=d_opacity,
-            d_color=d_color,
-        )
-        alpha_map = normal_alpha[0] if normal_alpha.ndim == 3 else normal_alpha
-
-        if live_active:
-            surf_normal = render_pkg_re["surf_normal"].detach()
-            valid_live = (
-                alpha_map >= self.photometric_normal_live_alpha_threshold
-            ) & (surf_normal.norm(dim=0) > 1e-3)
-            if bool(valid_live.any()):
-                target_normal = F.normalize(surf_normal, dim=0)
-                cosine = (predicted_normal * target_normal).sum(dim=0).clamp(-1.0, 1.0)
-                losses["photometric_normal_live"] = (
-                    self.lambda_photometric_normal_live
-                    * (1.0 - cosine)[valid_live].mean()
-                )
-
-        if mv_active:
-            train_cameras = self.scene.getTrainCameras()
-            if len(train_cameras) >= 2:
-                partner_cam = viewpoint_cam
-                while partner_cam.uid == viewpoint_cam.uid:
-                    partner_cam = train_cameras[randint(0, len(train_cameras) - 1)]
-                with torch.no_grad():
-                    num_points = self.gaussians.get_xyz.shape[0]
-                    partner_time = partner_cam.fid.unsqueeze(0).expand(num_points, -1)
-                    partner_deform = self.deform.step(
-                        self.gaussians.get_xyz,
-                        partner_time,
-                        iteration=self.iteration,
-                        feature=self.gaussians.get_binary_feature(
-                            eval=False, T=self.T_current
-                        ),
-                        camera_center=partner_cam.camera_center,
-                    )
-                    partner_pkg = render(
-                        partner_cam,
-                        self.gaussians,
-                        self.pipe,
-                        self.background,
-                        partner_deform["d_xyz"],
-                        partner_deform["d_rotation"],
-                        partner_deform["d_scaling"],
-                        d_opacity=partner_deform["d_opacity"],
-                        d_color=partner_deform["d_color"],
-                        photometric_renderer=self.photometric_renderer,
-                    )
-                    partner_normal_map, partner_alpha_map = self.render_world_normal_map(
-                        partner_cam,
-                        partner_pkg,
-                        partner_deform["d_xyz"],
-                        partner_deform["d_rotation"],
-                        partner_deform["d_scaling"],
-                        d_opacity=partner_deform["d_opacity"],
-                        d_color=partner_deform["d_color"],
-                    )
-                    partner_depth = partner_pkg["surf_depth"].detach()
-                current_depth = render_pkg_re["surf_depth"].detach()
-                height = viewpoint_cam.image_height
-                width = viewpoint_cam.image_width
-                world_points = depths_to_points(
-                    viewpoint_cam, current_depth
-                ).reshape(height, width, 3)
-                partner_w2c = partner_cam.world_view_transform
-                camera_points = (
-                    world_points @ partner_w2c[:3, :3] + partner_w2c[3, :3]
-                )
-                partner_depth_projected = camera_points[..., 2]
-                partner_w = partner_cam.image_width
-                partner_h = partner_cam.image_height
-                fx = partner_w / (2.0 * math.tan(partner_cam.FoVx / 2.0))
-                fy = partner_h / (2.0 * math.tan(partner_cam.FoVy / 2.0))
-                safe_depth = partner_depth_projected.clamp_min(1e-6)
-                u_coord = (
-                    fx * camera_points[..., 0] / safe_depth + partner_w / 2.0
-                )
-                v_coord = (
-                    fy * camera_points[..., 1] / safe_depth + partner_h / 2.0
-                )
-                in_bounds = (
-                    (partner_depth_projected > 1e-4)
-                    & (u_coord >= 0.0)
-                    & (u_coord <= partner_w - 1)
-                    & (v_coord >= 0.0)
-                    & (v_coord <= partner_h - 1)
-                )
-                grid = torch.stack(
-                    (
-                        (u_coord + 0.5) / partner_w * 2.0 - 1.0,
-                        (v_coord + 0.5) / partner_h * 2.0 - 1.0,
-                    ),
-                    dim=-1,
-                ).unsqueeze(0)
-                sampled_normal = F.grid_sample(
-                    partner_normal_map.unsqueeze(0),
-                    grid,
-                    mode="bilinear",
-                    padding_mode="zeros",
-                    align_corners=False,
-                )[0]
-                sampled_alpha = F.grid_sample(
-                    partner_alpha_map.reshape(1, 1, partner_h, partner_w),
-                    grid,
-                    mode="bilinear",
-                    padding_mode="zeros",
-                    align_corners=False,
-                )[0, 0]
-                sampled_depth = F.grid_sample(
-                    partner_depth.reshape(1, 1, partner_h, partner_w),
-                    grid,
-                    mode="bilinear",
-                    padding_mode="zeros",
-                    align_corners=False,
-                )[0, 0]
-                valid_mv = (
-                    in_bounds
-                    & (alpha_map >= self.photometric_normal_mv_alpha_threshold)
-                    & (sampled_alpha >= self.photometric_normal_mv_alpha_threshold)
-                    & (
-                        (partner_depth_projected - sampled_depth).abs()
-                        <= self.photometric_normal_mv_depth_tol
-                    )
-                    & (sampled_normal.norm(dim=0) > 1e-3)
-                )
-                if bool(valid_mv.any()):
-                    ramp = 1.0
-                    if self.photometric_normal_mv_ramp_iters > 0:
-                        ramp = min(
-                            1.0,
-                            (
-                                self.iteration
-                                - self.photometric_normal_mv_start_iter
-                                + 1
-                            )
-                            / self.photometric_normal_mv_ramp_iters,
-                        )
-                    target_normal = F.normalize(sampled_normal, dim=0)
-                    cosine = (predicted_normal * target_normal).sum(dim=0).clamp(
-                        -1.0, 1.0
-                    )
-                    losses["photometric_normal_mv"] = (
-                        self.lambda_photometric_normal_mv
-                        * ramp
-                        * (1.0 - cosine)[valid_mv].mean()
-                    )
-        return losses
-
     def gt_normal_for_camera(self, viewpoint_cam):
         """按训练 camera 返回缓存的 world-space GT normal 和 mask。"""
         image_name = viewpoint_cam.image_name_train_light
@@ -1115,7 +892,11 @@ class Trainer:
             group["name"]: float(group["lr"])
             for group in self.gaussians.optimizer.param_groups
         }
-        parameters = list(parameter_groups.values())
+        differentiable_parameters = {
+            name: parameter
+            for name, parameter in parameter_groups.items()
+            if parameter is not None and parameter.requires_grad
+        }
         rows = []
         frame_value = float(frame_id.detach().reshape(-1)[0].item())
 
@@ -1123,18 +904,20 @@ class Trainer:
             if torch.is_tensor(loss_value) and loss_value.requires_grad:
                 gradients = torch.autograd.grad(
                     loss_value,
-                    parameters,
+                    list(differentiable_parameters.values()),
                     retain_graph=True,
                     allow_unused=True,
                 )
+                gradients_by_name = dict(
+                    zip(differentiable_parameters, gradients)
+                )
                 scalar_loss = float(loss_value.detach().item())
             else:
-                gradients = (None,) * len(parameters)
+                gradients_by_name = {}
                 scalar_loss = float(loss_value.detach().item()) if torch.is_tensor(loss_value) else float(loss_value)
 
-            for (parameter_name, parameter), gradient in zip(
-                parameter_groups.items(), gradients
-            ):
+            for parameter_name, parameter in parameter_groups.items():
+                gradient = gradients_by_name.get(parameter_name)
                 parameter_detached = parameter.detach()
                 parameter_l2 = float(torch.linalg.vector_norm(parameter_detached).item())
                 learning_rate = learning_rates.get(
@@ -1228,244 +1011,34 @@ class Trainer:
     
 
 
-        lambda_normal = (
-            0.02
-            if self.iteration > self.opt.start_normal_reg and not self.pbr_active
-            else 0.0
-        )
-        lambda_dist = (
-            self.opt.lambda_dist
-            if self.iteration > self.opt.start_normal_reg and not self.pbr_active
-            else 0.0
-        )
-        rend_dist = render_pkg_re["rend_dist"]
-        rend_normal  = render_pkg_re['rend_normal']
-        surf_normal = render_pkg_re['surf_normal']
-        normal_error = (1 - (rend_normal * surf_normal).sum(dim=0))[None]
-        normal_loss = lambda_normal * (normal_error).mean()
-        dist_loss = lambda_dist * (rend_dist).mean()
-
-    
-        
-        # Loss
+        # Loss：统一由 scripts/loss.py 组装（--loss_preset 选择组合）。
         gt_image = viewpoint_cam.original_image_train_light.cuda()
-        if (
-            not self.pbr_active
-            and self.dataset.white_background
-            and viewpoint_cam.gt_alpha_mask is not None
-            and self.opt.gt_alpha_mask_as_scene_mask
-        ):
-            gt_alpha_mask = viewpoint_cam.gt_alpha_mask.cuda()
-            gt_image = gt_alpha_mask * gt_image + (1 - gt_alpha_mask) * self.background[:, None, None]
-
-        Ll1 = l1_loss(image, gt_image)
-        pbr_loss_terms = {}
-        if self.pbr_active:
-            # Geometry is fixed, so its detached rendered alpha is a stable
-            # foreground weight without introducing GT mask supervision.
-            foreground_mask = render_pkg_re["rend_alpha"].detach().clamp(0.0, 1.0)
-            if foreground_mask.ndim == 2:
-                foreground_mask = foreground_mask.unsqueeze(0)
-            foreground_denominator = (
-                foreground_mask.sum() * image.shape[0]
-            ).clamp_min(1.0)
-            rgb_mse = F.mse_loss(image, gt_image)
-            foreground_l1 = (
-                (image - gt_image).abs() * foreground_mask
-            ).sum() / foreground_denominator
-            foreground_dssim = 1.0 - ssim(
-                image * foreground_mask,
-                gt_image * foreground_mask,
-            )
-            gt_linear = srgb_to_linear(gt_image)
-            log_linear = torch.sqrt(
-                (
-                    torch.log1p(render_pkg_re["render_linear"])
-                    - torch.log1p(gt_linear)
-                ).pow(2.0)
-                + 1e-6
-            ).mean()
-            pbr_loss_terms.update(
-                rgb_mse=rgb_mse,
-                foreground_l1=foreground_l1,
-                foreground_dssim=foreground_dssim,
-                log_linear=log_linear,
-            )
-            loss_img = self.photometric_rgb_loss_weight * (
-                self.opt.photometric_pbr_loss_mse * rgb_mse
-                + self.opt.photometric_pbr_loss_l1_fg * foreground_l1
-                + self.opt.photometric_pbr_loss_dssim_fg * foreground_dssim
-                + self.opt.photometric_pbr_loss_log_linear * log_linear
-            )
-        else:
-            rgb_weight = (
-                self.photometric_rgb_loss_weight
-                if self.photometric_active
-                else 1.0
-            )
-            weighted_l1 = rgb_weight * (1.0 - self.opt.lambda_dssim) * Ll1
-            weighted_dssim = (
-                rgb_weight
-                * self.opt.lambda_dssim
-                * (1.0 - ssim(image, gt_image))
-            )
-            loss_img = weighted_l1 + weighted_dssim
-        loss = loss_img + normal_loss + dist_loss
-        audit_loss_terms = {
-            "rgb_l1": weighted_l1 if not self.pbr_active else loss_img,
-            "rgb_dssim": weighted_dssim if not self.pbr_active else loss.new_zeros(()),
-            "normal": normal_loss,
-            "distortion": dist_loss,
-        }
-        if self.photometric_active and self.photometric_gt_normal_enabled:
-            encoded_normal = render_pkg_re["photometric_normal"] * 0.5 + 0.5
-            normal_rendered = render(
-                viewpoint_cam,
-                self.gaussians,
-                self.pipe,
-                self.background,
-                d_xyz,
-                d_rotation,
-                d_scaling,
-                d_opacity=d_opacity,
-                d_color=d_color,
-                override_color=encoded_normal,
-            )
-            predicted_normal = alpha_normalized_normal_map(
-                normal_rendered["render"], normal_rendered["rend_alpha"]
-            )
-            source_frame, gt_normal, gt_normal_valid = self.gt_normal_for_camera(
-                viewpoint_cam
-            )
-            valid_normal = gt_normal_valid & (
-                render_pkg_re["rend_alpha"][0].detach()
-                >= self.photometric_gt_normal_alpha_threshold
-            )
-            gt_normal_cosine_loss = masked_normal_cosine_loss(
-                predicted_normal, gt_normal, valid_normal
-            )
-            weighted_gt_normal_loss = (
-                self.lambda_photometric_gt_normal * gt_normal_cosine_loss
-            )
-            loss = loss + weighted_gt_normal_loss
-            audit_loss_terms["photometric_gt_normal"] = weighted_gt_normal_loss
+        loss_result = compute_stage1_loss(
+            self,
+            viewpoint_cam,
+            render_pkg_re,
+            image,
+            gt_image,
+            d_xyz,
+            d_rotation,
+            d_scaling,
+            d_opacity,
+            d_color,
+        )
+        loss = loss_result.loss
+        Ll1 = loss_result.l1
+        audit_loss_terms = loss_result.audit_terms
+        pbr_loss_terms = loss_result.pbr_terms
+        light_smooth_loss = loss_result.light_smooth
+        if loss_result.gt_normal_oracle is not None:
+            oracle = loss_result.gt_normal_oracle
             self.log_gt_normal_oracle(
-                source_frame,
-                predicted_normal,
-                gt_normal,
-                valid_normal,
-                gt_normal_cosine_loss,
+                oracle["source_frame"],
+                oracle["predicted_normal"],
+                oracle["gt_normal"],
+                oracle["valid_normal"],
+                oracle["cosine_loss"],
             )
-        if self.photometric_active and self.gaussians.use_photometric_normal:
-            normal_init_cosine = (
-                self.gaussians.get_photometric_normal
-                * self.gaussians.get_photometric_normal_init
-            ).sum(dim=-1).clamp(-1.0, 1.0)
-            photometric_normal_init_loss = (
-                float(self.opt.lambda_photometric_normal_init)
-                * (1.0 - normal_init_cosine).mean()
-            )
-            loss = loss + photometric_normal_init_loss
-            audit_loss_terms["photometric_normal_init"] = photometric_normal_init_loss
-        if (
-            self.photometric_active
-            and self.gaussians.use_photometric_normal
-            and (
-                self.photometric_normal_live_enabled
-                or self.photometric_normal_mv_enabled
-            )
-        ):
-            consistency_losses = self.normal_consistency_losses(
-                viewpoint_cam,
-                render_pkg_re,
-                d_xyz,
-                d_rotation,
-                d_scaling,
-                d_opacity,
-                d_color,
-            )
-            for name, term in consistency_losses.items():
-                loss = loss + term
-                audit_loss_terms[name] = term
-                if self.tb_writer is not None:
-                    self.tb_writer.add_scalar(
-                        f"photometric_normal_consistency/{name}",
-                        float(term.detach().item()),
-                        self.iteration,
-                    )
-        light_smooth_loss = torch.zeros((), dtype=loss.dtype, device=loss.device)
-        if self.photometric_active:
-            light_smooth_loss = self.photometric_renderer.light_smoothness_loss()
-            weighted_light_smooth_loss = (
-                self.opt.lambda_photometric_light_smooth1 * light_smooth_loss
-            )
-            loss = loss + weighted_light_smooth_loss
-            audit_loss_terms["light_smooth"] = weighted_light_smooth_loss
-        if self.pbr_active:
-            regularizers = self.photometric_renderer.regularization_losses(
-                self.gaussians.get_rough
-            )
-            regularizer_weights = {
-                "light_smooth2": self.opt.lambda_photometric_light_smooth2,
-                "exposure": self.opt.lambda_photometric_pbr_exposure,
-                "normal_residual": self.opt.lambda_photometric_pbr_normal,
-                "roughness_prior": self.opt.lambda_photometric_pbr_roughness,
-                "environment_energy": self.opt.lambda_photometric_pbr_environment,
-                "residual": self.opt.lambda_photometric_pbr_residual,
-            }
-            for name, weight in regularizer_weights.items():
-                loss = loss + float(weight) * regularizers[name]
-            pbr_loss_terms.update(
-                {f"regularizer_{name}": value for name, value in regularizers.items()}
-            )
-
-        #mask loss
-        if (
-            not self.pbr_active
-            and self.opt.gt_alpha_mask_as_scene_mask
-            and viewpoint_cam.gt_alpha_mask is not None
-        ):
-            gt_alpha_mask = viewpoint_cam.gt_alpha_mask.cuda()
-            alpha_loss = F.binary_cross_entropy(render_pkg_re['rend_alpha'][:, None, None], gt_alpha_mask.unsqueeze(1).unsqueeze(1))
-            weighted_alpha_loss = alpha_loss * self.opt.lambda_alpha_loss
-            loss += weighted_alpha_loss
-            audit_loss_terms["alpha"] = weighted_alpha_loss
-
-        elif not self.pbr_active:
-            simulated_mask = torch.ones_like(render_pkg_re['rend_alpha'][:, None, None])
-            alpha_loss = F.binary_cross_entropy(render_pkg_re['rend_alpha'][:, None, None], simulated_mask)
-            weighted_alpha_loss = alpha_loss * 0.001
-            loss += weighted_alpha_loss
-            audit_loss_terms["alpha"] = weighted_alpha_loss
-
-
-        if self.iteration > self.opt.warm_up and not self.pbr_active:
-
-            # d_xyz loss is absent during scalar warm-up/static deformation.
-            if torch.is_tensor(d_xyz) and self.opt.d_xyz_loss_weight > 0:
-                weighted_d_xyz_loss = (
-                    (d_xyz**2).mean() * self.opt.d_xyz_loss_weight
-                )
-                loss += weighted_d_xyz_loss
-                audit_loss_terms["deformation_xyz"] = weighted_d_xyz_loss
-            
-            # d color loss
-            d_color_reg_loss_weight = self.opt.d_color_reg_loss_weight
-            if not self.photometric_active and (d_color is not None and torch.is_tensor(d_color)):
-                
-                shadow_modulation = d_color[:, :3]
-
-                d_color_reg_loss = (
-                    shadow_modulation.pow(2.0).mean() * d_color_reg_loss_weight
-                )
-                
-                loss += d_color_reg_loss
-
-            if self.iteration > self.opt.binarization_warm_up and not self.dataset.no_binary_separation:
-
-                # L1 for unsupervised bianrizationin the paper
-                loss += (self.gaussians.get_binary_feature(eval=False, T=self.T_current)**1).mean()*self.opt.lambda_separation
-
 
         audit_loss_terms["total"] = loss
         self.audit_loss_gradients(audit_loss_terms, fid)
@@ -1626,6 +1199,8 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args(sys.argv[1:])
+    # 按 --loss_preset 批量设定损失组合（仅覆盖未显式给出的参数）。
+    apply_loss_preset(args)
     required_iterations = [args.iterations]
     if (
         args.render_mode in {
