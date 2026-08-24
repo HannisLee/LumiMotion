@@ -491,7 +491,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--photometric_light_mode_override",
         default="",
-        choices=("", "learned_directional", "gt_directional", "gt_point"),
+        choices=(
+            "",
+            "learned_directional",
+            "gt_directional",
+            "gt_point",
+            "gt_point_direction_only",
+        ),
         help="Evaluation-only Lambertian mode override; does not modify checkpoints.",
     )
     parser.add_argument(

@@ -179,6 +179,127 @@ class PhotometricLambertianTest(unittest.TestCase):
             output["color_linear"], torch.tensor([[0.5, 1.0, 2.0]]) / math.pi
         )
 
+    def test_gt_point_direction_only_uses_per_gaussian_world_direction(self):
+        renderer = PhotometricLambertianRenderer(
+            [0.0],
+            light_mode="gt_point_direction_only",
+            gt_light_intensity=math.pi,
+            device="cpu",
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "lights.json"
+            path.write_text(
+                json.dumps({"0001": {"light_pos_world": [0.0, 0.0, 2.0]}}),
+                encoding="utf-8",
+            )
+            renderer.initialize_gt_point_direction_only_lights(
+                str(path), torch.zeros(3)
+            )
+
+        positions = torch.tensor([[0.0, 0.0, 0.0], [1.0, 0.0, 0.0]])
+        expected_directions = torch.nn.functional.normalize(
+            torch.tensor([[0.0, 0.0, 2.0], [-1.0, 0.0, 2.0]]), dim=-1
+        )
+        output = renderer(
+            torch.ones((2, 3)),
+            expected_directions,
+            torch.tensor([0.0]),
+            position=positions,
+        )
+        renderer.training_setup(type("Args", (), {"photometric_light_lr": 1.0})())
+
+        torch.testing.assert_close(
+            output["surface_to_light_dir"], expected_directions
+        )
+        torch.testing.assert_close(
+            output["surface_to_light_dir"].norm(dim=-1), torch.ones(2)
+        )
+        torch.testing.assert_close(
+            output["light_distance"], torch.tensor([[2.0], [math.sqrt(5.0)]])
+        )
+        torch.testing.assert_close(
+            output["light_attenuation"], torch.ones((2, 1))
+        )
+        torch.testing.assert_close(output["color_linear"], torch.ones((2, 3)))
+        self.assertFalse(renderer.learns_light)
+        self.assertIsNone(renderer.optimizer)
+        self.assertFalse(renderer.light_model._raw_light_dir_table.requires_grad)
+        self.assertFalse(renderer.initialization_metadata["uses_distance_attenuation"])
+        self.assertTrue(
+            renderer.initialization_metadata["uses_deformed_gaussian_position"]
+        )
+
+    def test_gt_point_direction_only_brightness_ignores_distance(self):
+        renderer = PhotometricLambertianRenderer(
+            [0.0], light_mode="gt_point_direction_only", device="cpu"
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "lights.json"
+            path.write_text(
+                json.dumps({"0001": {"light_pos_world": [0.0, 0.0, 10.0]}}),
+                encoding="utf-8",
+            )
+            renderer.initialize_gt_point_direction_only_lights(
+                str(path), torch.zeros(3)
+            )
+
+        output = renderer(
+            torch.ones((2, 3)),
+            torch.tensor([[0.0, 0.0, 1.0], [0.0, 0.0, 1.0]]),
+            torch.tensor([0.0]),
+            position=torch.tensor([[0.0, 0.0, 0.0], [0.0, 0.0, 9.0]]),
+        )
+        torch.testing.assert_close(output["color_linear"][0], output["color_linear"][1])
+        torch.testing.assert_close(
+            output["light_distance"], torch.tensor([[10.0], [1.0]])
+        )
+
+    def test_gt_point_direction_only_checkpoint_round_trip(self):
+        renderer = PhotometricLambertianRenderer(
+            [0.0], light_mode="gt_point_direction_only", device="cpu"
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "lights.json"
+            path.write_text(
+                json.dumps({"0001": {"light_pos_world": [1.0, 2.0, 3.0]}}),
+                encoding="utf-8",
+            )
+            renderer.initialize_gt_point_direction_only_lights(
+                str(path), torch.zeros(3)
+            )
+            state = renderer.capture()
+
+        restored = PhotometricLambertianRenderer([0.0], device="cpu")
+        restored.restore(state)
+        trajectory = restored.light_trajectory_dict()
+
+        self.assertEqual(restored.light_mode, "gt_point_direction_only")
+        self.assertEqual(
+            state["config"]["light_param"],
+            "fixed_gt_point_position_direction_only",
+        )
+        torch.testing.assert_close(
+            restored.gt_light_positions, torch.tensor([[1.0, 2.0, 3.0]])
+        )
+        self.assertEqual(
+            trajectory["frames"][0]["light_position_world"], [1.0, 2.0, 3.0]
+        )
+
+    def test_gt_light_positions_reject_non_finite_values(self):
+        renderer = PhotometricLambertianRenderer(
+            [0.0], light_mode="gt_point_direction_only", device="cpu"
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "lights.json"
+            path.write_text(
+                json.dumps({"0001": {"light_pos_world": [0.0, float("nan"), 1.0]}}),
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(ValueError, "finite"):
+                renderer.initialize_gt_point_direction_only_lights(
+                    str(path), torch.zeros(3)
+                )
+
     def test_gt_directional_light_is_fixed_and_ignores_distance(self):
         renderer = PhotometricLambertianRenderer(
             [0.0, 1.0],

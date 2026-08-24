@@ -143,10 +143,11 @@ class Trainer:
             "learned_directional",
             "gt_directional",
             "gt_point",
+            "gt_point_direction_only",
         }:
             raise ValueError(
                 "photometric_light_mode must be learned_directional, gt_directional, "
-                "or gt_point, got "
+                "gt_point, or gt_point_direction_only, got "
                 f"{self.photometric_light_mode!r}."
             )
         if (
@@ -574,7 +575,11 @@ class Trainer:
             )
 
     def photometric_light_lr(self):
-        if self.photometric_light_mode in {"gt_directional", "gt_point"}:
+        if self.photometric_light_mode in {
+            "gt_directional",
+            "gt_point",
+            "gt_point_direction_only",
+        }:
             return 0.0
         learning_rate = float(self.opt.photometric_light_lr)
         for start_iteration, scheduled_lr in self.photometric_light_lr_schedule:
@@ -657,6 +662,16 @@ class Trainer:
             )
             print(
                 "[photometric init] fixed GT point lights "
+                f"at iteration {self.iteration}: "
+                f"{os.path.abspath(self.photometric_gt_lights_path)}"
+            )
+        elif self.photometric_light_mode == "gt_point_direction_only":
+            self.photometric_renderer.initialize_gt_point_direction_only_lights(
+                self.photometric_gt_lights_path,
+                self.photometric_object_center,
+            )
+            print(
+                "[photometric init] fixed GT point-position direction-only lights "
                 f"at iteration {self.iteration}: "
                 f"{os.path.abspath(self.photometric_gt_lights_path)}"
             )
@@ -815,7 +830,7 @@ class Trainer:
             )
         self.tb_writer.add_scalar("photometric/ndotl_mean", render_pkg["photometric_ndotl"].mean().item(), self.iteration)
         self.tb_writer.add_scalar("photometric/shading_mean", render_pkg["photometric_shading"].mean().item(), self.iteration)
-        if self.photometric_light_mode == "gt_point":
+        if self.photometric_light_mode in {"gt_point", "gt_point_direction_only"}:
             self.tb_writer.add_scalar(
                 "photometric/gt_light_distance_mean",
                 render_pkg["photometric_light_distance"].mean().item(),

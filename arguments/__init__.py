@@ -228,6 +228,8 @@ class OptimizationParams(ParamGroup):
         # gt_directional converts GT positions to fixed per-frame directions at
         # the scene center, with no distance attenuation. gt_point shades from
         # fixed per-frame world-space light positions with inverse-square falloff.
+        # gt_point_direction_only instead recomputes the unit direction from
+        # each deformed GS position and deliberately keeps attenuation at one.
         self.photometric_light_mode = "learned_directional"
         self.photometric_gt_lights_path = ""
         # Fixed Lambertian irradiance. The directional default is calibrated on
@@ -313,4 +315,3 @@ def get_combined_args(parser: ArgumentParser):
         if v != None:
             merged_dict[k] = v
     return Namespace(**merged_dict)
-

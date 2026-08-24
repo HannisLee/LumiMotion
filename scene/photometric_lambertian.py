@@ -14,9 +14,15 @@ import torch.nn.functional as F
 from utils.general_utils import build_rotation
 
 
-PHOTOMETRIC_VERSION = "stage1_perlight_v5_linear_lambertian"
+PHOTOMETRIC_VERSION = "stage1_perlight_v6_gt_point_direction_only"
 DIRECTION_CONVENTION = "light_to_surface"
-LIGHT_MODES = {"learned_directional", "gt_directional", "gt_point"}
+LIGHT_MODES = {
+    "learned_directional",
+    "gt_directional",
+    "gt_point",
+    "gt_point_direction_only",
+}
+GT_POSITION_LIGHT_MODES = {"gt_point", "gt_point_direction_only"}
 
 
 def srgb_to_linear(value: torch.Tensor) -> torch.Tensor:
@@ -341,8 +347,9 @@ class PhotometricLambertianRenderer(nn.Module):
         if not np.isfinite(intensity) or intensity <= 0.0:
             raise ValueError("gt_light_intensity must be finite and positive.")
         color = parse_light_color(gt_light_color, device)
-        # This is irradiance for directional modes and source intensity before
-        # inverse-square attenuation for GT point mode. It is fixed and checkpointed.
+        # This is irradiance for directional/direction-only modes and source
+        # intensity before inverse-square attenuation for GT point mode. It is
+        # fixed and checkpointed.
         self.register_buffer("gt_light_intensity", torch.tensor(intensity, dtype=torch.float32, device=device))
         self.register_buffer("gt_light_color", color)
         self.register_buffer(
@@ -408,6 +415,8 @@ class PhotometricLambertianRenderer(nn.Module):
                 f"got {tuple(positions.shape)}, expected "
                 f"({self.light_model.num_timesteps}, 3)."
             )
+        if not torch.isfinite(positions).all():
+            raise ValueError("GT light positions must contain only finite values.")
         return positions
 
     def _initialize_gt_reference_rays(
@@ -468,6 +477,30 @@ class PhotometricLambertianRenderer(nn.Module):
             "reference_center": center.detach().cpu().tolist(),
             "source_light_type": "area_center_as_point",
             "uses_distance_attenuation": True,
+            "light_intensity": float(self.gt_light_intensity.item()),
+            "light_color": self.gt_light_color.detach().cpu().tolist(),
+        }
+
+    def initialize_gt_point_direction_only_lights(
+        self,
+        lights_path: str,
+        reference_center: torch.Tensor,
+    ) -> None:
+        """保存 GT 世界坐标光源点，逐 GS 实时计算方向但不做距离衰减。"""
+        positions = self._load_gt_light_positions(lights_path)
+        center = self._initialize_gt_reference_rays(positions, reference_center)
+        self.initialization_metadata = {
+            "type": "gt_point_direction_only_lights",
+            "light_mode": self.light_mode,
+            "direction_convention": DIRECTION_CONVENTION,
+            "lights_path": os.path.abspath(lights_path),
+            "reference_center": center.detach().cpu().tolist(),
+            "source_light_type": "area_center_per_gaussian_direction_only",
+            "runtime_direction": (
+                "normalize(light_position_world - gaussian_position_world)"
+            ),
+            "uses_deformed_gaussian_position": True,
+            "uses_distance_attenuation": False,
             "light_intensity": float(self.gt_light_intensity.item()),
             "light_color": self.gt_light_color.detach().cpu().tolist(),
         }
@@ -553,19 +586,23 @@ class PhotometricLambertianRenderer(nn.Module):
     ) -> dict[str, torch.Tensor]:
         timestep_idx = self.light_model.timestep_index(frame_id)[0]
         normal = F.normalize(normal, dim=-1)
-        if self.light_mode == "gt_point":
+        if self.light_mode in GT_POSITION_LIGHT_MODES:
             if position is None or position.shape != normal.shape:
                 raise ValueError(
-                    "gt_point light mode requires position with the same shape as normal."
+                    f"{self.light_mode} light mode requires position with the same "
+                    "shape as normal."
                 )
             if self.gt_light_positions.shape != (self.light_model.num_timesteps, 3):
-                raise RuntimeError("GT point lights have not been initialized.")
+                raise RuntimeError("GT position lights have not been initialized.")
             light_position = self.gt_light_positions[timestep_idx]
             light_vector = light_position[None] - position
             light_distance = torch.linalg.vector_norm(light_vector, dim=-1, keepdim=True)
             surface_to_light_dir = light_vector / light_distance.clamp_min(1e-6)
             ray_dir = -surface_to_light_dir
-            attenuation = light_distance.clamp_min(1e-6).reciprocal().pow(2)
+            if self.light_mode == "gt_point":
+                attenuation = light_distance.clamp_min(1e-6).reciprocal().pow(2)
+            else:
+                attenuation = torch.ones_like(light_distance)
             irradiance = attenuation * self.gt_light_intensity * self.gt_light_color[None]
         else:
             ray_dir = self.light_model(frame_id)
@@ -613,9 +650,13 @@ class PhotometricLambertianRenderer(nn.Module):
                     "fixed_gt_point_position"
                     if self.light_mode == "gt_point"
                     else (
-                        "fixed_gt_direction"
-                        if self.light_mode == "gt_directional"
-                        else "per_frame"
+                        "fixed_gt_point_position_direction_only"
+                        if self.light_mode == "gt_point_direction_only"
+                        else (
+                            "fixed_gt_direction"
+                            if self.light_mode == "gt_directional"
+                            else "per_frame"
+                        )
                     )
                 ),
                 "light_mode": self.light_mode,
@@ -682,7 +723,7 @@ class PhotometricLambertianRenderer(nn.Module):
                             .cpu()
                             .tolist()
                         }
-                        if self.light_mode in {"gt_directional", "gt_point"}
+                        if self.light_mode in {"gt_directional", *GT_POSITION_LIGHT_MODES}
                         else {}
                     ),
                 }
