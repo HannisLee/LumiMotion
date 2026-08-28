@@ -1,0 +1,149 @@
+{
+  "version": 1,
+  "generatedAt": "2026-08-24T16:44:11Z",
+  "status": "ready",
+  "datasets": {
+    "summary_cards": [
+      {
+        "scope": "0823后审计",
+        "formal_runs": 6,
+        "gt_supervised_runs": 0,
+        "normal_source_results": 11,
+        "best_independent_mean_deg": 18.357809,
+        "best_gs_mean_deg": 12.542028
+      }
+    ],
+    "normal_comparison": [
+      {"experiment": "0823-01 Dir·3N", "independent_mean_deg": 19.226150, "gs_mean_deg": 20.526115},
+      {"experiment": "0824-01 Dir·2N", "independent_mean_deg": 21.892032, "gs_mean_deg": 28.014720},
+      {"experiment": "0824-02 Wrapping", "independent_mean_deg": 27.579051, "gs_mean_deg": 30.570869},
+      {"experiment": "0824-03 SH", "independent_mean_deg": null, "gs_mean_deg": 12.542028},
+      {"experiment": "0824-04 PerGS·3N", "independent_mean_deg": 18.357809, "gs_mean_deg": 21.121992},
+      {"experiment": "0824-05 PerGS·Default", "independent_mean_deg": 41.840918, "gs_mean_deg": 20.167294}
+    ],
+    "experiment_overview": [
+      {
+        "experiment": "0823-01",
+        "appearance": "GT directional Lambertian",
+        "preset": "lambertian_normal3",
+        "recorded_status": "PASS",
+        "best_iteration": 30000,
+        "psnr": 47.64587,
+        "ssim": 0.99871,
+        "lpips": 0.00446,
+        "independent_mean_deg": 19.226150,
+        "gs_mean_deg": 20.526115,
+        "alpha_temporal": 0.000260897,
+        "audit_verdict": "基准可用；两类法线均中等误差"
+      },
+      {
+        "experiment": "0824-01",
+        "appearance": "GT directional Lambertian",
+        "preset": "lambertian_normal2",
+        "recorded_status": "PASS",
+        "best_iteration": 30000,
+        "psnr": 51.94910,
+        "ssim": 0.99931,
+        "lpips": 0.00278,
+        "independent_mean_deg": 21.892032,
+        "gs_mean_deg": 28.014720,
+        "alpha_temporal": 0.000073334,
+        "audit_verdict": "RGB PASS；GS 几何法线显著退化"
+      },
+      {
+        "experiment": "0824-02",
+        "appearance": "GT directional Lambertian",
+        "preset": "gs_wrapping",
+        "recorded_status": "FAILED",
+        "best_iteration": 30000,
+        "psnr": 33.65711,
+        "ssim": 0.98085,
+        "lpips": 0.03248,
+        "independent_mean_deg": 27.579051,
+        "gs_mean_deg": 30.570869,
+        "alpha_temporal": 0.001699158,
+        "audit_verdict": "RGB、alpha、双法线全部失败"
+      },
+      {
+        "experiment": "0824-03",
+        "appearance": "degree-3 SH + d_color",
+        "preset": "sh_baseline",
+        "recorded_status": "PASS",
+        "best_iteration": 30000,
+        "psnr": 52.56204,
+        "ssim": 0.99940,
+        "lpips": 0.00261,
+        "independent_mean_deg": null,
+        "gs_mean_deg": 12.542028,
+        "alpha_temporal": 0.000006690,
+        "audit_verdict": "当前观测最优；与 Lambertian 非单变量对照"
+      },
+      {
+        "experiment": "0824-04",
+        "appearance": "per-GS direction Lambertian",
+        "preset": "lambertian_normal3",
+        "recorded_status": "PASS",
+        "best_iteration": 30000,
+        "psnr": 46.96436,
+        "ssim": 0.99849,
+        "lpips": 0.00494,
+        "independent_mean_deg": 18.357809,
+        "gs_mean_deg": 21.121992,
+        "alpha_temporal": 0.000361412,
+        "audit_verdict": "independent 改善；GS 未改善"
+      },
+      {
+        "experiment": "0824-05",
+        "appearance": "per-GS direction Lambertian",
+        "preset": "lambertian_default",
+        "recorded_status": "FAILED",
+        "best_iteration": 30000,
+        "psnr": 46.99108,
+        "ssim": 0.99852,
+        "lpips": 0.00478,
+        "independent_mean_deg": 41.840918,
+        "gs_mean_deg": 20.167294,
+        "alpha_temporal": 0.000445227,
+        "audit_verdict": "RGB 不变但 independent 崩坏；配置 FAILED"
+      }
+    ],
+    "normal_detail": [
+      {"experiment": "0823-01", "source": "independent", "cosine_loss": 0.091503, "mean_deg": 19.226150, "median_deg": 15.603291, "p95_deg": 59.904321, "train_mean_deg": 19.231786, "test_mean_deg": 19.186698, "valid_pixels": 5533629, "source_path": "output/0823-01-CV3s-GTlight_lambert_iter1_3ncons/normal_gt_eval_dual_audit/independent/ours_35000/normal_metrics.json"},
+      {"experiment": "0823-01", "source": "GS / 2DGS", "cosine_loss": 0.109538, "mean_deg": 20.526115, "median_deg": 13.523021, "p95_deg": 69.473156, "train_mean_deg": 20.534308, "test_mean_deg": 20.468761, "valid_pixels": 5533629, "source_path": "output/0823-01-CV3s-GTlight_lambert_iter1_3ncons/normal_gt_eval_dual_audit/gs/ours_35000/normal_metrics.json"},
+      {"experiment": "0824-01", "source": "independent", "cosine_loss": 0.096893, "mean_deg": 21.892032, "median_deg": 19.362874, "p95_deg": 49.166421, "train_mean_deg": 21.899596, "test_mean_deg": 21.839080, "valid_pixels": 5531115, "source_path": "output/0824-01-CV3s-GTlight_lambert_iter1_2ncons/normal_gt_eval_dual_audit/independent/ours_35000/normal_metrics.json"},
+      {"experiment": "0824-01", "source": "GS / 2DGS", "cosine_loss": 0.164030, "mean_deg": 28.014720, "median_deg": 23.255325, "p95_deg": 70.743204, "train_mean_deg": 28.026008, "test_mean_deg": 27.935702, "valid_pixels": 5531115, "source_path": "output/0824-01-CV3s-GTlight_lambert_iter1_2ncons/normal_gt_eval_dual_audit/gs/ours_35000/normal_metrics.json"},
+      {"experiment": "0824-02", "source": "independent", "cosine_loss": 0.161740, "mean_deg": 27.579051, "median_deg": 20.224282, "p95_deg": 68.290499, "train_mean_deg": 27.576970, "test_mean_deg": 27.593615, "valid_pixels": 5186187, "source_path": "output/0824-02-CV3s-GTlight_lambert_iter1_gswrapping/normal_gt_eval_dual_audit/independent/ours_35000/normal_metrics.json"},
+      {"experiment": "0824-02", "source": "GS / 2DGS", "cosine_loss": 0.193154, "mean_deg": 30.570869, "median_deg": 23.247044, "p95_deg": 75.116261, "train_mean_deg": 30.565823, "test_mean_deg": 30.606189, "valid_pixels": 5186187, "source_path": "output/0824-02-CV3s-GTlight_lambert_iter1_gswrapping/normal_gt_eval_dual_audit/gs/ours_35000/normal_metrics.json"},
+      {"experiment": "0824-03", "source": "GS / 2DGS", "cosine_loss": 0.043387, "mean_deg": 12.542028, "median_deg": 8.866243, "p95_deg": 37.417675, "train_mean_deg": 12.548457, "test_mean_deg": 12.497028, "valid_pixels": 5532812, "source_path": "output/0824-03-CV3s-SH_default2DGSnormal/normal_gt_eval_dual_audit/gs/ours_35000/normal_metrics.json"},
+      {"experiment": "0824-04", "source": "independent", "cosine_loss": 0.087127, "mean_deg": 18.357809, "median_deg": 13.144962, "p95_deg": 56.043075, "train_mean_deg": 18.359633, "test_mean_deg": 18.345040, "valid_pixels": 5528870, "source_path": "output/0824-04-CV3s-GTposition_perGSdir_3ncons/normal_gt_eval_dual_audit/independent/ours_35000/normal_metrics.json"},
+      {"experiment": "0824-04", "source": "GS / 2DGS", "cosine_loss": 0.116031, "mean_deg": 21.121992, "median_deg": 13.360696, "p95_deg": 70.979073, "train_mean_deg": 21.123478, "test_mean_deg": 21.111587, "valid_pixels": 5528870, "source_path": "output/0824-04-CV3s-GTposition_perGSdir_3ncons/normal_gt_eval_dual_audit/gs/ours_35000/normal_metrics.json"},
+      {"experiment": "0824-05", "source": "independent", "cosine_loss": 0.311187, "mean_deg": 41.840918, "median_deg": 42.298584, "p95_deg": 84.773952, "train_mean_deg": 41.831356, "test_mean_deg": 41.907858, "valid_pixels": 5533315, "source_path": "output/0824-05-CV3s-GTposition_perGSdir_lambert_default/normal_gt_eval_dual_audit/independent/ours_35000/normal_metrics.json"},
+      {"experiment": "0824-05", "source": "GS / 2DGS", "cosine_loss": 0.109623, "mean_deg": 20.167294, "median_deg": 12.339100, "p95_deg": 69.514956, "train_mean_deg": 20.166008, "test_mean_deg": 20.176296, "valid_pixels": 5533315, "source_path": "output/0824-05-CV3s-GTposition_perGSdir_lambert_default/normal_gt_eval_dual_audit/gs/ours_35000/normal_metrics.json"}
+    ],
+    "loss_config": [
+      {"experiment": "0823-01", "preset": "lambertian_normal3", "independent_normal": "有", "lambda_gs": 0.02, "lambda_live": 0.01, "lambda_mv": 0.02, "lambda_gt": 0.0, "start_gs": 500, "gt_dir": "未传"},
+      {"experiment": "0824-01", "preset": "lambertian_normal2", "independent_normal": "有", "lambda_gs": 0.0, "lambda_live": 0.01, "lambda_mv": 0.02, "lambda_gt": 0.0, "start_gs": 500, "gt_dir": "未传"},
+      {"experiment": "0824-02", "preset": "gs_wrapping", "independent_normal": "有", "lambda_gs": 0.05, "lambda_live": 0.05, "lambda_mv": 0.02, "lambda_gt": 0.0, "start_gs": 500, "gt_dir": "未传"},
+      {"experiment": "0824-03", "preset": "sh_baseline", "independent_normal": "无", "lambda_gs": 0.02, "lambda_live": 0.0, "lambda_mv": 0.0, "lambda_gt": 0.0, "start_gs": 8000, "gt_dir": "未传"},
+      {"experiment": "0824-04", "preset": "lambertian_normal3", "independent_normal": "有", "lambda_gs": 0.02, "lambda_live": 0.01, "lambda_mv": 0.02, "lambda_gt": 0.0, "start_gs": 500, "gt_dir": "未传"},
+      {"experiment": "0824-05", "preset": "lambertian_default", "independent_normal": "有", "lambda_gs": 0.02, "lambda_live": 0.0, "lambda_mv": 0.0, "lambda_gt": 0.0, "start_gs": 500, "gt_dir": "未传"}
+    ],
+    "document_audit": [
+      {"document": "修改/0823-01 loss集中化", "kind": "已实施修改", "evidence": "62/62 回归通过；后续 6 条训练可追踪", "audit_note": "默认损失行为保持；属于基础设施变更"},
+      {"document": "修改/0824-01 lambda_gs开关", "kind": "已实施修改", "evidence": "0824-01 audit 中 GS loss 恒为 0", "audit_note": "开关有效；新双法线结果扩大了消融解释"},
+      {"document": "修改/0824-02 光强归一化方案D", "kind": "设计", "evidence": "明确标记未实施", "audit_note": "不纳入实验排名；没有训练结果可审计"},
+      {"document": "修改/0824-03 gs_wrapping预设", "kind": "已实施修改", "evidence": "权重注入与梯度日志可复核", "audit_note": "只对齐损失形式/权重，不等于论文完整复现"},
+      {"document": "修改/0824-04 SH评估兼容", "kind": "已实施修改", "evidence": "SH 120帧 GS GT评估完成", "audit_note": "诊断器修复不改变训练数值"},
+      {"document": "修改/0824-05 逐GS光方向", "kind": "已实施修改", "evidence": "0824-04/05 checkpoint与结果完整", "audit_note": "只修方向，不包含距离、AREA采样或visibility"},
+      {"document": "报告/SH优于Lambertian原因审计", "kind": "专题审计", "evidence": "核心机制与当前数据一致", "audit_note": "0824-04“正在运行”和仅补0823 GS已过时，本报告更新"},
+      {"document": "报告/SH+Per-light融合方案", "kind": "设计", "evidence": "明确未改代码、未训练", "audit_note": "建议合理但尚无效果证据；需novel-light数据"},
+      {"document": "训练/0823-01 directional·3N", "kind": "正式实验", "evidence": "checkpoint、渲染、双法线指标完整", "audit_note": "PASS；无GT监督；作为Lambertian基准"},
+      {"document": "训练/0824-01 directional·2N", "kind": "正式实验", "evidence": "checkpoint、渲染、双法线指标完整", "audit_note": "记录PASS，但GS mean较基准恶化7.49°"},
+      {"document": "训练/0824-02 gs_wrapping", "kind": "正式实验", "evidence": "FAILED产物完整；梯度爆炸有日志", "audit_note": "“随机不稳定”需多seed；README缺字面完整渲染命令"},
+      {"document": "训练/0824-03 SH baseline", "kind": "正式实验", "evidence": "checkpoint、渲染、GS指标完整", "audit_note": "PASS且观测最优；与Lambertian存在多重混杂"},
+      {"document": "训练/0824-04 perGS·3N", "kind": "正式实验", "evidence": "checkpoint、渲染、双法线指标完整", "audit_note": "PASS；只改善independent，不改善GS"},
+      {"document": "训练/0824-05 perGS·Default", "kind": "正式实验", "evidence": "checkpoint、渲染、双法线指标完整", "audit_note": "FAILED；RGB保持但independent mean崩至41.84°"},
+      {"document": "修改/0824-06 双法线GT评估", "kind": "本轮新增", "evidence": "11组120帧结果；62/62测试通过", "audit_note": "只改离线评估；默认auto兼容；不重训checkpoint"}
+    ]
+  }
+}

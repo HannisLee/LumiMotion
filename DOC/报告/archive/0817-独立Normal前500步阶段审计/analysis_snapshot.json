@@ -1,0 +1,28 @@
+{
+  "generated_at": "2026-08-17T06:30:00Z",
+  "scope": "GT directional light intensity 5.5；iteration 10001 初始化独立 normal；比较 iteration 10001 与 10500；GT normal 仅用于离线评估。",
+  "normal_metrics": [
+    {"dataset": "CV3", "metric": "平均角误差", "iteration_10001_deg": 23.719318, "iteration_10500_deg": 27.245435, "delta_deg": 3.526117, "relative_change_pct": 14.87},
+    {"dataset": "CV3", "metric": "中位角误差", "iteration_10001_deg": 15.652022, "iteration_10500_deg": 20.130081, "delta_deg": 4.478059, "relative_change_pct": 28.61},
+    {"dataset": "CV3", "metric": "P95 角误差", "iteration_10001_deg": 67.631985, "iteration_10500_deg": 69.469210, "delta_deg": 1.837225, "relative_change_pct": 2.72},
+    {"dataset": "CV3L", "metric": "平均角误差", "iteration_10001_deg": 25.385322, "iteration_10500_deg": 28.147734, "delta_deg": 2.762412, "relative_change_pct": 10.88},
+    {"dataset": "CV3L", "metric": "中位角误差", "iteration_10001_deg": 19.017694, "iteration_10500_deg": 24.230737, "delta_deg": 5.213043, "relative_change_pct": 27.41},
+    {"dataset": "CV3L", "metric": "P95 角误差", "iteration_10001_deg": 68.900562, "iteration_10500_deg": 68.490627, "delta_deg": -0.409936, "relative_change_pct": -0.59}
+  ],
+  "frame_audit": [
+    {"dataset": "CV3", "frames": 120, "mean_error_improved_frames": 0, "mean_error_worsened_frames": 120, "worst_source_frame": 109, "worst_delta_deg": 5.519051},
+    {"dataset": "CV3L", "frames": 120, "mean_error_improved_frames": 0, "mean_error_worsened_frames": 120, "worst_source_frame": 99, "worst_delta_deg": 4.342411}
+  ],
+  "freeze_audit": [
+    {"dataset": "CV3", "gaussians": 16059, "position_max_abs": 0.0, "rotation_max_abs": 0.0, "scale_max_abs": 0.0, "opacity_max_abs": 0.0, "deform_sha_equal": true, "light_dir_max_abs": 0.0, "normal_drift_mean_deg": 15.652658, "normal_drift_p95_deg": 35.181640, "albedo_raw_mean_abs": 0.172036},
+    {"dataset": "CV3L", "gaussians": 16404, "position_max_abs": 0.0, "rotation_max_abs": 0.0, "scale_max_abs": 0.0, "opacity_max_abs": 0.0, "deform_sha_equal": true, "light_dir_max_abs": 0.0, "normal_drift_mean_deg": 14.896496, "normal_drift_p95_deg": 33.175027, "albedo_raw_mean_abs": 0.163639}
+  ],
+  "run_status": [
+    {"dataset": "CV3", "target_iteration": 35000, "log_stopped_near_iteration": 13063, "latest_checkpoint": 10500, "python_traceback_found": false, "stage_result": "FAILED"},
+    {"dataset": "CV3L", "target_iteration": 35000, "log_stopped_near_iteration": 12320, "latest_checkpoint": 10500, "python_traceback_found": false, "stage_result": "FAILED"}
+  ],
+  "photometric_baseline": [
+    {"dataset": "CV3", "best_iteration": 10000, "psnr": 36.13052, "ssim": 0.98804, "lpips": 0.02326, "ms_ssim": 0.99490, "alex_lpips": 0.01818},
+    {"dataset": "CV3L", "best_iteration": 10000, "psnr": 36.43810, "ssim": 0.98963, "lpips": 0.02492, "ms_ssim": 0.99579, "alex_lpips": 0.02290}
+  ]
+}
