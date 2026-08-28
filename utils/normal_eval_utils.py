@@ -6,6 +6,20 @@ import torch
 import torch.nn.functional as F
 
 
+def resolve_normal_source(requested: str, has_independent: bool) -> str:
+    """Resolve the normal source while preserving legacy ``auto`` behavior."""
+    if requested not in {"auto", "independent", "gs"}:
+        raise ValueError(f"Unsupported normal source: {requested}")
+    if requested == "independent" and not has_independent:
+        raise ValueError(
+            "Independent photometric normal was requested, but the checkpoint "
+            "does not contain independent normals."
+        )
+    if requested == "independent" or (requested == "auto" and has_independent):
+        return "independent_photometric_normal"
+    return "gs_raster_normal"
+
+
 def blender_camera_normal_to_runtime_view(normal: torch.Tensor) -> torch.Tensor:
     """Map Blender camera axes (+X right, +Y up, -Z forward) to runtime view.
 

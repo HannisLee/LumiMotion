@@ -16,7 +16,7 @@ import torch
 from pathlib import Path
 from random import randint
 from utils.loss_utils import l1_loss
-from scripts.loss import apply_loss_preset, compute_stage1_loss
+from scripts.loss import apply_loss_preset, build_loss_preset, compute_stage1_loss
 from gaussian_renderer import render
 import sys
 from scene import Scene, GaussianModel, DeformModel
@@ -121,6 +121,8 @@ class Trainer:
             "photometric_perlight_pbr",
         }:
             raise ValueError(f"Unsupported render mode: {self.requested_render_mode}")
+        # Loss preset 只构造一次；每个原子 loss 的权重在对象内固定。
+        self.stage1_loss = build_loss_preset(opt, self.requested_render_mode)
         self.testing_iterations = testing_iterations
         self.saving_iterations = saving_iterations
         self.photometric_renderer = None

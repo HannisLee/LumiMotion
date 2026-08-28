@@ -1,15 +1,33 @@
 """scripts/loss.py 的单元测试：损失组装数值等价与 --loss_preset 预设。"""
 
 import argparse
+import hashlib
 import unittest
+from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 import torch
 import torch.nn.functional as F
 
 from scripts.loss import (
+    AlphaLoss,
+    BinarySeparationLoss,
+    DeformationColorLoss,
+    DeformationXYZLoss,
+    DistortionLoss,
+    GSNormalLoss,
+    GTNormalOracleLoss,
+    LightSmoothnessLoss,
     LOSS_PRESETS,
+    PhotometricNormalInitLoss,
+    PhotometricNormalLiveLoss,
+    PhotometricNormalMVLoss,
+    RGBDSSIMLoss,
+    RGBL1Loss,
+    Stage1LossContext,
     apply_loss_preset,
+    build_loss_preset,
     compute_stage1_loss,
 )
 from utils.loss_utils import l1_loss, ssim
@@ -17,6 +35,7 @@ from utils.loss_utils import l1_loss, ssim
 
 def _make_opt(**overrides):
     opt = dict(
+        loss_preset="auto",
         start_normal_reg=0,
         lambda_dist=1000.0,
         lambda_gs_normal=0.02,
@@ -29,6 +48,18 @@ def _make_opt(**overrides):
         binarization_warm_up=0,
         lambda_separation=0.005,
         lambda_photometric_normal_init=0.0,
+        lambda_photometric_normal_live=0.0,
+        lambda_photometric_normal_mv=0.0,
+        photometric_normal_live_start_iter=500,
+        photometric_normal_live_alpha_threshold=0.5,
+        photometric_normal_mv_start_iter=1000,
+        photometric_normal_mv_interval=1,
+        photometric_normal_mv_alpha_threshold=0.5,
+        photometric_normal_mv_depth_tol=0.1,
+        photometric_normal_mv_ramp_iters=2000,
+        photometric_rgb_loss_weight=1.0,
+        lambda_photometric_gt_normal=0.0,
+        photometric_gt_normal_alpha_threshold=0.5,
         lambda_photometric_light_smooth1=0.001,
         lambda_photometric_light_smooth2=0.01,
         lambda_photometric_pbr_exposure=0.001,
@@ -189,63 +220,66 @@ class ComputeStage1LossShPathTest(unittest.TestCase):
         self.assertTrue(torch.allclose(result.loss, expected))
 
 
-class ComputeStage1LossPbrPathTest(unittest.TestCase):
-    """PBR 路径：四项 RGB + 光源平滑 + 六项正则。"""
+class ComputeStage1LossLambertianPathTest(unittest.TestCase):
+    """Lambertian 路径：RGB 总权重与光照正则由对象内 ratio 控制。"""
 
-    def test_pbr_total_matches_reference(self):
-        from scene.photometric_perlight_pbr import srgb_to_linear
-
-        torch.manual_seed(3)
-        height = width = 4
-        tr = _make_trainer(pbr_active=True, photometric_active=True,
-                           photometric_renderer=_FakeRenderer())
-        render_pkg = _render_pkg(height, width, pbr=True)
-        image = torch.rand(3, height, width)
-        gt_image = torch.rand(3, height, width)
-
+    def test_lambertian_total_matches_reference(self):
+        torch.manual_seed(4)
+        opt = _make_opt(
+            loss_preset="lambertian_default",
+            lambda_dssim=0.2,
+            photometric_rgb_loss_weight=0.5,
+            start_normal_reg=10**9,
+            warm_up=10**9,
+        )
+        tr = _make_trainer(
+            opt=opt,
+            requested_render_mode="photometric_lambertian",
+            photometric_active=True,
+            photometric_renderer=_FakeRenderer(),
+        )
+        render_pkg = _render_pkg()
+        image = torch.rand(3, 4, 4)
+        gt_image = torch.rand(3, 4, 4)
         result = compute_stage1_loss(
             tr, SimpleNamespace(gt_alpha_mask=None), render_pkg, image, gt_image,
-            None, None, None, None, None,
+            0.0, None, None, None, None,
         )
-
-        opt = tr.opt
-        foreground_mask = render_pkg["rend_alpha"].detach().clamp(0.0, 1.0)
-        denominator = (foreground_mask.sum() * image.shape[0]).clamp_min(1.0)
-        rgb_mse = F.mse_loss(image, gt_image)
-        fg_l1 = ((image - gt_image).abs() * foreground_mask).sum() / denominator
-        fg_dssim = 1.0 - ssim(image * foreground_mask, gt_image * foreground_mask)
-        gt_linear = srgb_to_linear(gt_image)
-        log_linear = torch.sqrt(
-            (torch.log1p(render_pkg["render_linear"]) - torch.log1p(gt_linear)).pow(2.0) + 1e-6
-        ).mean()
-        loss_img = (
-            opt.photometric_pbr_loss_mse * rgb_mse
-            + opt.photometric_pbr_loss_l1_fg * fg_l1
-            + opt.photometric_pbr_loss_dssim_fg * fg_dssim
-            + opt.photometric_pbr_loss_log_linear * log_linear
+        expected = 0.5 * (
+            0.8 * l1_loss(image, gt_image)
+            + 0.2 * (1.0 - ssim(image, gt_image))
         )
-        expected = loss_img + 0.001 * torch.tensor(0.5)
-        regularizers = {
-            "light_smooth2": (0.01, 0.1),
-            "exposure": (0.001, 0.2),
-            "normal_residual": (0.01, 0.3),
-            "roughness_prior": (0.001, 0.4),
-            "environment_energy": (0.0001, 0.5),
-            "residual": (0.01, 0.6),
-        }
-        for weight, value in regularizers.values():
-            expected = expected + weight * value
+        expected = expected + 0.001 * torch.tensor(0.5)
+        expected = expected + 0.001 * F.binary_cross_entropy(
+            render_pkg["rend_alpha"][:, None, None],
+            torch.ones_like(render_pkg["rend_alpha"][:, None, None]),
+        )
         self.assertTrue(torch.allclose(result.loss, expected))
         self.assertEqual(
-            set(result.pbr_terms),
-            {"rgb_mse", "foreground_l1", "foreground_dssim", "log_linear",
-             "regularizer_light_smooth2", "regularizer_exposure",
-             "regularizer_normal_residual", "regularizer_roughness_prior",
-             "regularizer_environment_energy", "regularizer_residual"},
+            list(result.audit_terms),
+            ["rgb_l1", "rgb_dssim", "normal", "distortion",
+             "light_smooth", "alpha"],
         )
-        # PBR 阶段不产生 alpha / 形变正则项。
-        self.assertNotIn("alpha", result.audit_terms)
-        self.assertNotIn("deformation_xyz", result.audit_terms)
+        self.assertEqual(float(result.light_smooth), 0.5)
+
+
+class ComputeStage1LossPbrPathTest(unittest.TestCase):
+    """PBR 路径已停用，必须在进入训练前明确失败。"""
+
+    def test_pbr_compute_raises(self):
+        tr = _make_trainer(pbr_active=True, photometric_active=True,
+                           requested_render_mode="photometric_perlight_pbr",
+                           photometric_renderer=_FakeRenderer())
+        image = torch.rand(3, 4, 4)
+        with self.assertRaisesRegex(AssertionError, "PBR|pbr"):
+            compute_stage1_loss(
+                tr, SimpleNamespace(gt_alpha_mask=None), _render_pkg(pbr=True),
+                image, torch.rand_like(image), None, None, None, None, None,
+            )
+
+    def test_pbr_build_raises(self):
+        with self.assertRaisesRegex(AssertionError, "PBR|pbr"):
+            build_loss_preset(_make_opt(), "photometric_perlight_pbr")
 
 
 class LossPresetTest(unittest.TestCase):
@@ -270,6 +304,7 @@ class LossPresetTest(unittest.TestCase):
              "sh_baseline"],
         )
         for name, preset in LOSS_PRESETS.items():
+            self.assertIsInstance(preset, type, name)
             self.assertTrue(preset.render_modes, name)
             self.assertTrue(preset.description, name)
             self.assertTrue(preset.terms, name)
@@ -289,7 +324,7 @@ class LossPresetTest(unittest.TestCase):
     def test_render_mode_validation(self):
         args = self._make_args(loss_preset="lambertian_normal3",
                                render_mode="photometric_perlight_pbr")
-        with self.assertRaises(ValueError):
+        with self.assertRaises(AssertionError):
             apply_loss_preset(args, argv=[])
         args = self._make_args(loss_preset="pbr_default",
                                render_mode="photometric_lambertian")
@@ -357,6 +392,87 @@ class LossPresetTest(unittest.TestCase):
                          {"photometric_rgb_loss_weight", "lambda_photometric_gt_normal"})
         self.assertEqual(args.photometric_rgb_loss_weight, 0.0)
         self.assertEqual(args.lambda_photometric_gt_normal, 1.0)
+
+
+class PresetCompositionTest(unittest.TestCase):
+    """Preset 是独立大 loss 类，__init__ 明确保存原子 loss 顺序。"""
+
+    def test_preset_classes_do_not_inherit_from_each_other(self):
+        preset_types = list(LOSS_PRESETS.values())
+        self.assertEqual(len(preset_types), len(set(preset_types)))
+        for preset_type in preset_types:
+            self.assertEqual(preset_type.__bases__, (object,), preset_type.__name__)
+
+    def test_sh_composition_order(self):
+        preset = build_loss_preset(
+            _make_opt(loss_preset="sh_baseline"), "original_sh"
+        )
+        self.assertEqual(
+            [type(loss) for loss in preset.losses],
+            [RGBL1Loss, RGBDSSIMLoss, GSNormalLoss, DistortionLoss,
+             AlphaLoss, DeformationXYZLoss, DeformationColorLoss,
+             BinarySeparationLoss],
+        )
+
+    def test_lambertian_composition_order(self):
+        preset = build_loss_preset(
+            _make_opt(loss_preset="lambertian_normal3"),
+            "photometric_lambertian",
+        )
+        self.assertEqual(
+            [type(loss) for loss in preset.losses],
+            [RGBL1Loss, RGBDSSIMLoss, GSNormalLoss, DistortionLoss,
+             GTNormalOracleLoss, PhotometricNormalInitLoss,
+             PhotometricNormalLiveLoss, PhotometricNormalMVLoss,
+             LightSmoothnessLoss, AlphaLoss, DeformationXYZLoss,
+             DeformationColorLoss, BinarySeparationLoss],
+        )
+
+    def test_loss_ratio_is_fixed_after_construction(self):
+        opt = _make_opt(loss_preset="sh_baseline", lambda_dssim=0.2)
+        preset = build_loss_preset(opt, "original_sh")
+        opt.lambda_dssim = 0.8
+        self.assertEqual(preset.losses[0].ratio, 0.8)
+        self.assertEqual(preset.losses[1].ratio, 0.2)
+
+    def test_atomic_loss_default_ratio_is_one(self):
+        self.assertEqual(RGBL1Loss().ratio, 1.0)
+        self.assertEqual(GSNormalLoss().ratio, 1.0)
+
+    def test_world_normal_render_is_cached_per_context(self):
+        normal = torch.ones(3, 2, 2)
+        alpha = torch.ones(1, 2, 2)
+        context = Stage1LossContext(
+            tr=SimpleNamespace(),
+            viewpoint_cam=SimpleNamespace(),
+            render_pkg={},
+            image=torch.zeros(3, 2, 2),
+            gt_image=torch.zeros(3, 2, 2),
+            d_xyz=None,
+            d_rotation=None,
+            d_scaling=None,
+            d_opacity=None,
+            d_color=None,
+        )
+        with patch(
+            "scripts.loss.render_world_normal_map",
+            return_value=(normal, alpha),
+        ) as mocked_render:
+            first = context.rendered_world_normal()
+            second = context.rendered_world_normal()
+            self.assertIs(first[0], normal)
+            self.assertIs(first[1], alpha)
+            self.assertIs(second[0], normal)
+            self.assertIs(second[1], alpha)
+        mocked_render.assert_called_once()
+
+    def test_legacy_backup_checksum(self):
+        backup = Path(__file__).resolve().parents[1] / "scripts" / "loss_legacy_20260826.py"
+        digest = hashlib.sha256(backup.read_bytes()).hexdigest()
+        self.assertEqual(
+            digest,
+            "3f6cfb6f33499536ef775f946979b5f6726a62ec43746692e0db2925ee70d0f9",
+        )
 
 
 if __name__ == "__main__":
