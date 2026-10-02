@@ -1,0 +1,301 @@
+{
+  "surface": "report",
+  "manifest": {
+    "version": 1,
+    "surface": "report",
+    "title": "CV3s 0823 后实验与双法线真值审计",
+    "description": "对 0823—0824 的文档、六条正式训练、independent shading normal 与 GS/2DGS raster normal 相对 Blender GT normal 的统一审计。",
+    "generatedAt": "2026-08-24T16:44:11Z",
+    "cards": [
+      {
+        "id": "scope_card",
+        "description": "训练与 GT-normal 监督覆盖",
+        "dataset": "summary_cards",
+        "sourceId": "analysis_snapshot",
+        "filter": {"scope": "0823后审计"},
+        "metrics": [
+          {"label": "正式训练", "field": "formal_runs", "format": "number"},
+          {"label": "GT监督训练", "field": "gt_supervised_runs", "format": "number"},
+          {"label": "法线源结果", "field": "normal_source_results", "format": "number"}
+        ]
+      },
+      {
+        "id": "best_normal_card",
+        "description": "iteration 35000 的观测最佳 GT-normal mean",
+        "dataset": "summary_cards",
+        "sourceId": "analysis_snapshot",
+        "filter": {"scope": "0823后审计"},
+        "metrics": [
+          {"label": "最佳 independent°", "field": "best_independent_mean_deg", "format": "number"},
+          {"label": "最佳 GS°", "field": "best_gs_mean_deg", "format": "number"}
+        ]
+      }
+    ],
+    "charts": [
+      {
+        "id": "dual_normal_mean_chart",
+        "title": "同一 checkpoint 的两类法线质量差异很大",
+        "subtitle": "iteration 35000；角度越低越好。SH 不包含 independent normal，因此该柱为空。",
+        "intent": "comparison",
+        "question": "历史自动选源指标是否足以代表 2DGS 几何法线？",
+        "rationale": "并列柱形图把 independent shading normal 与 GS raster normal 放到同一实验、同一 alpha mask 下比较。",
+        "comparisonContext": {
+          "baseline": "0823-01 directional·3N",
+          "grain": "实验 × 法线源",
+          "unit": "degree",
+          "semanticFamily": "GT normal angular error"
+        },
+        "type": "bar",
+        "dataset": "normal_comparison",
+        "sourceId": "analysis_snapshot",
+        "encodings": {
+          "x": {"field": "experiment", "type": "nominal", "label": "实验"},
+          "y": {"fields": ["independent_mean_deg", "gs_mean_deg"], "type": "quantitative", "label": "mean 角误差", "unit": "°"}
+        },
+        "xAxisTitle": "实验",
+        "yAxisTitle": "GT normal mean 角误差（°，越低越好）",
+        "valueFormat": "number",
+        "unit": "°",
+        "layout": "full",
+        "maxRows": 6,
+        "surface": {"surface": "explorer", "viewMode": "both", "interactiveLegend": true}
+      }
+    ],
+    "tables": [
+      {
+        "id": "experiment_overview_table",
+        "title": "六条正式实验总览",
+        "subtitle": "RGB 取日志中的最佳 test iteration；法线与 alpha 固定取 iteration 35000，不能视为同一 checkpoint 的联合最优。",
+        "dataset": "experiment_overview",
+        "sourceId": "analysis_snapshot",
+        "defaultSort": {"field": "experiment", "direction": "asc"},
+        "density": "dense",
+        "layout": "full",
+        "columns": [
+          {"field": "experiment", "label": "实验", "type": "text"},
+          {"field": "appearance", "label": "外观/光照", "type": "text"},
+          {"field": "preset", "label": "损失 preset", "type": "text"},
+          {"field": "recorded_status", "label": "状态", "type": "text"},
+          {"field": "psnr", "label": "Best PSNR", "format": "number"},
+          {"field": "ssim", "label": "SSIM", "format": "number"},
+          {"field": "lpips", "label": "LPIPS", "format": "number"},
+          {"field": "independent_mean_deg", "label": "Independent mean°", "format": "number"},
+          {"field": "gs_mean_deg", "label": "GS mean°", "format": "number"},
+          {"field": "alpha_temporal", "label": "Alpha时序差", "format": "number"},
+          {"field": "audit_verdict", "label": "审计判断", "type": "text"}
+        ]
+      },
+      {
+        "id": "normal_detail_table",
+        "title": "双法线相对真实法线的完整指标",
+        "subtitle": "同 checkpoint 两个 source 共用 alpha mask；不同实验 mask 略有差异。Cosine loss 与训练 oracle 定义一致，但这里只做离线评估。",
+        "dataset": "normal_detail",
+        "sourceId": "analysis_snapshot",
+        "defaultSort": {"field": "mean_deg", "direction": "asc"},
+        "density": "dense",
+        "layout": "full",
+        "columns": [
+          {"field": "experiment", "label": "实验", "type": "text"},
+          {"field": "source", "label": "法线源", "type": "text"},
+          {"field": "cosine_loss", "label": "Cosine loss", "format": "number"},
+          {"field": "mean_deg", "label": "Mean°", "format": "number"},
+          {"field": "median_deg", "label": "Median°", "format": "number"},
+          {"field": "p95_deg", "label": "P95°", "format": "number"},
+          {"field": "train_mean_deg", "label": "Train mean°", "format": "number"},
+          {"field": "test_mean_deg", "label": "Test mean°", "format": "number"},
+          {"field": "valid_pixels", "label": "有效像素", "format": "number"},
+          {"field": "source_path", "label": "原始 JSON", "type": "text"}
+        ]
+      },
+      {
+        "id": "loss_config_table",
+        "title": "训练损失配置：六条实验均未使用 GT normal 监督",
+        "subtitle": "GS、live、mv 均为自一致性；只有 lambda_gt 对真实法线，但本轮全部为 0 且未传 GT dir。",
+        "dataset": "loss_config",
+        "sourceId": "analysis_snapshot",
+        "defaultSort": {"field": "experiment", "direction": "asc"},
+        "density": "dense",
+        "layout": "full",
+        "columns": [
+          {"field": "experiment", "label": "实验", "type": "text"},
+          {"field": "preset", "label": "Preset", "type": "text"},
+          {"field": "independent_normal", "label": "Independent", "type": "text"},
+          {"field": "lambda_gs", "label": "λ GS", "format": "number"},
+          {"field": "lambda_live", "label": "λ live", "format": "number"},
+          {"field": "lambda_mv", "label": "λ mv", "format": "number"},
+          {"field": "lambda_gt", "label": "λ GT", "format": "number"},
+          {"field": "start_gs", "label": "GS起始iter", "format": "number"},
+          {"field": "gt_dir", "label": "GT normal目录", "type": "text"}
+        ]
+      },
+      {
+        "id": "document_audit_table",
+        "title": "0823/0824 文档逐项审计",
+        "subtitle": "14 份原始文档 + 本轮新增 1 份评估修改记录；设计文档与已完成实验分开。",
+        "dataset": "document_audit",
+        "sourceId": "analysis_snapshot",
+        "defaultSort": {"field": "document", "direction": "asc"},
+        "density": "dense",
+        "layout": "full",
+        "columns": [
+          {"field": "document", "label": "文档", "type": "text"},
+          {"field": "kind", "label": "类型", "type": "text"},
+          {"field": "evidence", "label": "证据状态", "type": "text"},
+          {"field": "audit_note", "label": "审计备注", "type": "text"}
+        ]
+      }
+    ],
+    "sources": [
+      {"id": "analysis_snapshot", "label": "本轮审计查询映射与汇总快照", "path": "DOC/报告/0824-CV3s-0823后实验与双法线真值审计/report_query.sql"},
+      {"id": "source_notes", "label": "数据来源、指标口径与图表映射", "path": "DOC/报告/0824-CV3s-0823后实验与双法线真值审计/source_notes.md"},
+      {"id": "doc_modifications", "label": "0823/0824 修改记录", "path": "DOC/修改"},
+      {"id": "doc_reports", "label": "0824 专题报告", "path": "DOC/报告"},
+      {"id": "doc_training", "label": "0823/0824 训练记录", "path": "DOC/训练"},
+      {"id": "run_0823", "label": "0823-01 实验 README", "path": "output/0823-01-CV3s-GTlight_lambert_iter1_3ncons/README.md"},
+      {"id": "run_0824_01", "label": "0824-01 实验 README", "path": "output/0824-01-CV3s-GTlight_lambert_iter1_2ncons/README.md"},
+      {"id": "run_0824_02", "label": "0824-02 实验 README", "path": "output/0824-02-CV3s-GTlight_lambert_iter1_gswrapping/README.md"},
+      {"id": "run_0824_03", "label": "0824-03 实验 README", "path": "output/0824-03-CV3s-SH_default2DGSnormal/README.md"},
+      {"id": "run_0824_04", "label": "0824-04 实验 README", "path": "output/0824-04-CV3s-GTposition_perGSdir_3ncons/README.md"},
+      {"id": "run_0824_05", "label": "0824-05 实验 README", "path": "output/0824-05-CV3s-GTposition_perGSdir_lambert_default/README.md"}
+    ],
+    "blocks": [
+      {
+        "id": "report_title",
+        "type": "markdown",
+        "sourceId": "source_notes",
+        "body": "# CV3s 0823 后实验与双法线真值审计\n\n审计时点：2026-08-24；服务器/环境：garuda / lumimotion-garuda。"
+      },
+      {
+        "id": "technical_summary",
+        "type": "markdown",
+        "sourceId": "analysis_snapshot",
+        "body": "## 技术摘要\n\n已审完 0823（含）之后的 14 份原始文档和 6 条正式训练，并补齐 iteration 35000 的 11 组法线源真值结果：5 条 Lambertian checkpoint 各有 independent 与 GS 两套，SH 仅有其原生 GS。六条训练均没有使用 GT normal 监督；历史指标因评估器自动选源而把 shading normal 与 geometry normal 混在一起。\n\n最有判别力的新结果来自 0824-05：相对同光照的 0824-04，去掉 live/mv 后 PSNR 仅变化 +0.027 dB，independent mean 却从 18.36° 崩到 41.84°，而 GS mean 从 21.12° 小幅改善到 20.17°。因此 RGB 高分不能证明独立法线正确；live/mv 对 independent normal 必要，但没有证据表明它们改善 GS 几何法线。"
+      },
+      {"id": "metrics", "type": "metric-strip", "cardIds": ["scope_card", "best_normal_card"]},
+      {
+        "id": "key_findings",
+        "type": "markdown",
+        "sourceId": "analysis_snapshot",
+        "body": "## 关键发现\n\n1. **GT 监督缺失是事实，不是文档遗漏。** 六条正式命令的 lambda_photometric_gt_normal 全为 0，且都未传 GT normal 目录。现有 GT 项只监督 independent normal；仓库没有 GS raster normal 对 GT 的训练损失。\n2. **去掉 GS 自一致性主要伤到几何法线。** 0824-01 相对 0823-01，independent mean 恶化 2.67°，GS mean 却恶化 7.49°；原报告只看自动选出的 independent，低估了几何影响。\n3. **逐 GS 光方向只改善了 shading normal。** 0824-04 相对 0823-01，independent mean 改善 0.87°，但 GS mean 反而恶化 0.60°。因此“法线改善”必须限定法线源。\n4. **live/mv 防止 independent normal 被 RGB 带偏。** 0824-05 的 RGB 与 0824-04 持平，但 independent mean 恶化 23.48°；这是一条强证据，说明当前单灯 RGB 对 albedo-normal 分解严重欠约束。\n5. **SH 是当前观测最优，不是颜色模型的单变量因果证明。** SH 的 GS mean 12.54°、PSNR 52.56 dB 最好，但同时改变了颜色容量、normal 表达、normal-reg 启动时刻与 d_color 自由度。"
+      },
+      {"id": "dual_chart", "type": "chart", "chartId": "dual_normal_mean_chart"},
+      {"id": "overview", "type": "table", "tableId": "experiment_overview_table"},
+      {
+        "id": "scope_method",
+        "type": "markdown",
+        "sourceId": "source_notes",
+        "body": "## 范围、数据与方法\n\n真实法线来自 Blender world-space EXR。评估有效像素为 GT normal 有效且该 checkpoint 渲染 alpha ≥ 0.5；cosine loss 定义为有效像素上的 mean(1-cos)，角度输出 mean/median/P95。统计先逐帧计算，再对 120 帧等权平均；train/test 分别为 105/15 帧。\n\n本轮给评估器增加显式 normal_source=independent|gs 和 cosine loss 输出，默认 auto 行为保持历史兼容。所有新结果写入 normal_gt_eval_dual_audit，不覆盖旧评估；checkpoint 未重训。全量 62 个单元测试通过。"
+      },
+      {"id": "normal_detail", "type": "table", "tableId": "normal_detail_table"},
+      {
+        "id": "loss_boundary",
+        "type": "markdown",
+        "sourceId": "analysis_snapshot",
+        "body": "## 训练损失审计\n\nlambda_gs_normal 比较 rend_normal 与当前深度导出的 surf_normal；live 比较 independent normal 与当前几何目标；mv 做静态场景跨视角一致。三者都可能提高自洽性，但都不保证接近 GT。真正消费 GT EXR 的 photometric_gt_normal 默认关闭，且实现上只作用于 independent normal。故本报告新增的是离线真值损失数据，不是给旧实验补上训练监督。"
+      },
+      {"id": "loss_config", "type": "table", "tableId": "loss_config_table"},
+      {
+        "id": "causal_analysis",
+        "type": "markdown",
+        "sourceId": "analysis_snapshot",
+        "body": "## 结果解释与因果边界\n\n0824-05 构成当前最干净的 live/mv 消融：光方向、强度、GS normal、distortion、调度和优化器与 0824-04 对齐。它表明 live/mv 能把 independent normal 从 RGB 可接受但几何错误的解拉回合理区间；代价是 GS mean 约 +0.95°、alpha 时序差略增。0824-01 则说明 GS 自一致性对 GS 几何本身更重要，虽然去掉后 RGB 和 alpha 更好。\n\n0824-02 在 iter 650 后出现位置梯度从 0.71 升至 20.48 的明确异常，RGB、alpha 和两类法线最终同时失败；高 live 权重参与正反馈的机制解释有证据，但“随机不稳定”仍需多 seed 才能成立。SH 优势与不完整 AREA-light Lambertian、单轨迹 camera-light 绑定、外观容量更高相容，但现有实验不能拆出各因素的独立贡献。"
+      },
+      {"id": "document_audit", "type": "table", "tableId": "document_audit_table"},
+      {
+        "id": "limitations",
+        "type": "markdown",
+        "sourceId": "source_notes",
+        "body": "## 限制与稳健性\n\n- RGB 最佳值多来自 iteration 30000，法线和 alpha 来自 iteration 35000；同一行不是联合最优 checkpoint。\n- 不同实验使用自己的 alpha mask，有效像素约 5.19M—5.53M；跨实验不是严格 common-support 比较。\n- P95 是逐帧 P95 的平均，不是 pooled pixel P95。\n- 每配置只有一个 seed；训练/测试 mean 很接近，只能说明当前 stride-8 split 未显现过拟合，不能证明 novel-light 泛化。\n- 0824-03 SH 与 Lambertian 不是单变量消融；所谓 GT light 也只包含 AREA 灯中心方向，不含距离、面积采样、visibility、软阴影和间接光。"
+      },
+      {
+        "id": "recommendations",
+        "type": "markdown",
+        "sourceId": "analysis_snapshot",
+        "body": "## 建议\n\n1. 把 iteration 35000 的 independent + GS 双源评估、cosine/mean/median/P95、normal_source 字段设为所有后续实验的强制验收项；SH 明确只报 GS。\n2. 报告措辞固定写“independent shading normal”或“GS geometry normal”，不再只写含糊的 normal。\n3. 同时补报最佳 RGB checkpoint 的双法线指标，或统一以 final checkpoint 的 RGB+normal 做主表，消除 30000/35000 混用。\n4. 增加 common-support mask 与 pooled pixel 统计，用于严格跨实验排序；保留当前逐帧等权统计用于时序公平性。\n5. 对 gs_wrapping 与其他高权重方案至少跑 3 个 seed，再判断随机性；继续保留 gradient audit。\n6. 在扫更多损失权重前，先做 GT albedo+GT normal 的成像模型上限、RGB 梯度与 GT-normal 梯度 cosine，以及真正解耦的 camera×light 验证。\n7. 若训练目标禁止 GT normal，可继续把 live/mv 作为 independent 的必要护栏；若允许少量 GT 监督，先用独立 oracle 消融，不能把诊断结果冒充默认协议。"
+      },
+      {
+        "id": "further_questions",
+        "type": "markdown",
+        "sourceId": "analysis_snapshot",
+        "body": "## 后续待回答问题\n\n- live 与 mv 各自贡献多少？当前只有同时开启/关闭，仍需单项消融。\n- 为什么 live/mv 大幅改善 independent，却让 GS mean 小幅变差？需要审计两者对 rotation/xyz 的梯度方向与强度。\n- 0824-04 的 per-GS direction 对 independent 的 0.87°收益能否跨 seed、common mask 和最佳 checkpoint保持？\n- SH 的 12.54°中有多少来自颜色容量、start_normal_reg=8000、d_color 或训练轨迹差异？需要同外观容量的受控对照。\n- 只有在固定相机多光照或 camera×light 交叉数据上，才能验证 SH+direction adapter 是否真的获得可迁移 relighting。"
+      }
+    ]
+  },
+  "snapshot": {
+    "version": 1,
+    "generatedAt": "2026-08-24T16:44:11Z",
+    "status": "ready",
+    "datasets": {
+      "summary_cards": [
+        {"scope": "0823后审计", "formal_runs": 6, "gt_supervised_runs": 0, "normal_source_results": 11, "best_independent_mean_deg": 18.357809, "best_gs_mean_deg": 12.542028}
+      ],
+      "normal_comparison": [
+        {"experiment": "0823-01 Dir·3N", "independent_mean_deg": 19.226150, "gs_mean_deg": 20.526115},
+        {"experiment": "0824-01 Dir·2N", "independent_mean_deg": 21.892032, "gs_mean_deg": 28.014720},
+        {"experiment": "0824-02 Wrapping", "independent_mean_deg": 27.579051, "gs_mean_deg": 30.570869},
+        {"experiment": "0824-03 SH", "independent_mean_deg": null, "gs_mean_deg": 12.542028},
+        {"experiment": "0824-04 PerGS·3N", "independent_mean_deg": 18.357809, "gs_mean_deg": 21.121992},
+        {"experiment": "0824-05 PerGS·Default", "independent_mean_deg": 41.840918, "gs_mean_deg": 20.167294}
+      ],
+      "experiment_overview": [
+        {"experiment": "0823-01", "appearance": "GT directional Lambertian", "preset": "lambertian_normal3", "recorded_status": "PASS", "best_iteration": 30000, "psnr": 47.64587, "ssim": 0.99871, "lpips": 0.00446, "independent_mean_deg": 19.226150, "gs_mean_deg": 20.526115, "alpha_temporal": 0.000260897, "audit_verdict": "基准可用；两类法线均中等误差"},
+        {"experiment": "0824-01", "appearance": "GT directional Lambertian", "preset": "lambertian_normal2", "recorded_status": "PASS", "best_iteration": 30000, "psnr": 51.94910, "ssim": 0.99931, "lpips": 0.00278, "independent_mean_deg": 21.892032, "gs_mean_deg": 28.014720, "alpha_temporal": 0.000073334, "audit_verdict": "RGB PASS；GS 几何法线显著退化"},
+        {"experiment": "0824-02", "appearance": "GT directional Lambertian", "preset": "gs_wrapping", "recorded_status": "FAILED", "best_iteration": 30000, "psnr": 33.65711, "ssim": 0.98085, "lpips": 0.03248, "independent_mean_deg": 27.579051, "gs_mean_deg": 30.570869, "alpha_temporal": 0.001699158, "audit_verdict": "RGB、alpha、双法线全部失败"},
+        {"experiment": "0824-03", "appearance": "degree-3 SH + d_color", "preset": "sh_baseline", "recorded_status": "PASS", "best_iteration": 30000, "psnr": 52.56204, "ssim": 0.99940, "lpips": 0.00261, "independent_mean_deg": null, "gs_mean_deg": 12.542028, "alpha_temporal": 0.000006690, "audit_verdict": "当前观测最优；与 Lambertian 非单变量对照"},
+        {"experiment": "0824-04", "appearance": "per-GS direction Lambertian", "preset": "lambertian_normal3", "recorded_status": "PASS", "best_iteration": 30000, "psnr": 46.96436, "ssim": 0.99849, "lpips": 0.00494, "independent_mean_deg": 18.357809, "gs_mean_deg": 21.121992, "alpha_temporal": 0.000361412, "audit_verdict": "independent 改善；GS 未改善"},
+        {"experiment": "0824-05", "appearance": "per-GS direction Lambertian", "preset": "lambertian_default", "recorded_status": "FAILED", "best_iteration": 30000, "psnr": 46.99108, "ssim": 0.99852, "lpips": 0.00478, "independent_mean_deg": 41.840918, "gs_mean_deg": 20.167294, "alpha_temporal": 0.000445227, "audit_verdict": "RGB 不变但 independent 崩坏；配置 FAILED"}
+      ],
+      "normal_detail": [
+        {"experiment": "0823-01", "source": "independent", "cosine_loss": 0.091503, "mean_deg": 19.226150, "median_deg": 15.603291, "p95_deg": 59.904321, "train_mean_deg": 19.231786, "test_mean_deg": 19.186698, "valid_pixels": 5533629, "source_path": "output/0823-01-CV3s-GTlight_lambert_iter1_3ncons/normal_gt_eval_dual_audit/independent/ours_35000/normal_metrics.json"},
+        {"experiment": "0823-01", "source": "GS / 2DGS", "cosine_loss": 0.109538, "mean_deg": 20.526115, "median_deg": 13.523021, "p95_deg": 69.473156, "train_mean_deg": 20.534308, "test_mean_deg": 20.468761, "valid_pixels": 5533629, "source_path": "output/0823-01-CV3s-GTlight_lambert_iter1_3ncons/normal_gt_eval_dual_audit/gs/ours_35000/normal_metrics.json"},
+        {"experiment": "0824-01", "source": "independent", "cosine_loss": 0.096893, "mean_deg": 21.892032, "median_deg": 19.362874, "p95_deg": 49.166421, "train_mean_deg": 21.899596, "test_mean_deg": 21.839080, "valid_pixels": 5531115, "source_path": "output/0824-01-CV3s-GTlight_lambert_iter1_2ncons/normal_gt_eval_dual_audit/independent/ours_35000/normal_metrics.json"},
+        {"experiment": "0824-01", "source": "GS / 2DGS", "cosine_loss": 0.164030, "mean_deg": 28.014720, "median_deg": 23.255325, "p95_deg": 70.743204, "train_mean_deg": 28.026008, "test_mean_deg": 27.935702, "valid_pixels": 5531115, "source_path": "output/0824-01-CV3s-GTlight_lambert_iter1_2ncons/normal_gt_eval_dual_audit/gs/ours_35000/normal_metrics.json"},
+        {"experiment": "0824-02", "source": "independent", "cosine_loss": 0.161740, "mean_deg": 27.579051, "median_deg": 20.224282, "p95_deg": 68.290499, "train_mean_deg": 27.576970, "test_mean_deg": 27.593615, "valid_pixels": 5186187, "source_path": "output/0824-02-CV3s-GTlight_lambert_iter1_gswrapping/normal_gt_eval_dual_audit/independent/ours_35000/normal_metrics.json"},
+        {"experiment": "0824-02", "source": "GS / 2DGS", "cosine_loss": 0.193154, "mean_deg": 30.570869, "median_deg": 23.247044, "p95_deg": 75.116261, "train_mean_deg": 30.565823, "test_mean_deg": 30.606189, "valid_pixels": 5186187, "source_path": "output/0824-02-CV3s-GTlight_lambert_iter1_gswrapping/normal_gt_eval_dual_audit/gs/ours_35000/normal_metrics.json"},
+        {"experiment": "0824-03", "source": "GS / 2DGS", "cosine_loss": 0.043387, "mean_deg": 12.542028, "median_deg": 8.866243, "p95_deg": 37.417675, "train_mean_deg": 12.548457, "test_mean_deg": 12.497028, "valid_pixels": 5532812, "source_path": "output/0824-03-CV3s-SH_default2DGSnormal/normal_gt_eval_dual_audit/gs/ours_35000/normal_metrics.json"},
+        {"experiment": "0824-04", "source": "independent", "cosine_loss": 0.087127, "mean_deg": 18.357809, "median_deg": 13.144962, "p95_deg": 56.043075, "train_mean_deg": 18.359633, "test_mean_deg": 18.345040, "valid_pixels": 5528870, "source_path": "output/0824-04-CV3s-GTposition_perGSdir_3ncons/normal_gt_eval_dual_audit/independent/ours_35000/normal_metrics.json"},
+        {"experiment": "0824-04", "source": "GS / 2DGS", "cosine_loss": 0.116031, "mean_deg": 21.121992, "median_deg": 13.360696, "p95_deg": 70.979073, "train_mean_deg": 21.123478, "test_mean_deg": 21.111587, "valid_pixels": 5528870, "source_path": "output/0824-04-CV3s-GTposition_perGSdir_3ncons/normal_gt_eval_dual_audit/gs/ours_35000/normal_metrics.json"},
+        {"experiment": "0824-05", "source": "independent", "cosine_loss": 0.311187, "mean_deg": 41.840918, "median_deg": 42.298584, "p95_deg": 84.773952, "train_mean_deg": 41.831356, "test_mean_deg": 41.907858, "valid_pixels": 5533315, "source_path": "output/0824-05-CV3s-GTposition_perGSdir_lambert_default/normal_gt_eval_dual_audit/independent/ours_35000/normal_metrics.json"},
+        {"experiment": "0824-05", "source": "GS / 2DGS", "cosine_loss": 0.109623, "mean_deg": 20.167294, "median_deg": 12.339100, "p95_deg": 69.514956, "train_mean_deg": 20.166008, "test_mean_deg": 20.176296, "valid_pixels": 5533315, "source_path": "output/0824-05-CV3s-GTposition_perGSdir_lambert_default/normal_gt_eval_dual_audit/gs/ours_35000/normal_metrics.json"}
+      ],
+      "loss_config": [
+        {"experiment": "0823-01", "preset": "lambertian_normal3", "independent_normal": "有", "lambda_gs": 0.02, "lambda_live": 0.01, "lambda_mv": 0.02, "lambda_gt": 0.0, "start_gs": 500, "gt_dir": "未传"},
+        {"experiment": "0824-01", "preset": "lambertian_normal2", "independent_normal": "有", "lambda_gs": 0.0, "lambda_live": 0.01, "lambda_mv": 0.02, "lambda_gt": 0.0, "start_gs": 500, "gt_dir": "未传"},
+        {"experiment": "0824-02", "preset": "gs_wrapping", "independent_normal": "有", "lambda_gs": 0.05, "lambda_live": 0.05, "lambda_mv": 0.02, "lambda_gt": 0.0, "start_gs": 500, "gt_dir": "未传"},
+        {"experiment": "0824-03", "preset": "sh_baseline", "independent_normal": "无", "lambda_gs": 0.02, "lambda_live": 0.0, "lambda_mv": 0.0, "lambda_gt": 0.0, "start_gs": 8000, "gt_dir": "未传"},
+        {"experiment": "0824-04", "preset": "lambertian_normal3", "independent_normal": "有", "lambda_gs": 0.02, "lambda_live": 0.01, "lambda_mv": 0.02, "lambda_gt": 0.0, "start_gs": 500, "gt_dir": "未传"},
+        {"experiment": "0824-05", "preset": "lambertian_default", "independent_normal": "有", "lambda_gs": 0.02, "lambda_live": 0.0, "lambda_mv": 0.0, "lambda_gt": 0.0, "start_gs": 500, "gt_dir": "未传"}
+      ],
+      "document_audit": [
+        {"document": "修改/0823-01 loss集中化", "kind": "已实施修改", "evidence": "62/62 回归通过；后续 6 条训练可追踪", "audit_note": "默认损失行为保持；属于基础设施变更"},
+        {"document": "修改/0824-01 lambda_gs开关", "kind": "已实施修改", "evidence": "0824-01 audit 中 GS loss 恒为 0", "audit_note": "开关有效；新双法线结果扩大了消融解释"},
+        {"document": "修改/0824-02 光强归一化方案D", "kind": "设计", "evidence": "明确标记未实施", "audit_note": "不纳入实验排名；没有训练结果可审计"},
+        {"document": "修改/0824-03 gs_wrapping预设", "kind": "已实施修改", "evidence": "权重注入与梯度日志可复核", "audit_note": "只对齐损失形式/权重，不等于论文完整复现"},
+        {"document": "修改/0824-04 SH评估兼容", "kind": "已实施修改", "evidence": "SH 120帧 GS GT评估完成", "audit_note": "诊断器修复不改变训练数值"},
+        {"document": "修改/0824-05 逐GS光方向", "kind": "已实施修改", "evidence": "0824-04/05 checkpoint与结果完整", "audit_note": "只修方向，不包含距离、AREA采样或visibility"},
+        {"document": "报告/SH优于Lambertian原因审计", "kind": "专题审计", "evidence": "核心机制与当前数据一致", "audit_note": "0824-04“正在运行”和仅补0823 GS已过时，本报告更新"},
+        {"document": "报告/SH+Per-light融合方案", "kind": "设计", "evidence": "明确未改代码、未训练", "audit_note": "建议合理但尚无效果证据；需novel-light数据"},
+        {"document": "训练/0823-01 directional·3N", "kind": "正式实验", "evidence": "checkpoint、渲染、双法线指标完整", "audit_note": "PASS；无GT监督；作为Lambertian基准"},
+        {"document": "训练/0824-01 directional·2N", "kind": "正式实验", "evidence": "checkpoint、渲染、双法线指标完整", "audit_note": "记录PASS，但GS mean较基准恶化7.49°"},
+        {"document": "训练/0824-02 gs_wrapping", "kind": "正式实验", "evidence": "FAILED产物完整；梯度爆炸有日志", "audit_note": "“随机不稳定”需多seed；README缺字面完整渲染命令"},
+        {"document": "训练/0824-03 SH baseline", "kind": "正式实验", "evidence": "checkpoint、渲染、GS指标完整", "audit_note": "PASS且观测最优；与Lambertian存在多重混杂"},
+        {"document": "训练/0824-04 perGS·3N", "kind": "正式实验", "evidence": "checkpoint、渲染、双法线指标完整", "audit_note": "PASS；只改善independent，不改善GS"},
+        {"document": "训练/0824-05 perGS·Default", "kind": "正式实验", "evidence": "checkpoint、渲染、双法线指标完整", "audit_note": "FAILED；RGB保持但independent mean崩至41.84°"},
+        {"document": "修改/0824-06 双法线GT评估", "kind": "本轮新增", "evidence": "11组120帧结果；62/62测试通过", "audit_note": "只改离线评估；默认auto兼容；不重训checkpoint"}
+      ]
+    }
+  },
+  "sources": [
+    {"id": "analysis_snapshot", "label": "本轮审计查询映射与汇总快照", "path": "DOC/报告/0824-CV3s-0823后实验与双法线真值审计/report_query.sql"},
+    {"id": "source_notes", "label": "数据来源、指标口径与图表映射", "path": "DOC/报告/0824-CV3s-0823后实验与双法线真值审计/source_notes.md"},
+    {"id": "doc_modifications", "label": "0823/0824 修改记录", "path": "DOC/修改"},
+    {"id": "doc_reports", "label": "0824 专题报告", "path": "DOC/报告"},
+    {"id": "doc_training", "label": "0823/0824 训练记录", "path": "DOC/训练"},
+    {"id": "run_0823", "label": "0823-01 实验 README", "path": "output/0823-01-CV3s-GTlight_lambert_iter1_3ncons/README.md"},
+    {"id": "run_0824_01", "label": "0824-01 实验 README", "path": "output/0824-01-CV3s-GTlight_lambert_iter1_2ncons/README.md"},
+    {"id": "run_0824_02", "label": "0824-02 实验 README", "path": "output/0824-02-CV3s-GTlight_lambert_iter1_gswrapping/README.md"},
+    {"id": "run_0824_03", "label": "0824-03 实验 README", "path": "output/0824-03-CV3s-SH_default2DGSnormal/README.md"},
+    {"id": "run_0824_04", "label": "0824-04 实验 README", "path": "output/0824-04-CV3s-GTposition_perGSdir_3ncons/README.md"},
+    {"id": "run_0824_05", "label": "0824-05 实验 README", "path": "output/0824-05-CV3s-GTposition_perGSdir_lambert_default/README.md"}
+  ]
+}
