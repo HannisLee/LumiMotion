@@ -14,7 +14,7 @@
 ## 2026-10-02 OnlyCloth V4 实验入口
 
 - [Stage2 Lambertian 使用指南](DOC/指导/1002-01-Stage2-Lambertian训练渲染与续训使用说明.md)：实现分支 `1001-stage2-perlight`，原始 SH Stage1 + 独立 Stage2 双方向光模式。
-- [输出目录速查](DOC/指导/1002-02-输出目录与Stage对应说明.md)：两工作树、模型/渲染/验收产物的用途、输出方式与 Stage 对应。
+- [输出目录说明](DOC/指导/1002-02-输出目录与Stage对应说明.md)：以 `1002-03-onlyclothV4-stage2_GT` 为例，逐块说明命令、模型、渲染与验收产物。
 - [Stage2 三管线对照](DOC/训练/1002-02-onlyclothV4-Stage2三管线对照.md)：同一SH来源的原始IR、GT与learned训练、渲染和验收。
 - [Stage2 验收与限制](DOC/报告/1002-30-Stage2三管线对照验收与限制.md)：同协议整图/前景指标、固定几何和恢复证据，以及材质与光照可辨识性限制。
 - [Stage2 实现与 preset](DOC/修改/1002-28-Stage2屏幕空间Lambertian与Preset适配.md) / [HDR与来源保护](DOC/修改/1002-29-Stage2-HDR轴向回归与来源写入保护.md) / [旧渲染入口识别](DOC/修改/1002-31-Stage2续训配置与旧渲染入口识别.md) / [原始HDR配置读取](DOC/修改/1002-32-原始HDR渲染配置合并修复.md)：算法边界、兼容入口、完整恢复和验证证据。
