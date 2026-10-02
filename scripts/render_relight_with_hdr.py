@@ -151,6 +151,9 @@ def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter, colmap
 
             
 if __name__ == "__main__":
+    from scripts.stage2_compat import dispatch
+    if dispatch("hdr"):
+        raise SystemExit(0)
 
     """
     This script requires substantial cleaning. 

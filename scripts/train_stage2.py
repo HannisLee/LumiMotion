@@ -23,6 +23,8 @@ import uuid
 import tqdm
 from argparse import ArgumentParser, Namespace
 from arguments import ModelParams, PipelineParams, OptimizationParams
+from arguments.stage2 import Stage2PipelineParams, Stage2OptimizationParams, add_stage2_io_arguments, normalize_render_mode
+from scripts.loss_stage2 import apply_loss_preset, build_loss_preset
 from utils.train_report_utils import training_report_relight_screen_space
 import torch.nn.functional as F
 
@@ -41,6 +43,7 @@ class Trainer:
         self.dataset = dataset
         self.args = args
         self.opt = opt
+        self.stage2_loss = build_loss_preset(opt, "original_ir")
         self.pipe = pipe
         self.testing_iterations = testing_iterations
         self.saving_iterations = saving_iterations
@@ -175,70 +178,8 @@ class Trainer:
 
 
         gt_image = viewpoint_cam.original_image_train_light.cuda()
-        if self.opt.train_ray:
-            mask = render_pkg_re["mask"]
-            ray_rgb_gt = gt_image.permute(1, 2, 0)[mask]
-            ray_rgb = image_non_masked.permute(1, 2, 0)[mask]
-            Ll1 = F.l1_loss(ray_rgb, ray_rgb_gt)
-        loss = Ll1
-
-        ## add loss from stage1 colors
-        rendered_image_sh = render_pkg_re["render_sh"]
-        rend_alpha = render_pkg_re['rend_alpha']
-        mask2 = (rend_alpha > 0.9).float()  # (B,1,H,W), we need mask for enerf scenes, where we have areas with manually removed gaussians
-
-        if rendered_image_sh.shape[1] > 1:  # e.g. RGB
-            mask2 = mask2.expand_as(rendered_image_sh)
-
-        masked_render = rendered_image_sh * mask2
-        masked_gt = gt_image * mask2
-
-        lambda_dssim = 0.2
-        loss_sh = (1.0 - lambda_dssim) * l1_loss(masked_render, masked_gt) \
-                + lambda_dssim * (1.0 - ssim(masked_render, masked_gt))
-
-        loss += loss_sh
-
-        ### envmap loss
-        if self.opt.d_lower_hemisphere_weight >0:
-            env_dict = self.env_light.render_env_map(H=64)
-
-            grid = [
-                env_dict["env1"].permute(2, 0, 1),
-                env_dict["env2"].permute(2, 0, 1),
-            ]
-            hdr_tensor = grid[1]  # C, H, W
-
-            c, h, w = hdr_tensor.shape  # Get height, width, channels    
-            penalty_h = round(h * 0.66)
-            penalty = (hdr_tensor[:,penalty_h:,:]**2)
-
-            loss_env_lowerhem = penalty.mean() 
-            loss += self.opt.d_lower_hemisphere_weight*loss_env_lowerhem
-        #########
-
-        ##IRGS losses for tests:
-        if self.opt.lambda_roughness_smooth > 0:
-            rendered_roughness = render_pkg_re["roughness"]
-            loss_roughness_smooth = first_order_edge_aware_loss(rendered_roughness * mask2, masked_gt)
-            loss = loss + self.opt.lambda_roughness_smooth * loss_roughness_smooth
-        
-        if self.opt.lambda_light > 0:
-            light_direct = render_pkg_re["ray_light_direct"]
-            mean_light = light_direct.mean(-1, keepdim=True).expand_as(light_direct)
-            loss_light = F.l1_loss(light_direct, mean_light)
-            loss = loss + self.opt.lambda_light * loss_light
-
-        if self.opt.lambda_light_smooth > 0:
-            env = render_pkg_re["env_only"]
-            loss_light_smooth = tv_loss(env)
-            loss = loss + self.opt.lambda_light_smooth * loss_light_smooth
-        
-        if self.opt.lambda_base_color_smooth > 0:
-            rendered_base_color = render_pkg_re["base_color_linear"]
-            loss_base_color_smooth = first_order_edge_aware_loss(rendered_base_color*mask2, gt_image*mask2)
-            loss = loss + self.opt.lambda_base_color_smooth * loss_base_color_smooth
-        ###
+        loss_result = self.stage2_loss.compute(self, render_pkg_re, gt_image, image_non_masked)
+        Ll1, loss = loss_result.l1, loss_result.total
         loss.backward()
         self.iter_end.record()
 
@@ -312,8 +253,9 @@ if __name__ == "__main__":
     # Set up command line argument parser
     parser = ArgumentParser(description="Training script parameters")
     lp = ModelParams(parser)
-    op = OptimizationParams(parser)
-    pp = PipelineParams(parser)
+    op = Stage2OptimizationParams(parser)
+    pp = Stage2PipelineParams(parser)
+    add_stage2_io_arguments(parser)
 
     parser.add_argument('--load_iter', type=int, default=-1, help="Iteration to load.")
     parser.add_argument('--detect_anomaly', action='store_true', default=False)
@@ -325,6 +267,8 @@ if __name__ == "__main__":
     parser.add_argument("--deform-type", type=str, default='mlp')
 
     args = parser.parse_args(sys.argv[1:])
+    args.render_mode = normalize_render_mode(args.render_mode)
+    apply_loss_preset(args)
     args.save_iterations.append(args.iterations)
     args.test_iterations.append(args.iterations)
 
@@ -336,6 +280,37 @@ if __name__ == "__main__":
     safe_state(args.quiet)
 
     torch.autograd.set_detect_anomaly(args.detect_anomaly)
+    if args.render_mode == "photometric_lambertian":
+        from scripts.stage2_runtime import PhotometricTrainer
+        args.source_path = os.path.abspath(args.source_path)
+        if args.resume_iteration is None and not args.stage1_model_path:
+            parser.error("Lambertian 首次运行必须提供 --stage1_model_path 和 --load_iter。")
+        PhotometricTrainer(args).train()
+        print("Stage2 Lambertian training complete.")
+        sys.exit(0)
+    if args.resume_iteration is not None:
+        parser.error("完整状态恢复仅适用于 photometric_lambertian。")
+    if args.stage1_model_path:
+        from scripts.stage2_runtime import model_dir, file_sha256
+        from pathlib import Path
+        import shutil, json
+        source = model_dir(args.stage1_model_path, args.deform_type)
+        output = Path(args.model_path)
+        if output.exists() and any(output.iterdir()):
+            parser.error("独立 Stage2 基线输出目录必须为空。")
+        if args.load_iter <= 0:
+            parser.error("独立 Stage2 基线必须显式指定正的 --load_iter。")
+        output.mkdir(parents=True, exist_ok=True)
+        hashes = {}
+        for relative in ("point_cloud/iteration_{}/point_cloud.ply", "deform/iteration_{}/deform.pth"):
+            relative = relative.format(args.load_iter)
+            original = source / relative
+            destination = output / relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(original, destination)
+            hashes[str(original)] = file_sha256(original)
+        (output / "stage1_source.json").write_text(json.dumps(hashes, indent=2)+"\n")
+        (output / "stage2_config.json").write_text(json.dumps(vars(args), indent=2)+"\n")
     trainer = Trainer(args=args, dataset=lp.extract(args), opt=op.extract(args), pipe=pp.extract(args),
               testing_iterations=args.test_iterations, saving_iterations=args.save_iterations,
               load_iter=args.load_iter)
@@ -344,5 +319,4 @@ if __name__ == "__main__":
 
     # All done
     print("\nTraining complete.")
-
 

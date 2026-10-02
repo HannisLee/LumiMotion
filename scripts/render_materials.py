@@ -124,6 +124,9 @@ def render_set(dataset: ModelParams, pipeline: PipelineParams, load_iter):
 
             
 if __name__ == "__main__":
+    from scripts.stage2_compat import dispatch
+    if dispatch("materials"):
+        raise SystemExit(0)
     # Set up command line argument parser
     parser = ArgumentParser(description="Testing script parameters")
     model = ModelParams(parser)
