@@ -55,7 +55,7 @@ conda run --no-capture-output -n lumimotion python -m scripts.render_stage2 \
 
 HDR 默认2048确定性球面样本，世界 Z 向上、经度 `atan2(-y,x)`，与原始脚本一致；支持 `--hdr_yaw` / `--hdr_exposure`。先积分线性 irradiance，再按 `rho/pi` 漫反射和线性背景合成，最后转换 sRGB。镜面、阴影和间接光不在本管线内。
 
-旧 `scripts.render_materials` 和 `scripts.render_relight_with_hdr` 自动识别新模型；HDR 保留 `--hdr` 别名。实际参数从 checkpoint 恢复。新增统一入口记录渲染代码版本，旧 IR HDR 入口仍保持原始渲染流程。
+旧 `scripts.render_materials` 和 `scripts.render_relight_with_hdr` 自动识别新模型；HDR 保留 `--hdr` 别名，`--diffuse_sample_num` 可作为 `--hdr_samples` 别名。恢复到新目录且只有resume配置的模型也能识别。实际参数从 checkpoint 恢复。新增统一入口记录渲染代码版本，旧 IR HDR 入口仍保持原始渲染流程。
 
 ## 续训与迁移
 

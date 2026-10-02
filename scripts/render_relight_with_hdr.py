@@ -160,14 +160,8 @@ if __name__ == "__main__":
     For now, please manually adjust lit pixels, timesteps and cameras you need to render.
     """
     # Set up command line argument parser
-    parser = ArgumentParser(description="Testing script parameters")
-    model = ModelParams(parser)
-    pipeline = PipelineParams(parser)
-
-    parser.add_argument('--load_iter', type=int, default=-1, help="Iteration to load.")
-    parser.add_argument("--quiet", action="store_true")
-    parser.add_argument("--colmap_convention", action="store_true", default=False)
-    parser.add_argument("--hdr", type=str, help="Path to hdr.")
+    from scripts.stage2_compat import build_legacy_hdr_parser
+    parser, model, pipeline = build_legacy_hdr_parser()
     
 
 

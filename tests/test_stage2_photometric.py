@@ -3,6 +3,9 @@ import copy
 import math
 import subprocess
 import textwrap
+import tempfile
+from pathlib import Path
+from unittest.mock import patch
 import unittest
 from argparse import ArgumentParser, Namespace
 from types import SimpleNamespace
@@ -13,6 +16,8 @@ from scene.stage2_photometric import (diffuse_color, srgb_to_linear, linear_to_s
 from scripts.loss_stage2 import build_loss_preset, apply_loss_preset
 from arguments import ModelParams
 from arguments.stage2 import Stage2OptimizationParams, Stage2PipelineParams
+from scripts.stage2_compat import find_stage2_config, build_legacy_hdr_parser
+from arguments import get_combined_args
 from utils.loss_utils import l1_loss, ssim, first_order_edge_aware_loss, tv_loss
 
 
@@ -62,6 +67,29 @@ class Stage2PhotometricTest(unittest.TestCase):
         torch.testing.assert_close(clone.albedo,material.albedo)
         self.assertEqual(float(clone.prior()),0)
 
+    def test_legacy_reader_recognizes_resume_only_configuration(self):
+        with tempfile.TemporaryDirectory() as path:
+            root=Path(path)
+            self.assertIsNone(find_stage2_config(root))
+            (root/'resume_35000_config.json').write_text('{}')
+            (root/'resume_40000_config.json').write_text('{}')
+            self.assertEqual(find_stage2_config(root).name,'resume_40000_config.json')
+            (root/'stage2_config.json').write_text('{}')
+            self.assertEqual(find_stage2_config(root).name,'stage2_config.json')
+
+    def test_legacy_hdr_keeps_saved_blender_config_and_explicit_cli_wins(self):
+        with tempfile.TemporaryDirectory() as path:
+            root=Path(path)/'model_mlp';root.mkdir()
+            (root/'cfg_args').write_text(str(Namespace(model_path=str(root),deform_type='mlp',
+                is_blender=True,eval=True,resolution=2,train_light_folder='images',source_path='/saved/data')))
+            parser,_,_=build_legacy_hdr_parser()
+            with patch('sys.argv',['render','--model_path',str(root)]):args=get_combined_args(parser)
+            self.assertTrue(args.is_blender);self.assertTrue(args.eval)
+            self.assertEqual(args.resolution,2);self.assertEqual(args.train_light_folder,'images')
+            self.assertEqual(args.source_path,'/saved/data');self.assertEqual(args.deform_type,'mlp')
+            with patch('sys.argv',['render','--model_path',str(root),'--resolution','4']):args=get_combined_args(parser)
+            self.assertEqual(args.resolution,4)
+
     def test_white_furnace_hdr(self):
         hdr=HDRIrradiance(torch.ones(8,16,3)*2,samples=2048)
         normals=unit_vector(torch.tensor([[0.,0.,1.],[1.,0.,0.],[0.1,0.4,-0.9]]))
@@ -105,13 +133,17 @@ class Stage2PhotometricTest(unittest.TestCase):
                     torch.zeros(1,12,12),material,light)
 
     def test_irgs_loss_matches_initial_commit_with_all_terms(self):
+        # 原始 Trainer 每步强制 train_ray=True；False 分支没有定义 Ll1。
+        self._check_irgs_loss_against_original(True)
+
+    def _check_irgs_loss_against_original(self,train_ray):
         torch.manual_seed(3)
         opt=options(d_lower_hemisphere_weight=0.1,lambda_roughness_smooth=0.02,lambda_light=0.01,
                     lambda_light_smooth=0.03,lambda_base_color_smooth=0.04)
         image=torch.rand(3,16,16,requires_grad=True)
         gt=torch.rand(3,16,16)
         env=torch.rand(12,24,3,requires_grad=True)
-        pkg={'mask':torch.ones(16,16,dtype=torch.bool),'render_sh':torch.rand(3,16,16,requires_grad=True),
+        pkg={'mask':torch.rand(16,16)>0.4,'render_sh':torch.rand(3,16,16,requires_grad=True),
              'rend_alpha':torch.ones(1,16,16),'roughness':torch.rand(3,16,16,requires_grad=True),
              'ray_light_direct':torch.rand(32,3,requires_grad=True),'env_only':torch.rand(3,16,16,requires_grad=True),
              'base_color_linear':torch.rand(3,16,16,requires_grad=True)}
@@ -121,7 +153,7 @@ class Stage2PhotometricTest(unittest.TestCase):
         end=original.index('        loss.backward()',start)
         scope={'self':tr,'render_pkg_re':pkg,'gt_image':gt,'image_non_masked':image,'F':F,
                'l1_loss':l1_loss,'ssim':ssim,'first_order_edge_aware_loss':first_order_edge_aware_loss,'tv_loss':tv_loss}
-        tr.opt.train_ray=True
+        tr.opt.train_ray=train_ray
         exec(textwrap.dedent(original[start:end]),scope)
         result=build_loss_preset(opt,'original_ir').compute(tr,pkg,gt,image)
         torch.testing.assert_close(result.total,scope['loss'],rtol=0,atol=0)

@@ -18,7 +18,7 @@ Stage1 保留原始 SH。Stage2 默认 `original_ir`，新增 `photometric_lambe
 
 `python -m scripts.render_stage2` 统一评估、四类可视化、固定相机转灯和HDR。原有 `render_materials` 和 `render_relight_with_hdr` 自动识别新模型，使用保存配置；HDR的 `--hdr` 保留为别名。新评估使用各帧自己的相机/形变/光照，输出整图及前景指标；前景SSIM/LPIPS明确为遮罩后包围框指标，不冒充逐像素前景均值。不与旧固定形变NVS直接比较。
 
-CPU单测15项通过，覆盖原始IR损失及梯度、方向插值、GT冻结、CLI优先级、Lambertian平面响应、色彩空间、HDR白炉与轴向。两种模式各200步冒烟及完整渲染已完成。GPU检查覆盖真实来源哈希、冻结参数、材质/光照梯度、线性背景合成和完整续训。
+CPU单测17项通过，覆盖原始IR损失及梯度、方向插值、GT冻结、CLI优先级、Lambertian平面响应、色彩空间、HDR白炉与轴向。两种模式各200步冒烟及完整渲染已完成。GPU检查覆盖真实来源哈希、冻结参数、材质/光照梯度、线性背景合成和完整续训。
 
 首次GPU检查直接脚本调用遇到导入路径问题，改用模块调用；第一次严格浮点逐位比较出现最大4.77e-7的albedo logit差异，原因是原始CUDA rasterizer原子累加。完整随机状态/相机队列仍要求一致，浮点参数与优化器改用rtol=1e-5、atol=1e-6做等价验收。失败日志独立保留，未覆盖。
 

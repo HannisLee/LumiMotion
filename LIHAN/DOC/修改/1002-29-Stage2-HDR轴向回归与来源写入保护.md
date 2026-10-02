@@ -12,6 +12,6 @@
 
 ## 验证与保留
 
-CPU 验证现为 15 项：包括原始 IR 总损失和所有梯度逐位一致、HDR 原始矩阵回归、非均匀经度亮区和白炉响应。GPU 真实 checkpoint 验证通过，Python/NumPy/Torch/CUDA 随机状态与相机队列一致；跨进程浮点材质/优化器以 `rtol=1e-5, atol=1e-6` 验收，最大 albedo logit 差异 `4.77e-7`。
+CPU 验证现为 17 项：包括原始 IR 总损失和所有梯度逐位一致、HDR 原始矩阵回归、非均匀经度亮区和白炉响应。IR回归覆盖原始Trainer强制开启的train_ray路径，使用非平凡部分遮罩及全部可选项。补测曾误将False视为原始可执行分支，该分支实际未定义Ll1；修正测试范围，保留unit_tests_15_final.log失败记录，最终通过记录另存unit_tests_15_verified.log。GPU 真实 checkpoint 验证通过，Python/NumPy/Torch/CUDA 随机状态与相机队列一致；跨进程浮点材质/优化器以 `rtol=1e-5, atol=1e-6` 验收，最大 albedo logit 差异 `4.77e-7`。
 
 冒烟中旧轴向 HDR 输出及首次逐位比较失败日志全部保留。修复后的 HDR 必须写入新目录，实验 README 明确标注最终代表输出与早期失败尝试。全分支同步本文件不表示其他分支拥有这些代码。

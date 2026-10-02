@@ -49,6 +49,8 @@ if [[ "$stage2_mode" == original ]]; then
     --output_path "$stage2_output/model_mlp/stage2_insights/ours_55000"
   run_step hdr conda run --no-capture-output -n "$stage2_env" python -m scripts.render_relight_with_hdr \
     --model_path "$stage2_output/model_mlp" --load_iter 55000 --hdr "$stage2_hdr" \
+    --source_path "$stage2_data" --resolution 2 --is_blender --eval --deform_type mlp \
+    --train_light_folder images --test_light_folder images \
     --depth_ratio 0 --diffuse_sample_num 2048 --load2gpu_on_the_fly
 else
   stage2_light_mode=learned_directional
