@@ -1,9 +1,15 @@
 # LumiMotion 文档库与 Agent 工作索引
 
-更新日期：2026-08-29
+更新日期：2026-10-02
 适用范围：本仓库中的 LumiMotion 复现实验、数据准备、Stage 1 训练、离线评估与后续代码维护。
 
 本文件是进入项目后的**第一阅读入口**。它不重复各实验的原始命令或指标；需要执行、判断或修改时，请沿下方链接回到对应的一手文档、脚本和实验产物。当前文档库的唯一入口目录为 `LIHAN/DOC/`。
+
+## 2026-10-02 OnlyCloth V4 实验入口
+
+- [1001-01 原始项目训练记录归档](DOC/训练/1001-01-onlyclothV4-FOVxy修复后原始管线重训.md)：在原始 `/home/lihan/reproduce/LumiMotion` 的 main 分支训练，完整 [产物副本](../output/1001-01-onlyclothV4-FOVxy修复重训/README.md) 已校验归档，原 NVS PSNR 33.3726 dB。
+- [1002-01 perlight 原始管线复现计划](DOC/训练/1002-01-onlyclothV4原始实验归档与perlight原始管线复现.md)：当前目录的原始 SH 两阶段复现；[正式实验](../output/1002-01-onlyclothV4-perlight原始管线复现/README.md) 与 [冒烟实验](../output/smoke_test/1002-01-onlyclothV4-perlight原始管线冒烟/README.md) 分开记录。
+- [1002-02 归档与执行工具记录](DOC/修改/1002-02-onlyclothV4归档与原始复现执行记录.md)：来源标注、venus 环境映射、执行与预检查。
 
 ## 先读什么
 
@@ -11,6 +17,7 @@
 | --- | --- | --- |
 | 了解仓库规则、命名、环境与产物保留要求 | [仓库协作约定](../AGENTS.md) | 本文“Agent 工作流程” |
 | 首次理解项目代码与标准训练阶段 | [项目原始说明](../readme.md) | [Blender 数据训练指导](DOC/指导/blender数据训练指导.md) |
+| jumpingjacks 论文默认 Stage 1 训练与评测 | [0930-01 训练计划与执行记录](DOC/训练/0930-01-jumpingjacks官方原生管线训练.md) | [实验产物、启动器与日志](../output/0930-01-jumpingjacks150_v5_spec32-official_pipeline/README.md) |
 | 新建/检查 Blender 数据集 | [数据集转换指导](DOC/指导/blender数据集转换指导.md) | [训练集加载要求](DOC/指导/训练集加载要求.md) |
 | 延续当前真实方向光实验 | [0829 冒烟训练记录](DOC/训练/0829-01-CV3-真实方向光-LambertianStage1冒烟训练.md) | 该实验目录的 `README.md`、`run.sh`、日志和指标 |
 | 改 Stage 1 损失、预设或法线评估 | [0828 损失/评估完善](DOC/修改/0828-01-Stage1损失预设与法线评估完善.md) | [0826 loss 对象化重构](DOC/修改/0826-01-loss对象与preset组合式重构.md)、相关单测 |
@@ -19,7 +26,7 @@
 ## Agent 工作流程
 
 1. **先确认现场。** 在仓库根目录运行 `hostname` 和 `git status --short`；不得覆盖、删除或回滚自己未产生的改动。当前文档库位于 `LIHAN/DOC/`，不要假设历史路径仍然有效。
-2. **选择正确环境。** 服务器名与 Conda 环境一一对应：`mahadevi` → `lumimotion-mahadevi`、`minakshi` → `lumimotion-minakshi`、`parvati` → `lumimotion-parvati`、`ushas` → `lumimotion-ushas`、`garuda` → `lumimotion-garuda`。本机当前为 `garuda`，命令应使用 `conda run --no-capture-output -n lumimotion-garuda ...` 或等价的已激活环境。
+2. **选择正确环境。** 服务器名与 Conda 环境一一对应：`mahadevi` → `lumimotion-mahadevi`、`minakshi` → `lumimotion-minakshi`、`parvati` → `lumimotion-parvati`、`ushas` → `lumimotion-ushas`、`garuda` → `lumimotion-garuda`。`venus` → `lumimotion`。当前服务器为 `venus`，命令使用 `conda run --no-capture-output -n lumimotion ...` 或对应环境的绝对 Python 路径。
 3. **按任务读一手资料。** 训练前至少阅读“指导”中的训练与加载要求、目标训练记录，以及关联的“修改”文档；代码改动前至少阅读最新修改记录、目标脚本和对应单测。
 4. **让产物成为证据。** 实验结论以 `output/<实验名>/README.md`、完整命令、日志、checkpoint、渲染和 JSON/CSV 指标为准；文档中的摘要不能替代产物核验。冒烟结果只能写在 `output/smoke_test/`，不能作为 35k 正式训练的验收结论。
 5. **完成后补齐记录。** 代码修改写入 `LIHAN/DOC/修改/`；新训练或重新训练写入 `LIHAN/DOC/训练/`。除本入口及实验目录的 `README.md` 外，新增文档使用 `日期-当日序号-修改内容.md` 命名，并以中文记录。

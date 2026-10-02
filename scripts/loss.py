@@ -10,6 +10,8 @@
 # 数值兼容约定：非 PBR 路径保持原损失公式、门控条件与总损失累加顺序。
 # 默认 --loss_preset auto 不覆盖任何参数，显式 CLI 参数始终优先。
 
+from __future__ import annotations
+
 import math
 import sys
 from dataclasses import dataclass, field
