@@ -166,10 +166,13 @@ def load_photometric_run(output,iteration):
 class PhotometricTrainer:
     def __init__(self,args):
         self.args=args;self.output=Path(args.model_path)
-        self.output.mkdir(parents=True,exist_ok=True)
         if args.resume_iteration is None:
-            if (self.output/'stage2_config.json').exists() or (self.output/'stage2_photometric').exists():
+            source=model_dir(args.stage1_model_path,args.deform_type)
+            if self.output.resolve()==source or source in self.output.resolve().parents:
+                raise ValueError('Stage2 输出必须位于只读 Stage1 来源目录之外。')
+            if self.output.exists() and any(self.output.iterdir()):
                 raise ValueError('已有实验禁止覆盖；请使用新目录或 --resume_iteration。')
+            self.output.mkdir(parents=True,exist_ok=True)
             self.context=FrozenScene(args,args.stage1_model_path,args.load_iter)
             self.material=LambertianMaterial(self.context.pc.get_albedo.detach())
             self.light,_=make_light(self.context,args)

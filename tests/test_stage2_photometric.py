@@ -9,7 +9,7 @@ from types import SimpleNamespace
 import torch
 from torch.nn import functional as F
 from scene.stage2_photometric import (diffuse_color, srgb_to_linear, linear_to_srgb,
-    DirectionalLightTable, LambertianMaterial, HDRIrradiance, unit_vector)
+    DirectionalLightTable, LambertianMaterial, HDRIrradiance, unit_vector, world_direction_to_hdr_uv)
 from scripts.loss_stage2 import build_loss_preset, apply_loss_preset
 from arguments import ModelParams
 from arguments.stage2 import Stage2OptimizationParams, Stage2PipelineParams
@@ -66,6 +66,20 @@ class Stage2PhotometricTest(unittest.TestCase):
         hdr=HDRIrradiance(torch.ones(8,16,3)*2,samples=2048)
         normals=unit_vector(torch.tensor([[0.,0.,1.],[1.,0.,0.],[0.1,0.4,-0.9]]))
         torch.testing.assert_close(hdr(normals)/math.pi,torch.full_like(normals,2),atol=0.002,rtol=0.002)
+
+    def test_hdr_axes_match_original_transform(self):
+        directions=unit_vector(torch.tensor([[1.,2.,3.],[-2.,1.,-3.],[1.,-3.,2.],[-1.,-2.,3.]]))
+        transform=torch.tensor([[0.,-1.,0.],[0.,0.,1.],[-1.,0.,0.]])
+        env=directions@transform.T
+        expected=torch.stack((torch.atan2(env[:,0],-env[:,2])/(2*math.pi)+0.5,
+                              torch.acos(env[:,1])/math.pi),-1)
+        torch.testing.assert_close(world_direction_to_hdr_uv(directions),expected)
+        # 非均匀经度图：u=0.25 的亮区应照亮世界 +Y，而不是 -Y。
+        u=(torch.arange(128)+0.5)/128
+        radiance=(1+torch.cos(2*math.pi*(u-0.25))).clamp_min(0)
+        hdr=HDRIrradiance(radiance[None,:,None].expand(64,128,3).clone())
+        response=hdr(torch.tensor([[0.,1.,0.],[0.,-1.,0.]]))
+        self.assertGreater(float(response[0,0]),float(response[1,0])*2)
 
     def test_cli_explicit_wins_and_mode_validation(self):
         opt=options(render_mode='photometric_lambertian',loss_preset='lambertian_default',lambda_dssim=0.5)

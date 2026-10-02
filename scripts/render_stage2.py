@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import subprocess
 from pathlib import Path
 from argparse import Namespace
 import numpy as np
@@ -178,7 +179,8 @@ def hdr_relight(run,output,path,samples=2048,yaw=0.0,exposure=1.0):
     finally:writer.close()
     (output/'hdr.json').write_text(json.dumps({'path':str(Path(path).resolve()),'sha256':file_sha256(path),
         'samples':samples,'yaw_degrees':yaw,'exposure':exposure,'world_up':'Z',
-        'longitude':'atan2(y,x)','integrator':'确定性均匀球面积分；直接漫反射，无遮挡/镜面/间接光'},ensure_ascii=False,indent=2)+'\n')
+        'longitude':'atan2(-y,x)','axis_reference':'原始HDR脚本轴变换 [[0,-1,0],[0,0,1],[-1,0,0]]',
+        'integrator':'确定性均匀球面积分；直接漫反射，无遮挡/镜面/间接光'},ensure_ascii=False,indent=2)+'\n')
 
 
 def run_cli(argv=None):
@@ -193,6 +195,12 @@ def run_cli(argv=None):
     args=parser.parse_args(argv);model=model_dir(args.model_path,args.deform_type)
     output=ensure_directory(args.output_path or model/'renders_stage2'/('ours_'+str(args.load_iter)))
     (output/'command.json').write_text(json.dumps(vars(args),ensure_ascii=False,indent=2)+'\n')
+    repository=Path(__file__).resolve().parents[1]
+    provenance={'code_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=repository).decode().strip(),
+                'code_status':subprocess.check_output(['git','status','--short'],cwd=repository).decode(),
+                'model_path':str(model.resolve()),'iteration':args.load_iter}
+    (output/'code_diff.patch').write_bytes(subprocess.check_output(['git','diff'],cwd=repository))
+    (output/'provenance.json').write_text(json.dumps(provenance,ensure_ascii=False,indent=2)+'\n')
     run=Stage2RenderRun(model,args.load_iter)
     if args.task in {'eval','all'}:evaluate(run,output/'eval')
     if args.task in {'insights','materials','all'}:insights(run,output/'insights')

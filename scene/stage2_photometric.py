@@ -112,8 +112,17 @@ def diffuse_color(albedo_linear, normals, direction, intensity):
     return albedo_linear * directional_irradiance(normals, direction, intensity) / math.pi
 
 
+def world_direction_to_hdr_uv(directions, yaw_degrees=0.0):
+    """与原始 HDR 脚本的轴变换及 EnvLight 经纬映射一致。"""
+    directions = unit_vector(directions)
+    longitude = torch.atan2(-directions[..., 1], directions[..., 0]) - math.radians(yaw_degrees)
+    u = (longitude / (2 * math.pi) + 0.5).remainder(1)
+    v = torch.acos(directions[..., 2].clamp(-1, 1)) / math.pi
+    return torch.stack((u, v), -1)
+
+
 class HDRIrradiance:
-    """世界 Z 为上、经度 atan2(y,x)，确定性均匀球面积分。"""
+    """世界 Z 为上、经度 atan2(-y,x)，确定性均匀球面积分。"""
     def __init__(self, image, samples=2048, yaw_degrees=0.0, exposure=1.0):
         if samples < 16 or exposure < 0 or not math.isfinite(exposure) or not math.isfinite(yaw_degrees):
             raise ValueError("HDR 样本至少16，曝光非负且参数必须有限。")
@@ -124,9 +133,8 @@ class HDRIrradiance:
         phi = i * (math.pi * (3 - math.sqrt(5)))
         radius = (1 - z.square()).sqrt()
         self.directions = torch.stack((radius * phi.cos(), radius * phi.sin(), z), -1)
-        longitude = torch.atan2(self.directions[:, 1], self.directions[:, 0]) - math.radians(yaw_degrees)
-        u = (longitude / (2 * math.pi) + 0.5).remainder(1)
-        v = torch.acos(z) / math.pi
+        uv = world_direction_to_hdr_uv(self.directions, yaw_degrees)
+        u, v = uv.unbind(-1)
         # 水平周期边界，避免经度接缝。
         padded = torch.cat((image[:, -1:], image, image[:, :1]), 1)
         h, w = image.shape[:2]

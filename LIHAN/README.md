@@ -1,7 +1,7 @@
 # LumiMotion 文档库与 Agent 工作索引
 
 更新日期：2026-10-02
-适用范围：本仓库中的 LumiMotion 复现实验、数据准备、Stage 1 训练、离线评估与后续代码维护。
+适用范围：本仓库中的 LumiMotion 复现实验、数据准备、Stage 1/2 训练、离线评估与后续代码维护。
 
 本文件是进入项目后的**第一阅读入口**。它不重复各实验的原始命令或指标；需要执行、判断或修改时，请沿下方链接回到对应的一手文档、脚本和实验产物。当前文档库的唯一入口目录为 `LIHAN/DOC/`。
 
@@ -12,6 +12,10 @@
 - [远端分支归档索引与同步约定](DOC/报告/archive/1002-远端分支文档/1002-03-远端分支文档归档与同步说明.md)：原始论文复现、LH 静态两阶段结果、Stage1 V1/V2/V3/V5、历史环境及配图。
 
 ## 2026-10-02 OnlyCloth V4 实验入口
+
+- [Stage2 Lambertian 使用指南](DOC/指导/1002-01-Stage2-Lambertian训练渲染与续训使用说明.md)：实现分支 `1001-stage2-perlight`，原始 SH Stage1 + 独立 Stage2 双方向光模式。
+- [Stage2 三管线对照](DOC/训练/1002-02-onlyclothV4-Stage2三管线对照.md)：同一SH来源的原始IR、GT与learned训练、渲染和验收。
+- [Stage2 实现与 preset](DOC/修改/1002-28-Stage2屏幕空间Lambertian与Preset适配.md) / [HDR与来源保护](DOC/修改/1002-29-Stage2-HDR轴向回归与来源写入保护.md)：算法边界、兼容入口、完整恢复和验证证据。
 
 - [1001-01 原始项目训练记录归档](DOC/训练/1001-01-onlyclothV4-FOVxy修复后原始管线重训.md)：在原始 `/home/lihan/reproduce/LumiMotion` 的 main 分支训练，完整 [产物副本](../output/1001-01-onlyclothV4-FOVxy修复重训/README.md) 已校验归档，原 NVS PSNR 33.3726 dB。
 - [1002-01 perlight 原始管线复现计划](DOC/训练/1002-01-onlyclothV4原始实验归档与perlight原始管线复现.md)：当前目录的原始 SH 两阶段复现；[正式实验](../output/1002-01-onlyclothV4-perlight原始管线复现/README.md) 与 [冒烟实验](../output/smoke_test/1002-01-onlyclothV4-perlight原始管线冒烟/README.md) 分开记录。

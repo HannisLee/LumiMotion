@@ -3,7 +3,9 @@ import argparse
 import json
 from pathlib import Path
 import torch
-from scripts.stage2_runtime import load_photometric_run
+import numpy as np
+from argparse import Namespace
+from scripts.stage2_runtime import load_photometric_run, PhotometricTrainer
 from gaussian_renderer.render_stage2_lambertian import render_stage2_lambertian
 
 
@@ -18,6 +20,7 @@ def compare(a,b):
     elif isinstance(a,(list,tuple)):
         assert len(a)==len(b)
         for x,y in zip(a,b):compare(x,y)
+    elif isinstance(a,np.ndarray):np.testing.assert_array_equal(a,b)
     else:assert a==b
 
 
@@ -29,8 +32,14 @@ def main():
         continuation=Path('output/smoke_test/1002-'+resume+'-onlyclothV4-stage2_'+mode+'_resume/model_mlp')
         ctx,material,light,config,state=load_photometric_run(base,35200)
         restored=torch.load(continuation/'stage2_photometric/iteration_35200/checkpoint.pth',map_location='cuda')
-        for field in ['material','light','optimizer','camera_stack','rng_torch','rng_cuda']:
+        for field in ['material','light','optimizer','camera_stack','rng_python','rng_numpy','rng_torch','rng_cuda']:
             compare(state[field],restored[field])
+        for forbidden_output in (ctx.source,ctx.source/'stage2_forbidden',base):
+            invalid=Namespace(**vars(config));invalid.model_path=str(forbidden_output)
+            try:PhotometricTrainer(invalid)
+            except ValueError:pass
+            else:raise AssertionError('首次训练未拒绝来源目录或已有结果。')
+        assert not (ctx.source/'stage2_forbidden').exists()
         camera=ctx.train_cameras[0];ctx.load_camera(camera)
         deformation=ctx.deformation(camera);direction=light(camera.fid)
         pkg=render_stage2_lambertian(camera,ctx.pc,material,deformation,ctx.background,
@@ -52,6 +61,7 @@ def main():
                       'resume_float_tolerance':{'rtol':1e-5,'atol':1e-6},
                       'rng_and_camera_stack_exact':True,'material_gradient':True,'light_gradient':mode=='learned',
                       'geometry_frozen':True,'source_hashes_unchanged':True,'linear_background_compositing':True,
+                      'source_and_existing_output_protected':True,
                       'train_light_parameters':int(light.raw_directions.requires_grad)*len(light.times)}
     path=Path(args.output);path.parent.mkdir(parents=True,exist_ok=True)
     path.write_text(json.dumps(checks,ensure_ascii=False,indent=2)+'\n')

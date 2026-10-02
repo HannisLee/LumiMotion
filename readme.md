@@ -1,6 +1,8 @@
 
 # LumiMotion - Improving Gaussian Relighting with Scene Dynamics
 
+本分支 `1001-stage2-perlight` 从原始提交 `9cd834f` 开始，保留 Stage1 SH，新增 Stage2 `photometric_lambertian` 双方向光管线。中文训练、渲染、preset 与续训说明见 [Stage2 使用指南](LIHAN/DOC/指导/1002-01-Stage2-Lambertian训练渲染与续训使用说明.md)，实验结果见 [三管线对照](LIHAN/DOC/训练/1002-02-onlyclothV4-Stage2三管线对照.md)。
+
 [![arXiv](https://img.shields.io/badge/arXiv-Paper-b31b1b.svg)]()
 [![Project Page](https://img.shields.io/badge/Project-Page-blue.svg)](https://joaxkal.github.io/LumiMotion/)
 [![Data](https://img.shields.io/badge/Zenodo-Data-blue.svg?logo=zenodo)](https://zenodo.org/records/18894615)  
