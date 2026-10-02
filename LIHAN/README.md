@@ -5,6 +5,12 @@
 
 本文件是进入项目后的**第一阅读入口**。它不重复各实验的原始命令或指标；需要执行、判断或修改时，请沿下方链接回到对应的一手文档、脚本和实验产物。当前文档库的唯一入口目录为 `LIHAN/DOC/`。
 
+## 全分支共享文档与历史归档
+
+`LIHAN/` 和根目录 `LIHAN.md` 为全分支共享资料。训练、参数与实验记录仍以文中标注的来源分支和提交为准；当前分支未必具备其他分支的模型功能。服务器环境应先运行 `hostname`，再按根目录规则选择，文中的历史环境和本地 `output/` 链接仅供追溯。
+
+- [远端分支归档索引与同步约定](DOC/报告/archive/1002-远端分支文档/1002-03-远端分支文档归档与同步说明.md)：原始论文复现、LH 静态两阶段结果、Stage1 V1/V2/V3/V5、历史环境及配图。
+
 ## 2026-10-02 OnlyCloth V4 实验入口
 
 - [1001-01 原始项目训练记录归档](DOC/训练/1001-01-onlyclothV4-FOVxy修复后原始管线重训.md)：在原始 `/home/lihan/reproduce/LumiMotion` 的 main 分支训练，完整 [产物副本](../output/1001-01-onlyclothV4-FOVxy修复重训/README.md) 已校验归档，原 NVS PSNR 33.3726 dB。
@@ -26,7 +32,7 @@
 ## Agent 工作流程
 
 1. **先确认现场。** 在仓库根目录运行 `hostname` 和 `git status --short`；不得覆盖、删除或回滚自己未产生的改动。当前文档库位于 `LIHAN/DOC/`，不要假设历史路径仍然有效。
-2. **选择正确环境。** 服务器名与 Conda 环境一一对应：`mahadevi` → `lumimotion-mahadevi`、`minakshi` → `lumimotion-minakshi`、`parvati` → `lumimotion-parvati`、`ushas` → `lumimotion-ushas`、`garuda` → `lumimotion-garuda`。`venus` → `lumimotion`。当前服务器为 `venus`，命令使用 `conda run --no-capture-output -n lumimotion ...` 或对应环境的绝对 Python 路径。
+2. **选择正确环境。** 服务器名与 Conda 环境一一对应：`mahadevi` → `lumimotion-mahadevi`、`minakshi` → `lumimotion-minakshi`、`parvati` → `lumimotion-parvati`、`ushas` → `lumimotion-ushas`、`garuda` → `lumimotion-garuda`。`venus` → `lumimotion`。本次同步在 `venus` 完成；执行时以实际 `hostname` 为准。`venus` 命令使用 `conda run --no-capture-output -n lumimotion ...` 或对应环境的绝对 Python 路径。
 3. **按任务读一手资料。** 训练前至少阅读“指导”中的训练与加载要求、目标训练记录，以及关联的“修改”文档；代码改动前至少阅读最新修改记录、目标脚本和对应单测。
 4. **让产物成为证据。** 实验结论以 `output/<实验名>/README.md`、完整命令、日志、checkpoint、渲染和 JSON/CSV 指标为准；文档中的摘要不能替代产物核验。冒烟结果只能写在 `output/smoke_test/`，不能作为 35k 正式训练的验收结论。
 5. **完成后补齐记录。** 代码修改写入 `LIHAN/DOC/修改/`；新训练或重新训练写入 `LIHAN/DOC/训练/`。除本入口及实验目录的 `README.md` 外，新增文档使用 `日期-当日序号-修改内容.md` 命名，并以中文记录。
