@@ -109,4 +109,4 @@ We acknowledge the following useful resources and repositories we built upon whi
 - https://github.com/NJU-3DV/Relightable3DGaussian - codebase for Stage2.  
 - https://github.com/hbb1/diff-surfel-rasterization - Gaussian rasterizer.   
 
-We sincerely thank the authors for making their work open source.  
+We sincerely thank the authors for making their work open source.

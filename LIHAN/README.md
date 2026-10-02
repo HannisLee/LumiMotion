@@ -15,7 +15,8 @@
 
 - [Stage2 Lambertian 使用指南](DOC/指导/1002-01-Stage2-Lambertian训练渲染与续训使用说明.md)：实现分支 `1001-stage2-perlight`，原始 SH Stage1 + 独立 Stage2 双方向光模式。
 - [Stage2 三管线对照](DOC/训练/1002-02-onlyclothV4-Stage2三管线对照.md)：同一SH来源的原始IR、GT与learned训练、渲染和验收。
-- [Stage2 实现与 preset](DOC/修改/1002-28-Stage2屏幕空间Lambertian与Preset适配.md) / [HDR与来源保护](DOC/修改/1002-29-Stage2-HDR轴向回归与来源写入保护.md)：算法边界、兼容入口、完整恢复和验证证据。
+- [Stage2 验收与限制](DOC/报告/1002-30-Stage2三管线对照验收与限制.md)：同协议整图/前景指标、固定几何和恢复证据，以及材质与光照可辨识性限制。
+- [Stage2 实现与 preset](DOC/修改/1002-28-Stage2屏幕空间Lambertian与Preset适配.md) / [HDR与来源保护](DOC/修改/1002-29-Stage2-HDR轴向回归与来源写入保护.md) / [旧渲染入口识别](DOC/修改/1002-31-Stage2续训配置与旧渲染入口识别.md) / [原始HDR配置读取](DOC/修改/1002-32-原始HDR渲染配置合并修复.md)：算法边界、兼容入口、完整恢复和验证证据。
 
 - [1001-01 原始项目训练记录归档](DOC/训练/1001-01-onlyclothV4-FOVxy修复后原始管线重训.md)：在原始 `/home/lihan/reproduce/LumiMotion` 的 main 分支训练，完整 [产物副本](../output/1001-01-onlyclothV4-FOVxy修复重训/README.md) 已校验归档，原 NVS PSNR 33.3726 dB。
 - [1002-01 perlight 原始管线复现计划](DOC/训练/1002-01-onlyclothV4原始实验归档与perlight原始管线复现.md)：当前目录的原始 SH 两阶段复现；[正式实验](../output/1002-01-onlyclothV4-perlight原始管线复现/README.md) 与 [冒烟实验](../output/smoke_test/1002-01-onlyclothV4-perlight原始管线冒烟/README.md) 分开记录。
@@ -25,7 +26,7 @@
 
 | 任务 | 首先阅读 | 然后查看 |
 | --- | --- | --- |
-| 了解仓库规则、命名、环境与产物保留要求 | [仓库协作约定](../AGENTS.md) | 本文“Agent 工作流程” |
+| 了解仓库规则、命名、环境与产物保留要求 | [仓库协作约定](../LIHAN.md) | 本文“Agent 工作流程” |
 | 首次理解项目代码与标准训练阶段 | [项目原始说明](../readme.md) | [Blender 数据训练指导](DOC/指导/blender数据训练指导.md) |
 | jumpingjacks 论文默认 Stage 1 训练与评测 | [0930-01 训练计划与执行记录](DOC/训练/0930-01-jumpingjacks官方原生管线训练.md) | [实验产物、启动器与日志](../output/0930-01-jumpingjacks150_v5_spec32-official_pipeline/README.md) |
 | 新建/检查 Blender 数据集 | [数据集转换指导](DOC/指导/blender数据集转换指导.md) | [训练集加载要求](DOC/指导/训练集加载要求.md) |
