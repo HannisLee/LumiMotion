@@ -1,0 +1,968 @@
+{
+  "日期": "2026-10-02",
+  "来源分支提交": {
+    "main": "396215f217c875b20415fafc456fac370adde860",
+    "PS-stage1-V1": "bfa2c4675b99367f9ae84b0339142293b24be78a",
+    "PS-stage1-V2": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+    "PS-stage1-V3": "ff08af104359177bcb9f758209578ebd7420c9e0",
+    "PS-stage1-V5": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+    "PS-tools-common": "b14cf4193c9a3952703b57533d976191bef848fe",
+    "feature/photometric-lambertian-v1": "daf76ee215c198cc97403970b088346da4c6f03c"
+  },
+  "文件": [
+    {
+      "原始Git对象": "c169120cdb6676f8e847befe77478074ee16fbf3",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/1002-04-main分支Blender数据训练指导.md",
+      "来源": [
+        {
+          "分支": "main",
+          "提交": "396215f217c875b20415fafc456fac370adde860",
+          "原路径": "DOC/blender数据训练指导.md"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "8fa744ab49a95cd516f72d86ec4613800af36a7b",
+      "归档路径": "LIHAN/DOC/指导/blender训练错误报告.md",
+      "来源": [
+        {
+          "分支": "main",
+          "提交": "396215f217c875b20415fafc456fac370adde860",
+          "原路径": "DOC/blender训练错误报告.md"
+        }
+      ],
+      "处理": "已收录，内容完全一致"
+    },
+    {
+      "原始Git对象": "13888373551830c8e5c103e678ffa13e40929cc5",
+      "归档路径": "LIHAN/DOC/报告/archive/only-clothV2训练错误报告.md",
+      "来源": [
+        {
+          "分支": "main",
+          "提交": "396215f217c875b20415fafc456fac370adde860",
+          "原路径": "DOC/only-clothV2训练错误报告.md"
+        }
+      ],
+      "处理": "已收录，内容完全一致"
+    },
+    {
+      "原始Git对象": "be7edd857e9d7ea480a8a9a6bdf225628f4d905c",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/1002-05-LH数据原始两阶段训练指南.md",
+      "来源": [
+        {
+          "分支": "PS-stage1-V1",
+          "提交": "bfa2c4675b99367f9ae84b0339142293b24be78a",
+          "原路径": "DOC/Archive/LH-data-original-training.md"
+        },
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/Archive/LH-data-original-training.md"
+        },
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/Archive/LH-data-original-training.md"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/Archive/LH-data-original-training.md"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/Archive/LH-data-original-training.md"
+        },
+        {
+          "分支": "feature/photometric-lambertian-v1",
+          "提交": "daf76ee215c198cc97403970b088346da4c6f03c",
+          "原路径": "DOC/Archive/LH-data-original-training.md"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "1ec61b1ed3fd237f96c743f03fd8495beba1f0cc",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/1002-06-LH数据原始两阶段训练结果.md",
+      "来源": [
+        {
+          "分支": "PS-stage1-V1",
+          "提交": "bfa2c4675b99367f9ae84b0339142293b24be78a",
+          "原路径": "DOC/Archive/LH-data-two-stage-results.md"
+        },
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/Archive/LH-data-two-stage-results.md"
+        },
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/Archive/LH-data-two-stage-results.md"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/Archive/LH-data-two-stage-results.md"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/Archive/LH-data-two-stage-results.md"
+        },
+        {
+          "分支": "feature/photometric-lambertian-v1",
+          "提交": "daf76ee215c198cc97403970b088346da4c6f03c",
+          "原路径": "DOC/Archive/LH-data-two-stage-results.md"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "b128550caf865f1563598217b098154d38e6b4f8",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/1002-07-minakshi历史Conda环境.md",
+      "来源": [
+        {
+          "分支": "PS-stage1-V1",
+          "提交": "bfa2c4675b99367f9ae84b0339142293b24be78a",
+          "原路径": "DOC/Archive/minakshi-conda环境.md"
+        },
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/Archive/minakshi-conda环境.md"
+        },
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/Archive/minakshi-conda环境.md"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/Archive/minakshi-conda环境.md"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/Archive/minakshi-conda环境.md"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "be7481f318ce35025c3e16b20227309e8c013e10",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/1002-08-Lambertian早期版本执行记录.md",
+      "来源": [
+        {
+          "分支": "PS-stage1-V1",
+          "提交": "bfa2c4675b99367f9ae84b0339142293b24be78a",
+          "原路径": "DOC/Archive/version01.md"
+        },
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/Archive/version01.md"
+        },
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/Archive/version01.md"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/Archive/version01.md"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/Archive/version01.md"
+        },
+        {
+          "分支": "feature/photometric-lambertian-v1",
+          "提交": "daf76ee215c198cc97403970b088346da4c6f03c",
+          "原路径": "DOC/Archive/version01.md"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "efec8cf3de2a46ab6e1810b6dcb199955657fe2d",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/1002-09-原始基线训练超参参考.md",
+      "来源": [
+        {
+          "分支": "PS-stage1-V1",
+          "提交": "bfa2c4675b99367f9ae84b0339142293b24be78a",
+          "原路径": "DOC/Hyperparameters.md"
+        },
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/Hyperparameters.md"
+        },
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/Hyperparameters.md"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/Hyperparameters.md"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/Hyperparameters.md"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "61c76dd1506010c3cdca8ccd1f7f80a812c2eee5",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/1002-10-LH静态数据Stage1早期训练记录.md",
+      "来源": [
+        {
+          "分支": "PS-stage1-V1",
+          "提交": "bfa2c4675b99367f9ae84b0339142293b24be78a",
+          "原路径": "DOC/LH-static-stage1—try.md"
+        },
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/LH-static-stage1V1.md"
+        },
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/LH-static-stage1V1.md"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/LH-static-stage1V1.md"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/LH-static-stage1V1.md"
+        },
+        {
+          "分支": "feature/photometric-lambertian-v1",
+          "提交": "daf76ee215c198cc97403970b088346da4c6f03c",
+          "原路径": "DOC/LH-static-stage1V1.md"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "7b3b8ee22ded1b7ee867b89d7ba4a4d44eec4152",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/1002-11-LH数据转换训练评测与渲染.md",
+      "来源": [
+        {
+          "分支": "PS-stage1-V1",
+          "提交": "bfa2c4675b99367f9ae84b0339142293b24be78a",
+          "原路径": "DOC/LH数据集训练.md"
+        },
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/LH数据集训练.md"
+        },
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/LH数据集训练.md"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/LH数据集训练.md"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/LH数据集训练.md"
+        },
+        {
+          "分支": "feature/photometric-lambertian-v1",
+          "提交": "daf76ee215c198cc97403970b088346da4c6f03c",
+          "原路径": "DOC/LH数据集训练.md"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "70e12e295534534477770268f1b10be11c770d8d",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/1002-12-Stage1两种渲染路径代码梳理.md",
+      "来源": [
+        {
+          "分支": "PS-stage1-V1",
+          "提交": "bfa2c4675b99367f9ae84b0339142293b24be78a",
+          "原路径": "DOC/Stage1两种渲染路径代码梳理.md"
+        },
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/LH-static-stage1V1-Code.md"
+        },
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/stage1-V1-Code_spec.md"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/stage1-V1-Code_spec.md"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/LH-static-stage1V1-Code.md"
+        },
+        {
+          "分支": "feature/photometric-lambertian-v1",
+          "提交": "daf76ee215c198cc97403970b088346da4c6f03c",
+          "原路径": "DOC/LH-static-stage1V1-Code.md"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "786bc2cbb2f465d80dfca85d3f49208e4e87c1a1",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/assets/lh-data-two-stage/cat_stage1_iter35000_rgb.png",
+      "来源": [
+        {
+          "分支": "PS-stage1-V1",
+          "提交": "bfa2c4675b99367f9ae84b0339142293b24be78a",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage1_iter35000_rgb.png"
+        },
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage1_iter35000_rgb.png"
+        },
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage1_iter35000_rgb.png"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage1_iter35000_rgb.png"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage1_iter35000_rgb.png"
+        },
+        {
+          "分支": "feature/photometric-lambertian-v1",
+          "提交": "daf76ee215c198cc97403970b088346da4c6f03c",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage1_iter35000_rgb.png"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "d11ebf994f5ea03b0ad7ba487309382676f0cf7f",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/assets/lh-data-two-stage/cat_stage1_iter5000_rgb.png",
+      "来源": [
+        {
+          "分支": "PS-stage1-V1",
+          "提交": "bfa2c4675b99367f9ae84b0339142293b24be78a",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage1_iter5000_rgb.png"
+        },
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage1_iter5000_rgb.png"
+        },
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage1_iter5000_rgb.png"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage1_iter5000_rgb.png"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage1_iter5000_rgb.png"
+        },
+        {
+          "分支": "feature/photometric-lambertian-v1",
+          "提交": "daf76ee215c198cc97403970b088346da4c6f03c",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage1_iter5000_rgb.png"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "9eb8db90d75266895fac84322b6fc4ebe00bf24f",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/assets/lh-data-two-stage/cat_stage2_iter55000_albedo.png",
+      "来源": [
+        {
+          "分支": "PS-stage1-V1",
+          "提交": "bfa2c4675b99367f9ae84b0339142293b24be78a",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage2_iter55000_albedo.png"
+        },
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage2_iter55000_albedo.png"
+        },
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage2_iter55000_albedo.png"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage2_iter55000_albedo.png"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage2_iter55000_albedo.png"
+        },
+        {
+          "分支": "feature/photometric-lambertian-v1",
+          "提交": "daf76ee215c198cc97403970b088346da4c6f03c",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage2_iter55000_albedo.png"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "c53777c70775f94b9a5c6e36ed4176387dbc7a4a",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/assets/lh-data-two-stage/cat_stage2_iter55000_rgb.png",
+      "来源": [
+        {
+          "分支": "PS-stage1-V1",
+          "提交": "bfa2c4675b99367f9ae84b0339142293b24be78a",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage2_iter55000_rgb.png"
+        },
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage2_iter55000_rgb.png"
+        },
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage2_iter55000_rgb.png"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage2_iter55000_rgb.png"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage2_iter55000_rgb.png"
+        },
+        {
+          "分支": "feature/photometric-lambertian-v1",
+          "提交": "daf76ee215c198cc97403970b088346da4c6f03c",
+          "原路径": "DOC/assets/lh-data-two-stage/cat_stage2_iter55000_rgb.png"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "53b65dc922a156820c0580ff3a7dc9a58e752f9e",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/assets/lh-data-two-stage/rubber_duck_stage1_iter35000_rgb.png",
+      "来源": [
+        {
+          "分支": "PS-stage1-V1",
+          "提交": "bfa2c4675b99367f9ae84b0339142293b24be78a",
+          "原路径": "DOC/assets/lh-data-two-stage/rubber_duck_stage1_iter35000_rgb.png"
+        },
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/assets/lh-data-two-stage/rubber_duck_stage1_iter35000_rgb.png"
+        },
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/assets/lh-data-two-stage/rubber_duck_stage1_iter35000_rgb.png"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/assets/lh-data-two-stage/rubber_duck_stage1_iter35000_rgb.png"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/assets/lh-data-two-stage/rubber_duck_stage1_iter35000_rgb.png"
+        },
+        {
+          "分支": "feature/photometric-lambertian-v1",
+          "提交": "daf76ee215c198cc97403970b088346da4c6f03c",
+          "原路径": "DOC/assets/lh-data-two-stage/rubber_duck_stage1_iter35000_rgb.png"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "352289ab06695485d8f61fbdce69cd452fcc7ba0",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/assets/lh-data-two-stage/rubber_duck_stage2_iter55000_albedo.png",
+      "来源": [
+        {
+          "分支": "PS-stage1-V1",
+          "提交": "bfa2c4675b99367f9ae84b0339142293b24be78a",
+          "原路径": "DOC/assets/lh-data-two-stage/rubber_duck_stage2_iter55000_albedo.png"
+        },
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/assets/lh-data-two-stage/rubber_duck_stage2_iter55000_albedo.png"
+        },
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/assets/lh-data-two-stage/rubber_duck_stage2_iter55000_albedo.png"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/assets/lh-data-two-stage/rubber_duck_stage2_iter55000_albedo.png"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/assets/lh-data-two-stage/rubber_duck_stage2_iter55000_albedo.png"
+        },
+        {
+          "分支": "feature/photometric-lambertian-v1",
+          "提交": "daf76ee215c198cc97403970b088346da4c6f03c",
+          "原路径": "DOC/assets/lh-data-two-stage/rubber_duck_stage2_iter55000_albedo.png"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "bd671895708bbf1b49f8fe7dad93e253e8738c38",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/assets/lh-data-two-stage/rubber_duck_stage2_iter55000_rgb.png",
+      "来源": [
+        {
+          "分支": "PS-stage1-V1",
+          "提交": "bfa2c4675b99367f9ae84b0339142293b24be78a",
+          "原路径": "DOC/assets/lh-data-two-stage/rubber_duck_stage2_iter55000_rgb.png"
+        },
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/assets/lh-data-two-stage/rubber_duck_stage2_iter55000_rgb.png"
+        },
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/assets/lh-data-two-stage/rubber_duck_stage2_iter55000_rgb.png"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/assets/lh-data-two-stage/rubber_duck_stage2_iter55000_rgb.png"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/assets/lh-data-two-stage/rubber_duck_stage2_iter55000_rgb.png"
+        },
+        {
+          "分支": "feature/photometric-lambertian-v1",
+          "提交": "daf76ee215c198cc97403970b088346da4c6f03c",
+          "原路径": "DOC/assets/lh-data-two-stage/rubber_duck_stage2_iter55000_rgb.png"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "f6e95a368c81a257bb112e4f308bb00031c64511",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/1002-13-Stage1-V3.2代码说明.md",
+      "来源": [
+        {
+          "分支": "PS-stage1-V1",
+          "提交": "bfa2c4675b99367f9ae84b0339142293b24be78a",
+          "原路径": "DOC/stage1-V3.2-Code_spec.md"
+        },
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/stage1-V3.2-Code_spec.md"
+        },
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/stage1-V3.2-Code_spec.md"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/stage1-V3.2-Code_spec.md"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/stage1-V3.2-Code_spec.md"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "8759020b3ced6588ec974faf122ed511c929fef2",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/1002-14-Stage1-V3.2推荐参数.md",
+      "来源": [
+        {
+          "分支": "PS-stage1-V1",
+          "提交": "bfa2c4675b99367f9ae84b0339142293b24be78a",
+          "原路径": "DOC/stage1-V3.2-参数.md"
+        },
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/stage1-V3.2-参数.md"
+        },
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/stage1-V3.2-参数.md"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/stage1-V3.2-参数.md"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/stage1-V3.2-参数.md"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "8cd36526165fa48a507e639aed4d71be319c46ac",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/1002-15-Stage1光照模型版本说明.md",
+      "来源": [
+        {
+          "分支": "PS-stage1-V1",
+          "提交": "bfa2c4675b99367f9ae84b0339142293b24be78a",
+          "原路径": "DOC/stage1-version.md"
+        },
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/stage1-version.md"
+        },
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/stage1-version.md"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/stage1-version.md"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/stage1-version.md"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "a45a23a8526014e0f4206afbd36d0135ccef17b3",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/1002-16-Stage1光照模型版本说明.md",
+      "来源": [
+        {
+          "分支": "PS-stage1-V1",
+          "提交": "bfa2c4675b99367f9ae84b0339142293b24be78a",
+          "原路径": "DOC/version.md"
+        },
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/version.md"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/version.md"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "27522e0cfbd67c2c1d5c76d745b50047a60f2fb2",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/1002-17-合成数据集原始论文复现指南.md",
+      "来源": [
+        {
+          "分支": "PS-stage1-V1",
+          "提交": "bfa2c4675b99367f9ae84b0339142293b24be78a",
+          "原路径": "DOC/复现.md"
+        },
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/复现.md"
+        },
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/复现.md"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/复现.md"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/复现.md"
+        },
+        {
+          "分支": "feature/photometric-lambertian-v1",
+          "提交": "daf76ee215c198cc97403970b088346da4c6f03c",
+          "原路径": "DOC/复现.md"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "cd194afe0cff6c9f374d1db17790529bf6dbad36",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/1002-18-代码流程与数据流总览.md",
+      "来源": [
+        {
+          "分支": "PS-stage1-V1",
+          "提交": "bfa2c4675b99367f9ae84b0339142293b24be78a",
+          "原路径": "DOC/数据流.md"
+        },
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/数据流.md"
+        },
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/数据流.md"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/数据流.md"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/数据流.md"
+        },
+        {
+          "分支": "feature/photometric-lambertian-v1",
+          "提交": "daf76ee215c198cc97403970b088346da4c6f03c",
+          "原路径": "DOC/数据流.md"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "e821676cab56e5d5efe929c034179ff394d59be6",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/1002-19-Stage1-V2代码改动说明.md",
+      "来源": [
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/LH-static-stage1-V2-Code.md"
+        },
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/stage1-V2-Code_spec.md"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/stage1-V2-Code_spec.md"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/LH-static-stage1-V2-Code.md"
+        },
+        {
+          "分支": "feature/photometric-lambertian-v1",
+          "提交": "daf76ee215c198cc97403970b088346da4c6f03c",
+          "原路径": "DOC/LH-static-stage1-V2-Code.md"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "c61694f2218dc8e30121a6be90350688c633ff8c",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/1002-20-LH静态数据Stage1-V2完整训练结果.md",
+      "来源": [
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/LH-static-stage1-V2-LH-staticv2-results.md"
+        },
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/LH-static-stage1-V2-LH-staticv2-results.md"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/LH-static-stage1-V2-LH-staticv2-results.md"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/LH-static-stage1-V2-LH-staticv2-results.md"
+        },
+        {
+          "分支": "feature/photometric-lambertian-v1",
+          "提交": "daf76ee215c198cc97403970b088346da4c6f03c",
+          "原路径": "DOC/LH-static-stage1-V2-LH-staticv2-results.md"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "ec99de24822e7f3cf33d2dc528a105b322d9aefd",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/1002-21-LH静态数据Stage1-V2训练方案.md",
+      "来源": [
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/LH-static-stage1-V2.md"
+        },
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/LH-static-stage1-V2.md"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/LH-static-stage1-V2.md"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/LH-static-stage1-V2.md"
+        },
+        {
+          "分支": "feature/photometric-lambertian-v1",
+          "提交": "daf76ee215c198cc97403970b088346da4c6f03c",
+          "原路径": "DOC/LH-static-stage1-V2.md"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "088ef93dea21b52c8fcc6026950f51d2017bdd20",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/1002-22-历史训练测试流程.md",
+      "来源": [
+        {
+          "分支": "PS-stage1-V2",
+          "提交": "9021a8d8eb0d2ac8e8149aa29403544bb0278f20",
+          "原路径": "DOC/训练测试流程.md"
+        },
+        {
+          "分支": "PS-tools-common",
+          "提交": "b14cf4193c9a3952703b57533d976191bef848fe",
+          "原路径": "DOC/训练测试流程.md"
+        },
+        {
+          "分支": "feature/photometric-lambertian-v1",
+          "提交": "daf76ee215c198cc97403970b088346da4c6f03c",
+          "原路径": "DOC/训练测试流程.md"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "b70e9377fefafcb58cfd4b9b3ec534683e6f2076",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/1002-23-Stage1-V3.1推荐参数.md",
+      "来源": [
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/stage1-V3.1-参数.md"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/stage1-V3.1-参数.md"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "e0bfc90c9f753e6b48886afcba15953620f1e7c9",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/1002-24-Stage1光照模型版本说明.md",
+      "来源": [
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/version.md"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/version.md"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "acbac1104afdd2048c039811d677bd18f3f66355",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/1002-25-历史训练测试流程.md",
+      "来源": [
+        {
+          "分支": "PS-stage1-V3",
+          "提交": "ff08af104359177bcb9f758209578ebd7420c9e0",
+          "原路径": "DOC/训练测试流程.md"
+        },
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/训练测试流程.md"
+        }
+      ],
+      "处理": "新增归档"
+    },
+    {
+      "原始Git对象": "2786e1bdf9269bc64ab27d854ff05d2928cead4b",
+      "归档路径": "LIHAN/DOC/报告/archive/1002-远端分支文档/1002-26-Stage1-V5相机后方椭圆光照初始化.md",
+      "来源": [
+        {
+          "分支": "PS-stage1-V5",
+          "提交": "668e83e1ed0894381abd76c28d1dce9ab97b6a12",
+          "原路径": "DOC/stage1-V5-camera-back-ellipse.md"
+        }
+      ],
+      "处理": "新增中文译文；参数和命令原样保留"
+    }
+  ]
+}
