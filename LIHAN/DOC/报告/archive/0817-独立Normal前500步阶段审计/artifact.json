@@ -1,0 +1,177 @@
+{
+  "surface": "report",
+  "manifest": {
+    "version": 1,
+    "surface": "report",
+    "title": "GT Light 5.5 独立 Normal：前 500 步阶段审计",
+    "description": "CV3 与 CV3L independent-normal 前 500 步失败证据、调度根因再审及替代训练设计。",
+    "generatedAt": "2026-08-17T09:00:00Z",
+    "cards": [
+      {
+        "id": "cv3_card",
+        "description": "CV3 前 500 步法线变化",
+        "dataset": "summary_cards",
+        "sourceId": "derived_snapshot",
+        "filter": {"dataset": "CV3"},
+        "metrics": [
+          {"label": "10500 mean", "field": "after_mean_deg", "format": "number"},
+          {"label": "mean 变化", "field": "delta_mean_deg", "format": "number", "signed": true},
+          {"label": "改善帧", "field": "improved_frames", "format": "number"}
+        ]
+      },
+      {
+        "id": "cv3l_card",
+        "description": "CV3L 前 500 步法线变化",
+        "dataset": "summary_cards",
+        "sourceId": "derived_snapshot",
+        "filter": {"dataset": "CV3L"},
+        "metrics": [
+          {"label": "10500 mean", "field": "after_mean_deg", "format": "number"},
+          {"label": "mean 变化", "field": "delta_mean_deg", "format": "number", "signed": true},
+          {"label": "改善帧", "field": "improved_frames", "format": "number"}
+        ]
+      }
+    ],
+    "charts": [
+      {
+        "id": "normal_error_chart",
+        "title": "两个数据集的法线角误差均整体恶化",
+        "subtitle": "角度越低越好；10001 为独立 normal 初始化点，10500 为训练 500 步后。",
+        "intent": "comparison",
+        "question": "独立 normal 的 RGB 梯度是否在 500 步内改善 GT normal？",
+        "rationale": "分组柱形图直接比较相同指标在训练前后的绝对角误差。",
+        "comparisonContext": {"baseline": "iteration 10001", "grain": "数据集 × 指标", "unit": "degree", "semanticFamily": "normal angular error"},
+        "type": "bar",
+        "dataset": "normal_metrics",
+        "sourceId": "derived_snapshot",
+        "encodings": {
+          "x": {"field": "dataset_metric", "type": "nominal", "label": "数据集与统计量"},
+          "y": {"fields": ["iteration_10001_deg", "iteration_10500_deg"], "type": "quantitative", "label": "角误差", "unit": "°"}
+        },
+        "xAxisTitle": "数据集与统计量",
+        "yAxisTitle": "角误差（度，越低越好）",
+        "valueFormat": "number",
+        "unit": "°",
+        "layout": "full",
+        "maxRows": 6,
+        "surface": {"surface": "explorer", "viewMode": "both", "interactiveLegend": true}
+      },
+      {
+        "id": "normal_drift_chart",
+        "title": "独立 normal 本身已快速移动",
+        "subtitle": "geometry 与 light 均为零变化，但 normal 在 500 步内平均漂移约 15°。",
+        "intent": "comparison",
+        "type": "bar",
+        "dataset": "normal_drift",
+        "sourceId": "derived_snapshot",
+        "encodings": {
+          "x": {"field": "dataset", "type": "nominal", "label": "数据集"},
+          "y": {"fields": ["mean_deg", "p95_deg"], "type": "quantitative", "label": "相对初始化 normal 的漂移角", "unit": "°"}
+        },
+        "xAxisTitle": "数据集",
+        "yAxisTitle": "相对初始化 normal 的漂移角（度）",
+        "valueFormat": "number",
+        "unit": "°",
+        "layout": "full",
+        "maxRows": 2
+      }
+    ],
+    "tables": [
+      {
+        "id": "freeze_table",
+        "title": "冻结项与可学习项核验",
+        "subtitle": "10001 与 10500 checkpoint 的逐元素比较。",
+        "dataset": "freeze_audit",
+        "sourceId": "derived_snapshot",
+        "density": "dense",
+        "layout": "full",
+        "columns": [
+          {"field": "dataset", "label": "数据集", "type": "text"},
+          {"field": "gaussians", "label": "GS 数", "format": "number"},
+          {"field": "position_max_abs", "label": "position max", "format": "number"},
+          {"field": "rotation_max_abs", "label": "rotation max", "format": "number"},
+          {"field": "scale_max_abs", "label": "scale max", "format": "number"},
+          {"field": "opacity_max_abs", "label": "opacity max", "format": "number"},
+          {"field": "light_dir_max_abs", "label": "light max", "format": "number"},
+          {"field": "normal_drift_mean_deg", "label": "normal 平均漂移°", "format": "number"},
+          {"field": "albedo_raw_mean_abs", "label": "albedo 平均变化", "format": "number"}
+        ]
+      },
+      {
+        "id": "run_status_table",
+        "title": "运行状态",
+        "subtitle": "两条 35k 训练均提前退出，最新持久化 checkpoint 为 10500。",
+        "dataset": "run_status",
+        "sourceId": "derived_snapshot",
+        "density": "dense",
+        "layout": "full",
+        "columns": [
+          {"field": "dataset", "label": "数据集", "type": "text"},
+          {"field": "target_iteration", "label": "目标", "format": "number"},
+          {"field": "log_stopped_near_iteration", "label": "日志停止", "format": "number"},
+          {"field": "latest_checkpoint", "label": "最新 checkpoint", "format": "number"},
+          {"field": "traceback", "label": "Traceback", "type": "text"},
+          {"field": "result", "label": "阶段结论", "type": "text"}
+        ]
+      }
+    ],
+    "sources": [
+      {"id": "derived_snapshot", "label": "阶段审计汇总与冻结差分查询", "path": "DOC/报告/0817-独立Normal前500步阶段审计/report_query.sql"},
+      {"id": "cv3_metrics_10001", "label": "CV3 iteration 10001 全 120 帧 normal 指标", "path": "output/不重要/0817-04-CV3-GTlight_i5p5_explicit_normal/normal_gt_eval_independent/ours_10001/normal_metrics.json"},
+      {"id": "cv3_metrics_10500", "label": "CV3 iteration 10500 全 120 帧 normal 指标", "path": "output/不重要/0817-04-CV3-GTlight_i5p5_explicit_normal/normal_gt_eval_independent/ours_10500/normal_metrics.json"},
+      {"id": "cv3l_metrics_10001", "label": "CV3L iteration 10001 全 120 帧 normal 指标", "path": "output/不重要/0817-05-CV3L-GTlight_i5p5_explicit_normal/normal_gt_eval_independent/ours_10001/normal_metrics.json"},
+      {"id": "cv3l_metrics_10500", "label": "CV3L iteration 10500 全 120 帧 normal 指标", "path": "output/不重要/0817-05-CV3L-GTlight_i5p5_explicit_normal/normal_gt_eval_independent/ours_10500/normal_metrics.json"}
+    ],
+    "blocks": [
+      {"id": "reaudit_update", "type": "markdown", "sourceId": "derived_snapshot", "body": "## 再审更新：旧实验 FAILED，替代训练已启动\n\n旧实验的失败数据保留，但其 `albedo_only` 阶段实际同时训练了 albedo 与 independent normal；CV3L 还错误复用了 CV3 的 5.5 光强。重新标定得到 CV3 **5.50435**、CV3L **7.84349**。新训练在 10001–10500 严格只训练 albedo，10501 起冻结 albedo、只训练 normal（LR `1e-4`），并加入权重 `0.01` 的非 GT 初始化信赖先验。下方旧结论与旧建议作为失败证据保留，已由本更新取代。"},
+      {"id": "oracle_update", "type": "markdown", "sourceId": "derived_snapshot", "body": "## 方向光模型上限\n\n使用 GT normal 与 GT albedo 的 oracle 校准中，CV3 foreground PSNR 为 **16.318 dB**，CV3L 为 **16.524 dB**。全局方向光相对逐点近场光方向的平均误差约 **6.2°–7.7°**，P95 约 **10.4°–12.9°**，最大值 CV3 **14.39°**、CV3L **19.74°**。因此新训练必须以 GT normal 离线角误差验收，不能只看 RGB loss。"},
+      {"id": "executive_summary", "type": "markdown", "sourceId": "derived_snapshot", "body": "## 阶段结论：FAILED\n\n独立 normal 与冻结机制工作正常，但 RGB Lambertian 优化在两个数据集上都系统性推离 GT normal。CV3 mean 角误差 **23.72° → 27.25°**，CV3L **25.39° → 28.15°**；两组均为 **0/120 帧改善**。当前配置不应直接续训到 35k。"},
+      {"id": "metrics", "type": "metric-strip", "cardIds": ["cv3_card", "cv3l_card"]},
+      {"id": "error_chart", "type": "chart", "chartId": "normal_error_chart"},
+      {"id": "interpretation", "type": "markdown", "sourceId": "derived_snapshot", "body": "## 这说明什么\n\n本次实验已经把 geometry/deformation/light 的代偿通道关掉，因此失败不能再归因于 GS normal 被固定。normal 平均漂移约 15°，说明梯度很强，但方向错误。albedo 同时大幅变化，首要怀疑是 normal–albedo 不可辨识性；其次需要排查 directional-light 近似、light/normal 符号与空间约定，以及 normal LR。"},
+      {"id": "drift_chart", "type": "chart", "chartId": "normal_drift_chart"},
+      {"id": "freeze", "type": "table", "tableId": "freeze_table"},
+      {"id": "next_steps", "type": "markdown", "sourceId": "derived_snapshot", "body": "## 下一步最小审计\n\n1. 从 10001 开始固定 albedo，只训练 normal 50–100 步。\n2. 对 1 Gaussian / 1 pixel 做 autograd 与 finite-difference 对照，并记录 `grad · (n_gt - n)`。\n3. 用解析 Lambertian 单点闭环排除相机、GS 与坐标变换。\n4. 通过后再测三条不共面 GT light 共享 normal；LR 从 1e-4 或 1e-5 起，并加初始化角度信赖域。"},
+      {"id": "status", "type": "table", "tableId": "run_status_table"},
+      {"id": "limitations", "type": "markdown", "sourceId": "derived_snapshot", "body": "## 限制\n\n这是 10001→10500 的阶段审计，不是 35k 最终结果。两条训练进程均提前退出且无 Python traceback，最新落盘 checkpoint 为 10500。CV3L 的 P95 微降不构成恢复：mean/median 显著恶化，且逐帧 mean 为 120/120 恶化。"}
+    ]
+  },
+  "snapshot": {
+    "version": 1,
+    "generatedAt": "2026-08-17T09:00:00Z",
+    "status": "ready",
+    "datasets": {
+      "summary_cards": [
+        {"dataset": "CV3", "after_mean_deg": 27.245435, "delta_mean_deg": 3.526117, "improved_frames": 0},
+        {"dataset": "CV3L", "after_mean_deg": 28.147734, "delta_mean_deg": 2.762412, "improved_frames": 0}
+      ],
+      "normal_metrics": [
+        {"dataset_metric": "CV3 · mean", "iteration_10001_deg": 23.719318, "iteration_10500_deg": 27.245435},
+        {"dataset_metric": "CV3 · median", "iteration_10001_deg": 15.652022, "iteration_10500_deg": 20.130081},
+        {"dataset_metric": "CV3 · P95", "iteration_10001_deg": 67.631985, "iteration_10500_deg": 69.469210},
+        {"dataset_metric": "CV3L · mean", "iteration_10001_deg": 25.385322, "iteration_10500_deg": 28.147734},
+        {"dataset_metric": "CV3L · median", "iteration_10001_deg": 19.017694, "iteration_10500_deg": 24.230737},
+        {"dataset_metric": "CV3L · P95", "iteration_10001_deg": 68.900562, "iteration_10500_deg": 68.490627}
+      ],
+      "normal_drift": [
+        {"dataset": "CV3", "mean_deg": 15.652658, "p95_deg": 35.181640},
+        {"dataset": "CV3L", "mean_deg": 14.896496, "p95_deg": 33.175027}
+      ],
+      "freeze_audit": [
+        {"dataset": "CV3", "gaussians": 16059, "position_max_abs": 0, "rotation_max_abs": 0, "scale_max_abs": 0, "opacity_max_abs": 0, "light_dir_max_abs": 0, "normal_drift_mean_deg": 15.652658, "albedo_raw_mean_abs": 0.172036},
+        {"dataset": "CV3L", "gaussians": 16404, "position_max_abs": 0, "rotation_max_abs": 0, "scale_max_abs": 0, "opacity_max_abs": 0, "light_dir_max_abs": 0, "normal_drift_mean_deg": 14.896496, "albedo_raw_mean_abs": 0.163639}
+      ],
+      "run_status": [
+        {"dataset": "CV3", "target_iteration": 35000, "log_stopped_near_iteration": 13063, "latest_checkpoint": 10500, "traceback": "未发现", "result": "FAILED"},
+        {"dataset": "CV3L", "target_iteration": 35000, "log_stopped_near_iteration": 12320, "latest_checkpoint": 10500, "traceback": "未发现", "result": "FAILED"}
+      ]
+    }
+  },
+  "sources": [
+    {"id": "derived_snapshot", "label": "阶段审计汇总与冻结差分查询", "path": "DOC/报告/0817-独立Normal前500步阶段审计/report_query.sql"},
+    {"id": "cv3_metrics_10001", "label": "CV3 iteration 10001 normal metrics", "path": "output/不重要/0817-04-CV3-GTlight_i5p5_explicit_normal/normal_gt_eval_independent/ours_10001/normal_metrics.json"},
+    {"id": "cv3_metrics_10500", "label": "CV3 iteration 10500 normal metrics", "path": "output/不重要/0817-04-CV3-GTlight_i5p5_explicit_normal/normal_gt_eval_independent/ours_10500/normal_metrics.json"},
+    {"id": "cv3l_metrics_10001", "label": "CV3L iteration 10001 normal metrics", "path": "output/不重要/0817-05-CV3L-GTlight_i5p5_explicit_normal/normal_gt_eval_independent/ours_10001/normal_metrics.json"},
+    {"id": "cv3l_metrics_10500", "label": "CV3L iteration 10500 normal metrics", "path": "output/不重要/0817-05-CV3L-GTlight_i5p5_explicit_normal/normal_gt_eval_independent/ours_10500/normal_metrics.json"}
+  ]
+}

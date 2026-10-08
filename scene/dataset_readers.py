@@ -201,8 +201,8 @@ def readCamerasFromTransforms(path, transformsfile, train_light, white_backgroun
             image_train_light = Image.fromarray(np.array(arr_train_light * 255.0, dtype=np.byte), "RGBA" if arr_train_light.shape[-1] == 4 else "RGB")
 
             fovy = focal2fov(fov2focal(fovx, image_train_light.size[0]), image_train_light.size[1])
-            FovY = fovx
-            FovX = fovy
+            FovX = fovx
+            FovY = fovy
 
             cam_infos.append(CameraInfo(uid=idx, R=R, T=T, FovY=FovY, FovX=FovX, 
                                         image_train_light=image_train_light, image_path_train_light=image_path_train_light, image_name_train_light=image_name_train_light, 
