@@ -1,9 +1,54 @@
 # LumiMotion 文档库与 Agent 工作索引
 
-更新日期：2026-10-02
+更新日期：2026-10-07
 适用范围：本仓库中的 LumiMotion 复现实验、数据准备、Stage 1/2 训练、离线评估与后续代码维护。
 
 本文件是进入项目后的**第一阅读入口**。它不重复各实验的原始命令或指标；需要执行、判断或修改时，请沿下方链接回到对应的一手文档、脚本和实验产物。当前文档库的唯一入口目录为 `LIHAN/DOC/`。
+
+
+## 1008 通用前景 MAE 使用指导
+
+[简明指导](DOC/指导/1008-01-通用前景MAE评测使用指导.md)：Albedo、Normal、Roughness 均使用全前景，不按材质或物体类别拆分。更换数据集只需替换模型/GT路径；roughness直接读取逐帧浮点真值，不绑定场景、帧数或分辨率。[修改与核验](DOC/修改/1008-42-通用前景MAE与逐帧粗糙度真值评测.md)，33项测试、三项各15帧实际评测、通用纹理场景核验通过。
+
+## 1008 CV4 Roughness MAE（历史材质分区协议）
+
+[实现与真实权重验收](DOC/修改/1008-41-CV4静态PBR粗糙度MAE评测与真值核验.md)：原版1006-01/55k，15测试帧，roughness条件MAE **0.18104681**、四材质bMAE **0.24102391**、覆盖率 **99.991658%**。Blender四材质常量核验、黑白背景渲染一致性、21项测试及独立CPU复算通过；木框误差最高。未修改原PBR训练/渲染。[完整产物](/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1008-01-CV4-PBR-Roughness-MAE/README.md)。
+
+## 1007 动态 Stage1 质量差异审计
+
+[1006-11 与 1006-03 审计报告](DOC/报告/1007-01-1006-11与1006-03动态Stage1质量差异审计报告.md)：核对相同配置和随机初始化，重新渲染两组各15测试帧，区分canonical PLY与时间形变后的显示。only_cloth沿采集轨迹的RGB拟合较好，固定视角布料几何仍有碎边；报告量化相机采样、薄布可见性、布料GT误差及高斯分配差异，并列出待验证的单因素对照。只读审计，未启动新训练。
+
+## 1007 三类法线 MAE 与训练视角图
+
+[实现与核验](DOC/修改/1007-02-三类NormalMAE命名与模型Mesh评测.md)：历史Normal MAE明确为GS Render Normal MAE；并列Depth Normal MAE，新增模型重建Mesh Normal MAE。1002-02/55k仅训练预测提取静态TSDF Mesh，15测试帧三项全前景8.0163°/12.3835°/11.4455°，覆盖率联报；旧指标不变，15项测试通过。[新流程与训练相机视角](/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1007-02-onlyclothV4-三类法线MAE/normal_metrics_with_train_views.png)，三项共用GT Normal EXR。未修改训练损失或来源模型。
+
+## 1006 jumpingjacks 默认随机方块训练：全部完成
+
+用户已选择`jumpingjacks150_v5_spec32`，使用默认10万随机方块初始化，原版SH Stage1 35k → IR Stage2累计55k。训练光照Chapel Day，测试重光照Golden Bay。已核实原始目录已有PLY及原版历史模型input.ply本身就是默认seed=0随机方块；本次独立data_view重新生成同样输入并保存证据。用户已回复“OK开始吧”，已于2026-10-06 18:03（Asia/Tokyo）启动GPU0正式后台流水线；初始化后自动衔接Stage1渲染、Stage2及材质/HDR/NVS。Stage1 35k、Stage2 55k及完整渲染/评测全部完成，流程和产物PASS。15帧原版动态NVS：PSNR 27.3426、SSIM 0.948958、LPIPS 0.0194175。10视频各150帧完整解码，代表帧RGB和Alpha完整；人体normal斑驳、albedo明暗残留及局部重光照误差是主要质量限制。
+
+[1006-11 jumpingjacks默认两阶段训练计划](DOC/训练/1006-11-jumpingjacks150_v5_spec32-原版随机方块初始化默认两阶段训练计划.md)。此前0930训练中止记录保持不变。
+
+[1006-13双阶段MAE评测报告](DOC/报告/1006-13-jumpingjacks-双阶段Albedo与NormalDepth-MAE评测报告.md)：全15测试帧albedo MAE（全前景线性RGB）Stage1 SH代理0.08579548 → Stage2 0.06169353；normal GT缺失，150张depth全白，normal/depth真值MAE不可评测。完整数值、审计和GT对照均已保存。
+
+## 1006 随机方块来源的GT Lambertian Stage2：全部完成
+
+四组固定共用光强6.030241533058244，独立200步冒烟后正式35k→55k；4/4训练、全量MAE评测、6视频逐组全解码及代表图真实目检完成，流程PASS。
+
+[四组报告汇总](DOC/报告/1006-10-V4四组固定共用光强GT-Lambertian-Stage2评测汇总.md)；[完整训练结果](DOC/训练/1006-10-V4随机方块Stage1来源的Stage2-GT灯位Lambertian训练核对.md)；[全量MAE](/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1006-10-V4四版本GT灯位Lambertian执行汇总/all_mae.csv)。材质、RGB和冻结几何的限制均逐组报告。
+
+静态四组1006-01/02/06/07的独立比较见[静态四组Stage2汇总报告](DOC/报告/1006-12-静态四组Stage2-IR与GT-Lambertian汇总报告.md)，含各材质/尺度诊断、RGB、冻结几何、对应Stage1参考及代表图。
+
+## 1006 四版本随机方块初始化重训：全部完成
+
+**最终状态：4/4 COMPLETED，流程及产物验收PASS；训练只有1006-01～04。** 原版SH Stage1 35k、IR Stage2累计55k，两阶段共8组结果、120行逐帧指标已完成。
+
+评测完成：2026-10-06 02:44:28（Asia/Tokyo）；最终核验及文档回填：2026-10-06T11:16:08+09:00。
+
+[完整双阶段报告](/home/lihan/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/1006-01-四组Stage1与Stage2真值评测报告.md)；[阶段CSV](/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1006-01-only_clothV4-LumiMotion原版随机方块两阶段/evaluation/stage_comparison_task/metrics.csv)；[最终核验](/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1006-01-only_clothV4-LumiMotion原版随机方块两阶段/evaluation/stage_comparison_task/final_audit.json)。
+
+四组的Stage2全图及前景包围框SSIM均下降，depth和normal MAE均增加；共同有效像素比较也显示几何误差上升。只有1006-04的原始albedo MAE下降（0.138899→0.122299，约11.95%），其bMAE也下降；01、02、03的原始albedo MAE增加。Stage1为含光照的SH基色代理，以上数值变化不能解释为Stage1物理材质恢复更准确。
+
+[四组执行记录（辅助文档）](DOC/训练/1006-05-V4四版本原版随机方块初始化重训核对.md)、[初始化审计](DOC/修改/1006-06-随机方块重训准备与初始化审计.md)、[调度及最终回填](DOC/修改/1006-07-四版本随机方块正式调度与结果回填.md)。默认随机方块100000点，原版35k/55k；冒烟按用户要求跳过。四组正式流程和双阶段评测、代表图目检均完成；质量限制见报告，PASS仅表示流程与产物验收。
 
 ## 全分支共享文档与历史归档
 
@@ -11,7 +56,31 @@
 
 - [远端分支归档索引与同步约定](DOC/报告/archive/1002-远端分支文档/1002-03-远端分支文档归档与同步说明.md)：原始论文复现、LH 静态两阶段结果、Stage1 V1/V2/V3/V5、历史环境及配图。
 
+## 2026-10-05 Stage2 GT灯位 Lambertian 四组执行
+
+使用1003四组原版SH Stage1 **iter35000**作为各自只读来源，新增20,000步Stage2 Lambertian至55000。每组独立输出、独立训练帧光强标定，最多两组并行。GT灯位沿用现有场景中心方向近似；详细灯光语义、来源哈希、命令及验收在各计划中。**四组冒烟、正式训练、完整渲染、评测与真实目检均已完成，文档已回填；正式流水线耗时51分23秒，实际最大并行2组。流程验收PASS，材质与动态细节缺陷见[执行汇总](../output/1005-07-V4四版本Stage2-GT灯位执行汇总/README.md)。**
+
+- [1005-07 四版本Stage2 GT灯位训练结果](DOC/训练/1005-07-V4四版本Stage2-GT灯位Lambertian训练结果.md)：4/4完成，独立光强标定、RGB/前景与GT albedo评分、同协议原版对照和逐组质量限制。raw albedo均衡误差下降约10%–33%，RGB拟合指标低于原版。
+- [1005-07 调度与验收回填](DOC/修改/1005-07-V4四版本Stage2-GT灯位执行与验收回填.md)：两槽后台流水线、冻结/梯度核查、完整产物与真实目检。
+
+- [1005-03 静态V4 Lambertian训练计划](DOC/训练/1005-03-only_clothV4_lambertian-Stage2-GT灯位Lambertian训练计划.md)：来源1003-01，独立输出`output/1005-03-only_clothV4_lambertian-Stage2-GT灯位Lambertian/`。
+- [1005-04 动态V4原始材质训练计划](DOC/训练/1005-04-only_clothV4_Dynamic-Stage2-GT灯位Lambertian训练计划.md)：来源1003-02，独立输出`output/1005-04-only_clothV4_Dynamic-Stage2-GT灯位Lambertian/`。
+- [1005-05 动态V4 Lambertian训练计划](DOC/训练/1005-05-only_clothV4_Dynamic_Lambertian-Stage2-GT灯位Lambertian训练计划.md)：来源1003-03，独立输出`output/1005-05-only_clothV4_Dynamic_Lambertian-Stage2-GT灯位Lambertian/`。
+- [1005-06 静态V4原始材质训练计划](DOC/训练/1005-06-only_clothV4-Stage2-GT灯位Lambertian训练计划.md)：来源1003-04，独立输出`output/1005-06-only_clothV4-Stage2-GT灯位Lambertian/`。
+
 ## 2026-10-02 OnlyCloth V4 实验入口
+
+- [1005-01 V4四版本材质与动态几何真值评测报告](DOC/报告/1005-01-V4四版本Albedo与动态法线深度真值评测报告.md)：1003-01/02/03/04最终55k、每组15测试帧；统一raw与训练帧scalar材质尺度诊断，动态从Blender重新导出逐帧PLY，联报全前景/布料法线和深度，含RGB/NVS与前景Albedo SSIM、PLY法线对照与完整验证。
+- [1005-01 原版配置与逐帧PLY评测支持](DOC/修改/1005-01-原版材质配置与逐帧BlenderPLY评测支持.md)：cfg_args恢复、PLY实际求交与动态frame/time保护。
+
+- [1003-02 V4 法线与深度真值评测](DOC/修改/1003-02-onlyclothV4法线与深度真值评测.md)：直接比较世界法线 EXR 和原场景三角面 Z 深度，已评测1002-02的35k/40k/50k/55k及GT/learned Stage2；含仅布料指标、覆盖率、阈值敏感性与完整运行入口。
+- [1006-13 几何评测流程图与训练相机视角](DOC/修改/1006-13-onlyclothV4几何评测流程图与训练视角.md)：圆角流程图、105个训练相机分布、真实TRAIN 0001/0041/0081及1002-02原版55k法线/深度GT对照，提供PNG/SVG/PDF与来源记录。
+- [1003-01 V4 四版本原版训练核对](DOC/训练/1003-01-V4四版本原版LumiMotion训练核对.md)：CV4 静态原始材质、CV4L 静态 Lambertian、CV4D 动态原始材质、CV4DL 动态 Lambertian；四组原版两阶段从头训练，输出/README/命令全部位于当前项目，**四组冒烟与正式流程验收全部完成，最多两组并行，正式35k/55k与最终回填4/4 PASS**。
+- [1003-02 四版本训练结果](DOC/训练/1003-02-V4四版本原版LumiMotion训练结果.md)：四组最终指标、输出、目检与质量限制已回填；正式流水线5小时34分51秒，40个视频完整解码，PASS表示流程与产物验收。
+- [1003-01 四版本调度与验收回填](DOC/修改/1003-01-V4四版本并行调度与验收回填.md)：后台双任务队列、产物检查、Stage1提前目检、回填状态与原版进度条解释。
+- [当前数据集总览](DOC/指导/当前数据集总览.md)：V4 四版本的绝对训练路径、静动态属性、15 万点 canonical 初始化与 Alpha/光照语义。
+
+本轮用户指定输出与活动文档仅保存在当前项目，执行代码使用原版 LumiMotion main；本轮不复制文档到其他项目。
 
 - [Stage2 Lambertian 使用指南](DOC/指导/1002-01-Stage2-Lambertian训练渲染与续训使用说明.md)：实现分支 `1001-stage2-perlight`，原始 SH Stage1 + 独立 Stage2 双方向光模式。
 - [输出目录说明](DOC/指导/1002-02-输出目录与Stage对应说明.md)：以 `1002-03-onlyclothV4-stage2_GT` 为例，逐块说明命令、模型、渲染与验收产物。
@@ -127,3 +196,5 @@ output/ ────────────────── 训练、渲染�
 - 启动正式训练前：完成目标配置的冒烟，确认 checkpoint、日志、四类可视化和定量指标齐全；未满足验收条件时记录 `FAILED` 并保留产物。
 
 当文档、代码和产物存在冲突时，优先级为：**当前代码与可复现实验产物 > 最新修改/训练记录 > 审计报告 > 历史归档**。发现不一致时，不要静默修正文档；先定位差异，再在相应目录新增中文记录。
+
+四组Stage1/Stage2的SSIM、albedo、depth及normal MAE评测已完成：[双阶段真值评测报告](DOC/报告/1006-01-四组Stage1与Stage2真值评测报告.md)。训练仍只有01～04，全部结果、质量限制和最终状态已回填。

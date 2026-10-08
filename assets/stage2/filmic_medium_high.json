@@ -1,0 +1,14 @@
+{
+  "source_config": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/Archive/1003-06-onlyclothV4-geometry_gt_eval/tools/blender-5.2.2-linux-x64/5.2/datafiles/colormanagement/config.ocio",
+  "source_config_sha256": "f10891fc7d34e78e71b535e3f92b3c612177320f990641283247cb84bb8d62ad",
+  "ocio_version": "2.6.0",
+  "view": "Filmic",
+  "look": "Medium High Contrast",
+  "input": "Linear Rec.709",
+  "display": "sRGB",
+  "size": 65,
+  "log_min": -12.473931188,
+  "log_max": 4.026068812,
+  "generated_by": "output/1007-03-static-geometry-stage2/bake_filmic.py",
+  "documentation": "https://opencolorio.readthedocs.io/en/latest/guides/developing/developing.html"
+}

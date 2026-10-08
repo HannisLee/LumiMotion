@@ -3,6 +3,10 @@
 
 本分支 `1001-stage2-perlight` 从原始提交 `9cd834f` 开始，保留 Stage1 SH，新增 Stage2 `photometric_lambertian` 双方向光管线。中文训练、渲染、preset 与续训说明见 [Stage2 使用指南](LIHAN/DOC/指导/1002-01-Stage2-Lambertian训练渲染与续训使用说明.md)，实验结果见 [三管线对照](LIHAN/DOC/训练/1002-02-onlyclothV4-Stage2三管线对照.md)。
 
+直接材质评测入口为 `python -m scripts.eval_albedo_gt`，以未缩放的线性 albedo MAE 和材质均衡 bMAE 对比真值；管线审计、only_clothV4 的 shader 真值、1002-02 多 checkpoint 及三管线结果见 [Albedo 评测说明](LIHAN/DOC/修改/1003-02-Stage2-Albedo真值评测与材质均衡指标.md)。
+
+1003-01/02/03/04四组最终模型的统一SSIM、材质、法线与深度评测见 [1005-01 四版本报告](LIHAN/DOC/报告/1005-01-V4四版本Albedo与动态法线深度真值评测报告.md)。动态真值使用从Blender重新导出的逐帧PLY，albedo同时保留未缩放与训练帧尺度校准诊断。
+
 [![arXiv](https://img.shields.io/badge/arXiv-Paper-b31b1b.svg)]()
 [![Project Page](https://img.shields.io/badge/Project-Page-blue.svg)](https://joaxkal.github.io/LumiMotion/)
 [![Data](https://img.shields.io/badge/Zenodo-Data-blue.svg?logo=zenodo)](https://zenodo.org/records/18894615)  

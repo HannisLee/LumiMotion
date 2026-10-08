@@ -1,0 +1,29 @@
+{
+  "source": "https://github.com/hbb1/diff-surfel-rasterization.git",
+  "commit": "f7e2b68a0f17d6d7bca3fa564a96c7678581ce5a",
+  "local_git_objects": "/home/lihan/reproduce/2d-gaussian-splatting/submodules/diff-surfel-rasterization",
+  "source_sha256": {
+    "LICENSE.md": "cd5c95b3cfff3acc1bd412420c770f88809331c3db6872df11a970147aa8e81f",
+    "cuda_rasterizer/auxiliary.h": "015acc22f176aa24a9b5c3c0bae92577e6a3c814383519f95dd41528a977fcbe",
+    "cuda_rasterizer/backward.cu": "94587a79009d11f2a951b4e268ad32de92d803282d06fb76092a17f3d1523e5b",
+    "cuda_rasterizer/backward.h": "690b93e42650b37e171b73275a9f5a67842c88d4856ed7f69ff8fe65e9c6f975",
+    "cuda_rasterizer/config.h": "86d90fe26989e5a991104842961341d1bcb4374d5068dcb2a56d63a9017f8d65",
+    "cuda_rasterizer/forward.cu": "2356a3da8ff148adfa7174acc1661b8797784a37ad0a9c7bd4f6ea9bbecc76a0",
+    "cuda_rasterizer/forward.h": "5c1adcda39b604152ee583116852fed145d97ed6bcb5b9443fcc54596d263918",
+    "cuda_rasterizer/rasterizer.h": "f0b7302974c939c76bd8596734e125e13c66ea81b1cad97787fbbb8bec006965",
+    "cuda_rasterizer/rasterizer_impl.cu": "3fb83843fb8b0725d0265f22a72f80e3a330cfd122514af0e7ea26590a55ddd7",
+    "cuda_rasterizer/rasterizer_impl.h": "6aebed812748ed98d13868aaad8d61dc9d7af93627ba7da9690db8be9ff6c2f3",
+    "diff_surfel_rasterization/__init__.py": "046c1c81f22969b9ca5de2352061c2973c611c475257d938ab15d33c7836839a",
+    "ext.cpp": "102d6ca2a07cf57717e5828c49a7100841cc0147f7373de768070f06bc4909ef",
+    "rasterize_points.cu": "f6bee1c684711287825d2f5af5d5d86ca25253ae66ae5930e1fa1a87e6cd63eb",
+    "rasterize_points.h": "7a5d6b93e25887fc8edefe166907178fd169cd6b9afacb18e14d13388f84ab11",
+    "setup.py": "b72115d8346aeac7b4c41623d184cd55da4ce2ea800c5341424b27b1578ee1bd"
+  },
+  "glm_source": "submodules/surfel_tracer/include/glm",
+  "changes": [
+    "centered NDC-depth moments",
+    "saved ray reference depth",
+    "matching backward centered depths",
+    "independent package name/version"
+  ]
+}

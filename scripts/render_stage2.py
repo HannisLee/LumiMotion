@@ -50,11 +50,18 @@ class Stage2RenderRun:
         ctx=self.context;ctx.load_camera(camera)
         deformation=ctx.deformation(camera,time_override)
         if self.mode=='photometric_lambertian':
+            kwargs={}
+            if direction is None and hdr is None and hasattr(self.light,'render_kwargs'):
+                kwargs=self.light.render_kwargs(camera.fid if time_override is None else time_override)
+                if getattr(self.args,'geometry_shadows',False):
+                    if time_override is not None and float(time_override)!=float(camera.fid.item()):
+                        raise ValueError('参考阴影只支持相机自身时刻；替换时刻需重新计算阴影。')
+                    kwargs['direct_visibility']=ctx.direct_visibility(camera,self.material,self.light)
             if direction is None and hdr is None:
                 direction=self.light(camera.fid if time_override is None else time_override)
             return render_stage2_lambertian(camera,ctx.pc,self.material,deformation,ctx.background,
                 direction=direction,intensity=self.args.photometric_light_intensity if intensity is None else intensity,
-                hdr=hdr,depth_ratio=self.args.depth_ratio)
+                hdr=hdr,depth_ratio=self.args.depth_ratio,**kwargs)
         if direction is not None or hdr is not None:
             raise ValueError('原始 IR 对照使用原始 HDR 工具；此重光照入口针对 Lambertian。')
         from gaussian_renderer.render_ir import render_ir

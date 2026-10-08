@@ -1,0 +1,10 @@
+{
+  "dataset": "only_clothV4",
+  "reference": "原始 chair_cloth_mvps_120views.blend 的 Principled BSDF Base Color；PNG 模态颜色用于定位纯材质区域",
+  "materials": [
+    {"name": "cloth", "label": "红布", "srgb8": [174, 36, 46], "linear_rgb": [0.42, 0.018, 0.028]},
+    {"name": "seat", "label": "椅面", "srgb8": [66, 75, 82], "linear_rgb": [0.055, 0.07, 0.085]},
+    {"name": "wood", "label": "木框", "srgb8": [129, 72, 43], "linear_rgb": [0.22, 0.065, 0.025]},
+    {"name": "platform", "label": "底盘", "srgb8": [231, 231, 231], "linear_rgb": [0.8, 0.8, 0.8]}
+  ]
+}

@@ -88,6 +88,93 @@ class DirectionalLightTable(nn.Module):
         return (dirs[1:] - dirs[:-1]).square().mean()
 
 
+class PointLightTable(DirectionalLightTable):
+    """已知灯位的近场近似；不学习灯位，强度定义为参考距离的辐照度。"""
+    def __init__(self, times, positions, center, reference_distance=8., ambient=0.):
+        super().__init__(times, positions-center, learned=False)
+        self.register_buffer('positions', positions)
+        self.reference_distance=reference_distance
+        self.ambient=ambient
+        if reference_distance<=0 or ambient<0:raise ValueError('近场光参考距离须正，环境项须非负。')
+
+    def position(self,time):
+        time=torch.as_tensor(time,device=self.times.device).float().reshape(())
+        if len(self.times)==1:return self.positions[0]
+        right=torch.searchsorted(self.times,time).clamp(1,len(self.times)-1);left=right-1
+        weight=((time-self.times[left])/(self.times[right]-self.times[left])).clamp(0,1)
+        return (1-weight)*self.positions[left]+weight*self.positions[right]
+
+    def render_kwargs(self,time):
+        return dict(light_position=self.position(time),reference_distance=self.reference_distance,
+                    ambient_irradiance=self.ambient)
+
+
+class AreaLightTable(PointLightTable):
+    """已知矩形面积光四点积分；Blender5默认P/(πA)，旧实验可显式加载legacy约定。"""
+    def __init__(self, times, positions, center, records, reference_distance=8., ambient=0., power_convention='blender5'):
+        super().__init__(times,positions,center,reference_distance,ambient)
+        if power_convention not in {'blender5','legacy'}:raise ValueError('未知面积光功率约定。')
+        self.power_convention=power_convention
+        samples=[];normals=[];powers=[]
+        offsets=positions.new_tensor([[-1.,-1.],[-1.,1.],[1.,-1.],[1.,1.]])
+        for pos,record in zip(positions,records):
+            if record.get('area_shape') not in {'SQUARE','RECTANGLE'}:
+                raise ValueError('面积光当前只支持矩形或正方形。')
+            normal=unit_vector(positions.new_tensor(record['emission_normal_world']))
+            u=unit_vector(positions.new_tensor(record['area_axis_u_world']))
+            v=unit_vector(positions.new_tensor(record['area_axis_v_world']))
+            width=record.get('world_area_size',record['area_size'])
+            height=record.get('world_area_size_y',record.get('area_size_y',width) if record['area_shape']=='RECTANGLE' else width)
+            if min(width,height,record['intensity'])<=0:raise ValueError('面积光尺寸及功率必须为正。')
+            if abs(float(u@v))>1e-4 or abs(float(normal@u))>1e-4 or abs(float(normal@v))>1e-4:
+                raise ValueError('面积光坐标轴必须正交。')
+            samples.append(pos+(offsets[:,:1]*u*width+offsets[:,1:]*v*height)*.25)
+            power=record['intensity']*2**record.get('exposure',0.)*record.get('diffuse_factor',1.)
+            if not record.get('normalize',True):power*=width*height
+            if not math.isfinite(power) or power<=0:raise ValueError('面积光有效功率必须正且有限。')
+            if any(abs(v-1)>1e-5 for v in record.get('light_rgb',[1.,1.,1.])):raise ValueError('当前面积光分支要求白色光源。')
+            normals.append(normal);powers.append(power)
+        if max(powers)-min(powers)>1e-5:raise ValueError('当前面积光分支要求各帧共享固定功率。')
+        self.register_buffer('area_samples',torch.stack(samples))
+        self.register_buffer('emission_normals',torch.stack(normals))
+        if any('influence_radius' in r for r in records):
+            radii=positions.new_tensor([r['influence_radius'] for r in records])
+            if not torch.isfinite(radii).all() or (radii<=0).any():raise ValueError('面积光影响距离必须正且有限。')
+            self.register_buffer('influence_radii',radii)
+        factor=math.pi if power_convention=='blender5' else 4.
+        self.reference_intensity=powers[0]/(factor*reference_distance**2)
+
+    def interpolate(self,values,time):
+        time=torch.as_tensor(time,device=self.times.device).float().reshape(())
+        if len(self.times)==1:return values[0]
+        right=torch.searchsorted(self.times,time).clamp(1,len(self.times)-1);left=right-1
+        weight=((time-self.times[left])/(self.times[right]-self.times[left])).clamp(0,1)
+        return values[left]*(1-weight)+values[right]*weight
+
+    def sample_positions(self,time):
+        return self.interpolate(self.area_samples,time)
+
+    def render_kwargs(self,time):
+        result=dict(super().render_kwargs(time),light_sample_positions=self.sample_positions(time),
+                    light_emission_normal=unit_vector(self.interpolate(self.emission_normals,time)))
+        if hasattr(self,'influence_radii'):result['light_influence_radius']=self.interpolate(self.influence_radii,time)
+        return result
+
+
+def area_irradiance(points,normals,samples,emission_normal,intensity,reference_distance,influence_radius=None):
+    """矩形四子区域中点积分；包含受光面与发光面的余弦以及距离平方衰减。"""
+    delta=samples-points[...,None,:]
+    distance2=delta.square().sum(-1).clamp_min(1e-6)
+    direction=F.normalize(delta,dim=-1)
+    receiver=(normals[...,None,:]*direction).sum(-1).clamp_min(0)
+    emitter=(-(direction*emission_normal).sum(-1)).clamp_min(0)
+    result=(receiver*emitter/distance2).mean(-1,keepdim=True)*intensity*reference_distance**2
+    if influence_radius is not None:
+        relative_distance2=(points-samples.mean(0)).square().sum(-1,keepdim=True)/influence_radius**2
+        result=result*(1-relative_distance2.square()).clamp(0,1).square()
+    return result
+
+
 class LambertianMaterial(nn.Module):
     def __init__(self, albedo_srgb):
         super().__init__()
@@ -101,6 +188,83 @@ class LambertianMaterial(nn.Module):
 
     def prior(self):
         return (self.albedo - self.initial_albedo).square().mean()
+
+
+class PaletteLambertianMaterial(nn.Module):
+    """由Stage1颜色自动分组的共享材质；不读取GT标签或GT albedo。"""
+    def __init__(self, albedo_srgb, size=4, state=None):
+        super().__init__()
+        if size<1 or size>len(albedo_srgb):raise ValueError('材质颜色数量必须在1到Gaussian数之间。')
+        if state is not None:
+            labels=torch.zeros(len(albedo_srgb),device=albedo_srgb.device,dtype=torch.long)
+            initial=albedo_srgb.new_full((size,3),.5)
+        else:
+            with torch.no_grad():
+                initial_colors=albedo_srgb.detach().clamp(1e-4,1-1e-4)
+                log_color=srgb_to_linear(initial_colors).clamp_min(1e-3).log()
+                features=log_color-log_color.mean(-1,keepdim=True)
+                # 固定、局部随机源的kmeans++，不消耗训练RNG，不把亮暗当独立材质。
+                generator=torch.Generator(device=features.device).manual_seed(0)
+                centers=[features[torch.randint(len(features),(1,),device=features.device,generator=generator)[0]]]
+                distances=(features-centers[0]).square().sum(-1)
+                for _ in range(1,size):
+                    index=torch.multinomial(distances+1e-12,1,generator=generator)[0]
+                    centers.append(features[index]);distances=torch.minimum(distances,(features-centers[-1]).square().sum(-1))
+                centers=torch.stack(centers)
+                for _ in range(40):
+                    labels=torch.cdist(features,centers).argmin(-1)
+                    updated=centers.clone()
+                    for k in range(size):
+                        selected=labels==k
+                        if selected.any():updated[k]=features[selected].mean(0)
+                    if torch.max((updated-centers).abs())<1e-5:break
+                    centers=updated
+                initial=torch.stack([initial_colors[labels==k].median(0).values if (labels==k).any()
+                                     else initial_colors.median(0).values for k in range(size)])
+        self.register_buffer('labels',labels)
+        self.register_buffer('initial_palette',initial)
+        self.raw_albedo=nn.Parameter(torch.logit(initial.clamp(1e-4,1-1e-4)))
+
+    @property
+    def albedo(self):
+        return self.raw_albedo.sigmoid()[self.labels]
+
+    def prior(self):
+        return (self.raw_albedo.sigmoid()-self.initial_palette).square().mean()
+
+
+def make_material(albedo_srgb,args,state=None):
+    mode=getattr(args,'photometric_material_mode','per_gaussian')
+    initialization=getattr(args,'photometric_palette_init','')
+    if initialization and mode!='palette':raise ValueError('共享材质初始化文件仅用于palette模式。')
+    if initialization and state is None:
+        import numpy as np
+        import hashlib
+        with np.load(initialization,allow_pickle=False) as data:
+            source=Path(str(data['source_model'].item())).resolve()
+            if source!=Path(args.stage1_model_path).resolve() or int(data['source_iteration'])!=args.load_iter:
+                raise ValueError('共享材质初始化的Stage1来源或迭代不匹配。')
+            hashes=json.loads(str(data['source_files_json'].item()))
+            expected={str(source/'point_cloud'/('iteration_'+str(args.load_iter))/'point_cloud.ply'),
+                      str(source/'deform'/('iteration_'+str(args.load_iter))/'deform.pth')}
+            if set(hashes)!=expected:raise ValueError('共享材质初始化缺少完整来源哈希。')
+            for path,digest in hashes.items():
+                if hashlib.sha256(Path(path).read_bytes()).hexdigest()!=digest:
+                    raise ValueError('共享材质初始化来源哈希不匹配。')
+            labels=data['labels'];palette=data['initial_palette']
+            if labels.shape!=(len(albedo_srgb),) or labels.dtype.kind not in 'iu':
+                raise ValueError('共享材质初始化标签数量或类型错误。')
+            if palette.shape!=(args.photometric_palette_size,3) or not np.isfinite(palette).all() or (palette<0).any() or (palette>1).any():
+                raise ValueError('共享材质初始化颜色必须为K×3、有限且在[0,1]。')
+            if (labels<0).any() or (labels>=args.photometric_palette_size).any():raise ValueError('共享材质初始化标签越界。')
+            initial=torch.as_tensor(palette,device=albedo_srgb.device,dtype=albedo_srgb.dtype).clamp(1e-4,1-1e-4)
+            state={'labels':torch.as_tensor(labels,device=albedo_srgb.device,dtype=torch.long),
+                   'initial_palette':initial,'raw_albedo':torch.logit(initial)}
+    if mode=='per_gaussian':material=LambertianMaterial(albedo_srgb)
+    elif mode=='palette':material=PaletteLambertianMaterial(albedo_srgb,args.photometric_palette_size,state)
+    else:raise ValueError('未知Lambertian材质参数化：'+mode)
+    if state is not None:material.load_state_dict(state)
+    return material
 
 
 def directional_irradiance(normals, direction, intensity):
