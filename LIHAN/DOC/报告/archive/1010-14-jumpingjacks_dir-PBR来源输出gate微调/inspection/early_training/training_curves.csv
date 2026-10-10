@@ -1,0 +1,221 @@
+run,tag,step,value
+B07 native Direct SUN,train_loss_patches/l1_loss,50.5,0.235797660946846
+B07 native Direct SUN,train_loss_patches/l1_loss,150.5,0.2273477052152157
+B07 native Direct SUN,train_loss_patches/l1_loss,250.5,0.21460161685943605
+B07 native Direct SUN,train_loss_patches/l1_loss,350.5,0.21716339498758316
+B07 native Direct SUN,train_loss_patches/l1_loss,450.5,0.20751254692673682
+B07 native Direct SUN,train_loss_patches/l1_loss,550.5,0.19896121464669705
+B07 native Direct SUN,train_loss_patches/l1_loss,650.5,0.19135419376194476
+B07 native Direct SUN,train_loss_patches/l1_loss,750.5,0.19217320315539838
+B07 native Direct SUN,train_loss_patches/l1_loss,850.5,0.18503389500081538
+B07 native Direct SUN,train_loss_patches/l1_loss,950.5,0.17766404792666435
+B07 native Direct SUN,train_loss_patches/l1_loss,1050.5,0.17603928446769715
+B07 native Direct SUN,train_loss_patches/l1_loss,1150.5,0.17328839808702468
+B07 native Direct SUN,train_loss_patches/l1_loss,1250.5,0.16954128697514534
+B07 native Direct SUN,train_loss_patches/l1_loss,1350.5,0.17031306996941567
+B07 native Direct SUN,train_loss_patches/l1_loss,1450.5,0.16522821016609668
+B07 native Direct SUN,train_loss_patches/l1_loss,1550.5,0.16559876181185246
+B07 native Direct SUN,train_loss_patches/l1_loss,1650.5,0.15942828625440597
+B07 native Direct SUN,train_loss_patches/l1_loss,1750.5,0.166400583460927
+B07 native Direct SUN,train_loss_patches/l1_loss,1850.5,0.15880801141262055
+B07 native Direct SUN,train_loss_patches/l1_loss,1950.5,0.15739022687077522
+B07 native Direct SUN,train_loss_patches/l1_loss,2050.5,0.16004979848861695
+B07 native Direct SUN,train_loss_patches/l1_loss,2150.5,0.15844437539577483
+B07 native Direct SUN,train_loss_patches/l1_loss,2250.5,0.15490603394806385
+B07 native Direct SUN,train_loss_patches/l1_loss,2350.5,0.15390687674283982
+B07 native Direct SUN,train_loss_patches/l1_loss,2450.5,0.15252963714301587
+B07 native Direct SUN,train_loss_patches/l1_loss,2550.5,0.1528289084136486
+B07 native Direct SUN,train_loss_patches/l1_loss,2650.5,0.14625533431768417
+B07 native Direct SUN,train_loss_patches/l1_loss,2750.5,0.1416474037617445
+B07 native Direct SUN,train_loss_patches/l1_loss,2850.5,0.14795812502503394
+B07 native Direct SUN,train_loss_patches/l1_loss,2950.5,0.14133711263537407
+B07 native Direct SUN,train_loss_patches/l1_loss,3050.5,0.13817705817520617
+B07 native Direct SUN,train_loss_patches/l1_loss,3150.5,0.13264539629220962
+B07 native Direct SUN,train_loss_patches/l1_loss,3250.5,0.13944275207817555
+B07 native Direct SUN,train_loss_patches/l1_loss,3350.5,0.13026279412209987
+B07 native Direct SUN,train_loss_patches/l1_loss,3450.5,0.1285419826209545
+B07 native Direct SUN,train_loss_patches/l1_loss,3550.5,0.1254330113530159
+B07 native Direct SUN,train_loss_patches/l1_loss,3632.0,0.13461966445994755
+B07 native Direct SUN,train_loss_patches/total_loss,50.5,0.26889299660921095
+B07 native Direct SUN,train_loss_patches/total_loss,150.5,0.26078314512968065
+B07 native Direct SUN,train_loss_patches/total_loss,250.5,0.2462727028131485
+B07 native Direct SUN,train_loss_patches/total_loss,350.5,0.2498795683681965
+B07 native Direct SUN,train_loss_patches/total_loss,450.5,0.24043132469058037
+B07 native Direct SUN,train_loss_patches/total_loss,550.5,0.23125599652528764
+B07 native Direct SUN,train_loss_patches/total_loss,650.5,0.22251413896679878
+B07 native Direct SUN,train_loss_patches/total_loss,750.5,0.2246824848651886
+B07 native Direct SUN,train_loss_patches/total_loss,850.5,0.21750113278627395
+B07 native Direct SUN,train_loss_patches/total_loss,950.5,0.20808785036206245
+B07 native Direct SUN,train_loss_patches/total_loss,1050.5,0.20801783941686153
+B07 native Direct SUN,train_loss_patches/total_loss,1150.5,0.203842109143734
+B07 native Direct SUN,train_loss_patches/total_loss,1250.5,0.20063197277486325
+B07 native Direct SUN,train_loss_patches/total_loss,1350.5,0.202114237844944
+B07 native Direct SUN,train_loss_patches/total_loss,1450.5,0.1964741463214159
+B07 native Direct SUN,train_loss_patches/total_loss,1550.5,0.19624132253229618
+B07 native Direct SUN,train_loss_patches/total_loss,1650.5,0.18964822113513946
+B07 native Direct SUN,train_loss_patches/total_loss,1750.5,0.1979772610217333
+B07 native Direct SUN,train_loss_patches/total_loss,1850.5,0.18880658008158208
+B07 native Direct SUN,train_loss_patches/total_loss,1950.5,0.1889662142843008
+B07 native Direct SUN,train_loss_patches/total_loss,2050.5,0.1946022266894579
+B07 native Direct SUN,train_loss_patches/total_loss,2150.5,0.19936341635882854
+B07 native Direct SUN,train_loss_patches/total_loss,2250.5,0.20201314255595207
+B07 native Direct SUN,train_loss_patches/total_loss,2350.5,0.20221885815262794
+B07 native Direct SUN,train_loss_patches/total_loss,2450.5,0.20198815152049066
+B07 native Direct SUN,train_loss_patches/total_loss,2550.5,0.20139565259218217
+B07 native Direct SUN,train_loss_patches/total_loss,2650.5,0.19364724427461624
+B07 native Direct SUN,train_loss_patches/total_loss,2750.5,0.18815783366560937
+B07 native Direct SUN,train_loss_patches/total_loss,2850.5,0.19512196205556392
+B07 native Direct SUN,train_loss_patches/total_loss,2950.5,0.18844363391399382
+B07 native Direct SUN,train_loss_patches/total_loss,3050.5,0.18414522036910058
+B07 native Direct SUN,train_loss_patches/total_loss,3150.5,0.1769047771394253
+B07 native Direct SUN,train_loss_patches/total_loss,3250.5,0.18509495250880717
+B07 native Direct SUN,train_loss_patches/total_loss,3350.5,0.17458416953682898
+B07 native Direct SUN,train_loss_patches/total_loss,3450.5,0.17208690017461778
+B07 native Direct SUN,train_loss_patches/total_loss,3550.5,0.1680130399763584
+B07 native Direct SUN,train_loss_patches/total_loss,3632.0,0.17860276949784112
+B07 native Direct SUN,pbr_light/intensity_scale,100.0,3.21774959564209
+B07 native Direct SUN,pbr_light/intensity_scale,200.0,3.299015522003174
+B07 native Direct SUN,pbr_light/intensity_scale,300.0,3.381943941116333
+B07 native Direct SUN,pbr_light/intensity_scale,400.0,3.4670794010162354
+B07 native Direct SUN,pbr_light/intensity_scale,500.0,3.5539379119873047
+B07 native Direct SUN,pbr_light/intensity_scale,600.0,3.6410560607910156
+B07 native Direct SUN,pbr_light/intensity_scale,700.0,3.7282073497772217
+B07 native Direct SUN,pbr_light/intensity_scale,800.0,3.812237501144409
+B07 native Direct SUN,pbr_light/intensity_scale,900.0,3.896463632583618
+B07 native Direct SUN,pbr_light/intensity_scale,1000.0,3.979072093963623
+B07 native Direct SUN,pbr_light/intensity_scale,1100.0,4.054845809936523
+B07 native Direct SUN,pbr_light/intensity_scale,1200.0,4.13060188293457
+B07 native Direct SUN,pbr_light/intensity_scale,1300.0,4.199634075164795
+B07 native Direct SUN,pbr_light/intensity_scale,1400.0,4.268009662628174
+B07 native Direct SUN,pbr_light/intensity_scale,1500.0,4.3334126472473145
+B07 native Direct SUN,pbr_light/intensity_scale,1600.0,4.3974690437316895
+B07 native Direct SUN,pbr_light/intensity_scale,1700.0,4.4591875076293945
+B07 native Direct SUN,pbr_light/intensity_scale,1800.0,4.5188117027282715
+B07 native Direct SUN,pbr_light/intensity_scale,1900.0,4.5783467292785645
+B07 native Direct SUN,pbr_light/intensity_scale,2000.0,4.629780292510986
+B07 native Direct SUN,pbr_light/intensity_scale,2100.0,4.662387371063232
+B07 native Direct SUN,pbr_light/intensity_scale,2200.0,4.69702672958374
+B07 native Direct SUN,pbr_light/intensity_scale,2300.0,4.73026180267334
+B07 native Direct SUN,pbr_light/intensity_scale,2400.0,4.764525413513184
+B07 native Direct SUN,pbr_light/intensity_scale,2500.0,4.7964677810668945
+B07 native Direct SUN,pbr_light/intensity_scale,2600.0,4.829432010650635
+B07 native Direct SUN,pbr_light/intensity_scale,2700.0,4.861639976501465
+B07 native Direct SUN,pbr_light/intensity_scale,2800.0,4.895177364349365
+B07 native Direct SUN,pbr_light/intensity_scale,2900.0,4.927827835083008
+B07 native Direct SUN,pbr_light/intensity_scale,3000.0,4.9599103927612305
+B07 native Direct SUN,pbr_light/intensity_scale,3100.0,4.993415832519531
+B07 native Direct SUN,pbr_light/intensity_scale,3200.0,5.026482105255127
+B07 native Direct SUN,pbr_light/intensity_scale,3300.0,5.060522556304932
+B07 native Direct SUN,pbr_light/intensity_scale,3400.0,5.091930389404297
+B07 native Direct SUN,pbr_light/intensity_scale,3500.0,5.12252950668335
+B07 native Direct SUN,pbr_light/intensity_scale,3600.0,5.1553568840026855
+B08 native Direct + gate,train_loss_patches/l1_loss,50.5,0.2357976606488228
+B08 native Direct + gate,train_loss_patches/l1_loss,150.5,0.22734770506620408
+B08 native Direct + gate,train_loss_patches/l1_loss,250.5,0.21460161730647087
+B08 native Direct + gate,train_loss_patches/l1_loss,350.5,0.21716339483857156
+B08 native Direct + gate,train_loss_patches/l1_loss,450.5,0.2075125467777252
+B08 native Direct + gate,train_loss_patches/l1_loss,550.5,0.19896121464669705
+B08 native Direct + gate,train_loss_patches/l1_loss,650.5,0.19135419368743897
+B08 native Direct + gate,train_loss_patches/l1_loss,750.5,0.19217320300638677
+B08 native Direct + gate,train_loss_patches/l1_loss,850.5,0.18503389529883862
+B08 native Direct + gate,train_loss_patches/l1_loss,950.5,0.1776640474051237
+B08 native Direct + gate,train_loss_patches/l1_loss,1050.5,0.17603928446769715
+B08 native Direct + gate,train_loss_patches/l1_loss,1150.5,0.17328839801251888
+B08 native Direct + gate,train_loss_patches/l1_loss,1250.5,0.1695412864536047
+B08 native Direct + gate,train_loss_patches/l1_loss,1350.5,0.17031307004392146
+B08 native Direct + gate,train_loss_patches/l1_loss,1450.5,0.16522820949554443
+B08 native Direct + gate,train_loss_patches/l1_loss,1550.5,0.16559876143932342
+B08 native Direct + gate,train_loss_patches/l1_loss,1650.5,0.15942828670144082
+B08 native Direct + gate,train_loss_patches/l1_loss,1750.5,0.16640058286488058
+B08 native Direct + gate,train_loss_patches/l1_loss,1850.5,0.1588080119341612
+B08 native Direct + gate,train_loss_patches/l1_loss,1950.5,0.15739022515714168
+B08 native Direct + gate,train_loss_patches/l1_loss,2050.5,0.1600497445464134
+B08 native Direct + gate,train_loss_patches/l1_loss,2150.5,0.15844192720949649
+B08 native Direct + gate,train_loss_patches/l1_loss,2250.5,0.15490044109523296
+B08 native Direct + gate,train_loss_patches/l1_loss,2350.5,0.15389784641563892
+B08 native Direct + gate,train_loss_patches/l1_loss,2450.5,0.15252995520830154
+B08 native Direct + gate,train_loss_patches/l1_loss,2550.5,0.15280237853527068
+B08 native Direct + gate,train_loss_patches/l1_loss,2650.5,0.1462273410707712
+B08 native Direct + gate,train_loss_patches/l1_loss,2750.5,0.14160422183573246
+B08 native Direct + gate,train_loss_patches/l1_loss,2850.5,0.1479056953638792
+B08 native Direct + gate,train_loss_patches/l1_loss,2950.5,0.1412446215003729
+B08 native Direct + gate,train_loss_patches/l1_loss,3050.5,0.13804544866085053
+B08 native Direct + gate,train_loss_patches/l1_loss,3150.5,0.13249955765902996
+B08 native Direct + gate,train_loss_patches/l1_loss,3250.5,0.13936218447983265
+B08 native Direct + gate,train_loss_patches/l1_loss,3350.5,0.13017609864473342
+B08 native Direct + gate,train_loss_patches/l1_loss,3450.5,0.12848382845520973
+B08 native Direct + gate,train_loss_patches/l1_loss,3550.5,0.12538342900574206
+B08 native Direct + gate,train_loss_patches/l1_loss,3632.0,0.13455988904313435
+B08 native Direct + gate,train_loss_patches/total_loss,50.5,0.2688929967582226
+B08 native Direct + gate,train_loss_patches/total_loss,150.5,0.2607831446826458
+B08 native Direct + gate,train_loss_patches/total_loss,250.5,0.24627270326018333
+B08 native Direct + gate,train_loss_patches/total_loss,350.5,0.24987956911325454
+B08 native Direct + gate,train_loss_patches/total_loss,450.5,0.2404313239455223
+B08 native Direct + gate,train_loss_patches/total_loss,550.5,0.2312559975683689
+B08 native Direct + gate,train_loss_patches/total_loss,650.5,0.2225141394138336
+B08 native Direct + gate,train_loss_patches/total_loss,750.5,0.22468248263001442
+B08 native Direct + gate,train_loss_patches/total_loss,850.5,0.21750113055109976
+B08 native Direct + gate,train_loss_patches/total_loss,950.5,0.20808784887194634
+B08 native Direct + gate,train_loss_patches/total_loss,1050.5,0.20801783449947833
+B08 native Direct + gate,train_loss_patches/total_loss,1150.5,0.203842109516263
+B08 native Direct + gate,train_loss_patches/total_loss,1250.5,0.20063196904957295
+B08 native Direct + gate,train_loss_patches/total_loss,1350.5,0.20211423695087433
+B08 native Direct + gate,train_loss_patches/total_loss,1450.5,0.1964741436392069
+B08 native Direct + gate,train_loss_patches/total_loss,1550.5,0.19624133415520192
+B08 native Direct + gate,train_loss_patches/total_loss,1650.5,0.18964822247624397
+B08 native Direct + gate,train_loss_patches/total_loss,1750.5,0.1979772639274597
+B08 native Direct + gate,train_loss_patches/total_loss,1850.5,0.18880657628178596
+B08 native Direct + gate,train_loss_patches/total_loss,1950.5,0.18896621279418468
+B08 native Direct + gate,train_loss_patches/total_loss,2050.5,0.19460217475891115
+B08 native Direct + gate,train_loss_patches/total_loss,2150.5,0.1993612615764141
+B08 native Direct + gate,train_loss_patches/total_loss,2250.5,0.20200824081897736
+B08 native Direct + gate,train_loss_patches/total_loss,2350.5,0.20220950722694397
+B08 native Direct + gate,train_loss_patches/total_loss,2450.5,0.20198728695511817
+B08 native Direct + gate,train_loss_patches/total_loss,2550.5,0.20136654987931252
+B08 native Direct + gate,train_loss_patches/total_loss,2650.5,0.19361952193081378
+B08 native Direct + gate,train_loss_patches/total_loss,2750.5,0.18811240307986737
+B08 native Direct + gate,train_loss_patches/total_loss,2850.5,0.19503658182919026
+B08 native Direct + gate,train_loss_patches/total_loss,2950.5,0.18830870136618613
+B08 native Direct + gate,train_loss_patches/total_loss,3050.5,0.1839921560883522
+B08 native Direct + gate,train_loss_patches/total_loss,3150.5,0.17674451872706412
+B08 native Direct + gate,train_loss_patches/total_loss,3250.5,0.18500657312572003
+B08 native Direct + gate,train_loss_patches/total_loss,3350.5,0.17449405580759048
+B08 native Direct + gate,train_loss_patches/total_loss,3450.5,0.17202428556978702
+B08 native Direct + gate,train_loss_patches/total_loss,3550.5,0.1679725272208452
+B08 native Direct + gate,train_loss_patches/total_loss,3632.0,0.17855290749243327
+B08 native Direct + gate,pbr_light/intensity_scale,100.0,3.21774959564209
+B08 native Direct + gate,pbr_light/intensity_scale,200.0,3.299015522003174
+B08 native Direct + gate,pbr_light/intensity_scale,300.0,3.381943941116333
+B08 native Direct + gate,pbr_light/intensity_scale,400.0,3.4670794010162354
+B08 native Direct + gate,pbr_light/intensity_scale,500.0,3.5539379119873047
+B08 native Direct + gate,pbr_light/intensity_scale,600.0,3.6410560607910156
+B08 native Direct + gate,pbr_light/intensity_scale,700.0,3.7282073497772217
+B08 native Direct + gate,pbr_light/intensity_scale,800.0,3.812237501144409
+B08 native Direct + gate,pbr_light/intensity_scale,900.0,3.896463632583618
+B08 native Direct + gate,pbr_light/intensity_scale,1000.0,3.979072093963623
+B08 native Direct + gate,pbr_light/intensity_scale,1100.0,4.054845809936523
+B08 native Direct + gate,pbr_light/intensity_scale,1200.0,4.13060188293457
+B08 native Direct + gate,pbr_light/intensity_scale,1300.0,4.199634075164795
+B08 native Direct + gate,pbr_light/intensity_scale,1400.0,4.268009662628174
+B08 native Direct + gate,pbr_light/intensity_scale,1500.0,4.3334126472473145
+B08 native Direct + gate,pbr_light/intensity_scale,1600.0,4.3974690437316895
+B08 native Direct + gate,pbr_light/intensity_scale,1700.0,4.4591875076293945
+B08 native Direct + gate,pbr_light/intensity_scale,1800.0,4.5188117027282715
+B08 native Direct + gate,pbr_light/intensity_scale,1900.0,4.5783467292785645
+B08 native Direct + gate,pbr_light/intensity_scale,2000.0,4.629780292510986
+B08 native Direct + gate,pbr_light/intensity_scale,2100.0,4.662387847900391
+B08 native Direct + gate,pbr_light/intensity_scale,2200.0,4.697029113769531
+B08 native Direct + gate,pbr_light/intensity_scale,2300.0,4.730265140533447
+B08 native Direct + gate,pbr_light/intensity_scale,2400.0,4.7645263671875
+B08 native Direct + gate,pbr_light/intensity_scale,2500.0,4.7964982986450195
+B08 native Direct + gate,pbr_light/intensity_scale,2600.0,4.8294572830200195
+B08 native Direct + gate,pbr_light/intensity_scale,2700.0,4.86162805557251
+B08 native Direct + gate,pbr_light/intensity_scale,2800.0,4.895157337188721
+B08 native Direct + gate,pbr_light/intensity_scale,2900.0,4.927772045135498
+B08 native Direct + gate,pbr_light/intensity_scale,3000.0,4.959758281707764
+B08 native Direct + gate,pbr_light/intensity_scale,3100.0,4.99326753616333
+B08 native Direct + gate,pbr_light/intensity_scale,3200.0,5.026312351226807
+B08 native Direct + gate,pbr_light/intensity_scale,3300.0,5.0603156089782715
+B08 native Direct + gate,pbr_light/intensity_scale,3400.0,5.0916361808776855
+B08 native Direct + gate,pbr_light/intensity_scale,3500.0,5.122288703918457
+B08 native Direct + gate,pbr_light/intensity_scale,3600.0,5.155186176300049

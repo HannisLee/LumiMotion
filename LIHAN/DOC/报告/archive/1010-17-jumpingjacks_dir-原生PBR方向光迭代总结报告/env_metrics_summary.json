@@ -1,0 +1,112 @@
+{
+  "status": "PASS",
+  "model_path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-01-jumpingjacks_environment_light-原版LumiMotion两阶段训练/model_mlp",
+  "iteration": 55000,
+  "split": "test",
+  "frames": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150
+  ],
+  "resolution": [
+    400,
+    400
+  ],
+  "aggregation": "valid pixel pooled; GT-defined full foreground",
+  "metrics": [
+    {
+      "metric": "Albedo MAE",
+      "mae": 0.19101779363417556,
+      "unit": "linear RGB",
+      "coverage_pct": 96.26582001553288
+    },
+    {
+      "metric": "Roughness MAE",
+      "mae": 0.19992533398217635,
+      "unit": "r",
+      "coverage_pct": 96.55537993517116
+    },
+    {
+      "metric": "GS Render Normal MAE",
+      "mae": 13.889867645864298,
+      "unit": "degree",
+      "coverage_pct": 92.93556361675648
+    },
+    {
+      "metric": "Depth Normal MAE",
+      "mae": 18.922640487946197,
+      "unit": "degree",
+      "coverage_pct": 88.3709286455337
+    },
+    {
+      "metric": "Mesh Normal MAE",
+      "mae": 14.957262857211683,
+      "unit": "degree",
+      "coverage_pct": 93.9422241372255
+    },
+    {
+      "metric": "Expected Z Depth MAE",
+      "mae": 0.05899602401932292,
+      "unit": "m",
+      "coverage_pct": 92.93556361675648
+    },
+    {
+      "metric": "Median Z Depth MAE",
+      "mae": 0.05912711922333235,
+      "unit": "m",
+      "coverage_pct": 92.93556361675648
+    },
+    {
+      "metric": "GS Normal XYZ component MAE (supplementary)",
+      "mae": 0.11561260637870588,
+      "unit": "unit normal XYZ",
+      "coverage_pct": 92.93556361675648
+    }
+  ],
+  "normal_common_pixels": {
+    "methods": [
+      "gs_render",
+      "depth_normal",
+      "mesh"
+    ],
+    "gt_pixels": 415433,
+    "valid_pixels": 366343,
+    "coverage": 0.8818341345054437,
+    "angular_deg": {
+      "gs_render": {
+        "mae_frame_mean_deg": 13.042455945354318,
+        "mae_pixel_mean_deg": 12.622846205484528
+      },
+      "depth_normal": {
+        "mae_frame_mean_deg": 18.996127873435128,
+        "mae_pixel_mean_deg": 18.837130420876548
+      },
+      "mesh": {
+        "mae_frame_mean_deg": 13.840566464032557,
+        "mae_pixel_mean_deg": 13.563316265555063
+      }
+    }
+  },
+  "source_model_unchanged": true,
+  "independent_audit": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/inspection/independent_audit.json",
+  "gt_audit": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/inspection/gt_audit.json",
+  "code_hashes": {
+    "scripts/extract_geometry_mesh_dynamic.py": "810c134e4e96151d943f619ee5fff7776d566b8b854ffc5dc779301e08d86da8",
+    "scripts/eval_geometry_gt.py": "0e81a53568f7b849607a3d926ce2cd79dd247f7009335d643a7ef15bde1216e8",
+    "scripts/eval_albedo_gt.py": "e14a5b99453784c9ae5e92deb89f5d7768e6326dbf34bd022013c9ae8bf27f61",
+    "scripts/eval_roughness_gt.py": "1daf5556d7f8066389182f18c06de159c1cda75cfe68a9ac6edeed4773582846",
+    "utils/predicted_mesh.py": "1a6f367d30d752a74beec53021d581a41302c77201236237562f4aa6417c6a73"
+  }
+}

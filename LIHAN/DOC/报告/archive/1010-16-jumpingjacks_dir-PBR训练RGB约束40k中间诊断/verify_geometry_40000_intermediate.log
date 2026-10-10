@@ -1,0 +1,43 @@
+{
+  "status": "PASS_INDEPENDENT_INTERMEDIATE_ONLY",
+  "iteration": 40000,
+  "frames": 15,
+  "metrics": {
+    "gs_render": {
+      "mae": 15.712251253353628,
+      "coverage": 0.939383727339908,
+      "valid_pixels": 390251,
+      "gt_pixels": 415433
+    },
+    "depth_normal": {
+      "mae": 25.683768819307527,
+      "coverage": 0.8929189544403069,
+      "valid_pixels": 370948,
+      "gt_pixels": 415433
+    },
+    "expected": {
+      "mae": 0.07940794805770243,
+      "coverage": 0.939383727339908,
+      "valid_pixels": 390251,
+      "gt_pixels": 415433
+    },
+    "median": {
+      "mae": 0.08330994147129,
+      "coverage": 0.939383727339908,
+      "valid_pixels": 390251,
+      "gt_pixels": 415433
+    }
+  },
+  "missing_180_normal_mae_deg": 25.670762226093036,
+  "common_GS_Depth_only_pixels": 370948,
+  "common_GS_Depth_only_mae_deg": [
+    14.736012450480185,
+    25.683768819307527
+  ],
+  "source_hashes_verified": 506,
+  "optimizer_steps": 0,
+  "GT_labels_used_for_training": false,
+  "full_seven_MAE": false,
+  "mesh_normal": "NOT_AVAILABLE",
+  "normal_7_goal": "FAILED_INTERMEDIATE_NOT_FINAL"
+}

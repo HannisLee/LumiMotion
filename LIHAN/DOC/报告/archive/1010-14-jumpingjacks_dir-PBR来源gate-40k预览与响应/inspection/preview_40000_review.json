@@ -1,0 +1,45 @@
+{
+  "status": "FAILED_SO_FAR_RGB_ONLY",
+  "actual_images_viewed": true,
+  "iteration": 40000,
+  "reviewed_frames": [
+    10,
+    80,
+    150
+  ],
+  "images": [
+    "inspection/rgb_40000_comparison.png"
+  ],
+  "reviewed_at": "2026-10-10T09:22:17.610367+09:00",
+  "rgb": "GT/B07/B08实际首中尾拼图：黑背景正常，人物平台存在；人物头手/衣服/腿依旧破碎斑驳，脚周大块灰黑阴影污染和平台伪凸起明显。B08同40k外观几乎与B07相同，未通过质量。GT0080本身背光暗，失败不单凭暗。",
+  "rgb_metrics": {
+    "psnr": 18.05530376415172,
+    "ssim": 0.8995908578236897,
+    "lpips": 0.111405814687411,
+    "psnr_foreground": 10.838017264580584,
+    "ssim_foreground_bbox": 0.7804378151893616,
+    "lpips_foreground_bbox": 0.22845209042231243
+  },
+  "previous_B07": {
+    "psnr": 18.055981592794627,
+    "ssim": 0.899448827902476,
+    "lpips": 0.11159734278917313,
+    "psnr_foreground": 10.840379814378556,
+    "ssim_foreground_bbox": 0.7803961118062337,
+    "lpips_foreground_bbox": 0.22812511424223583
+  },
+  "delta": {
+    "psnr": -0.0006778286429067748,
+    "ssim": 0.0001420299212137044,
+    "lpips": -0.00019152810176213675,
+    "psnr_foreground": -0.0023625497979722354,
+    "ssim_foreground_bbox": 4.170338312792232e-05,
+    "lpips_foreground_bbox": 0.0003269761800765991
+  },
+  "full_normal_MAE": false,
+  "normal_7_goal": "PENDING",
+  "commit_allowed": false,
+  "preview_session_exit_code": 0,
+  "preview_session_verified_closed": true,
+  "source_checkpoint_audit": "PASS_CHECKPOINT_ONLY"
+}

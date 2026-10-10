@@ -1,0 +1,61 @@
+{
+  "status": "TRAINING_CURVE_SNAPSHOT_ONLY",
+  "stage2_steps": 2464,
+  "created_at": "2026-10-10T11:15:05.565044+09:00",
+  "snapshots": {
+    "B09 Direct SUN + probability gate": {
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-15-jumpingjacks_dir-PBR概率gate优化/model_mlp/events.out.tfevents.1791594233.venus.291976.0",
+      "snapshot": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/inspection/early_training/B09.tfevents",
+      "bytes": 4797901,
+      "sha256": "8128eb15800af3f50a1b9837c1690216ec0dc278123ac81b9d74b4c8c827464c"
+    },
+    "B10 source-local + TRAIN RGB axis": {
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/events.out.tfevents.1791598293.venus.306459.0",
+      "snapshot": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/inspection/early_training/B10.tfevents",
+      "bytes": 457272,
+      "sha256": "31fa9bfcb778b14fcc152409873f63f7f6dd40f2cf8b39ed5f77332c1f17371f"
+    }
+  },
+  "pointwise_differences": {
+    "train_loss_patches/l1_loss": {
+      "warmup": {
+        "points": 2000,
+        "mean_delta": 2.391636371612549e-09,
+        "max_abs_delta": 2.682209014892578e-07
+      },
+      "geometry": {
+        "points": 464,
+        "mean_delta": -0.00016005976318285382,
+        "max_abs_delta": 0.001611083745956421
+      }
+    },
+    "train_loss_patches/total_loss": {
+      "warmup": {
+        "points": 2000,
+        "mean_delta": 1.7806887626647948e-09,
+        "max_abs_delta": 3.129243850708008e-07
+      },
+      "geometry": {
+        "points": 464,
+        "mean_delta": 0.03294333017527543,
+        "max_abs_delta": 0.04665762186050415
+      }
+    },
+    "pbr_light/intensity_scale": {
+      "warmup": {
+        "points": 20,
+        "mean_delta": -1.1920928955078125e-07,
+        "max_abs_delta": 1.430511474609375e-06
+      },
+      "geometry": {
+        "points": 4,
+        "mean_delta": -0.00019228458404541016,
+        "max_abs_delta": 0.0005230903625488281
+      }
+    }
+  },
+  "optimizer_steps": 0,
+  "gt_labels_read": false,
+  "loss_selection": "B09/B10均all-eligible alpha>.9、相同Direct SUN/native GGX/BVH；B09/B10均概率坐标/[0,1]，B10 source-local真实q与lambda2自身训练RGB轴约束，total包含新增约束故不可仅直接比较total，训练loss不代表法线MAE",
+  "limitations": "训练loss和RGB拟合光强，不是GT材质/法线MAE，不由曲线声明质量或7度通过。"
+}

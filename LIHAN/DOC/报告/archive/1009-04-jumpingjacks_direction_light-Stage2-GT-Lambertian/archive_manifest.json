@@ -1,0 +1,462 @@
+{
+  "archived_at": "2026-10-09T20:12:46.051089+09:00",
+  "report": "/home/lihan/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian-各项MAE与三类Normal评测报告.md",
+  "training_report": "/home/lihan/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/训练/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian训练报告.md",
+  "experiment": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian",
+  "model_path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/model_mlp",
+  "iteration": 55000,
+  "files": [
+    {
+      "path": "albedo/iteration_55000/0010_comparison.png",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/albedo/iteration_55000/0010_comparison.png",
+      "bytes": 259001,
+      "sha256": "6a993c472a7d1a5ef5abb7128e669193ec71745e1451bf041711844a3ce4e512"
+    },
+    {
+      "path": "albedo/iteration_55000/0080_comparison.png",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/albedo/iteration_55000/0080_comparison.png",
+      "bytes": 257196,
+      "sha256": "e5629d8ce539e142e68a22d89e4139d8855ea9dfc603db8ccd42bfbf132ebc99"
+    },
+    {
+      "path": "albedo/iteration_55000/0150_comparison.png",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/albedo/iteration_55000/0150_comparison.png",
+      "bytes": 243590,
+      "sha256": "559c60f9b644530c87bc1d2c3784be1ee282e3e8bee6e7cf2d22a6699bb9112b"
+    },
+    {
+      "path": "albedo/iteration_55000/frames.csv",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/albedo/iteration_55000/frames.csv",
+      "bytes": 1559,
+      "sha256": "8fbeb0cdc6a9d743b4571c41bc60e68fad8da37bbc58b55a620b113a1d388729"
+    },
+    {
+      "path": "albedo/iteration_55000/metrics.json",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/albedo/iteration_55000/metrics.json",
+      "bytes": 35356,
+      "sha256": "3a12246cff0c56eb658c2e0f302b87c0bf9b2f34c34ba6792db14640c0a50ae1"
+    },
+    {
+      "path": "code_commit.txt",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/code_commit.txt",
+      "bytes": 41,
+      "sha256": "4538d1328cbee9d0fb9498d385999e230cd3d133a03e5279ae8c8943a84465dc"
+    },
+    {
+      "path": "code_diff.patch",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/code_diff.patch",
+      "bytes": 3282,
+      "sha256": "69a18dcea1bdb0b89a0a4aca8762e6776657e07864e8b55a63af7369c7530931"
+    },
+    {
+      "path": "code_status.txt",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/code_status.txt",
+      "bytes": 1462,
+      "sha256": "b8eb570c5b9feff9525ada6b8e290f426217fcb6eb86bf9e3e71bd791d806263"
+    },
+    {
+      "path": "commands/albedo.sh",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/albedo.sh",
+      "bytes": 571,
+      "sha256": "438b7733de26482d75b8b69db8aa254145b8b2fa16a894b38a654b77846e6256"
+    },
+    {
+      "path": "commands/check_artifacts.py",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/check_artifacts.py",
+      "bytes": 4727,
+      "sha256": "b707f7c5bd072869bd71cd49982e8d670d0ceaead6bf1f4fec607530e5a513c8"
+    },
+    {
+      "path": "commands/check_checkpoint.py",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/check_checkpoint.py",
+      "bytes": 2708,
+      "sha256": "06873fdfcfe8524d732fad57102d8b9b3b36210d9b0ca9042ec98ba15e210a35"
+    },
+    {
+      "path": "commands/code_snapshot/gaussian_renderer/render_stage2_lambertian.py",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/code_snapshot/gaussian_renderer/render_stage2_lambertian.py",
+      "bytes": 8134,
+      "sha256": "ec3411f4a95f636424baad73a78f801fd98f2b5c2b0c7d60e1e35de5ea9e394b"
+    },
+    {
+      "path": "commands/code_snapshot/scene/stage2_photometric.py",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/code_snapshot/scene/stage2_photometric.py",
+      "bytes": 17649,
+      "sha256": "4004dcc7a409d287e555048719f528456a1ef5786e68e1c8d7cd93f27dda93d2"
+    },
+    {
+      "path": "commands/code_snapshot/scripts/eval_albedo_gt.py",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/code_snapshot/scripts/eval_albedo_gt.py",
+      "bytes": 19902,
+      "sha256": "e14a5b99453784c9ae5e92deb89f5d7768e6326dbf34bd022013c9ae8bf27f61"
+    },
+    {
+      "path": "commands/code_snapshot/scripts/eval_geometry_gt.py",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/code_snapshot/scripts/eval_geometry_gt.py",
+      "bytes": 26172,
+      "sha256": "0e81a53568f7b849607a3d926ce2cd79dd247f7009335d643a7ef15bde1216e8"
+    },
+    {
+      "path": "commands/code_snapshot/scripts/export_blender_geometry.py",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/code_snapshot/scripts/export_blender_geometry.py",
+      "bytes": 8224,
+      "sha256": "358d7c1c1bd1462ecfa3ec287678ea1d3714dcea6d4744f08d4cd0a069bff764"
+    },
+    {
+      "path": "commands/code_snapshot/scripts/extract_geometry_mesh_dynamic.py",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/code_snapshot/scripts/extract_geometry_mesh_dynamic.py",
+      "bytes": 6714,
+      "sha256": "810c134e4e96151d943f619ee5fff7776d566b8b854ffc5dc779301e08d86da8"
+    },
+    {
+      "path": "commands/code_snapshot/scripts/render_stage2.py",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/code_snapshot/scripts/render_stage2.py",
+      "bytes": 13131,
+      "sha256": "4bade45659624574f2036e0ccc8cacdcc53f851e56688abe92c30f2c1f856669"
+    },
+    {
+      "path": "commands/code_snapshot/scripts/stage2_runtime.py",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/code_snapshot/scripts/stage2_runtime.py",
+      "bytes": 38762,
+      "sha256": "ad9ef9b231d93571df683d3f76f698317fef12e29ec2d472f2005e5517174059"
+    },
+    {
+      "path": "commands/code_snapshot/scripts/train_stage2.py",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/code_snapshot/scripts/train_stage2.py",
+      "bytes": 14700,
+      "sha256": "81ece2c95eda6d152b7f55c49ee2606dd8a12fd7a510a01a4d2e5073f1160f5c"
+    },
+    {
+      "path": "commands/export_gt_meshes.sh",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/export_gt_meshes.sh",
+      "bytes": 746,
+      "sha256": "8e58eee648edacc491751f683c163918a1f072fbdbeb98096b647e2055644bc4"
+    },
+    {
+      "path": "commands/normal_depth.sh",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/normal_depth.sh",
+      "bytes": 884,
+      "sha256": "25d2b501311ab582571272ce4c4da909ddf243e77c779651472ca99cf62e51a5"
+    },
+    {
+      "path": "commands/predicted_meshes.sh",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/predicted_meshes.sh",
+      "bytes": 568,
+      "sha256": "6bb507ad976cffed49be817b46c8fe1787514258214caeb416128e51026777ed"
+    },
+    {
+      "path": "commands/prepare_depth_gt.sh",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/prepare_depth_gt.sh",
+      "bytes": 853,
+      "sha256": "18411a1287a1b502baf856e0570445155011855eca32a6b199b07d0fef091db1"
+    },
+    {
+      "path": "commands/prepare_gt_directions.py",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/prepare_gt_directions.py",
+      "bytes": 1794,
+      "sha256": "a8a70c5f3e5d88c9ac075cc6d8122bd2483bb44072f07b1c0a2a2a5578a7fbaf"
+    },
+    {
+      "path": "commands/prepare_jump_depth_gt.py",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/prepare_jump_depth_gt.py",
+      "bytes": 10007,
+      "sha256": "0f366317b0076362f388cae9868465969a3a51b151e957d8958b3422ae484bfb"
+    },
+    {
+      "path": "commands/render.sh",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/render.sh",
+      "bytes": 464,
+      "sha256": "269b9e3d78ee82d218b6c417860fe08724b5409cf7461dc700227cd05c7c1943"
+    },
+    {
+      "path": "commands/run_pipeline.py",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/run_pipeline.py",
+      "bytes": 1871,
+      "sha256": "c7c32c3783aeae1707fada3c668c5f9f47c7dd200b8ebd67a4e8000e3fe66070"
+    },
+    {
+      "path": "commands/summarize_results.py",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/summarize_results.py",
+      "bytes": 4432,
+      "sha256": "e6dadd21d4a682cfd404c8c518bab66792e943463c7ca46940c39b1c2e4105fe"
+    },
+    {
+      "path": "commands/train.sh",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/train.sh",
+      "bytes": 1349,
+      "sha256": "dec802f5c5b21738c08d2b5966670f95324681cd9bdb0c56bd6a56ef5a17c4c9"
+    },
+    {
+      "path": "commands/verify_all_mae.py",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/verify_all_mae.py",
+      "bytes": 7451,
+      "sha256": "00b5dae684d5bd1ab902c288641287255939ff4ba6d1d4bef9f7110125fc81e7"
+    },
+    {
+      "path": "commands/verify_all_mae.sh",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/verify_all_mae.sh",
+      "bytes": 284,
+      "sha256": "585d13ded303047d111f0678f72b65ea9c06f5d4b1bf97853b0a22c0dd72c487"
+    },
+    {
+      "path": "commands/write_reports.py",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/commands/write_reports.py",
+      "bytes": 15091,
+      "sha256": "c9f0448721f7d144796e305b5cf6954d08f6e4e67e62323815277038633231ed"
+    },
+    {
+      "path": "gt_directions.json",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/gt_directions.json",
+      "bytes": 69992,
+      "sha256": "1d0032182b6a18b7c2760bfb7907a7567e6cef6930ddfa923b7cbd65ea530942"
+    },
+    {
+      "path": "inspection/albedo_first_middle_last.png",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/inspection/albedo_first_middle_last.png",
+      "bytes": 683272,
+      "sha256": "37dd3721a228946819e08d2230c4dae973dc230d7d75a2cb24046c4406da782c"
+    },
+    {
+      "path": "inspection/artifact_checks.json",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/inspection/artifact_checks.json",
+      "bytes": 7622,
+      "sha256": "ed81ff13ddd51130fda91a57968bea806418b50587b8a866b88e8dc8e88127a5"
+    },
+    {
+      "path": "inspection/checkpoint_35000.json",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/inspection/checkpoint_35000.json",
+      "bytes": 487,
+      "sha256": "96c1f67285b0e75fc67928258f55920779f8fd94e76616c1a79311a5bfc311b7"
+    },
+    {
+      "path": "inspection/checkpoint_55000.json",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/inspection/checkpoint_55000.json",
+      "bytes": 487,
+      "sha256": "eb34ca03b43a94a46ed5f46161a6cab02e3f1c1eb22d89f42d715e67044b73c1"
+    },
+    {
+      "path": "inspection/four_categories.png",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/inspection/four_categories.png",
+      "bytes": 283270,
+      "sha256": "b993829442c7e303edab6f0503c1763f479fdaacb5618708530b2ed74662bc4d"
+    },
+    {
+      "path": "inspection/gt_audit.json",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/inspection/gt_audit.json",
+      "bytes": 980,
+      "sha256": "171208385f21bf74ee9758d4dfe246f864871f4577040b5d449a96bc2a4fc517"
+    },
+    {
+      "path": "inspection/gt_preflight_audit.json",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/inspection/gt_preflight_audit.json",
+      "bytes": 550,
+      "sha256": "58a08dc1cb9ab108bb6965e48d950dd907ef685480e27e591ab5bf2507a74e71"
+    },
+    {
+      "path": "inspection/independent_audit.json",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/inspection/independent_audit.json",
+      "bytes": 1067,
+      "sha256": "630ec520b90f7edf08cb99d3832fa10e5b18a153db4e2455a12b16acc9981312"
+    },
+    {
+      "path": "inspection/preflight.json",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/inspection/preflight.json",
+      "bytes": 2457,
+      "sha256": "8722f795708febb0164c8733f5750b0d01557581f04ce74e6ad44dd828191fb5"
+    },
+    {
+      "path": "inspection/relight.png",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/inspection/relight.png",
+      "bytes": 164688,
+      "sha256": "abc2639aa16888d99b6ce9cdeb90704d4fbef33232f5cde871939df47b357878"
+    },
+    {
+      "path": "inspection/rgb_comparison.png",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/inspection/rgb_comparison.png",
+      "bytes": 144655,
+      "sha256": "84fce6d648da3df8a44c5232c582b68341b4ab1998c68f8c53cadab19dc25ab0"
+    },
+    {
+      "path": "inspection/three_normals_first_middle_last.png",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/inspection/three_normals_first_middle_last.png",
+      "bytes": 473493,
+      "sha256": "df2a40877eb68a1519f130f020353a5c7262e053d5e39cd63e8b82ed35149b86"
+    },
+    {
+      "path": "inspection/visual_review.json",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/inspection/visual_review.json",
+      "bytes": 2328,
+      "sha256": "c7ffb3ea71ab460e32c07ae5d60fcfb658663944d30b0410280bdb459222290f"
+    },
+    {
+      "path": "logs/albedo.log",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/logs/albedo.log",
+      "bytes": 1425,
+      "sha256": "9e115121a03bb8ee9058e7c6e6f2d864b0ef4585061818cd7d2c25e06f27f5a8"
+    },
+    {
+      "path": "logs/check_artifacts.log",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/logs/check_artifacts.log",
+      "bytes": 395,
+      "sha256": "cc11222a62655a44180fc7bed738f091040f81d5431e4c2e06af773784aed387"
+    },
+    {
+      "path": "logs/check_checkpoint_35000.log",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/logs/check_checkpoint_35000.log",
+      "bytes": 487,
+      "sha256": "96c1f67285b0e75fc67928258f55920779f8fd94e76616c1a79311a5bfc311b7"
+    },
+    {
+      "path": "logs/check_checkpoint_55000.log",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/logs/check_checkpoint_55000.log",
+      "bytes": 487,
+      "sha256": "eb34ca03b43a94a46ed5f46161a6cab02e3f1c1eb22d89f42d715e67044b73c1"
+    },
+    {
+      "path": "logs/export_gt_meshes.log",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/logs/export_gt_meshes.log",
+      "bytes": 1006,
+      "sha256": "dc88e2935bd8bd0ce128cca3304b3a21008b6dc075444b2eb885802dc7be3388"
+    },
+    {
+      "path": "logs/normal_depth.log",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/logs/normal_depth.log",
+      "bytes": 10878,
+      "sha256": "843aa59d4e392c3a876d59030204b70e46dfecbaa22f680c8ee26e874e60633d"
+    },
+    {
+      "path": "logs/predicted_meshes.log",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/logs/predicted_meshes.log",
+      "bytes": 1292,
+      "sha256": "e2b3d2e6ad4966553e67aa6b311d2418b260801620a664638734508b96bde22a"
+    },
+    {
+      "path": "logs/prepare_depth_gt.log",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/logs/prepare_depth_gt.log",
+      "bytes": 795,
+      "sha256": "2f38900a6a42783708b69a706c82c6f5427a5c3834e86313b7d9fd6ac2a8b54e"
+    },
+    {
+      "path": "logs/prepare_gt_directions.log",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/logs/prepare_gt_directions.log",
+      "bytes": 238,
+      "sha256": "a795b6c1fbef500afce5484e5bee86b43c9d5648e2ca16d6d117951b623bf477"
+    },
+    {
+      "path": "logs/render.log",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/logs/render.log",
+      "bytes": 891,
+      "sha256": "ca19cda6cc631e8d09d29f01b4bef146e7efbfc658dd14c4de43d39589398633"
+    },
+    {
+      "path": "logs/runner_gt.log",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/logs/runner_gt.log",
+      "bytes": 611,
+      "sha256": "94f0519af49be9c681b760fa2d22af2c7b779ac4687becb08070b3be42d3d3fd"
+    },
+    {
+      "path": "logs/runner_main.log",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/logs/runner_main.log",
+      "bytes": 1599,
+      "sha256": "479499243afdded1581e7b4c21061cf857127615418289173c3d08d3d0fa8de7"
+    },
+    {
+      "path": "logs/summarize_results.log",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/logs/summarize_results.log",
+      "bytes": 4774,
+      "sha256": "02ba6d467030c53993a4ac27fe18787109016f3f2a308bbd519e9264cf4fe1f8"
+    },
+    {
+      "path": "logs/train.log",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/logs/train.log",
+      "bytes": 48330,
+      "sha256": "4eddd6227753137c44f8e7b160235b15d19593031e090254326f10382297dfdc"
+    },
+    {
+      "path": "logs/verify_all_mae.log",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/logs/verify_all_mae.log",
+      "bytes": 1067,
+      "sha256": "630ec520b90f7edf08cb99d3832fa10e5b18a153db4e2455a12b16acc9981312"
+    },
+    {
+      "path": "metrics_summary.csv",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/metrics_summary.csv",
+      "bytes": 595,
+      "sha256": "7a49165bfe5108f0ee2180ddb72686253276b216f6561b3511c07ac6bae20d51"
+    },
+    {
+      "path": "metrics_summary.json",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/metrics_summary.json",
+      "bytes": 4902,
+      "sha256": "e81d925448d9db1a17f48379b1d397c7183a6a40989109a5631875f1b7a66ed0"
+    },
+    {
+      "path": "normal_depth/comparison_0010.png",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/normal_depth/comparison_0010.png",
+      "bytes": 538576,
+      "sha256": "a3d48cbe418bc2601c1cb9bc8c4ca3ef8b5bc30f769d7157aedf7e75628c2b5b"
+    },
+    {
+      "path": "normal_depth/comparison_0080.png",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/normal_depth/comparison_0080.png",
+      "bytes": 383143,
+      "sha256": "c7a90ee5df53d244a8473cebc8ea0584326f399266fce879c1e98d24cec25a09"
+    },
+    {
+      "path": "normal_depth/comparison_0150.png",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/normal_depth/comparison_0150.png",
+      "bytes": 373098,
+      "sha256": "e0cbf9244c20ff8b1eebcfe515b7c70015054d3079b07bede30eb2c1071deaa7"
+    },
+    {
+      "path": "normal_depth/metrics.json",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/normal_depth/metrics.json",
+      "bytes": 631190,
+      "sha256": "f1161e5bee28efa5028a8aa6924e3d80d923cf338a7bd641712a4f73932fe9ec"
+    },
+    {
+      "path": "normal_depth/metrics_summary.csv",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/normal_depth/metrics_summary.csv",
+      "bytes": 999,
+      "sha256": "b18366afc8a87df4833b8a161b6febbf4a063ee0718fe6feef2d5983644ad610"
+    },
+    {
+      "path": "normal_depth/normal_metrics_per_frame.csv",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/normal_depth/normal_metrics_per_frame.csv",
+      "bytes": 8843,
+      "sha256": "b9f157815cfaf7bc2a9ef93aecdda2fcd6eea2e1578caff302eac026aadd4647"
+    },
+    {
+      "path": "planned_commands.json",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/planned_commands.json",
+      "bytes": 8364,
+      "sha256": "24b92f9b9420c550f707207b9b87a1812df23df3b47be1cb46eedeb47898424d"
+    },
+    {
+      "path": "state.json",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/state.json",
+      "bytes": 276,
+      "sha256": "bc2062766132e9ef4723e1f2f0c4442f8cdde17c97ae52069fde7243634f1624"
+    },
+    {
+      "path": "documents/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian训练报告.md",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/训练/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian训练报告.md",
+      "bytes": 12102,
+      "sha256": "6e0ffbea210ab8d2d9137e3bc28381ffe365e611073ae045cbad07584544a344"
+    },
+    {
+      "path": "documents/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian-各项MAE与三类Normal评测报告.md",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian-各项MAE与三类Normal评测报告.md",
+      "bytes": 17333,
+      "sha256": "3907181a2b9c9fc672ac312701f59b791d2b68d19bb623bb63afa28b1288dbc1",
+      "note": "归档副本链接改为绝对路径，正文和数值与主报告一致"
+    },
+    {
+      "path": "documents/1009-04-dir多SUN兼容表与GT-Lambertian执行记录.md",
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/修改/1009-04-dir多SUN兼容表与GT-Lambertian执行记录.md",
+      "bytes": 2402,
+      "sha256": "baa3ddc9034c72b4a4ce1e23780297759b13ac7e5266d9cdc1eb41914208bc26"
+    }
+  ],
+  "not_embedded": "完整权重、浮点数组、GT及预测Mesh保留在source输出目录"
+}

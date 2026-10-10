@@ -1,0 +1,36 @@
+{
+  "installed_source_metadata": {
+    "url": "https://github.com/hbb1/diff-surfel-rasterization.git",
+    "vcs_info": {
+      "commit_id": "f7e2b68a0f17d6d7bca3fa564a96c7678581ce5a",
+      "requested_revision": "f7e2b68a0f17d6d7bca3fa564a96c7678581ce5a",
+      "vcs": "git"
+    }
+  },
+  "installed_extension_sha256": "49de0cdbfae3b83f513c0c2a387eba317f9a159aaf69c115b1bff7c615a889e4",
+  "native_snapshot": {
+    "README.md": "2c228f36bce62f74cb97f9be7d089a851425e30f52caf28d69d0168397440e01",
+    ".gitmodules": "b3e723b5074f9d22ad417e4414072675aa96fd85296d6c867cbb320f18e57d1f",
+    "setup.py": "e098a26cb42165806df3c9dfe355e3ddf237bc869f5af5b25c582b2753c6fd9d",
+    "rasterize_points.h": "6cb09279b26a95f2386ef78ad435d07a06d6485272a159b1abe6aa2f108e1e0c",
+    "rasterize_points.cu": "8ce6965419f54f2cdf4135286dc6bee5d564346e6dd75fdfb63fe1559124e209",
+    "LICENSE.md": "cd5c95b3cfff3acc1bd412420c770f88809331c3db6872df11a970147aa8e81f",
+    "ext.cpp": "102d6ca2a07cf57717e5828c49a7100841cc0147f7373de768070f06bc4909ef",
+    "CMakeLists.txt": "8fc64ae6030af399b7b9559dea0c68e0aef619dca110e11248cf08ca9e9ad830",
+    ".gitignore": "fbbefba8d3739c81185226279dd2ddf215d154fd5bd0c0214e72a1f63faa2f43",
+    "diff_surfel_rasterization/__init__.py": "5d176066f3c59c32f5d5f5179534715568f5bb8f219dfb12d85f595f606fd1ea",
+    "third_party/stbi_image_write.h": "24d110c51536eea49b99b3ef9eb717e3587338358d41b2596d5b1d1c0b0a18b8",
+    "cuda_rasterizer/rasterizer_impl.cu": "a45132b5669b44b68e06e5d702c39f0aea923ca1d28265be327e7b790093101c",
+    "cuda_rasterizer/config.h": "86d90fe26989e5a991104842961341d1bcb4374d5068dcb2a56d63a9017f8d65",
+    "cuda_rasterizer/rasterizer_impl.h": "6aebed812748ed98d13868aaad8d61dc9d7af93627ba7da9690db8be9ff6c2f3",
+    "cuda_rasterizer/backward.h": "690b93e42650b37e171b73275a9f5a67842c88d4856ed7f69ff8fe65e9c6f975",
+    "cuda_rasterizer/backward.cu": "e946a6a1dcf440f1f3f1af1a3128f6f2a0b84d01c83dd9564ec7c8ce5489f744",
+    "cuda_rasterizer/forward.h": "90d87b692db998e251937c664469919e52f0d1165a40871c5e92dbf8455812ec",
+    "cuda_rasterizer/forward.cu": "3647ad319d7a1b12b905e14413cd5b0b9d664477558914d3b0c162725d3cd465",
+    "cuda_rasterizer/auxiliary.h": "015acc22f176aa24a9b5c3c0bae92577e6a3c814383519f95dd41528a977fcbe",
+    "cuda_rasterizer/rasterizer.h": "eb219011e9d7ad937d8d3fd07aef09bdbc212267a521f7bedc0b278d6bba7d81"
+  },
+  "train_steps": 0,
+  "gt_labels_used": false,
+  "status": "DIAGNOSTIC_BUILD_PLANNED"
+}

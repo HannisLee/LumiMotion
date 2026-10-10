@@ -1,0 +1,41 @@
+{
+  "status": "PASS",
+  "iteration": 55000,
+  "frames": 15,
+  "independently_recomputed_normal": {
+    "gs_render": {
+      "mae_deg": 13.889867645864298,
+      "coverage": 0.9293556361675649,
+      "common_mae_deg": 12.622846205484528
+    },
+    "depth_normal": {
+      "mae_deg": 18.922640487946197,
+      "coverage": 0.883709286455337,
+      "common_mae_deg": 18.837130420876548
+    },
+    "mesh": {
+      "mae_deg": 14.957262857211683,
+      "coverage": 0.9394222413722549,
+      "common_mae_deg": 13.563316265555063
+    }
+  },
+  "independently_recomputed_depth": {
+    "expected": {
+      "mae": 0.05899602271818989,
+      "coverage": 0.9293556361675649
+    },
+    "median": {
+      "mae": 0.05912711887010592,
+      "coverage": 0.9293556361675649
+    }
+  },
+  "independently_recomputed_albedo": {
+    "mae_linear": 0.19101779361724958,
+    "coverage_pct": 96.26582001553288
+  },
+  "source_hashes_verified": 83,
+  "dynamic_meshes": 15,
+  "train_poses_per_time": 135,
+  "common_normal_pixels": 366343,
+  "roughness_independent_check_log": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/logs/verify_roughness.log"
+}

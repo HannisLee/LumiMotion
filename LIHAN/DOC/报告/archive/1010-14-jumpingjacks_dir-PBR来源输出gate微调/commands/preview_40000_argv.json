@@ -1,0 +1,14 @@
+[
+  "/home/lihan/miniconda3/envs/lumimotion/bin/python",
+  "-u",
+  "-m",
+  "scripts.render_stage2",
+  "--model_path",
+  "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-14-jumpingjacks_dir-PBR来源输出gate微调/model_mlp",
+  "--load_iter",
+  "40000",
+  "--task",
+  "eval",
+  "--output_path",
+  "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-14-jumpingjacks_dir-PBR来源输出gate微调/preview_40000"
+]

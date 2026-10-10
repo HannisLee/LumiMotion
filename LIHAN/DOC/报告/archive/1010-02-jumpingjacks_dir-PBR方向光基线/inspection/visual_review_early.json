@@ -1,0 +1,17 @@
+{
+  "status": "FAILED",
+  "scope": "55k首中尾人工图像质量；不等同所有150帧逐帧人工查看",
+  "rgb": {
+    "background": "黑背景正常",
+    "foreground": "人物强斑驳，头手边界欠完整、脚周平台伪几何/阴影误差"
+  },
+  "alpha": "主体/平台大致覆盖，边界毛糙/局部漏检残影",
+  "normal": "人体/平台斑驳，脚周强异常；冻结几何无法修复",
+  "albedo": "保留强照明与暗背面结构、平台偏白/缺棋盘格",
+  "evidence": [
+    "inspection/rgb_final_55000.png",
+    "inspection/four_categories_final_55000.png"
+  ],
+  "normal_target_pass": false,
+  "commit_allowed": false
+}

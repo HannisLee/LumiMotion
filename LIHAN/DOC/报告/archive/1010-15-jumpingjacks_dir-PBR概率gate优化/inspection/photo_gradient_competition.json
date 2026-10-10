@@ -1,0 +1,1096 @@
+{
+  "status": "PASS_READ_ONLY_LOSS_GRADIENT_RELATION",
+  "iteration": 40000,
+  "rows": [
+    {
+      "frame": "0001",
+      "eligible_pixels": 18960,
+      "losses": {
+        "PBR_photo": 0.06200587376952171,
+        "SH_photo": 0.016729122027754784,
+        "normal_depth": 0.007351449225097895,
+        "own_alpha": 0.0030755377374589443
+      },
+      "pairs": {
+        "PBR_photo_vs_SH_photo": {
+          "canonical_XYZ": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.38226300259427703,
+              "b_L2": 0.03913212868929122,
+              "aggregate_cosine": -0.2087736323364095,
+              "both_nonzero_points": 45057,
+              "negative_dot_points": 19806,
+              "negative_fraction": 0.4395765363872428,
+              "median_point_cosine": 0.35877062822107686,
+              "b_to_a_L2_ratio": 0.10236964713748388,
+              "a_squared_gradient_fraction_where_negative": 0.819147966019882
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.009611508367039957,
+              "b_L2": 0.0030832403448272597,
+              "aggregate_cosine": -0.038849641633821076,
+              "both_nonzero_points": 11549,
+              "negative_dot_points": 5320,
+              "negative_fraction": 0.4606459433717205,
+              "median_point_cosine": 0.20894692840109444,
+              "b_to_a_L2_ratio": 0.3207863143937314,
+              "a_squared_gradient_fraction_where_negative": 0.540817669215659
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.38214214902219645,
+              "b_L2": 0.03901047455147501,
+              "aggregate_cosine": -0.20941369504940816,
+              "both_nonzero_points": 33508,
+              "negative_dot_points": 14486,
+              "negative_fraction": 0.4323146711233138,
+              "median_point_cosine": 0.4138626289997966,
+              "b_to_a_L2_ratio": 0.10208367397130305,
+              "a_squared_gradient_fraction_where_negative": 0.8193240393978446
+            }
+          },
+          "canonical_quaternion": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.036533271943737775,
+              "b_L2": 0.002875986280371251,
+              "aggregate_cosine": -0.08671552028890904,
+              "both_nonzero_points": 41410,
+              "negative_dot_points": 19110,
+              "negative_fraction": 0.4614827336392176,
+              "median_point_cosine": 0.16959075099627538,
+              "b_to_a_L2_ratio": 0.07872238448284477,
+              "a_squared_gradient_fraction_where_negative": 0.7926154402798568
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.0014144379523873584,
+              "b_L2": 0.00030800439138045253,
+              "aggregate_cosine": -0.20598485281598627,
+              "both_nonzero_points": 9986,
+              "negative_dot_points": 4740,
+              "negative_fraction": 0.47466453034247946,
+              "median_point_cosine": 0.9999999973786245,
+              "b_to_a_L2_ratio": 0.21775744270760514,
+              "a_squared_gradient_fraction_where_negative": 0.7542717254217073
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.036505880679610296,
+              "b_L2": 0.002859445816897746,
+              "aggregate_cosine": -0.08642289810285607,
+              "both_nonzero_points": 31424,
+              "negative_dot_points": 14370,
+              "negative_fraction": 0.45729378818737265,
+              "median_point_cosine": 0.1441142294943233,
+              "b_to_a_L2_ratio": 0.07832836144930584,
+              "a_squared_gradient_fraction_where_negative": 0.7926730023399042
+            }
+          },
+          "native_gate_probability": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.019407627454124502,
+              "b_L2": 0.0013852196517813852,
+              "aggregate_cosine": -0.055729550434198694,
+              "both_nonzero_points": 44687,
+              "negative_dot_points": 20165,
+              "negative_fraction": 0.4512498041936134,
+              "median_point_cosine": 1.0,
+              "b_to_a_L2_ratio": 0.07137501248185794,
+              "a_squared_gradient_fraction_where_negative": 0.4694911150802974
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.00019397060785385995,
+              "b_L2": 0.00016280298208461424,
+              "aggregate_cosine": 0.04259161629564567,
+              "both_nonzero_points": 11494,
+              "negative_dot_points": 5356,
+              "negative_fraction": 0.46598225160953544,
+              "median_point_cosine": 1.0,
+              "b_to_a_L2_ratio": 0.8393177909060953,
+              "a_squared_gradient_fraction_where_negative": 0.38512697859045186
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.01940665810492306,
+              "b_L2": 0.001375619377846103,
+              "aggregate_cosine": -0.05617166477237595,
+              "both_nonzero_points": 33193,
+              "negative_dot_points": 14809,
+              "negative_fraction": 0.44614828427680536,
+              "median_point_cosine": 1.0,
+              "b_to_a_L2_ratio": 0.0708838879114966,
+              "a_squared_gradient_fraction_where_negative": 0.4694995431517643
+            }
+          }
+        },
+        "PBR_photo_vs_normal_depth": {
+          "canonical_XYZ": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.38226300259427703,
+              "b_L2": 0.025500938018039765,
+              "aggregate_cosine": -0.24259112266328042,
+              "both_nonzero_points": 45606,
+              "negative_dot_points": 22976,
+              "negative_fraction": 0.5037933605227383,
+              "median_point_cosine": -0.018020390977259198,
+              "b_to_a_L2_ratio": 0.06671045286876932,
+              "a_squared_gradient_fraction_where_negative": 0.8239415189824328
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.009611508367039957,
+              "b_L2": 0.0016523179592275998,
+              "aggregate_cosine": -0.07185056003681885,
+              "both_nonzero_points": 11545,
+              "negative_dot_points": 5709,
+              "negative_fraction": 0.49449978345604156,
+              "median_point_cosine": 0.02444034182739916,
+              "b_to_a_L2_ratio": 0.17191036995751605,
+              "a_squared_gradient_fraction_where_negative": 0.6265450295302827
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.38214214902219645,
+              "b_L2": 0.025447351240581402,
+              "aggregate_cosine": -0.24306150986438388,
+              "both_nonzero_points": 34061,
+              "negative_dot_points": 17267,
+              "negative_fraction": 0.506943425031561,
+              "median_point_cosine": -0.03307261262998457,
+              "b_to_a_L2_ratio": 0.06659132290351806,
+              "a_squared_gradient_fraction_where_negative": 0.8240663931592467
+            }
+          },
+          "canonical_quaternion": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.036533271943737775,
+              "b_L2": 0.002686431462764688,
+              "aggregate_cosine": -0.06599325550857037,
+              "both_nonzero_points": 42341,
+              "negative_dot_points": 22253,
+              "negative_fraction": 0.5255662360359935,
+              "median_point_cosine": -0.11120378686805728,
+              "b_to_a_L2_ratio": 0.07353383148659297,
+              "a_squared_gradient_fraction_where_negative": 0.6584065164423107
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.0014144379523873584,
+              "b_L2": 0.0004195152786754547,
+              "aggregate_cosine": -0.11573844717978297,
+              "both_nonzero_points": 9064,
+              "negative_dot_points": 4651,
+              "negative_fraction": 0.5131288614298323,
+              "median_point_cosine": -0.9999997168157274,
+              "b_to_a_L2_ratio": 0.2965950383100058,
+              "a_squared_gradient_fraction_where_negative": 0.7596782272265215
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.036505880679610296,
+              "b_L2": 0.0026534733718448877,
+              "aggregate_cosine": -0.06615409529310537,
+              "both_nonzero_points": 33277,
+              "negative_dot_points": 17602,
+              "negative_fraction": 0.5289539321453256,
+              "median_point_cosine": -0.09969634176462865,
+              "b_to_a_L2_ratio": 0.07268618979864627,
+              "a_squared_gradient_fraction_where_negative": 0.6582544860947342
+            }
+          },
+          "native_gate_probability": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.019407627454124502,
+              "b_L2": 0.0008996174161502299,
+              "aggregate_cosine": -0.08039987435665524,
+              "both_nonzero_points": 44933,
+              "negative_dot_points": 22700,
+              "negative_fraction": 0.5051966260877306,
+              "median_point_cosine": -1.0,
+              "b_to_a_L2_ratio": 0.04635380693888183,
+              "a_squared_gradient_fraction_where_negative": 0.6609959298689747
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.00019397060785385995,
+              "b_L2": 4.867350680105312e-05,
+              "aggregate_cosine": -0.05703168412279118,
+              "both_nonzero_points": 11228,
+              "negative_dot_points": 5650,
+              "negative_fraction": 0.5032062700391877,
+              "median_point_cosine": -1.0,
+              "b_to_a_L2_ratio": 0.250932382692353,
+              "a_squared_gradient_fraction_where_negative": 0.7760095307983639
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.01940665810492306,
+              "b_L2": 0.0008982997190117025,
+              "aggregate_cosine": -0.08049094627852212,
+              "both_nonzero_points": 33705,
+              "negative_dot_points": 17050,
+              "negative_fraction": 0.5058596647381693,
+              "median_point_cosine": -1.0,
+              "b_to_a_L2_ratio": 0.04628822304979046,
+              "a_squared_gradient_fraction_where_negative": 0.6609844398817756
+            }
+          }
+        },
+        "PBR_photo_vs_own_alpha": {
+          "canonical_XYZ": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.38226300259427703,
+              "b_L2": 0.0027402261281046407,
+              "aggregate_cosine": -0.0010047851947708186,
+              "both_nonzero_points": 45752,
+              "negative_dot_points": 16999,
+              "negative_fraction": 0.37154659905577897,
+              "median_point_cosine": 0.69762869794422,
+              "b_to_a_L2_ratio": 0.007168431445124806,
+              "a_squared_gradient_fraction_where_negative": 0.4251507089786418
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.009611508367039957,
+              "b_L2": 4.2154096856006413e-05,
+              "aggregate_cosine": 0.021023874252951973,
+              "both_nonzero_points": 11550,
+              "negative_dot_points": 2583,
+              "negative_fraction": 0.22363636363636363,
+              "median_point_cosine": 0.9857997105639403,
+              "b_to_a_L2_ratio": 0.0043857941174521966,
+              "a_squared_gradient_fraction_where_negative": 0.6149703293978929
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.38214214902219645,
+              "b_L2": 0.0027399018714664956,
+              "aggregate_cosine": -0.0010133574089156276,
+              "both_nonzero_points": 34202,
+              "negative_dot_points": 14416,
+              "negative_fraction": 0.4214958189579557,
+              "median_point_cosine": 0.45768097985152345,
+              "b_to_a_L2_ratio": 0.007169849958915028,
+              "a_squared_gradient_fraction_where_negative": 0.42503062797361063
+            }
+          },
+          "canonical_quaternion": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.036533271943737775,
+              "b_L2": 0.0002231833817195296,
+              "aggregate_cosine": 0.02218338268242542,
+              "both_nonzero_points": 38202,
+              "negative_dot_points": 14814,
+              "negative_fraction": 0.38778074446364064,
+              "median_point_cosine": 0.49894203265566345,
+              "b_to_a_L2_ratio": 0.0061090444366230885,
+              "a_squared_gradient_fraction_where_negative": 0.41847388295111104
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.0014144379523873584,
+              "b_L2": 2.0847165030201174e-06,
+              "aggregate_cosine": 0.0025027553472882613,
+              "both_nonzero_points": 8394,
+              "negative_dot_points": 1962,
+              "negative_fraction": 0.23373838456040028,
+              "median_point_cosine": 0.9999999999986294,
+              "b_to_a_L2_ratio": 0.0014738833184597669,
+              "a_squared_gradient_fraction_where_negative": 0.3791774666000361
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.036505880679610296,
+              "b_L2": 0.00022317364502303427,
+              "aggregate_cosine": 0.022200090149440244,
+              "both_nonzero_points": 29808,
+              "negative_dot_points": 12852,
+              "negative_fraction": 0.43115942028985504,
+              "median_point_cosine": 0.24067223796592674,
+              "b_to_a_L2_ratio": 0.006113361487747476,
+              "a_squared_gradient_fraction_where_negative": 0.4185328752184492
+            }
+          },
+          "native_gate_probability": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.019407627454124502,
+              "b_L2": 0.00013019726060245574,
+              "aggregate_cosine": -0.0008079108480630044,
+              "both_nonzero_points": 44144,
+              "negative_dot_points": 16996,
+              "negative_fraction": 0.3850126857557086,
+              "median_point_cosine": 1.0,
+              "b_to_a_L2_ratio": 0.006708561410209173,
+              "a_squared_gradient_fraction_where_negative": 0.48031219798109975
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.00019397060785385995,
+              "b_L2": 1.6600763010440253e-06,
+              "aggregate_cosine": 0.038497224868592826,
+              "both_nonzero_points": 11108,
+              "negative_dot_points": 2702,
+              "negative_fraction": 0.2432481094706518,
+              "median_point_cosine": 1.0,
+              "b_to_a_L2_ratio": 0.008558390982074712,
+              "a_squared_gradient_fraction_where_negative": 0.5050990862297609
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.01940665810492306,
+              "b_L2": 0.00013018667679550963,
+              "aggregate_cosine": -0.000812923435384316,
+              "both_nonzero_points": 33036,
+              "negative_dot_points": 14294,
+              "negative_fraction": 0.4326795011502603,
+              "median_point_cosine": 1.0,
+              "b_to_a_L2_ratio": 0.006708351128342082,
+              "a_squared_gradient_fraction_where_negative": 0.48030972174327763
+            }
+          }
+        }
+      }
+    },
+    {
+      "frame": "0075",
+      "eligible_pixels": 15940,
+      "losses": {
+        "PBR_photo": 0.11945498734712601,
+        "SH_photo": 0.01303393766283989,
+        "normal_depth": 0.008805098943412304,
+        "own_alpha": 0.0020853769965469837
+      },
+      "pairs": {
+        "PBR_photo_vs_SH_photo": {
+          "canonical_XYZ": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.544272838664532,
+              "b_L2": 0.05142559805298236,
+              "aggregate_cosine": -0.13924229476002656,
+              "both_nonzero_points": 31550,
+              "negative_dot_points": 14124,
+              "negative_fraction": 0.4476703645007924,
+              "median_point_cosine": 0.31192440335075483,
+              "b_to_a_L2_ratio": 0.0944849612175467,
+              "a_squared_gradient_fraction_where_negative": 0.5553514792404296
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.011012441072628925,
+              "b_L2": 0.004334851835777409,
+              "aggregate_cosine": -0.04854268580395375,
+              "both_nonzero_points": 11925,
+              "negative_dot_points": 5378,
+              "negative_fraction": 0.4509853249475891,
+              "median_point_cosine": 0.23718644943576705,
+              "b_to_a_L2_ratio": 0.39363223895486227,
+              "a_squared_gradient_fraction_where_negative": 0.6176164792977756
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.5441614181927726,
+              "b_L2": 0.05124257209263367,
+              "aggregate_cosine": -0.13968514261649148,
+              "both_nonzero_points": 19625,
+              "negative_dot_points": 8746,
+              "negative_fraction": 0.44565605095541405,
+              "median_point_cosine": 0.37214609906756013,
+              "b_to_a_L2_ratio": 0.0941679626292077,
+              "a_squared_gradient_fraction_where_negative": 0.5553259783294623
+            }
+          },
+          "canonical_quaternion": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.06687370181211591,
+              "b_L2": 0.004620360622452276,
+              "aggregate_cosine": -0.12017504707821086,
+              "both_nonzero_points": 29347,
+              "negative_dot_points": 13597,
+              "negative_fraction": 0.4633182267352711,
+              "median_point_cosine": 0.17453752194978256,
+              "b_to_a_L2_ratio": 0.06909084583702793,
+              "a_squared_gradient_fraction_where_negative": 0.19476586607889662
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.002132407612388595,
+              "b_L2": 0.00042413820006043817,
+              "aggregate_cosine": 0.05038960532435834,
+              "both_nonzero_points": 10806,
+              "negative_dot_points": 4967,
+              "negative_fraction": 0.4596520451600962,
+              "median_point_cosine": 0.9999995045567455,
+              "b_to_a_L2_ratio": 0.19890109076535514,
+              "a_squared_gradient_fraction_where_negative": 0.5036957031059957
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.06683969503095015,
+              "b_L2": 0.004600851993789528,
+              "aggregate_cosine": -0.1208942170827823,
+              "both_nonzero_points": 18541,
+              "negative_dot_points": 8630,
+              "negative_fraction": 0.46545493770562535,
+              "median_point_cosine": 0.09877874464504202,
+              "b_to_a_L2_ratio": 0.0688341260632488,
+              "a_squared_gradient_fraction_where_negative": 0.19445143071493312
+            }
+          },
+          "native_gate_probability": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.014309455429076471,
+              "b_L2": 0.0018339785569769461,
+              "aggregate_cosine": 0.017810423100104222,
+              "both_nonzero_points": 31355,
+              "negative_dot_points": 14343,
+              "negative_fraction": 0.45743900494339024,
+              "median_point_cosine": 1.0,
+              "b_to_a_L2_ratio": 0.12816550329723558,
+              "a_squared_gradient_fraction_where_negative": 0.4133513382611619
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.00020954658479955163,
+              "b_L2": 0.0001028609190305361,
+              "aggregate_cosine": -0.07818222194024672,
+              "both_nonzero_points": 11874,
+              "negative_dot_points": 5490,
+              "negative_fraction": 0.4623547246083881,
+              "median_point_cosine": 1.0,
+              "b_to_a_L2_ratio": 0.4908737554894103,
+              "a_squared_gradient_fraction_where_negative": 0.4648007813083122
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.014307921054630017,
+              "b_L2": 0.0018310917450492302,
+              "aggregate_cosine": 0.01790473609219089,
+              "both_nonzero_points": 19481,
+              "negative_dot_points": 8853,
+              "negative_fraction": 0.45444279041116986,
+              "median_point_cosine": 1.0,
+              "b_to_a_L2_ratio": 0.12797748450371077,
+              "a_squared_gradient_fraction_where_negative": 0.4133403028433283
+            }
+          }
+        },
+        "PBR_photo_vs_normal_depth": {
+          "canonical_XYZ": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.544272838664532,
+              "b_L2": 0.06417284505847114,
+              "aggregate_cosine": -0.1488640734987251,
+              "both_nonzero_points": 31667,
+              "negative_dot_points": 15610,
+              "negative_fraction": 0.49294217955600467,
+              "median_point_cosine": 0.03582244869222588,
+              "b_to_a_L2_ratio": 0.11790565411261449,
+              "a_squared_gradient_fraction_where_negative": 0.4752879659290025
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.011012441072628925,
+              "b_L2": 0.0015124015097016193,
+              "aggregate_cosine": 0.10377654745654989,
+              "both_nonzero_points": 11925,
+              "negative_dot_points": 5792,
+              "negative_fraction": 0.4857023060796645,
+              "median_point_cosine": 0.05911476733788297,
+              "b_to_a_L2_ratio": 0.13733571873184824,
+              "a_squared_gradient_fraction_where_negative": 0.27365127419222723
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.5441614181927726,
+              "b_L2": 0.06415502072770296,
+              "aggregate_cosine": -0.14898543189573127,
+              "both_nonzero_points": 19742,
+              "negative_dot_points": 9818,
+              "negative_fraction": 0.49731536825043055,
+              "median_point_cosine": 0.015604461710030125,
+              "b_to_a_L2_ratio": 0.11789704044209845,
+              "a_squared_gradient_fraction_where_negative": 0.4753705471434735
+            }
+          },
+          "canonical_quaternion": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.06687370181211591,
+              "b_L2": 0.009498852714907633,
+              "aggregate_cosine": 0.10458696479196654,
+              "both_nonzero_points": 29349,
+              "negative_dot_points": 14702,
+              "negative_fraction": 0.5009369995570547,
+              "median_point_cosine": -0.0050182770977317565,
+              "b_to_a_L2_ratio": 0.14204167643650123,
+              "a_squared_gradient_fraction_where_negative": 0.6348571710431931
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.002132407612388595,
+              "b_L2": 0.0003484093035105276,
+              "aggregate_cosine": 0.24941189108368547,
+              "both_nonzero_points": 10080,
+              "negative_dot_points": 5048,
+              "negative_fraction": 0.5007936507936508,
+              "median_point_cosine": -0.9992766446725905,
+              "b_to_a_L2_ratio": 0.16338776014791112,
+              "a_squared_gradient_fraction_where_negative": 0.11732921073993458
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.06683969503095015,
+              "b_L2": 0.009492460895718003,
+              "aggregate_cosine": 0.1044185824541113,
+              "both_nonzero_points": 19269,
+              "negative_dot_points": 9654,
+              "negative_fraction": 0.501011988167523,
+              "median_point_cosine": -0.003003032972631707,
+              "b_to_a_L2_ratio": 0.1420183154833743,
+              "a_squared_gradient_fraction_where_negative": 0.6353839220172177
+            }
+          },
+          "native_gate_probability": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.014309455429076471,
+              "b_L2": 0.0017679253275552497,
+              "aggregate_cosine": -0.13155862164576684,
+              "both_nonzero_points": 31165,
+              "negative_dot_points": 15415,
+              "negative_fraction": 0.494625381036419,
+              "median_point_cosine": 1.0,
+              "b_to_a_L2_ratio": 0.12354944856691526,
+              "a_squared_gradient_fraction_where_negative": 0.6254779009737798
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.00020954658479955163,
+              "b_L2": 3.1135656021864855e-05,
+              "aggregate_cosine": 0.01648917221715739,
+              "both_nonzero_points": 11746,
+              "negative_dot_points": 5770,
+              "negative_fraction": 0.4912310573812361,
+              "median_point_cosine": 1.0,
+              "b_to_a_L2_ratio": 0.14858584334194064,
+              "a_squared_gradient_fraction_where_negative": 0.3716892487579212
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.014307921054630017,
+              "b_L2": 0.00176765113490627,
+              "aggregate_cosine": -0.13159739276385074,
+              "both_nonzero_points": 19419,
+              "negative_dot_points": 9645,
+              "negative_fraction": 0.49667851073690716,
+              "median_point_cosine": 1.0,
+              "b_to_a_L2_ratio": 0.12354353425330519,
+              "a_squared_gradient_fraction_where_negative": 0.6255323362339649
+            }
+          }
+        },
+        "PBR_photo_vs_own_alpha": {
+          "canonical_XYZ": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.544272838664532,
+              "b_L2": 0.0025951718675314627,
+              "aggregate_cosine": -0.0004673374595641174,
+              "both_nonzero_points": 31676,
+              "negative_dot_points": 14116,
+              "negative_fraction": 0.4456370753883066,
+              "median_point_cosine": 0.29012369986604225,
+              "b_to_a_L2_ratio": 0.004768145097777004,
+              "a_squared_gradient_fraction_where_negative": 0.5559299863388403
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.011012441072628925,
+              "b_L2": 9.850989056562418e-06,
+              "aggregate_cosine": 0.017206548248347605,
+              "both_nonzero_points": 11926,
+              "negative_dot_points": 4785,
+              "negative_fraction": 0.40122421599865843,
+              "median_point_cosine": 0.41592079034604,
+              "b_to_a_L2_ratio": 0.0008945327372553884,
+              "a_squared_gradient_fraction_where_negative": 0.6049473033061972
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.5441614181927726,
+              "b_L2": 0.0025951531708246715,
+              "aggregate_cosine": -0.00046875831958946,
+              "both_nonzero_points": 19750,
+              "negative_dot_points": 9331,
+              "negative_fraction": 0.4724556962025317,
+              "median_point_cosine": 0.1824271549406879,
+              "b_to_a_L2_ratio": 0.004769087046713999,
+              "a_squared_gradient_fraction_where_negative": 0.5559099110760972
+            }
+          },
+          "canonical_quaternion": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.06687370181211591,
+              "b_L2": 0.00035569032525917753,
+              "aggregate_cosine": -0.002802387680748716,
+              "both_nonzero_points": 24823,
+              "negative_dot_points": 12229,
+              "negative_fraction": 0.49264794746807394,
+              "median_point_cosine": 0.03371004340154293,
+              "b_to_a_L2_ratio": 0.00531883708574265,
+              "a_squared_gradient_fraction_where_negative": 0.21594816744555442
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.002132407612388595,
+              "b_L2": 5.910630873598965e-07,
+              "aggregate_cosine": 0.032172170848167675,
+              "both_nonzero_points": 7956,
+              "negative_dot_points": 3430,
+              "negative_fraction": 0.43112116641528403,
+              "median_point_cosine": 0.9999999975647051,
+              "b_to_a_L2_ratio": 0.0002771810998638404,
+              "a_squared_gradient_fraction_where_negative": 0.5277335774689814
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.06683969503095015,
+              "b_L2": 0.00035568983416370823,
+              "aggregate_cosine": -0.0028055229593539487,
+              "both_nonzero_points": 16867,
+              "negative_dot_points": 8799,
+              "negative_fraction": 0.5216695322226833,
+              "median_point_cosine": -0.0775773439057724,
+              "b_to_a_L2_ratio": 0.005321535862768462,
+              "a_squared_gradient_fraction_where_negative": 0.21563082561861194
+            }
+          },
+          "native_gate_probability": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.014309455429076471,
+              "b_L2": 0.00015077667830925198,
+              "aggregate_cosine": -0.010254592318440435,
+              "both_nonzero_points": 29844,
+              "negative_dot_points": 13848,
+              "negative_fraction": 0.4640128669079212,
+              "median_point_cosine": 1.0,
+              "b_to_a_L2_ratio": 0.010536856490211178,
+              "a_squared_gradient_fraction_where_negative": 0.43546274165714854
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.00020954658479955163,
+              "b_L2": 2.578820768999656e-07,
+              "aggregate_cosine": 0.026473419376706914,
+              "both_nonzero_points": 11180,
+              "negative_dot_points": 4708,
+              "negative_fraction": 0.4211091234347048,
+              "median_point_cosine": 1.0,
+              "b_to_a_L2_ratio": 0.0012306670478387936,
+              "a_squared_gradient_fraction_where_negative": 0.4088263705668872
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.014307921054630017,
+              "b_L2": 0.00015077645777377205,
+              "aggregate_cosine": -0.01025637015118214,
+              "both_nonzero_points": 18664,
+              "negative_dot_points": 9140,
+              "negative_fraction": 0.48971281611658807,
+              "median_point_cosine": 1.0,
+              "b_to_a_L2_ratio": 0.010537971044016983,
+              "a_squared_gradient_fraction_where_negative": 0.43546845490625585
+            }
+          }
+        }
+      }
+    },
+    {
+      "frame": "0149",
+      "eligible_pixels": 19214,
+      "losses": {
+        "PBR_photo": 0.0613257959485054,
+        "SH_photo": 0.018029995262622833,
+        "normal_depth": 0.0072327363304793835,
+        "own_alpha": 0.0033226236701011658
+      },
+      "pairs": {
+        "PBR_photo_vs_SH_photo": {
+          "canonical_XYZ": {
+            "all": {
+              "points": 99827,
+              "a_L2": 1.4447237258762224,
+              "b_L2": 0.02922794261810736,
+              "aggregate_cosine": 0.01829716820991079,
+              "both_nonzero_points": 45360,
+              "negative_dot_points": 19579,
+              "negative_fraction": 0.43163580246913585,
+              "median_point_cosine": 0.39583039386303487,
+              "b_to_a_L2_ratio": 0.020230817902835135,
+              "a_squared_gradient_fraction_where_negative": 0.6007829264366822
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.043765437985316145,
+              "b_L2": 0.003092933396419571,
+              "aggregate_cosine": 0.06902066603812587,
+              "both_nonzero_points": 11730,
+              "negative_dot_points": 5249,
+              "negative_fraction": 0.4474850809889173,
+              "median_point_cosine": 0.2602746873094622,
+              "b_to_a_L2_ratio": 0.07067068305033962,
+              "a_squared_gradient_fraction_where_negative": 0.26871992319060656
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 1.4440606741226725,
+              "b_L2": 0.029063833069515953,
+              "aggregate_cosine": 0.018186323312852862,
+              "both_nonzero_points": 33630,
+              "negative_dot_points": 14330,
+              "negative_fraction": 0.42610764198632173,
+              "median_point_cosine": 0.44952851133294247,
+              "b_to_a_L2_ratio": 0.020126462544361894,
+              "a_squared_gradient_fraction_where_negative": 0.6010879350946486
+            }
+          },
+          "canonical_quaternion": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.1683406555661475,
+              "b_L2": 0.0017887456986750662,
+              "aggregate_cosine": 0.06026067933677159,
+              "both_nonzero_points": 41649,
+              "negative_dot_points": 18839,
+              "negative_fraction": 0.45232778698168025,
+              "median_point_cosine": 0.22176947812746717,
+              "b_to_a_L2_ratio": 0.010625749868083408,
+              "a_squared_gradient_fraction_where_negative": 0.24294274563690935
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.005584925381754399,
+              "b_L2": 0.0003637580438140707,
+              "aggregate_cosine": 0.034503235037464,
+              "both_nonzero_points": 10110,
+              "negative_dot_points": 4687,
+              "negative_fraction": 0.46360039564787336,
+              "median_point_cosine": 0.9999999990217403,
+              "b_to_a_L2_ratio": 0.0651321224456186,
+              "a_squared_gradient_fraction_where_negative": 0.5464526902114608
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.16824798639187497,
+              "b_L2": 0.0017513683964515037,
+              "aggregate_cosine": 0.06134276574889658,
+              "both_nonzero_points": 31539,
+              "negative_dot_points": 14152,
+              "negative_fraction": 0.4487142902438251,
+              "median_point_cosine": 0.18092859556874527,
+              "b_to_a_L2_ratio": 0.010409446401172981,
+              "a_squared_gradient_fraction_where_negative": 0.24260831356073995
+            }
+          },
+          "native_gate_probability": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.03668488251696405,
+              "b_L2": 0.0013520020424795847,
+              "aggregate_cosine": 0.030108146349819877,
+              "both_nonzero_points": 45034,
+              "negative_dot_points": 20074,
+              "negative_fraction": 0.44575209841453123,
+              "median_point_cosine": 1.0,
+              "b_to_a_L2_ratio": 0.036854473824589284,
+              "a_squared_gradient_fraction_where_negative": 0.1485310150636721
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.0003865351954097913,
+              "b_L2": 0.00011159441462887305,
+              "aggregate_cosine": 0.04829340193824038,
+              "both_nonzero_points": 11675,
+              "negative_dot_points": 5448,
+              "negative_fraction": 0.46663811563169166,
+              "median_point_cosine": 1.0,
+              "b_to_a_L2_ratio": 0.2887044076557233,
+              "a_squared_gradient_fraction_where_negative": 0.43232508111168266
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.036682846070420494,
+              "b_L2": 0.0013473886631156608,
+              "aggregate_cosine": 0.030170765361674297,
+              "both_nonzero_points": 33359,
+              "negative_dot_points": 14626,
+              "negative_fraction": 0.43844239935249857,
+              "median_point_cosine": 1.0,
+              "b_to_a_L2_ratio": 0.036730755855995,
+              "a_squared_gradient_fraction_where_negative": 0.1484995045595146
+            }
+          }
+        },
+        "PBR_photo_vs_normal_depth": {
+          "canonical_XYZ": {
+            "all": {
+              "points": 99827,
+              "a_L2": 1.4447237258762224,
+              "b_L2": 0.021354681940223937,
+              "aggregate_cosine": -0.013059113900662781,
+              "both_nonzero_points": 45956,
+              "negative_dot_points": 22939,
+              "negative_fraction": 0.4991513621725129,
+              "median_point_cosine": 0.0037387605321177945,
+              "b_to_a_L2_ratio": 0.014781152657593659,
+              "a_squared_gradient_fraction_where_negative": 0.6294584497333797
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.043765437985316145,
+              "b_L2": 0.0015309822682894635,
+              "aggregate_cosine": 0.011886464870280519,
+              "both_nonzero_points": 11729,
+              "negative_dot_points": 5730,
+              "negative_fraction": 0.4885326967345895,
+              "median_point_cosine": 0.04401189910781317,
+              "b_to_a_L2_ratio": 0.03498153654495877,
+              "a_squared_gradient_fraction_where_negative": 0.023400745565603336
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 1.4440606741226725,
+              "b_L2": 0.021299730844832516,
+              "aggregate_cosine": -0.013124710452046814,
+              "both_nonzero_points": 34227,
+              "negative_dot_points": 17209,
+              "negative_fraction": 0.5027901948753908,
+              "median_point_cosine": -0.012546232019660333,
+              "b_to_a_L2_ratio": 0.0147498863631703,
+              "a_squared_gradient_fraction_where_negative": 0.6300151297765983
+            }
+          },
+          "canonical_quaternion": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.1683406555661475,
+              "b_L2": 0.002084301220584451,
+              "aggregate_cosine": -0.009922418274969678,
+              "both_nonzero_points": 42822,
+              "negative_dot_points": 22939,
+              "negative_fraction": 0.5356825930596423,
+              "median_point_cosine": -0.15800623152581833,
+              "b_to_a_L2_ratio": 0.012381448875642813,
+              "a_squared_gradient_fraction_where_negative": 0.3866025246160928
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.005584925381754399,
+              "b_L2": 0.0003489278192501865,
+              "aggregate_cosine": 0.005436533008142429,
+              "both_nonzero_points": 9328,
+              "negative_dot_points": 4821,
+              "negative_fraction": 0.5168310463121784,
+              "median_point_cosine": -0.9999998417917183,
+              "b_to_a_L2_ratio": 0.062476719991660365,
+              "a_squared_gradient_fraction_where_negative": 0.3809249065120001
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.16824798639187497,
+              "b_L2": 0.0020548870905923618,
+              "aggregate_cosine": -0.010100636874799195,
+              "both_nonzero_points": 33494,
+              "negative_dot_points": 18118,
+              "negative_fraction": 0.5409327043649609,
+              "median_point_cosine": -0.14102617153056446,
+              "b_to_a_L2_ratio": 0.01221344239928209,
+              "a_squared_gradient_fraction_where_negative": 0.3866087806800018
+            }
+          },
+          "native_gate_probability": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.03668488251696405,
+              "b_L2": 0.000904721013179448,
+              "aggregate_cosine": -0.00695820019591073,
+              "both_nonzero_points": 45378,
+              "negative_dot_points": 22948,
+              "negative_fraction": 0.5057076116179646,
+              "median_point_cosine": -1.0,
+              "b_to_a_L2_ratio": 0.02466195749055708,
+              "a_squared_gradient_fraction_where_negative": 0.7186297851954115
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.0003865351954097913,
+              "b_L2": 4.0190828732883526e-05,
+              "aggregate_cosine": -0.025893047624884525,
+              "both_nonzero_points": 11419,
+              "negative_dot_points": 5734,
+              "negative_fraction": 0.5021455468955249,
+              "median_point_cosine": -1.0,
+              "b_to_a_L2_ratio": 0.10397715191309964,
+              "a_squared_gradient_fraction_where_negative": 0.5058653236594387
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.036682846070420494,
+              "b_L2": 0.0009038278646812185,
+              "aggregate_cosine": -0.006953330342414694,
+              "both_nonzero_points": 33959,
+              "negative_dot_points": 17214,
+              "negative_fraction": 0.5069053859065343,
+              "median_point_cosine": -1.0,
+              "b_to_a_L2_ratio": 0.02463897874625457,
+              "a_squared_gradient_fraction_where_negative": 0.7186534090700862
+            }
+          }
+        },
+        "PBR_photo_vs_own_alpha": {
+          "canonical_XYZ": {
+            "all": {
+              "points": 99827,
+              "a_L2": 1.4447237258762224,
+              "b_L2": 0.002728007249289909,
+              "aggregate_cosine": -0.01783409596337277,
+              "both_nonzero_points": 46104,
+              "negative_dot_points": 16902,
+              "negative_fraction": 0.3666059344091619,
+              "median_point_cosine": 0.7141626938199688,
+              "b_to_a_L2_ratio": 0.0018882553116758552,
+              "a_squared_gradient_fraction_where_negative": 0.4088534242409621
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.043765437985316145,
+              "b_L2": 5.2357887171073564e-05,
+              "aggregate_cosine": 0.0008345250793342963,
+              "both_nonzero_points": 11731,
+              "negative_dot_points": 2698,
+              "negative_fraction": 0.22998891825078852,
+              "median_point_cosine": 0.9865408555508242,
+              "b_to_a_L2_ratio": 0.0011963295600661028,
+              "a_squared_gradient_fraction_where_negative": 0.9783739945346825
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 1.4440606741226725,
+              "b_L2": 0.0027275047578014006,
+              "aggregate_cosine": -0.017846057247704127,
+              "both_nonzero_points": 34373,
+              "negative_dot_points": 14204,
+              "negative_fraction": 0.4132313152765252,
+              "median_point_cosine": 0.49529888857618254,
+              "b_to_a_L2_ratio": 0.0018887743476973184,
+              "a_squared_gradient_fraction_where_negative": 0.4083303045223201
+            }
+          },
+          "canonical_quaternion": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.1683406555661475,
+              "b_L2": 0.0002496417808801681,
+              "aggregate_cosine": 0.0005724687338877234,
+              "both_nonzero_points": 38514,
+              "negative_dot_points": 14707,
+              "negative_fraction": 0.3818611414031261,
+              "median_point_cosine": 0.5229261540965321,
+              "b_to_a_L2_ratio": 0.0014829559742451774,
+              "a_squared_gradient_fraction_where_negative": 0.34903291341656917
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.005584925381754399,
+              "b_L2": 2.511450136343211e-06,
+              "aggregate_cosine": 0.0014707862750680208,
+              "both_nonzero_points": 8449,
+              "negative_dot_points": 2022,
+              "negative_fraction": 0.23931826251627414,
+              "median_point_cosine": 0.9999999999988863,
+              "b_to_a_L2_ratio": 0.00044968374054700196,
+              "a_squared_gradient_fraction_where_negative": 0.4999822072980374
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.16824798639187497,
+              "b_L2": 0.0002496291476956057,
+              "aggregate_cosine": 0.0005723218444306414,
+              "both_nonzero_points": 30065,
+              "negative_dot_points": 12685,
+              "negative_fraction": 0.42191917512057214,
+              "median_point_cosine": 0.2703295503516569,
+              "b_to_a_L2_ratio": 0.0014836976836928183,
+              "a_squared_gradient_fraction_where_negative": 0.3488665851408357
+            }
+          },
+          "native_gate_probability": {
+            "all": {
+              "points": 99827,
+              "a_L2": 0.03668488251696405,
+              "b_L2": 0.00014084987393918748,
+              "aggregate_cosine": -0.04819866722475285,
+              "both_nonzero_points": 44521,
+              "negative_dot_points": 17172,
+              "negative_fraction": 0.38570562206599135,
+              "median_point_cosine": 1.0,
+              "b_to_a_L2_ratio": 0.003839452773879126,
+              "a_squared_gradient_fraction_where_negative": 0.7921311778831186
+            },
+            "source_projected": {
+              "points": 15187,
+              "a_L2": 0.0003865351954097913,
+              "b_L2": 2.2565128813166492e-06,
+              "aggregate_cosine": 0.007165763092229991,
+              "both_nonzero_points": 11304,
+              "negative_dot_points": 2831,
+              "negative_fraction": 0.2504423213021939,
+              "median_point_cosine": 1.0,
+              "b_to_a_L2_ratio": 0.005837794095113051,
+              "a_squared_gradient_fraction_where_negative": 0.517910828940477
+            },
+            "source_unprojected": {
+              "points": 84640,
+              "a_L2": 0.036682846070420494,
+              "b_L2": 0.00014083179732681626,
+              "aggregate_cosine": -0.04820873973866312,
+              "both_nonzero_points": 33217,
+              "negative_dot_points": 14341,
+              "negative_fraction": 0.4317367612969263,
+              "median_point_cosine": 1.0,
+              "b_to_a_L2_ratio": 0.0038391731398501575,
+              "a_squared_gradient_fraction_where_negative": 0.7921616253888252
+            }
+          }
+        }
+      }
+    }
+  ],
+  "optimizer_steps": 0,
+  "GT_labels_read": false,
+  "training_changed": false,
+  "training_prior_saved": false,
+  "source_files": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-15-jumpingjacks_dir-PBR概率gate优化/model_mlp/point_cloud/iteration_40000/point_cloud.ply": "b9ab333b76c7637c4d2e6d9e43c0111f71fe527e5986c64fdebb3e6c5f5d22f7",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-15-jumpingjacks_dir-PBR概率gate优化/model_mlp/deform/iteration_40000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+  },
+  "created_at": "2026-10-10T10:27:23.129620+09:00",
+  "limitations": "3 TRAIN原RGB/自身Alpha固定40k的局部梯度；不是优化轨迹、全15正式MAE或GT normal结论。source plane支持仅预测分组，全99827点保留。负dot和范数比不能单独证明损失有害；只读不改loss/Preset。"
+}

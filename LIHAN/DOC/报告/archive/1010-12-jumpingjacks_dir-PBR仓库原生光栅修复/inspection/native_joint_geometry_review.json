@@ -1,0 +1,12 @@
+{
+  "actual_viewed_frames": [
+    "0001",
+    "0075",
+    "0150"
+  ],
+  "comparison": "inspection/native_joint_geometry_comparison.png",
+  "conclusion": "原生投影支持组自身法线向上，但联合光栅中许多平台像素被未投影来源组占据，动态plane候选主要覆盖平台，其它动态也覆盖部分平台/脚周；人体主要其它动态、衣服有静态非投影贡献。source组是预测筛选，不当真实物体标签。",
+  "quality": "FAILED_SO_FAR",
+  "final_mae": false,
+  "training_modified": false
+}

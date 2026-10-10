@@ -1,0 +1,14 @@
+{
+  "status": "FINISHED_QUALITY_FAILED",
+  "step": "finished",
+  "pid": 258864,
+  "training_pid": 258688,
+  "updated_at": "2026-10-10T07:58:11.127570+09:00",
+  "iteration": 55000,
+  "frames": 15,
+  "reviewed_at": "2026-10-10T08:01:26.105680+09:00",
+  "pipeline_exit_code": 0,
+  "verified_session_closed": true,
+  "final_gs_normal_mae_deg": 17.297797047583543,
+  "commit_allowed": false
+}

@@ -1,0 +1,243 @@
+{
+  "automatic_status": "PASS",
+  "scope": "实际权重有限性、几何信赖域和opacity/scale/feature冻结、roughness已变化、全量图片与6视频解码、15帧背景数值；人工实际审阅FAILED；自动数值PASS不等于质量PASS",
+  "manual_review": "FAILED",
+  "checkpoint": {
+    "40000": {
+      "gaussians": 99827,
+      "finite": true,
+      "geometry_unchanged": false,
+      "max_displacement": 0.03549213707447052,
+      "max_rotation_deg": 60.00005340576172,
+      "opacity_scale_feature_unchanged": true,
+      "roughness_range": [
+        0.33245375752449036,
+        0.9128654599189758
+      ],
+      "ply_sha256": "0b1ecef8fa45646c7926ee505cd94818b0e8cef626f958eaa3c6e57223273e44",
+      "deform_sha256": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5",
+      "deform_finite_tensors": 32
+    },
+    "50000": {
+      "gaussians": 99827,
+      "finite": true,
+      "geometry_unchanged": false,
+      "max_displacement": 0.07999999821186066,
+      "max_rotation_deg": 60.00005340576172,
+      "opacity_scale_feature_unchanged": true,
+      "roughness_range": [
+        0.04365788400173187,
+        0.9918642044067383
+      ],
+      "ply_sha256": "445461507a3e3c2b725fe0493e160973ce07f716bc765c6f9c56b94bc96ee931",
+      "deform_sha256": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5",
+      "deform_finite_tensors": 32
+    },
+    "55000": {
+      "gaussians": 99827,
+      "finite": true,
+      "geometry_unchanged": false,
+      "max_displacement": 0.08000001311302185,
+      "max_rotation_deg": 60.00005340576172,
+      "opacity_scale_feature_unchanged": true,
+      "roughness_range": [
+        0.023521995171904564,
+        0.9977287650108337
+      ],
+      "ply_sha256": "ecbc19705fd4debe92254c4f93baa1fca05fc1dbb6848aebc3873b7f6799c633",
+      "deform_sha256": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5",
+      "deform_finite_tensors": 32
+    }
+  },
+  "rgb": {
+    "psnr": 19.235614174536575,
+    "ssim": 0.9104916214942932,
+    "lpips": 0.11079909801483154,
+    "psnr_foreground": 11.882659584201594,
+    "ssim_foreground_bbox": 0.803943928082784,
+    "lpips_foreground_bbox": 0.22023212313652038
+  },
+  "images": {
+    "rgb": 150,
+    "alpha": 150,
+    "normal": 150,
+    "albedo": 150,
+    "directional": 72,
+    "hdr": 150
+  },
+  "videos": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/directional/rotating_directional.mp4": 72,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/hdr/hdr.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/insights/albedo.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/insights/alpha.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/insights/normal.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/insights/rgb.mp4": 150
+  },
+  "representatives": {
+    "rgb": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/insights/rgb/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/insights/rgb/0075.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/insights/rgb/0150.png"
+    ],
+    "alpha": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/insights/alpha/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/insights/alpha/0075.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/insights/alpha/0150.png"
+    ],
+    "normal": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/insights/normal/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/insights/normal/0075.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/insights/normal/0150.png"
+    ],
+    "albedo": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/insights/albedo/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/insights/albedo/0075.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/insights/albedo/0150.png"
+    ],
+    "directional": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/directional/0000.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/directional/0036.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/directional/0071.png"
+    ],
+    "hdr": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/hdr/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/hdr/0076.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/renders_stage2/ours_55000/hdr/0150.png"
+    ]
+  },
+  "background": [
+    {
+      "frame": "0010",
+      "mean_rgb_background_all": 0.002013251529284608,
+      "mean_rgb_background_core": 9.163432514014662e-06,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0020",
+      "mean_rgb_background_all": 0.007042005166957607,
+      "mean_rgb_background_core": 0.000615495602998256,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0030",
+      "mean_rgb_background_all": 0.002986279837208871,
+      "mean_rgb_background_core": 0.0005263016210518154,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0040",
+      "mean_rgb_background_all": 0.0012388395216585506,
+      "mean_rgb_background_core": 0.0004040240856215977,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0050",
+      "mean_rgb_background_all": 0.0014539580132564144,
+      "mean_rgb_background_core": 1.6724078234793136e-05,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0060",
+      "mean_rgb_background_all": 0.003276362505870906,
+      "mean_rgb_background_core": 0.00014921456355635804,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0070",
+      "mean_rgb_background_all": 0.0004315622909141491,
+      "mean_rgb_background_core": 1.4887359262349213e-07,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0080",
+      "mean_rgb_background_all": 0.0005571017216660041,
+      "mean_rgb_background_core": 5.262265801738674e-05,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0090",
+      "mean_rgb_background_all": 0.0033044400775145435,
+      "mean_rgb_background_core": 0.0010388980826772309,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0100",
+      "mean_rgb_background_all": 0.0028746629499919103,
+      "mean_rgb_background_core": 0.00019886332218371636,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0110",
+      "mean_rgb_background_all": 0.0035757068571483433,
+      "mean_rgb_background_core": 0.00012681054265005785,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0120",
+      "mean_rgb_background_all": 0.004552567111441938,
+      "mean_rgb_background_core": 0.0005897152785090461,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0130",
+      "mean_rgb_background_all": 0.0038646954324813446,
+      "mean_rgb_background_core": 0.0002632236340347754,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0140",
+      "mean_rgb_background_all": 0.005602048379489252,
+      "mean_rgb_background_core": 0.0008547004432625962,
+      "p99_background_core": 0.00784313725490196
+    },
+    {
+      "frame": "0150",
+      "mean_rgb_background_all": 0.0016298583378337532,
+      "mean_rgb_background_core": 0.00013053416191072132,
+      "p99_background_core": 0.0
+    }
+  ],
+  "source_files": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/point_cloud/iteration_35000/point_cloud.ply": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/deform/iteration_35000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+  },
+  "visual_review": {
+    "status": "FAILED",
+    "iteration": 55000,
+    "actual_images_viewed": true,
+    "reviewed_at": "2026-10-10T09:00:56.921362+09:00",
+    "reviewed_test_frames": [
+      10,
+      80,
+      150
+    ],
+    "reviewed_insight_frames": [
+      1,
+      75,
+      150
+    ],
+    "reviewed_hdr_frames": [
+      1,
+      76,
+      150
+    ],
+    "reviewed_directional_frames": [
+      0,
+      36,
+      71
+    ],
+    "images": [
+      "inspection/rgb_final_55000_comparison.png",
+      "inspection/four_categories_final_55000.png",
+      "inspection/relight_final_55000.png",
+      "normal_depth/comparison_0010.png",
+      "normal_depth/comparison_0080.png",
+      "normal_depth/comparison_0150.png"
+    ],
+    "rgb_background": "实际查看GT/B06/B07测试0010/0080/0150：黑背景正常、人物与平台存在，但头手、衣服及小腿斑驳稀疏，脚周灰黑污染与伪凸起明显；Direct增加对比，未通过质量验收。GT0080本身背光暗，结论不单凭亮度。",
+    "alpha": "实际查看四类0001/0075/0150：人物和平台大部饱和覆盖，腰手边缘、脚周与平台仍有薄雾和细碎残影；饱和Alpha不代表正确表面。",
+    "albedo_static_dynamic": "材质仍带正背面光照与色差，平台棋盘/脚周污染，身体破碎；固定source feature未纠正静动态误分，材质质量FAILED。",
+    "normal_depth": "实际逐张查看0010/0080/0150 Normal/Depth/Mesh对比：平台GS法线整体上向，但脚周及人体存在混合轴和斑驳；Depth Normal平台呈强烈波纹，Expected/Median Z脚周均出现大块几何偏差；Mesh复现脚周隆起且0080/0150腿部细碎/缺口。与GT平整平台和连续人体有明显差异，质量FAILED。",
+    "relighting": "实际查看HDR0001/0076/0150和SUN0000/0036/0071：存在光照响应，但身体破碎和平台脚周污染/伪凸起保持。SUN36位于平台下侧，Direct无间接光近黑可解释；其它方向仍有伪影。灯表为白色单位原GT方向乘RGB拟合scale7.94063759，未使用GT光强/颜色，无重光照GT精度声明。"
+  }
+}

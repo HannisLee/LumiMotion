@@ -1,0 +1,1593 @@
+{
+  "status": "SOURCE_TRAIN_RGB_CANDIDATE_BUILT_NOT_ACCEPTED",
+  "format_version": 1,
+  "method": "source_native_rotation_transported_TRAIN_RGB_linear_luminance",
+  "source_iteration": 35000,
+  "points": 99827,
+  "TRAIN_frames": 135,
+  "TEST_frames_used": 0,
+  "training_frame_keys": [
+    "0001",
+    "0002",
+    "0003",
+    "0004",
+    "0005",
+    "0006",
+    "0007",
+    "0008",
+    "0009",
+    "0011",
+    "0012",
+    "0013",
+    "0014",
+    "0015",
+    "0016",
+    "0017",
+    "0018",
+    "0019",
+    "0021",
+    "0022",
+    "0023",
+    "0024",
+    "0025",
+    "0026",
+    "0027",
+    "0028",
+    "0029",
+    "0031",
+    "0032",
+    "0033",
+    "0034",
+    "0035",
+    "0036",
+    "0037",
+    "0038",
+    "0039",
+    "0041",
+    "0042",
+    "0043",
+    "0044",
+    "0045",
+    "0046",
+    "0047",
+    "0048",
+    "0049",
+    "0051",
+    "0052",
+    "0053",
+    "0054",
+    "0055",
+    "0056",
+    "0057",
+    "0058",
+    "0059",
+    "0061",
+    "0062",
+    "0063",
+    "0064",
+    "0065",
+    "0066",
+    "0067",
+    "0068",
+    "0069",
+    "0071",
+    "0072",
+    "0073",
+    "0074",
+    "0075",
+    "0076",
+    "0077",
+    "0078",
+    "0079",
+    "0081",
+    "0082",
+    "0083",
+    "0084",
+    "0085",
+    "0086",
+    "0087",
+    "0088",
+    "0089",
+    "0091",
+    "0092",
+    "0093",
+    "0094",
+    "0095",
+    "0096",
+    "0097",
+    "0098",
+    "0099",
+    "0101",
+    "0102",
+    "0103",
+    "0104",
+    "0105",
+    "0106",
+    "0107",
+    "0108",
+    "0109",
+    "0111",
+    "0112",
+    "0113",
+    "0114",
+    "0115",
+    "0116",
+    "0117",
+    "0118",
+    "0119",
+    "0121",
+    "0122",
+    "0123",
+    "0124",
+    "0125",
+    "0126",
+    "0127",
+    "0128",
+    "0129",
+    "0131",
+    "0132",
+    "0133",
+    "0134",
+    "0135",
+    "0136",
+    "0137",
+    "0138",
+    "0139",
+    "0141",
+    "0142",
+    "0143",
+    "0144",
+    "0145",
+    "0146",
+    "0147",
+    "0148",
+    "0149"
+  ],
+  "statistics": {
+    "all": {
+      "points": 99827,
+      "observations_ge12": 80388,
+      "conditioned_points": 77904,
+      "reliable_linear_points": 40948,
+      "relative_residual_median": 0.1872808188199997,
+      "unoriented_source_axis_difference_median_deg": 11.022283554077148,
+      "applicable_points": 29621
+    },
+    "source_static": {
+      "points": 54244,
+      "observations_ge12": 42617,
+      "conditioned_points": 41708,
+      "reliable_linear_points": 28716,
+      "relative_residual_median": 0.18109740316867828,
+      "unoriented_source_axis_difference_median_deg": 9.54464340209961,
+      "applicable_points": 17389
+    },
+    "source_dynamic": {
+      "points": 45583,
+      "observations_ge12": 37771,
+      "conditioned_points": 36196,
+      "reliable_linear_points": 12232,
+      "relative_residual_median": 0.20139333605766296,
+      "unoriented_source_axis_difference_median_deg": 15.82878589630127,
+      "applicable_points": 12232
+    },
+    "projected_source": {
+      "points": 15187,
+      "observations_ge12": 13543,
+      "conditioned_points": 13264,
+      "reliable_linear_points": 11327,
+      "relative_residual_median": 0.20508134365081787,
+      "unoriented_source_axis_difference_median_deg": 5.000063419342041,
+      "applicable_points": 0
+    }
+  },
+  "rows": [
+    {
+      "frame": "0001",
+      "own_rgb_observations": 16206,
+      "projection_roundtrip_max_abs_error": 7.133930921554565e-07,
+      "source_direction_transport_max_abs_error": 7.152557373046875e-07
+    },
+    {
+      "frame": "0002",
+      "own_rgb_observations": 16830,
+      "projection_roundtrip_max_abs_error": 2.08243727684021e-06,
+      "source_direction_transport_max_abs_error": 6.556510925292969e-07
+    },
+    {
+      "frame": "0003",
+      "own_rgb_observations": 18662,
+      "projection_roundtrip_max_abs_error": 1.2069940567016602e-06,
+      "source_direction_transport_max_abs_error": 7.152557373046875e-07
+    },
+    {
+      "frame": "0004",
+      "own_rgb_observations": 22376,
+      "projection_roundtrip_max_abs_error": 1.5497207641601562e-06,
+      "source_direction_transport_max_abs_error": 7.748603820800781e-07
+    },
+    {
+      "frame": "0005",
+      "own_rgb_observations": 25819,
+      "projection_roundtrip_max_abs_error": 1.0132789611816406e-06,
+      "source_direction_transport_max_abs_error": 7.152557373046875e-07
+    },
+    {
+      "frame": "0006",
+      "own_rgb_observations": 29735,
+      "projection_roundtrip_max_abs_error": 1.7285346984863281e-06,
+      "source_direction_transport_max_abs_error": 7.748603820800781e-07
+    },
+    {
+      "frame": "0007",
+      "own_rgb_observations": 32735,
+      "projection_roundtrip_max_abs_error": 1.7285346984863281e-06,
+      "source_direction_transport_max_abs_error": 7.152557373046875e-07
+    },
+    {
+      "frame": "0008",
+      "own_rgb_observations": 35887,
+      "projection_roundtrip_max_abs_error": 1.8477439880371094e-06,
+      "source_direction_transport_max_abs_error": 7.748603820800781e-07
+    },
+    {
+      "frame": "0009",
+      "own_rgb_observations": 38855,
+      "projection_roundtrip_max_abs_error": 1.8477439880371094e-06,
+      "source_direction_transport_max_abs_error": 7.748603820800781e-07
+    },
+    {
+      "frame": "0011",
+      "own_rgb_observations": 42300,
+      "projection_roundtrip_max_abs_error": 1.2516975402832031e-06,
+      "source_direction_transport_max_abs_error": 7.748603820800781e-07
+    },
+    {
+      "frame": "0012",
+      "own_rgb_observations": 42847,
+      "projection_roundtrip_max_abs_error": 2.074986696243286e-06,
+      "source_direction_transport_max_abs_error": 7.748603820800781e-07
+    },
+    {
+      "frame": "0013",
+      "own_rgb_observations": 44541,
+      "projection_roundtrip_max_abs_error": 1.4100223779678345e-06,
+      "source_direction_transport_max_abs_error": 7.748603820800781e-07
+    },
+    {
+      "frame": "0014",
+      "own_rgb_observations": 45150,
+      "projection_roundtrip_max_abs_error": 1.6689300537109375e-06,
+      "source_direction_transport_max_abs_error": 8.940696716308594e-07
+    },
+    {
+      "frame": "0015",
+      "own_rgb_observations": 44409,
+      "projection_roundtrip_max_abs_error": 1.4901161193847656e-06,
+      "source_direction_transport_max_abs_error": 7.748603820800781e-07
+    },
+    {
+      "frame": "0016",
+      "own_rgb_observations": 42969,
+      "projection_roundtrip_max_abs_error": 1.7415732145309448e-06,
+      "source_direction_transport_max_abs_error": 8.940696716308594e-07
+    },
+    {
+      "frame": "0017",
+      "own_rgb_observations": 40516,
+      "projection_roundtrip_max_abs_error": 2.2854655981063843e-06,
+      "source_direction_transport_max_abs_error": 8.940696716308594e-07
+    },
+    {
+      "frame": "0018",
+      "own_rgb_observations": 37114,
+      "projection_roundtrip_max_abs_error": 1.2516975402832031e-06,
+      "source_direction_transport_max_abs_error": 8.940696716308594e-07
+    },
+    {
+      "frame": "0019",
+      "own_rgb_observations": 36000,
+      "projection_roundtrip_max_abs_error": 1.385807991027832e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0021",
+      "own_rgb_observations": 35402,
+      "projection_roundtrip_max_abs_error": 1.1855736374855042e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0022",
+      "own_rgb_observations": 35371,
+      "projection_roundtrip_max_abs_error": 1.5976838767528534e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0023",
+      "own_rgb_observations": 35633,
+      "projection_roundtrip_max_abs_error": 1.7154961824417114e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0024",
+      "own_rgb_observations": 35296,
+      "projection_roundtrip_max_abs_error": 1.1939555406570435e-06,
+      "source_direction_transport_max_abs_error": 1.0132789611816406e-06
+    },
+    {
+      "frame": "0025",
+      "own_rgb_observations": 34835,
+      "projection_roundtrip_max_abs_error": 2.1457672119140625e-06,
+      "source_direction_transport_max_abs_error": 1.0132789611816406e-06
+    },
+    {
+      "frame": "0026",
+      "own_rgb_observations": 34638,
+      "projection_roundtrip_max_abs_error": 2.3115426301956177e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0027",
+      "own_rgb_observations": 34743,
+      "projection_roundtrip_max_abs_error": 1.2218952178955078e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0028",
+      "own_rgb_observations": 34322,
+      "projection_roundtrip_max_abs_error": 1.1865049600601196e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0029",
+      "own_rgb_observations": 33779,
+      "projection_roundtrip_max_abs_error": 1.3709068298339844e-06,
+      "source_direction_transport_max_abs_error": 8.940696716308594e-07
+    },
+    {
+      "frame": "0031",
+      "own_rgb_observations": 31838,
+      "projection_roundtrip_max_abs_error": 1.9818544387817383e-06,
+      "source_direction_transport_max_abs_error": 8.940696716308594e-07
+    },
+    {
+      "frame": "0032",
+      "own_rgb_observations": 30130,
+      "projection_roundtrip_max_abs_error": 1.1920928955078125e-06,
+      "source_direction_transport_max_abs_error": 8.940696716308594e-07
+    },
+    {
+      "frame": "0033",
+      "own_rgb_observations": 28099,
+      "projection_roundtrip_max_abs_error": 2.0265579223632812e-06,
+      "source_direction_transport_max_abs_error": 8.344650268554688e-07
+    },
+    {
+      "frame": "0034",
+      "own_rgb_observations": 25455,
+      "projection_roundtrip_max_abs_error": 1.1026859283447266e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0035",
+      "own_rgb_observations": 23113,
+      "projection_roundtrip_max_abs_error": 1.0728836059570312e-06,
+      "source_direction_transport_max_abs_error": 7.748603820800781e-07
+    },
+    {
+      "frame": "0036",
+      "own_rgb_observations": 20696,
+      "projection_roundtrip_max_abs_error": 1.2218952178955078e-06,
+      "source_direction_transport_max_abs_error": 8.940696716308594e-07
+    },
+    {
+      "frame": "0037",
+      "own_rgb_observations": 18821,
+      "projection_roundtrip_max_abs_error": 1.4901161193847656e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0038",
+      "own_rgb_observations": 17891,
+      "projection_roundtrip_max_abs_error": 1.4901161193847656e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0039",
+      "own_rgb_observations": 17434,
+      "projection_roundtrip_max_abs_error": 1.5497207641601562e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0041",
+      "own_rgb_observations": 19942,
+      "projection_roundtrip_max_abs_error": 2.473592758178711e-06,
+      "source_direction_transport_max_abs_error": 1.0728836059570312e-06
+    },
+    {
+      "frame": "0042",
+      "own_rgb_observations": 22337,
+      "projection_roundtrip_max_abs_error": 1.7285346984863281e-06,
+      "source_direction_transport_max_abs_error": 8.344650268554688e-07
+    },
+    {
+      "frame": "0043",
+      "own_rgb_observations": 25095,
+      "projection_roundtrip_max_abs_error": 8.940696716308594e-07,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0044",
+      "own_rgb_observations": 27645,
+      "projection_roundtrip_max_abs_error": 1.6242265701293945e-06,
+      "source_direction_transport_max_abs_error": 1.0132789611816406e-06
+    },
+    {
+      "frame": "0045",
+      "own_rgb_observations": 31467,
+      "projection_roundtrip_max_abs_error": 1.7285346984863281e-06,
+      "source_direction_transport_max_abs_error": 1.0132789611816406e-06
+    },
+    {
+      "frame": "0046",
+      "own_rgb_observations": 35091,
+      "projection_roundtrip_max_abs_error": 1.519918441772461e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0047",
+      "own_rgb_observations": 38168,
+      "projection_roundtrip_max_abs_error": 1.2516975402832031e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0048",
+      "own_rgb_observations": 40886,
+      "projection_roundtrip_max_abs_error": 2.0265579223632812e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0049",
+      "own_rgb_observations": 42921,
+      "projection_roundtrip_max_abs_error": 2.205371856689453e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0051",
+      "own_rgb_observations": 45511,
+      "projection_roundtrip_max_abs_error": 1.1312076821923256e-06,
+      "source_direction_transport_max_abs_error": 1.0132789611816406e-06
+    },
+    {
+      "frame": "0052",
+      "own_rgb_observations": 46452,
+      "projection_roundtrip_max_abs_error": 1.3709068298339844e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0053",
+      "own_rgb_observations": 48120,
+      "projection_roundtrip_max_abs_error": 1.1604279279708862e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0054",
+      "own_rgb_observations": 48366,
+      "projection_roundtrip_max_abs_error": 1.3206154108047485e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0055",
+      "own_rgb_observations": 46815,
+      "projection_roundtrip_max_abs_error": 2.450309693813324e-06,
+      "source_direction_transport_max_abs_error": 8.344650268554688e-07
+    },
+    {
+      "frame": "0056",
+      "own_rgb_observations": 44767,
+      "projection_roundtrip_max_abs_error": 9.94652509689331e-07,
+      "source_direction_transport_max_abs_error": 8.940696716308594e-07
+    },
+    {
+      "frame": "0057",
+      "own_rgb_observations": 42515,
+      "projection_roundtrip_max_abs_error": 1.3262033462524414e-06,
+      "source_direction_transport_max_abs_error": 8.940696716308594e-07
+    },
+    {
+      "frame": "0058",
+      "own_rgb_observations": 40853,
+      "projection_roundtrip_max_abs_error": 1.9846484065055847e-06,
+      "source_direction_transport_max_abs_error": 8.940696716308594e-07
+    },
+    {
+      "frame": "0059",
+      "own_rgb_observations": 39678,
+      "projection_roundtrip_max_abs_error": 2.0293518900871277e-06,
+      "source_direction_transport_max_abs_error": 8.344650268554688e-07
+    },
+    {
+      "frame": "0061",
+      "own_rgb_observations": 37674,
+      "projection_roundtrip_max_abs_error": 1.6093254089355469e-06,
+      "source_direction_transport_max_abs_error": 7.748603820800781e-07
+    },
+    {
+      "frame": "0062",
+      "own_rgb_observations": 38148,
+      "projection_roundtrip_max_abs_error": 1.3853423297405243e-06,
+      "source_direction_transport_max_abs_error": 7.748603820800781e-07
+    },
+    {
+      "frame": "0063",
+      "own_rgb_observations": 38751,
+      "projection_roundtrip_max_abs_error": 1.2889504432678223e-06,
+      "source_direction_transport_max_abs_error": 7.152557373046875e-07
+    },
+    {
+      "frame": "0064",
+      "own_rgb_observations": 39726,
+      "projection_roundtrip_max_abs_error": 1.5497207641601562e-06,
+      "source_direction_transport_max_abs_error": 7.152557373046875e-07
+    },
+    {
+      "frame": "0065",
+      "own_rgb_observations": 40089,
+      "projection_roundtrip_max_abs_error": 1.1101365089416504e-06,
+      "source_direction_transport_max_abs_error": 5.960464477539062e-07
+    },
+    {
+      "frame": "0066",
+      "own_rgb_observations": 40092,
+      "projection_roundtrip_max_abs_error": 1.3709068298339844e-06,
+      "source_direction_transport_max_abs_error": 5.960464477539062e-07
+    },
+    {
+      "frame": "0067",
+      "own_rgb_observations": 39801,
+      "projection_roundtrip_max_abs_error": 1.1557713150978088e-06,
+      "source_direction_transport_max_abs_error": 5.960464477539062e-07
+    },
+    {
+      "frame": "0068",
+      "own_rgb_observations": 39020,
+      "projection_roundtrip_max_abs_error": 1.3709068298339844e-06,
+      "source_direction_transport_max_abs_error": 5.364418029785156e-07
+    },
+    {
+      "frame": "0069",
+      "own_rgb_observations": 37706,
+      "projection_roundtrip_max_abs_error": 1.2516975402832031e-06,
+      "source_direction_transport_max_abs_error": 5.960464477539062e-07
+    },
+    {
+      "frame": "0071",
+      "own_rgb_observations": 29538,
+      "projection_roundtrip_max_abs_error": 1.0132789611816406e-06,
+      "source_direction_transport_max_abs_error": 6.556510925292969e-07
+    },
+    {
+      "frame": "0072",
+      "own_rgb_observations": 23408,
+      "projection_roundtrip_max_abs_error": 1.3113021850585938e-06,
+      "source_direction_transport_max_abs_error": 7.748603820800781e-07
+    },
+    {
+      "frame": "0073",
+      "own_rgb_observations": 18970,
+      "projection_roundtrip_max_abs_error": 2.562999725341797e-06,
+      "source_direction_transport_max_abs_error": 7.748603820800781e-07
+    },
+    {
+      "frame": "0074",
+      "own_rgb_observations": 15752,
+      "projection_roundtrip_max_abs_error": 1.0728836059570312e-06,
+      "source_direction_transport_max_abs_error": 8.344650268554688e-07
+    },
+    {
+      "frame": "0075",
+      "own_rgb_observations": 13856,
+      "projection_roundtrip_max_abs_error": 1.4975666999816895e-06,
+      "source_direction_transport_max_abs_error": 8.940696716308594e-07
+    },
+    {
+      "frame": "0076",
+      "own_rgb_observations": 13164,
+      "projection_roundtrip_max_abs_error": 1.1920928955078125e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0077",
+      "own_rgb_observations": 13386,
+      "projection_roundtrip_max_abs_error": 1.2814998626708984e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0078",
+      "own_rgb_observations": 14436,
+      "projection_roundtrip_max_abs_error": 2.4437904357910156e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0079",
+      "own_rgb_observations": 17006,
+      "projection_roundtrip_max_abs_error": 1.0132789611816406e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0081",
+      "own_rgb_observations": 24996,
+      "projection_roundtrip_max_abs_error": 1.3113021850585938e-06,
+      "source_direction_transport_max_abs_error": 8.344650268554688e-07
+    },
+    {
+      "frame": "0082",
+      "own_rgb_observations": 27646,
+      "projection_roundtrip_max_abs_error": 1.9669532775878906e-06,
+      "source_direction_transport_max_abs_error": 7.152557373046875e-07
+    },
+    {
+      "frame": "0083",
+      "own_rgb_observations": 29492,
+      "projection_roundtrip_max_abs_error": 1.0728836059570312e-06,
+      "source_direction_transport_max_abs_error": 6.556510925292969e-07
+    },
+    {
+      "frame": "0084",
+      "own_rgb_observations": 30711,
+      "projection_roundtrip_max_abs_error": 1.2582167983055115e-06,
+      "source_direction_transport_max_abs_error": 6.556510925292969e-07
+    },
+    {
+      "frame": "0085",
+      "own_rgb_observations": 31728,
+      "projection_roundtrip_max_abs_error": 1.6093254089355469e-06,
+      "source_direction_transport_max_abs_error": 6.556510925292969e-07
+    },
+    {
+      "frame": "0086",
+      "own_rgb_observations": 32743,
+      "projection_roundtrip_max_abs_error": 1.1324882507324219e-06,
+      "source_direction_transport_max_abs_error": 5.960464477539062e-07
+    },
+    {
+      "frame": "0087",
+      "own_rgb_observations": 33752,
+      "projection_roundtrip_max_abs_error": 1.430511474609375e-06,
+      "source_direction_transport_max_abs_error": 6.556510925292969e-07
+    },
+    {
+      "frame": "0088",
+      "own_rgb_observations": 34195,
+      "projection_roundtrip_max_abs_error": 1.3709068298339844e-06,
+      "source_direction_transport_max_abs_error": 5.960464477539062e-07
+    },
+    {
+      "frame": "0089",
+      "own_rgb_observations": 34371,
+      "projection_roundtrip_max_abs_error": 1.938082277774811e-06,
+      "source_direction_transport_max_abs_error": 5.960464477539062e-07
+    },
+    {
+      "frame": "0091",
+      "own_rgb_observations": 36128,
+      "projection_roundtrip_max_abs_error": 2.2547319531440735e-06,
+      "source_direction_transport_max_abs_error": 5.960464477539062e-07
+    },
+    {
+      "frame": "0092",
+      "own_rgb_observations": 36562,
+      "projection_roundtrip_max_abs_error": 1.1809170246124268e-06,
+      "source_direction_transport_max_abs_error": 5.960464477539062e-07
+    },
+    {
+      "frame": "0093",
+      "own_rgb_observations": 36532,
+      "projection_roundtrip_max_abs_error": 1.3385433703660965e-06,
+      "source_direction_transport_max_abs_error": 5.960464477539062e-07
+    },
+    {
+      "frame": "0094",
+      "own_rgb_observations": 36714,
+      "projection_roundtrip_max_abs_error": 1.7667189240455627e-06,
+      "source_direction_transport_max_abs_error": 6.556510925292969e-07
+    },
+    {
+      "frame": "0095",
+      "own_rgb_observations": 36723,
+      "projection_roundtrip_max_abs_error": 1.6154954209923744e-06,
+      "source_direction_transport_max_abs_error": 5.960464477539062e-07
+    },
+    {
+      "frame": "0096",
+      "own_rgb_observations": 36365,
+      "projection_roundtrip_max_abs_error": 1.5087425708770752e-06,
+      "source_direction_transport_max_abs_error": 6.556510925292969e-07
+    },
+    {
+      "frame": "0097",
+      "own_rgb_observations": 35552,
+      "projection_roundtrip_max_abs_error": 1.650303602218628e-06,
+      "source_direction_transport_max_abs_error": 7.152557373046875e-07
+    },
+    {
+      "frame": "0098",
+      "own_rgb_observations": 35040,
+      "projection_roundtrip_max_abs_error": 1.9371509552001953e-06,
+      "source_direction_transport_max_abs_error": 7.152557373046875e-07
+    },
+    {
+      "frame": "0099",
+      "own_rgb_observations": 34797,
+      "projection_roundtrip_max_abs_error": 1.275213435292244e-06,
+      "source_direction_transport_max_abs_error": 7.748603820800781e-07
+    },
+    {
+      "frame": "0101",
+      "own_rgb_observations": 36984,
+      "projection_roundtrip_max_abs_error": 1.330394297838211e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0102",
+      "own_rgb_observations": 37976,
+      "projection_roundtrip_max_abs_error": 1.0132789611816406e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0103",
+      "own_rgb_observations": 38648,
+      "projection_roundtrip_max_abs_error": 2.4437904357910156e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0104",
+      "own_rgb_observations": 37968,
+      "projection_roundtrip_max_abs_error": 1.8477439880371094e-06,
+      "source_direction_transport_max_abs_error": 1.0132789611816406e-06
+    },
+    {
+      "frame": "0105",
+      "own_rgb_observations": 35849,
+      "projection_roundtrip_max_abs_error": 1.6093254089355469e-06,
+      "source_direction_transport_max_abs_error": 1.0132789611816406e-06
+    },
+    {
+      "frame": "0106",
+      "own_rgb_observations": 32055,
+      "projection_roundtrip_max_abs_error": 2.562999725341797e-06,
+      "source_direction_transport_max_abs_error": 8.940696716308594e-07
+    },
+    {
+      "frame": "0107",
+      "own_rgb_observations": 27783,
+      "projection_roundtrip_max_abs_error": 1.2516975402832031e-06,
+      "source_direction_transport_max_abs_error": 8.344650268554688e-07
+    },
+    {
+      "frame": "0108",
+      "own_rgb_observations": 24237,
+      "projection_roundtrip_max_abs_error": 1.1920928955078125e-06,
+      "source_direction_transport_max_abs_error": 7.748603820800781e-07
+    },
+    {
+      "frame": "0109",
+      "own_rgb_observations": 20817,
+      "projection_roundtrip_max_abs_error": 1.0728836059570312e-06,
+      "source_direction_transport_max_abs_error": 7.152557373046875e-07
+    },
+    {
+      "frame": "0111",
+      "own_rgb_observations": 16299,
+      "projection_roundtrip_max_abs_error": 2.9206275939941406e-06,
+      "source_direction_transport_max_abs_error": 8.344650268554688e-07
+    },
+    {
+      "frame": "0112",
+      "own_rgb_observations": 15038,
+      "projection_roundtrip_max_abs_error": 1.341104507446289e-06,
+      "source_direction_transport_max_abs_error": 8.344650268554688e-07
+    },
+    {
+      "frame": "0113",
+      "own_rgb_observations": 15074,
+      "projection_roundtrip_max_abs_error": 1.1026859283447266e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0114",
+      "own_rgb_observations": 15560,
+      "projection_roundtrip_max_abs_error": 1.0132789611816406e-06,
+      "source_direction_transport_max_abs_error": 8.940696716308594e-07
+    },
+    {
+      "frame": "0115",
+      "own_rgb_observations": 17013,
+      "projection_roundtrip_max_abs_error": 9.5367431640625e-07,
+      "source_direction_transport_max_abs_error": 8.940696716308594e-07
+    },
+    {
+      "frame": "0116",
+      "own_rgb_observations": 19494,
+      "projection_roundtrip_max_abs_error": 1.4901161193847656e-06,
+      "source_direction_transport_max_abs_error": 8.940696716308594e-07
+    },
+    {
+      "frame": "0117",
+      "own_rgb_observations": 22625,
+      "projection_roundtrip_max_abs_error": 1.1324882507324219e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0118",
+      "own_rgb_observations": 25568,
+      "projection_roundtrip_max_abs_error": 1.9073486328125e-06,
+      "source_direction_transport_max_abs_error": 8.940696716308594e-07
+    },
+    {
+      "frame": "0119",
+      "own_rgb_observations": 28489,
+      "projection_roundtrip_max_abs_error": 1.3113021850585938e-06,
+      "source_direction_transport_max_abs_error": 1.0132789611816406e-06
+    },
+    {
+      "frame": "0121",
+      "own_rgb_observations": 35271,
+      "projection_roundtrip_max_abs_error": 2.1457672119140625e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0122",
+      "own_rgb_observations": 38108,
+      "projection_roundtrip_max_abs_error": 2.6226043701171875e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0123",
+      "own_rgb_observations": 39432,
+      "projection_roundtrip_max_abs_error": 1.716427505016327e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0124",
+      "own_rgb_observations": 40504,
+      "projection_roundtrip_max_abs_error": 1.7881393432617188e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0125",
+      "own_rgb_observations": 40908,
+      "projection_roundtrip_max_abs_error": 1.4333054423332214e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0126",
+      "own_rgb_observations": 40682,
+      "projection_roundtrip_max_abs_error": 1.7881393432617188e-06,
+      "source_direction_transport_max_abs_error": 8.940696716308594e-07
+    },
+    {
+      "frame": "0127",
+      "own_rgb_observations": 40555,
+      "projection_roundtrip_max_abs_error": 1.3094395399093628e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0128",
+      "own_rgb_observations": 40560,
+      "projection_roundtrip_max_abs_error": 2.0542647689580917e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0129",
+      "own_rgb_observations": 40475,
+      "projection_roundtrip_max_abs_error": 1.86823308467865e-06,
+      "source_direction_transport_max_abs_error": 9.5367431640625e-07
+    },
+    {
+      "frame": "0131",
+      "own_rgb_observations": 39987,
+      "projection_roundtrip_max_abs_error": 1.087784767150879e-06,
+      "source_direction_transport_max_abs_error": 8.940696716308594e-07
+    },
+    {
+      "frame": "0132",
+      "own_rgb_observations": 39944,
+      "projection_roundtrip_max_abs_error": 1.1031515896320343e-06,
+      "source_direction_transport_max_abs_error": 8.344650268554688e-07
+    },
+    {
+      "frame": "0133",
+      "own_rgb_observations": 39893,
+      "projection_roundtrip_max_abs_error": 1.4426186680793762e-06,
+      "source_direction_transport_max_abs_error": 8.344650268554688e-07
+    },
+    {
+      "frame": "0134",
+      "own_rgb_observations": 39768,
+      "projection_roundtrip_max_abs_error": 1.5371479094028473e-06,
+      "source_direction_transport_max_abs_error": 8.344650268554688e-07
+    },
+    {
+      "frame": "0135",
+      "own_rgb_observations": 39928,
+      "projection_roundtrip_max_abs_error": 1.5078112483024597e-06,
+      "source_direction_transport_max_abs_error": 6.556510925292969e-07
+    },
+    {
+      "frame": "0136",
+      "own_rgb_observations": 40224,
+      "projection_roundtrip_max_abs_error": 1.6689300537109375e-06,
+      "source_direction_transport_max_abs_error": 6.556510925292969e-07
+    },
+    {
+      "frame": "0137",
+      "own_rgb_observations": 39408,
+      "projection_roundtrip_max_abs_error": 1.6689300537109375e-06,
+      "source_direction_transport_max_abs_error": 7.152557373046875e-07
+    },
+    {
+      "frame": "0138",
+      "own_rgb_observations": 36977,
+      "projection_roundtrip_max_abs_error": 1.7033889889717102e-06,
+      "source_direction_transport_max_abs_error": 7.748603820800781e-07
+    },
+    {
+      "frame": "0139",
+      "own_rgb_observations": 33456,
+      "projection_roundtrip_max_abs_error": 2.1960586309432983e-06,
+      "source_direction_transport_max_abs_error": 6.556510925292969e-07
+    },
+    {
+      "frame": "0141",
+      "own_rgb_observations": 30572,
+      "projection_roundtrip_max_abs_error": 1.1324882507324219e-06,
+      "source_direction_transport_max_abs_error": 7.152557373046875e-07
+    },
+    {
+      "frame": "0142",
+      "own_rgb_observations": 29454,
+      "projection_roundtrip_max_abs_error": 2.209097146987915e-06,
+      "source_direction_transport_max_abs_error": 6.556510925292969e-07
+    },
+    {
+      "frame": "0143",
+      "own_rgb_observations": 27956,
+      "projection_roundtrip_max_abs_error": 1.1771917343139648e-06,
+      "source_direction_transport_max_abs_error": 6.556510925292969e-07
+    },
+    {
+      "frame": "0144",
+      "own_rgb_observations": 26299,
+      "projection_roundtrip_max_abs_error": 2.1457672119140625e-06,
+      "source_direction_transport_max_abs_error": 6.556510925292969e-07
+    },
+    {
+      "frame": "0145",
+      "own_rgb_observations": 25002,
+      "projection_roundtrip_max_abs_error": 1.3709068298339844e-06,
+      "source_direction_transport_max_abs_error": 6.556510925292969e-07
+    },
+    {
+      "frame": "0146",
+      "own_rgb_observations": 23022,
+      "projection_roundtrip_max_abs_error": 1.5497207641601562e-06,
+      "source_direction_transport_max_abs_error": 7.152557373046875e-07
+    },
+    {
+      "frame": "0147",
+      "own_rgb_observations": 19345,
+      "projection_roundtrip_max_abs_error": 1.0281801223754883e-06,
+      "source_direction_transport_max_abs_error": 7.152557373046875e-07
+    },
+    {
+      "frame": "0148",
+      "own_rgb_observations": 16975,
+      "projection_roundtrip_max_abs_error": 1.6689300537109375e-06,
+      "source_direction_transport_max_abs_error": 7.152557373046875e-07
+    },
+    {
+      "frame": "0149",
+      "own_rgb_observations": 15992,
+      "projection_roundtrip_max_abs_error": 2.2649765014648438e-06,
+      "source_direction_transport_max_abs_error": 7.152557373046875e-07
+    }
+  ],
+  "confidence_points": 29621,
+  "excluded_existing_projected_points": 11327,
+  "source_manifest": {
+    "PLY": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/point_cloud/iteration_35000/point_cloud.ply",
+      "sha256": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529"
+    },
+    "MLP": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/deform/iteration_35000/deform.pth",
+      "sha256": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+    },
+    "TRAIN_cameras": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/transforms_train.json",
+      "sha256": "657fdfc2f3a2661c8b613f2c9526782175079f5bdf300a42deae247fb0dd567c"
+    },
+    "directions_only": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-15-jumpingjacks_dir-PBR概率gate优化/model_mlp/pbr_gt_lights.json",
+      "sha256": "15fa8ab35b9aa4438bfbcacc1e7d5399579096000e43d4c3e1c5f6483973c1a8"
+    },
+    "plane_metadata": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-15-jumpingjacks_dir-PBR概率gate优化/model_mlp/pbr_plane_projection.json",
+      "sha256": "e91d72275bf8a4295223eb6caf4fc8391395f6245dbd33b5404e9e4ac150b82a"
+    },
+    "plane_arrays": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-15-jumpingjacks_dir-PBR概率gate优化/model_mlp/pbr_plane_projection.npz",
+      "sha256": "eb650a3c2c9c584b0617c4ac2e62673979179c8fbcbb60991a98b6f66b9a40f7"
+    }
+  },
+  "TRAIN_RGBA_manifest": {
+    "0001": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0001.png",
+      "sha256": "11e897fd39447ed94a7696ce32ea60bbe2206e69199acbfb52fb6eb8d6bb1d64"
+    },
+    "0002": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0002.png",
+      "sha256": "57f0b21f6641242f564e8d2b769da1677cfbb56ef88f96acf52d023fb088f11b"
+    },
+    "0003": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0003.png",
+      "sha256": "e9daa2bc3ad979c6e7b139154b149e9c2e14e75b5c75b43b2bb6fce481cc4feb"
+    },
+    "0004": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0004.png",
+      "sha256": "a7dfe70830f68ae15ea6987e66cd9b6fbabb744e922ceaf0d22b4bf593872985"
+    },
+    "0005": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0005.png",
+      "sha256": "c70a7b76053376ff7110e9c414ee13d6a38d07faa67424acdc68ac727e618581"
+    },
+    "0006": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0006.png",
+      "sha256": "343f72c0a5d26838fa05b3699992a36425ad0e194926d0ce3e808bc7d5bfed52"
+    },
+    "0007": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0007.png",
+      "sha256": "32d6a3d62240c31801756853d71632149dda7fa2646acbbb7bd8ed175e706068"
+    },
+    "0008": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0008.png",
+      "sha256": "943ec38eb01e66135f1656596f3b82cfda17fd40939fe368b379e53c07ffcbae"
+    },
+    "0009": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0009.png",
+      "sha256": "4af8063f290710658b1c5db32baf9a05e157d0c1bcb04a59f89e64c2227632fb"
+    },
+    "0011": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0011.png",
+      "sha256": "1e948ec1010e772bab8e122494acafdb996666455c73540381029390513478a7"
+    },
+    "0012": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0012.png",
+      "sha256": "fc400fa1904ef5d147b11be0aedd2266b942f553da6c12e2015c8c9d58fccc59"
+    },
+    "0013": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0013.png",
+      "sha256": "592fb8e611fc5c494f86dfe4fa21f8dfa24ec3e3c0ef8c1297f09381db87f4cd"
+    },
+    "0014": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0014.png",
+      "sha256": "c709a8f51f06c47b4ef8df4084c3d3c976932ae487b97a84d6f489e77b51cbb8"
+    },
+    "0015": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0015.png",
+      "sha256": "cad5793daed06b728fb953928cecea693101bf6e2a5c5d6ed35f3d087f450c8c"
+    },
+    "0016": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0016.png",
+      "sha256": "ce846b4beab6f1f1b80062a1d7cd7e3ea5daf7021d4f1daf4794ec663313f2e8"
+    },
+    "0017": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0017.png",
+      "sha256": "b90dabffbd2946f959e50c6ae920ca79657f839f493147ee164c7a52a51ca981"
+    },
+    "0018": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0018.png",
+      "sha256": "010195487e706535765b9736bdfc787f8bcb8610b872f1d518a7e52bb9279fd9"
+    },
+    "0019": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0019.png",
+      "sha256": "ade27eeaa3dbbdcb2df752fb05dcf3336551c3c16e14b74ad5c799896f8a50fe"
+    },
+    "0021": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0021.png",
+      "sha256": "577ac2f66b3eb8fbf8a35521b6a7a4af82788dc9d4078d2a8503b11566c7f477"
+    },
+    "0022": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0022.png",
+      "sha256": "ffce7ba66a56175cc5f758952345241c9ee6f84f136d8acf14439de20a24e480"
+    },
+    "0023": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0023.png",
+      "sha256": "17d41d966997eda9b88b2e81e262e817efc6f335826a2ab0cbc666436f542ed4"
+    },
+    "0024": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0024.png",
+      "sha256": "c61969f5b6f9d8f61f9be08825e88a8acf6faea077a6494e913908e3d8020c4e"
+    },
+    "0025": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0025.png",
+      "sha256": "f252a230c2598df6ead2957a4ae166cda628f873964a837b436ececfc638cb3f"
+    },
+    "0026": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0026.png",
+      "sha256": "f53e960bc7d8de640faf5767085cb0dd6bc2a63f1afbfa597ae461951ef8c089"
+    },
+    "0027": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0027.png",
+      "sha256": "519ee5600550411e03dfb7a64ae8e1c40c31394ed579ab8885c7cfd4d73646f3"
+    },
+    "0028": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0028.png",
+      "sha256": "e45966f54cf6a87036e71b4fbd4897a496b19c2979ef0819651761fe771bc247"
+    },
+    "0029": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0029.png",
+      "sha256": "ac85067d05670d291f5e3c7a7ca323d0e4d7be7262552145793e47e8d7028bfb"
+    },
+    "0031": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0031.png",
+      "sha256": "dba02b561e34e9c44292cfa5e029c20a2e5527390b0954531b34dd579a7d2e0a"
+    },
+    "0032": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0032.png",
+      "sha256": "ca2fbaf646e87f752411aa94ce2003ef745a2b90ea7c75821429672e40cfbfd9"
+    },
+    "0033": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0033.png",
+      "sha256": "18f76cbfcae3c51c4848f17c94b21364f636bcf380e5627d16e01777ad705b56"
+    },
+    "0034": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0034.png",
+      "sha256": "cb6f50c3959016e4195a3fbbcae06e70f312f9d8e15054d0354e09acda2f64af"
+    },
+    "0035": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0035.png",
+      "sha256": "21a7cb3696dde55e3b2301eed69898d87bf169f97704b31696450cf8f5b138d3"
+    },
+    "0036": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0036.png",
+      "sha256": "5c64e1d7e8ce14a920d66e1bca24496b56cb73f541e816dc5b11e87ba04423a9"
+    },
+    "0037": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0037.png",
+      "sha256": "ba33fc7d2dd46c49ab2fa7c448222cbf5ea0191f8ea676c912e89942b489ce9f"
+    },
+    "0038": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0038.png",
+      "sha256": "d2e8cb1172dd619fd122bb57d397d9bca20554683da139f22a0952a14f69130f"
+    },
+    "0039": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0039.png",
+      "sha256": "4925e85e6ab47d83a89a8395f0fe95ba35839b69bcca676fdc3447972f2d5b20"
+    },
+    "0041": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0041.png",
+      "sha256": "81788539ea9c076090240d32a94c44bcbba42eeaf4d8c645c87fe968ad170cff"
+    },
+    "0042": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0042.png",
+      "sha256": "858a45f23b3be30f33ea05c55fb435e649fd287b7942eb4bc7d5cfb2ebf87595"
+    },
+    "0043": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0043.png",
+      "sha256": "8044f2af10a44282cf50fcae19e5bca2c262a3fadcbf9211e2d71c971d33b3a9"
+    },
+    "0044": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0044.png",
+      "sha256": "4dc51307df73562ff20918b213869fb88fa897b9c320977c3b53e2384b2e5260"
+    },
+    "0045": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0045.png",
+      "sha256": "2481dab6221e3dca7ce275371d09151355ef91f1a8c93c6ea603542a1e827702"
+    },
+    "0046": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0046.png",
+      "sha256": "a08ad4ba062039160ebe5a0afd52f2c70bfd4f31696475cb6c901b8dbff04154"
+    },
+    "0047": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0047.png",
+      "sha256": "c9d121949e1cac878a4cf98e3ec80a18618c0971242615eb6c1321a72592d0f5"
+    },
+    "0048": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0048.png",
+      "sha256": "ec2cd56e4f763889fd495644ef723f386841ac4ad0bbce9ee14662b28879fa48"
+    },
+    "0049": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0049.png",
+      "sha256": "2a95ab768e6f23a04d9f98e8eb89878e1bcb530f9c2c5bc91ac49ca09a7f99a6"
+    },
+    "0051": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0051.png",
+      "sha256": "ece12812cba86634cc84b957e8916c74cdd16137fdee9e18d1ca4c443093ce33"
+    },
+    "0052": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0052.png",
+      "sha256": "7b1c922913cc3fbe71b99c201f9c74411a79c9082a0854e427b84ff858fc13a6"
+    },
+    "0053": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0053.png",
+      "sha256": "46706fb49864e925129e9e875b5588d60fc06d7923d6eb07291aabb7c9f5286f"
+    },
+    "0054": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0054.png",
+      "sha256": "aacba706a244c8c539ef4816416c5b444d60705ebf6b9ebd592c7473fedeabf9"
+    },
+    "0055": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0055.png",
+      "sha256": "8d972fd8df4cf89665a2b2112fbdddcc7a4b6ff05ee9b6b64e1880b34ccc44d3"
+    },
+    "0056": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0056.png",
+      "sha256": "64fbafb787fa6977080dd0c151857334c0bf80599ce61d05ef94eea729e820fc"
+    },
+    "0057": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0057.png",
+      "sha256": "294cf6de8acadc517feae9620c072c997f436132a4bb6b545406582df01f4d68"
+    },
+    "0058": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0058.png",
+      "sha256": "344307cffd09a243a93d0fcb956f7b41db46c1be1270a2b593fba66bd514ad60"
+    },
+    "0059": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0059.png",
+      "sha256": "83b8022d522c83b88cb9ca34e7038a18f90b7a60c354838e44a9c81f8021590f"
+    },
+    "0061": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0061.png",
+      "sha256": "98e99d40930626400a258b90fef24b0dc7ef83cc16f59820751d33ad48360c7b"
+    },
+    "0062": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0062.png",
+      "sha256": "94626260c8f96df965dd46bc661db4cb5c6021329dc5c416332e7d81e5b085c6"
+    },
+    "0063": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0063.png",
+      "sha256": "3a3f19a9da80825c1817154452d54a574643cb33bd8b9ca4152c0d42fdf22e22"
+    },
+    "0064": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0064.png",
+      "sha256": "77c9591864543a0c45df15c15f20336b327a542ae835331cde8b1b307584bcc9"
+    },
+    "0065": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0065.png",
+      "sha256": "6f010e3f7a688ee4bd19c8ddb4a182d6815cb4e1c210273a9ce6b88c57949886"
+    },
+    "0066": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0066.png",
+      "sha256": "e7fbfc496c03a2ab0a17f7d6d9a831f5346f56d12e4b5b25fcd86b2b01e97aed"
+    },
+    "0067": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0067.png",
+      "sha256": "94790867ef51f5df62c3b41f9e56730fb9ddd2edc5d2922e83c4d8a48f42e6d6"
+    },
+    "0068": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0068.png",
+      "sha256": "597a7e40bb17000d0c4f4bd334823d9555391fd9287be1998d2b271062a702f5"
+    },
+    "0069": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0069.png",
+      "sha256": "6266c99fff16708658093e45e3b97dc849f3474d43b9672b5054a21378dc94ce"
+    },
+    "0071": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0071.png",
+      "sha256": "b5471eed1c366dc0cbe04bb31d3b89bb928d3d7d9105f437cfa0a930cddf236c"
+    },
+    "0072": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0072.png",
+      "sha256": "6f3581a31bf7ac0d8d715134a4ce5e00a0f10de2d69133ad5c687c4dd2448730"
+    },
+    "0073": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0073.png",
+      "sha256": "1d8203d4e9f2e40efc4b26cb3b1d4d827eed6c585ddef6d6a47959c7166ef2c6"
+    },
+    "0074": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0074.png",
+      "sha256": "a9610d9383f5b91a8b152b970c9df10d5fa17e4c9a706af5c58d058111826e0b"
+    },
+    "0075": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0075.png",
+      "sha256": "fa6dadc678c156d25bb4ca6069aa15380405f4a3cec2f619d3eb68c1aa4f0234"
+    },
+    "0076": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0076.png",
+      "sha256": "592c0a01fc46d562a996d49c2400fe6f308c5a2895852b3ba921aaa46f72fd66"
+    },
+    "0077": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0077.png",
+      "sha256": "185f2740ac7315c9348bd519b107daf7387cb1a370f521c3ada670126810782b"
+    },
+    "0078": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0078.png",
+      "sha256": "69826388b425fa98d90f2652eed4be419c3cee73a799d28c3f3e77b4f61480c5"
+    },
+    "0079": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0079.png",
+      "sha256": "74763fb4b4b0d102794ec53e98a564f918ea8b1c26c9e15ce532e624cb8ee755"
+    },
+    "0081": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0081.png",
+      "sha256": "c0b723bc36c61a7e86952b8194fcc90855d0446f2101776465a3571e64357355"
+    },
+    "0082": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0082.png",
+      "sha256": "bc8694d3102e1f72808a0e55e5a043aae61b27d417709630080f8067c2d341d2"
+    },
+    "0083": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0083.png",
+      "sha256": "625ba6ba29ceb2f2036959f9b2ff47da98aacf6aa288162bf724ed22c5c41038"
+    },
+    "0084": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0084.png",
+      "sha256": "280c82361f5bff1f3d46aa950ba8b251407052114a55a8d4cbd3363f1185aba1"
+    },
+    "0085": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0085.png",
+      "sha256": "c28aaef9a2f8758003634f68b937722cd3a2c28ba4fc59a3849bec16831d0a56"
+    },
+    "0086": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0086.png",
+      "sha256": "685d34dc945bea5f58f62d37e4bc81036477265923f7effda69616553f2a77bb"
+    },
+    "0087": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0087.png",
+      "sha256": "b748c069e98bedd194789ccc2d92ebcf4dcf6101b8f3cc7caa3bd3d165ae8b4d"
+    },
+    "0088": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0088.png",
+      "sha256": "9a72328576f38eec70aaa2c5c27f078a79b760fa168bca5160d8368d5ebbae3f"
+    },
+    "0089": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0089.png",
+      "sha256": "9082f68c0012f74d097859fccb3b271e0493e2b0a648618897259eae76313353"
+    },
+    "0091": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0091.png",
+      "sha256": "f4f5fea976d087bfcf55b5563c42329991542228fdc47b82410663986b19d08b"
+    },
+    "0092": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0092.png",
+      "sha256": "9f8f9cc38f78ca1d3072100ac115d76530d46801d57e660c082e9f5a5fe99c5e"
+    },
+    "0093": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0093.png",
+      "sha256": "e05c7ccd6af562b75893887289d4897ee2898c73208e9386cee022d061477ce1"
+    },
+    "0094": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0094.png",
+      "sha256": "0cc40af113c9b58305317adca6a4284224a345db1d591897e9ce71672390256f"
+    },
+    "0095": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0095.png",
+      "sha256": "487059a160d79d7b2c58efa6f775590cca190e624b5146c443abdfc6cf49da2f"
+    },
+    "0096": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0096.png",
+      "sha256": "8ebf6c22df0e49828da1d9923ed206626a8e8fc9b1349e443c4952a482c0e0c6"
+    },
+    "0097": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0097.png",
+      "sha256": "b1e4cf5483d99610fb0b2a33349bf3e8f93592bbf4e4847066cce0d303530159"
+    },
+    "0098": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0098.png",
+      "sha256": "15dc852b4f2466a66fa23337129f565d42486d7769627214afb542aa717eed41"
+    },
+    "0099": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0099.png",
+      "sha256": "85a99d9477370957f00ed73909fa3559be174a9ed09aec6e37b7e480bcd707a0"
+    },
+    "0101": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0101.png",
+      "sha256": "dde2308ad6841b9e48595e81b3851f672d36570383daef3fc2d985fbde56c41f"
+    },
+    "0102": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0102.png",
+      "sha256": "5bf092f7f785ba9f53b2048abdaee40c36122fdcd3743db041fb7ab2dc8cf758"
+    },
+    "0103": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0103.png",
+      "sha256": "b1a500b72694b555e1e58e403ba1c96a8438191d0b06bde738730096e7e29da5"
+    },
+    "0104": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0104.png",
+      "sha256": "dced3023894d87a57d0ea0dc756f4316d619b6bf3a30654322555d561c3470cf"
+    },
+    "0105": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0105.png",
+      "sha256": "5e118a3728e29f296f71bab7ca646f55f8bdf16e374297af41185f0bed80f618"
+    },
+    "0106": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0106.png",
+      "sha256": "22b5d7509020c930a4fcaa1f2ba5a2d8130aab3911c30ef7628bf9812e80ddaa"
+    },
+    "0107": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0107.png",
+      "sha256": "c90e817a387c5ffea0253cba3ee3436a3b4c35a0dddfbb01c8873d8322073139"
+    },
+    "0108": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0108.png",
+      "sha256": "7ea9c1ff9d253d06df009f50f309a4eb4b8f823e07f222ee5b6002048da186ac"
+    },
+    "0109": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0109.png",
+      "sha256": "a1b33ac0cd907ddb592d8319b5b3e1140c332b28565dd3db3c468596891de9f3"
+    },
+    "0111": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0111.png",
+      "sha256": "252872d60fb037265b3212c9e6ffa00e8388c6b03dae4dc7df59562644a8ae6b"
+    },
+    "0112": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0112.png",
+      "sha256": "b9285a4d403306e653657fe75ef732788027e078989a7effecac9af0fdf16ee9"
+    },
+    "0113": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0113.png",
+      "sha256": "c3183dd2313c25036f9d617b0792c6a1d228a55358cf96318f8fd9cb7f83bb70"
+    },
+    "0114": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0114.png",
+      "sha256": "551bf6d060bfbdd898ebc1620a6c7934dcf24e5293159bf74e11400cf8147e1d"
+    },
+    "0115": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0115.png",
+      "sha256": "f2e63d58d9b050c1ba3ef8778bac6840b241b53d59113c4fa2e55b2066469fb4"
+    },
+    "0116": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0116.png",
+      "sha256": "8b6c8b5cfaa8bb80353ecd8fc55238f701693138432339a9c2a17760e42bd56d"
+    },
+    "0117": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0117.png",
+      "sha256": "bc970db37025da4f9706a9a287cdd7506576c8e2e555bf22b3e3a4ff6789489d"
+    },
+    "0118": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0118.png",
+      "sha256": "0df56de39b0c94936206a5d80b0c0dab8984b6035b118021afb0afc336ae7dfb"
+    },
+    "0119": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0119.png",
+      "sha256": "99a2ef47b6f0d93780eece8ec21fd63a7c53ef1bd5b3299a1db35365cdd6b5d0"
+    },
+    "0121": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0121.png",
+      "sha256": "1c4e65f28d47a296fafd491e419f810219068133e116da540e77b99d24265725"
+    },
+    "0122": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0122.png",
+      "sha256": "fe8067356a5f52abf3be880dd29cb3aba62dbae325c7af8d1865d829fbe54751"
+    },
+    "0123": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0123.png",
+      "sha256": "f0038286e8d9f066f428a7509bc205bf87e7058da73b00e2d15fbdd1041c1d8f"
+    },
+    "0124": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0124.png",
+      "sha256": "0273ab2fc8a7b056391410da2139ae36cad410fa2903ca44e93169c55a97e581"
+    },
+    "0125": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0125.png",
+      "sha256": "b2928faa41abb2ee3443d57bac0af9f6b80ef9c02df0d909a8c9b26ffd067c42"
+    },
+    "0126": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0126.png",
+      "sha256": "119cdc5c631c43aa2430c562b6792f5a0b85b5c2b89644835bff4289d8bb6298"
+    },
+    "0127": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0127.png",
+      "sha256": "23a8801bb76017bacc3790317661e321f854b6296f5e3521c05f4e22bace52ac"
+    },
+    "0128": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0128.png",
+      "sha256": "8e30ccce1786fd5f1fe49680a21fe39a77e37bd1fb186d6a5f0912dffe72f003"
+    },
+    "0129": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0129.png",
+      "sha256": "083a4dff83e19400caaca362bbfb6bf74d64b6783d8fdd4f47b961bb215cbb2e"
+    },
+    "0131": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0131.png",
+      "sha256": "58476510f30d75a6323134a7be7ea248db9945b79347b3db16b83e12a6b4ddd2"
+    },
+    "0132": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0132.png",
+      "sha256": "ffdbfc410c426a0e50d062af476ab70c0d6bc6addfb52b54ebe87224e26bb66c"
+    },
+    "0133": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0133.png",
+      "sha256": "659e0eea2ab3f3243fbd5a5f3d8b8c1cf707c50be298ba39128d2916ef7ff296"
+    },
+    "0134": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0134.png",
+      "sha256": "17943a8e9c27d7f43a9e9590054d3361116559eed8fe901dd8519f1e96ee0a83"
+    },
+    "0135": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0135.png",
+      "sha256": "242fc50225a0ddab56110ad03d232db4c1a69148e88a597c86385241335d95ed"
+    },
+    "0136": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0136.png",
+      "sha256": "878b882e24bfd9a1d36fc7f107e6d0c220f5b5cff8d483a60954f311531b331f"
+    },
+    "0137": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0137.png",
+      "sha256": "30d88b5738585442964598df43c82cd03f620cdf2a80abef8604eacf88af1c37"
+    },
+    "0138": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0138.png",
+      "sha256": "a129d93def0370908aa4a403d258fa2589b3f482caa1c6838e73757c14fe8e2d"
+    },
+    "0139": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0139.png",
+      "sha256": "a9989f43bd28ee848abcbbe8ba9b60e76c9c71c029bf1f1df4be3be082b9ebd3"
+    },
+    "0141": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0141.png",
+      "sha256": "82d0cd334b2a98bc77566594fecd34ad32eab92f9fa5b9256291996230b29886"
+    },
+    "0142": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0142.png",
+      "sha256": "ac38e7ba27b8488f46fc0f25767cb7c853092e4e5a43526a7ca94691e2ec4d5a"
+    },
+    "0143": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0143.png",
+      "sha256": "6e501f7cbf9aaace27a5576ad3634190e437f95112494a5d99c546df3e3cb1fd"
+    },
+    "0144": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0144.png",
+      "sha256": "540e25eef597957e0f7dfe984082f22e6a6f36fd7dbf1b1aa492107f1e4c63ca"
+    },
+    "0145": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0145.png",
+      "sha256": "eef0cce7b73732c1f2ffd76f71f00fff336beb4d2ec6400a79d256a6a8b6ddb6"
+    },
+    "0146": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0146.png",
+      "sha256": "00d7b9734c69a95461b8ef60784ce756fe15e65a9d24c867146fa5ed0f33d664"
+    },
+    "0147": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0147.png",
+      "sha256": "464e5a5dbc6f0ae7c474387f500dfc9a2b549e5fd650c99ef35ae9bd9874e8dc"
+    },
+    "0148": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0148.png",
+      "sha256": "9a78ca18ecdd6ad37bd65a7e021e2ffd1a6bce6accf8ff398e513b31bf886af7"
+    },
+    "0149": {
+      "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view/images/frame_0149.png",
+      "sha256": "b5b66e5d6e14d75d2f39cb32475703147dabfa375c011eeeef0e77730dff7af3"
+    }
+  },
+  "asset_sha256": "87752217f37e9fe9b96835f892ee2289c3740560d2f4592029652db52d03bc15",
+  "optimizer_steps": 0,
+  "GT_labels_read": false,
+  "GT_light_photometry_read": false,
+  "learned_40000_geometry_material_feature_used": false,
+  "production_pipeline_changed": false,
+  "full_stage2_started": false,
+  "source_MLP_and_XYZ_frozen": true,
+  "native_feature_probability_exact": true,
+  "derivation_inputs": [
+    "TRAIN_original_RGB",
+    "own_RGBA_alpha",
+    "source35k_predicted_PLY_and_MLP",
+    "camera_time",
+    "unit_white_GT_light_direction"
+  ],
+  "threshold_protocol": {
+    "min_observations": 12,
+    "gram_eigenvalue_ratio": 0.01,
+    "min_coefficient_norm": 0.01,
+    "max_relative_residual": 0.3,
+    "source_expected_Z_distance_m": 0.025,
+    "own_alpha_min": 0.99,
+    "source_raster_alpha_min": 0.9
+  },
+  "created_at": "2026-10-10T10:40:44.371804+09:00",
+  "limitations": "来自训练RGB的Lambertian线性候选轴，不是GT normal、原生GGX/阴影拟合或7度结论。方向运输须与未来source-local表示一致；原生additive修改后运输有近似误差。全99827点资产保留，confidence0不删点/帧/原photo支持/评分。必须来源独立复算、GPU/完整独立训练再验收，不把该生成当已经实现生产Preset。"
+}

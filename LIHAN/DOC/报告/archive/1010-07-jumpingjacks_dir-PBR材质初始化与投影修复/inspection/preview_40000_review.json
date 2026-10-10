@@ -1,0 +1,23 @@
+{
+  "status": "FAILED_SO_FAR",
+  "iteration": 40000,
+  "metrics": {
+    "psnr": 18.469882165991756,
+    "ssim": 0.8856826225916544,
+    "lpips": 0.11016974796851477,
+    "psnr_foreground": 11.435341690063554,
+    "ssim_foreground_bbox": 0.7512827237447103,
+    "lpips_foreground_bbox": 0.23224637508392335
+  },
+  "reviewed_image": "inspection/preview_40000_rgb_comparison.png",
+  "sample_frames": [
+    10,
+    80,
+    150
+  ],
+  "scope": "实际看首中尾RGB；不是全四类/完整MAE验收",
+  "observation": "黑背景正常，平台/人物存在；背光0080平台棋盘纹理开始出现，人体/脚周仍明显斑驳，头手边缘稀疏；正面平台多白、影周伪结构。GT背光也暗，不把暗部单独判功能故障。",
+  "all_mae": false,
+  "training_continues": true,
+  "commit_allowed": false
+}

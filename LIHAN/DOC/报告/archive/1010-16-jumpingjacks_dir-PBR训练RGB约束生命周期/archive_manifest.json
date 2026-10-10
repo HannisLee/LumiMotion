@@ -1,0 +1,16 @@
+{
+  "README.md": "ef4642ff3aefe6178178dcab89bbd0fe8eed798666bf824b0f6ff1cf27dcd1b8",
+  "plot_early_training.py": "818563b4226ce3f440f4c5c45eaffbdfdf4b05a106ce85d2f6c4f72cd24e798f",
+  "audit_rgb_axis_lifecycle.py": "d19a5e93d0ea508f9901abcb22cbc958a73cfb17a40e3c34626e2e1e2a0136a9",
+  "early_training_curves.log": "90ef2fda64ee93a6c64354cec113ba5b78747d1ef2d9bf6bca8529fbf3376d3b",
+  "rgb_axis_lifecycle.log": "428133b1ffe9a714d9c6389105dda470acef8cee3934660ff70e7d683fc2e2bc",
+  "early_training/metadata.json": "90ef2fda64ee93a6c64354cec113ba5b78747d1ef2d9bf6bca8529fbf3376d3b",
+  "early_training/training_curves.png": "de9c679af19362e2c9a5d45d6051decb6e21586ad6022d8b768b8d5bed2749f1",
+  "early_training/B09.tfevents": "8128eb15800af3f50a1b9837c1690216ec0dc278123ac81b9d74b4c8c827464c",
+  "early_training/training_curves.csv": "a285ba1fc08848449bfc2b5aae0447d4b9eccbe6157fd249cee3ae29288b4a9f",
+  "early_training/B10.tfevents": "31fa9bfcb778b14fcc152409873f63f7f6dd40f2cf8b39ed5f77332c1f17371f",
+  "rgb_axis_lifecycle/axis_lifecycle.png": "99133f239fa1c6c7760677dc0fbab7b7c7fb47aecf5a58ac1764d627895f0f3a",
+  "rgb_axis_lifecycle/report.json": "428133b1ffe9a714d9c6389105dda470acef8cee3934660ff70e7d683fc2e2bc",
+  "rgb_axis_lifecycle/axis_loss.csv": "e2681439921ba40a808baca4b14e5b129a05b061805f799b4cb637a7037e20af",
+  "rgb_axis_lifecycle/B10.tfevents": "e48f4b69365011c0822acdff2e5250d193aa5d202967477d5ea2f2d40bdb4727"
+}

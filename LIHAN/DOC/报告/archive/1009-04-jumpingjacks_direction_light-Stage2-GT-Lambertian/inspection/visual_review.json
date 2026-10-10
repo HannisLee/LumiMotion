@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "reviewed_at": "2026-10-09T20:12:46.029168+09:00",
+  "scope": "训练与产物、数值复算及首中尾真实目检；非模型质量阈值",
+  "frames": {
+    "rgb_gt_albedo_normal_depth": [
+      10,
+      80,
+      150
+    ],
+    "insights": [
+      1,
+      75,
+      150
+    ],
+    "hdr": [
+      1,
+      76,
+      150
+    ],
+    "directional": [
+      0,
+      36,
+      71
+    ]
+  },
+  "conclusion": "本次训练与完整评测执行成功，但RGB重建和材质恢复质量较差：中间帧明显偏暗，albedo总体偏亮、保留照明结构；冻结几何仍有平台突起、肢体碎片和漏覆盖。此结果不能说明GT Lambertian只训练材质能够修复Stage1几何。",
+  "rgb": "0010/0150姿态可辨认，但人体颜色斑驳、平台无法重现对应阴影；0080人物和平台明显偏暗、局部呈黑块，15帧PSNR仅17.0186 dB。",
+  "alpha": "人物和平台大体覆盖，手臂/头部/腿脚边缘有遗漏及多余残影；0080与真值轮廓和腿脚位置有偏移。",
+  "albedo_separation": "平台预测接近白色并抹去GT棋盘格；衣服、腿部、面部仍有强照明/阴影/褶皱残留。完整GT内部前景线性RGB平均偏差R=+0.138632、G=+0.109958、B=+0.190370，总体偏亮。静动态分离沿用冻结Stage1，平台红绿混杂未修复。",
+  "normal_depth": "GS人体和平台法线斑驳，Expected/Median Z显示脚周围平台起伏、突起和残影，0080人物轮廓/腿部深度偏差明显。Depth Normal放大中心差分碎片；Mesh较Depth平滑，但仍有平台凸起、腿脚缺面及轮廓偏移。在共同像素上Mesh误差21.8787°仍高于GS20.5594°、低于Depth27.5541°。GT着色法线与几何差单列诊断，不计作模型自洽误差。",
+  "relight": "72帧转灯有真实亮度响应，替换光照不改变Alpha；背向光时接近黑色。HDR首中尾可辨认但有橙色偏色及照明/伪几何残留；无对应HDR或转灯GT。",
+  "representatives": [
+    "inspection/rgb_comparison.png",
+    "inspection/four_categories.png",
+    "inspection/relight.png",
+    "inspection/three_normals_first_middle_last.png",
+    "inspection/albedo_first_middle_last.png",
+    "normal_depth/comparison_0010.png",
+    "normal_depth/comparison_0080.png",
+    "normal_depth/comparison_0150.png"
+  ]
+}

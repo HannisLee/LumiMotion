@@ -1,0 +1,24 @@
+{
+  "status": "FAILED_SO_FAR_RGB_ONLY",
+  "iteration": 40000,
+  "actual_images_viewed": true,
+  "reviewed_test_frames": [
+    10,
+    80,
+    150
+  ],
+  "images": [
+    "inspection/rgb_40000_comparison.png"
+  ],
+  "reviewed_at": "2026-10-10T10:16:35.143803+09:00",
+  "conclusion": "实际view GT/B08/B09 TEST0010/0080/0150：黑背景正常，人物/平台存在；B09头/衣服/腿略更完整，平台脚周黑灰污染稍有变化，但人物斑驳/手臂与腿稀疏、平台脚周伪凸起仍明显，未通过质量。GT0080自身背光暗，不单以暗失败。没有正式40k Normal/七MAE，不推断最终7°。",
+  "rgb": {
+    "psnr": 18.35268776687028,
+    "ssim": 0.9038688580195109,
+    "lpips": 0.10786088953415553,
+    "psnr_foreground": 10.983958675439107,
+    "ssim_foreground_bbox": 0.7853347500165303,
+    "lpips_foreground_bbox": 0.22448021868864695
+  },
+  "final_MAE": false
+}

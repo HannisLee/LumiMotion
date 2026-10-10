@@ -1,0 +1,11 @@
+{
+  "status": "PIPELINE_COMPLETED_REVIEW_PENDING",
+  "step": "finished",
+  "updated_at": "2026-10-09T19:31:37.716271+09:00",
+  "pid": 120207,
+  "metrics": {
+    "psnr_nvs_avg": 33.86182581583659,
+    "ssim_nvs_avg": 0.9797303954760234,
+    "lpips_nvs_avg": 0.02929333858191967
+  }
+}

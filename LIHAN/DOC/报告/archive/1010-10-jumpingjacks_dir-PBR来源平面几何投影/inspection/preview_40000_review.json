@@ -1,0 +1,23 @@
+{
+  "status": "FAILED_SO_FAR",
+  "iteration": 40000,
+  "reviewed_frames": [
+    10,
+    80,
+    150
+  ],
+  "image": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/inspection/preview_40000_rgb_comparison.png",
+  "rgb": {
+    "psnr": 18.393261800805856,
+    "ssim": 0.8858578602472941,
+    "lpips": 0.10931317210197448,
+    "psnr_foreground": 11.360213718905596,
+    "ssim_foreground_bbox": 0.7518338481585185,
+    "lpips_foreground_bbox": 0.2303248941898346
+  },
+  "scope": "仅中间40k RGB首中尾，对照B04同40k/GT；全55k四类及七MAE待完成",
+  "background": "黑背景正常、人体平台存在。",
+  "foreground": "人物/头手/衣服斑驳稀疏，脚周平台伪结构、异常灰块和残影仍明显；与B04同40k较近，未见足以判PASS的质量改善。GT背光本来暗，不凭背面暗单独判错。",
+  "normal_mae": "NOT_MEASURED_AT_40000",
+  "commit_allowed": false
+}
