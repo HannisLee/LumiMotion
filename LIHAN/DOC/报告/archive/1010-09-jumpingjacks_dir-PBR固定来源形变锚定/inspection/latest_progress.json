@@ -1,0 +1,11 @@
+{
+  "status": "TRAINING_VERIFIED_LIVE",
+  "updated_at": "2026-10-10T04:36:08.891390+09:00",
+  "steps": 2743,
+  "total_steps": 20000,
+  "iteration": 37743,
+  "training_pid": 232645,
+  "process_start_ticks": "8458195",
+  "checkpoint_40000": false,
+  "postprocess": "WAITING_LIVE_TRAIN"
+}

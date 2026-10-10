@@ -1,0 +1,49 @@
+{
+  "status": "PASS_LIVE_LAUNCH_AUDIT",
+  "training_pid": 271624,
+  "source_iteration": 35000,
+  "target_iteration": 55000,
+  "code_files": 471,
+  "stage1_source_files": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/point_cloud/iteration_35000/point_cloud.ply": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/deform/iteration_35000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+  },
+  "plane_support_points": 15187,
+  "plane_arrays_bit_identical_B06": true,
+  "light_table_bit_identical_B06": true,
+  "configuration_differences": {
+    "source_path": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复/data_view",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/data_view"
+    ],
+    "model_path": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复/model_mlp",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp"
+    ],
+    "loss_preset": [
+      "pbr_gt_directional_plane_native",
+      "pbr_gt_directional_plane_native_direct"
+    ],
+    "pbr_gt_lights_path": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复/model_mlp/pbr_gt_lights.json",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/pbr_gt_lights.json"
+    ],
+    "pbr_directional_actual_ray_budget": [
+      null,
+      true
+    ],
+    "wo_indirect": [
+      false,
+      true
+    ],
+    "wo_indirect_relight": [
+      false,
+      true
+    ]
+  },
+  "provenance_frames": 150,
+  "native_source_sha": "82b1840f4039649e548239445e8c83a6e2018d57c4fc0f7819c835f31aa098d0",
+  "optimizer_steps": 0,
+  "gt_material_geometry_normal_photometry_read": false,
+  "final_mae": false
+}

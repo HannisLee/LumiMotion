@@ -1,0 +1,39 @@
+Setting up [LPIPS] perceptual loss: trunk [alex], v[0.1], spatial [off]
+/home/lihan/miniconda3/envs/lumimotion/lib/python3.8/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/home/lihan/miniconda3/envs/lumimotion/lib/python3.8/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=AlexNet_Weights.IMAGENET1K_V1`. You can also use `weights=AlexNet_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+Loading model from: /home/lihan/miniconda3/envs/lumimotion/lib/python3.8/site-packages/lpips/weights/v0.1/alex.pth
+/home/lihan/miniconda3/envs/lumimotion/lib/python3.8/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=VGG16_Weights.IMAGENET1K_V1`. You can also use `weights=VGG16_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+Optimizing /home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-18-dir-PBR训练RGB来源局部法线/model_mlp
+Output folder: /home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-18-dir-PBR训练RGB来源局部法线/model_mlp [10/10 10:58:24]
+################ gaussian_color params: 156934 [10/10 10:58:24]
+Loading trained model at iteration 35000 [10/10 10:58:24]
+Found transforms_train.json file, assuming Blender data set! [10/10 10:58:24]
+Reading Training Transforms [10/10 10:58:24]
+Read Train Transforms with 135 cameras [10/10 10:58:30]
+Loading Training Cameras [10/10 10:58:30]
+Loading Test Cameras [10/10 10:58:33]
+LOAD PLY [10/10 10:58:34]
+/home/lihan/reproduce/LumiMotion-stage2-perlight/scene/__init__.py:103: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  unique_fids = [torch.tensor(val, dtype=torch.float32, device="cuda") for val in unique_values]
+######## Optimizer params: before=678,957 | after=0 [10/10 10:58:36]
+Training progress:   0%|          | 0/35020 [00:00<?, ?it/s]
+  0%|          | 0/20 [00:00<?, ?it/s][AStage2 material training | EMA loss=0.1097510:   0%|          | 0/35020 [00:00<?, ?it/s]
+  5%|▌         | 1/20 [00:00<00:03,  5.45it/s][AStage2 material training | EMA loss=0.1788419:   0%|          | 0/35020 [00:00<?, ?it/s]Stage2 material training | EMA loss=0.2022118:   0%|          | 0/35020 [00:00<?, ?it/s]
+ 15%|█▌        | 3/20 [00:00<00:01,  9.42it/s][AStage2 material training | EMA loss=0.2279554:   0%|          | 0/35020 [00:00<?, ?it/s]
+ 20%|██        | 4/20 [00:00<00:01,  8.19it/s][AStage2 material training | EMA loss=0.2342944:   0%|          | 0/35020 [00:00<?, ?it/s]Stage2 material training | EMA loss=0.2461530:   0%|          | 0/35020 [00:00<?, ?it/s]
+ 30%|███       | 6/20 [00:00<00:01,  9.99it/s][AStage2 material training | EMA loss=0.2719379:   0%|          | 0/35020 [00:00<?, ?it/s]Stage2 material training | EMA loss=0.2987251:   0%|          | 0/35020 [00:00<?, ?it/s]
+ 40%|████      | 8/20 [00:00<00:01, 10.80it/s][AStage2 material training | EMA loss=0.2808140:   0%|          | 0/35020 [00:00<?, ?it/s]Stage2 material training | EMA loss=0.2808140:   0%|          | 0/35020 [00:00<?, ?it/s, Loss=0.2743308]Stage2 material training | EMA loss=0.2808140:   0%|          | 10/35020 [00:00<58:18, 10.01it/s, Loss=0.2743308]Stage2 material training | EMA loss=0.2743308:   0%|          | 10/35020 [00:00<58:18, 10.01it/s, Loss=0.2743308]
+ 50%|█████     | 10/20 [00:00<00:00, 10.78it/s][AStage2 material training | EMA loss=0.2557071:   0%|          | 10/35020 [00:01<58:18, 10.01it/s, Loss=0.2743308]Stage2 material training | EMA loss=0.2889152:   0%|          | 10/35020 [00:01<58:18, 10.01it/s, Loss=0.2743308]
+ 60%|██████    | 12/20 [00:01<00:00, 11.10it/s][AStage2 material training | EMA loss=0.2656903:   0%|          | 10/35020 [00:01<58:18, 10.01it/s, Loss=0.2743308]Stage2 material training | EMA loss=0.2667258:   0%|          | 10/35020 [00:01<58:18, 10.01it/s, Loss=0.2743308]
+ 70%|███████   | 14/20 [00:01<00:00, 11.84it/s][AStage2 material training | EMA loss=0.2654076:   0%|          | 10/35020 [00:01<58:18, 10.01it/s, Loss=0.2743308]Stage2 material training | EMA loss=0.2673607:   0%|          | 10/35020 [00:01<58:18, 10.01it/s, Loss=0.2743308]
+ 80%|████████  | 16/20 [00:01<00:00, 11.24it/s][AStage2 material training | EMA loss=0.2878172:   0%|          | 10/35020 [00:01<58:18, 10.01it/s, Loss=0.2743308]Stage2 material training | EMA loss=0.2883943:   0%|          | 10/35020 [00:01<58:18, 10.01it/s, Loss=0.2743308]
+ 90%|█████████ | 18/20 [00:01<00:00, 11.35it/s][AStage2 material training | EMA loss=0.3046291:   0%|          | 10/35020 [00:01<58:18, 10.01it/s, Loss=0.2743308]Stage2 material training | EMA loss=0.3046291:   0%|          | 10/35020 [00:01<58:18, 10.01it/s, Loss=0.2906676]Stage2 material training | EMA loss=0.3046291:   0%|          | 20/35020 [00:01<53:06, 10.98it/s, Loss=0.2906676]Stage2 material training | EMA loss=0.3046291:   0%|          | 20/35020 [00:01<53:53, 10.82it/s, Loss=0.2906676]
+
+[ITER 35020] Saving Gaussians [10/10 10:58:39]
+
+100%|██████████| 20/20 [00:02<00:00,  4.29it/s][A100%|██████████| 20/20 [00:02<00:00,  7.15it/s]
+
+Training complete. [10/10 10:58:39]

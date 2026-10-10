@@ -1,0 +1,94 @@
+{
+  "train": {
+    "pid": 282299,
+    "start_ticks": "10140426",
+    "argv": [
+      "/home/lihan/miniconda3/envs/lumimotion/bin/python",
+      "-u",
+      "-m",
+      "scripts.train_stage2",
+      "--source_path",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-14-jumpingjacks_dir-PBR来源输出gate微调/data_view",
+      "--stage1_model_path",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp",
+      "--model_path",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-14-jumpingjacks_dir-PBR来源输出gate微调/model",
+      "--load_iter",
+      "35000",
+      "--iterations",
+      "55000",
+      "--save_iterations",
+      "40000",
+      "50000",
+      "55000",
+      "--test_iterations",
+      "40000",
+      "55000",
+      "--render_mode",
+      "original_ir",
+      "--loss_preset",
+      "pbr_gt_directional_plane_native_direct_gate",
+      "--pbr_gt_lights_path",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-14-jumpingjacks_dir-PBR来源输出gate微调/gt_directions_only.json",
+      "--pbr_light_intensity_scale",
+      "3.141592653589793",
+      "--depth_ratio",
+      "0",
+      "--resolution",
+      "2",
+      "--is_blender",
+      "--eval",
+      "--load2gpu_on_the_fly",
+      "--gt_alpha_mask_as_scene_mask",
+      "--train_light_folder",
+      "images",
+      "--test_light_folder",
+      "images",
+      "--deform-type",
+      "mlp",
+      "--sh_degree",
+      "3",
+      "--hyper_dim",
+      "1"
+    ],
+    "cwd": "/home/lihan/reproduce/LumiMotion-stage2-perlight",
+    "started_at": "2026-10-10T09:10:32.082100+09:00",
+    "session_id": 76498
+  },
+  "launcher_pid": 282298,
+  "postprocess": {
+    "pid": 282335,
+    "start_ticks": "10141990",
+    "argv": [
+      "/home/lihan/miniconda3/envs/lumimotion/bin/python",
+      "-u",
+      "output/1010-14-jumpingjacks_dir-PBR来源输出gate微调/commands/postprocess.py",
+      "282299"
+    ],
+    "cwd": "/home/lihan/reproduce/LumiMotion-stage2-perlight",
+    "session_id": 89846
+  },
+  "preview_40000": {
+    "pid": 282338,
+    "start_ticks": "10142106",
+    "argv": [
+      "/home/lihan/miniconda3/envs/lumimotion/bin/python",
+      "-u",
+      "output/1010-14-jumpingjacks_dir-PBR来源输出gate微调/commands/preview_40000.py",
+      "282299"
+    ],
+    "cwd": "/home/lihan/reproduce/LumiMotion-stage2-perlight",
+    "session_id": 88932
+  },
+  "checkpoint_audits": {
+    "pid": 282503,
+    "start_ticks": "10149524",
+    "argv": [
+      "/home/lihan/miniconda3/envs/lumimotion/bin/python",
+      "-u",
+      "output/1010-14-jumpingjacks_dir-PBR来源输出gate微调/commands/audit_checkpoints_when_saved.py"
+    ],
+    "cwd": "/home/lihan/reproduce/LumiMotion-stage2-perlight",
+    "session_id": 3502
+  }
+}

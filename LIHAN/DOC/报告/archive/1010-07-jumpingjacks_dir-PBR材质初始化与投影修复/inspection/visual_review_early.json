@@ -1,0 +1,35 @@
+{
+  "status": "FAILED_FINAL_FOUR_CATEGORIES_PENDING_ALL_MAE",
+  "iteration": 55000,
+  "metrics": {
+    "psnr": 19.35354474812191,
+    "ssim": 0.8932221968968709,
+    "lpips": 0.11383797228336334,
+    "psnr_foreground": 12.234762806258436,
+    "ssim_foreground_bbox": 0.7692404826482137,
+    "lpips_foreground_bbox": 0.22925928036371868
+  },
+  "reviewed_image": "inspection/rgb_final_55000_comparison.png",
+  "sample_frames": [
+    10,
+    80,
+    150
+  ],
+  "scope": "实际查看最终RGB首中尾；完整四类与MAE尚待完成",
+  "RGB": "背景黑色正常，主体平台存在；0080平台棋盘纹理有恢复，人物衣服/皮肤仍斑驳，头手边界稀疏，脚周平台仍伪结构/残色，正面平台多白；GT背光也暗，未把暗部单独判功能失败",
+  "quality_gate": "FAILED",
+  "commit_allowed": false,
+  "all_mae": "PENDING",
+  "reviewed_four_categories_image": "inspection/four_categories_final_55000.png",
+  "four_category_sample_frames": [
+    1,
+    75,
+    150
+  ],
+  "Alpha": "主体和平台轮廓基本完整，头手边毛糙，平台边缘及下方残影/薄雾；不能把暗RGB解释成全Alpha丢失",
+  "Normal": "平台整体较集中，但脚周异常/起伏及人体斑驳仍明显，平台背面脚周大块杂色",
+  "Albedo": "平台棋盘纹理比B02更可见，但人体正背面照明结构明显残留、背面暗、头手斑驳及脚周污染",
+  "reviewed_relight_image": "inspection/relight_final_55000.png",
+  "HDR_review": "实际看0001/0076/0150：场景和黑背景存在、无全黑全白，HDR呈橙粉色；人物斑驳、脚周/平台伪结构明显，无HDR GT，不声称颜色精度",
+  "directional_review": "实际看0000/0036/0071：随方向变化、黑背景正常、场景存在，背向光变暗是光照响应；人体和平台仍斑驳/伪结构"
+}

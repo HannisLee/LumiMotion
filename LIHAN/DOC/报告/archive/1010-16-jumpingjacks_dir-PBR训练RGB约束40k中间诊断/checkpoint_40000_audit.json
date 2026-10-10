@@ -1,0 +1,45 @@
+{
+  "rgb_normal": {
+    "status": "PASS_SHARED_RGB_MODEL_LOAD",
+    "points": 99827,
+    "confidence_points": 29621,
+    "constraint_weight": 2.0,
+    "canonical_RGB_axis_loss": 0.0038387239910662174,
+    "source_MLP_frozen": true,
+    "source_RGB_derived": true,
+    "GT_labels_read": false,
+    "optimizer_steps": 0,
+    "source_files": {
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/point_cloud/iteration_40000/point_cloud.ply": "afa337601fb93944f5ec6c1f7aa3acba0833ded3941bf38b9c3af585a9c06d5a",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/deform/iteration_40000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/pbr_rgb_normal.npz": "8f2987d0af3f0554ab16891c62ee99cdc04e3a7e1ca0f418046144aabceeada2",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/pbr_rgb_normal.json": "e36b993b4d4cf3f3cb8d1fb1d43be397597a3157af2e85dc338e1e45bc39aaef",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/pbr_rgb_normal_input.npz": "87752217f37e9fe9b96835f892ee2289c3740560d2f4592029652db52d03bc15",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/pbr_rgb_normal_input.json": "40d6b721ae4082522394c446270f1d37484c26832dfb4261aafe6b5e6b6e171e"
+    }
+  },
+  "status": "PASS_CHECKPOINT_ONLY",
+  "iteration": 40000,
+  "gaussians": 99827,
+  "all_finite": true,
+  "opacity_scale_frozen": true,
+  "feature_optimized": true,
+  "max_feature_probability_delta": 0.6157300472259521,
+  "max_feature_logit_delta": 79.57797241210938,
+  "feature_changed_points": 72133,
+  "albedo_rgb_range": [
+    0.030999988317489624,
+    0.968999981880188
+  ],
+  "clamped_albedo_channel_fraction": 0.0,
+  "channels_at_projected_bound_fraction": 0.41231664112247524,
+  "max_displacement": 0.0354757234454155,
+  "max_rotation_deg": 60.000064849853516,
+  "actual_light_scale": 5.503770351409912,
+  "deformation_state_tensors_unchanged": true,
+  "deformation_tensor_count": 32,
+  "deformation_input_exactly_source_xyz": true,
+  "anchor_marker_bound": true,
+  "source_files_unchanged": true,
+  "final_mae": false
+}

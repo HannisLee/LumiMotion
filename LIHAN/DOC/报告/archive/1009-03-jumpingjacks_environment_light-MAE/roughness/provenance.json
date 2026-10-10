@@ -1,0 +1,587 @@
+{
+  "command_argv": [
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/scripts/eval_roughness_gt.py",
+    "--model_path",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-01-jumpingjacks_environment_light-原版LumiMotion两阶段训练/model_mlp",
+    "--iteration",
+    "55000",
+    "--gt_roughness_dir",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness",
+    "--split",
+    "test",
+    "--output_path",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/roughness"
+  ],
+  "cwd": "/home/lihan/reproduce/LumiMotion-stage2-perlight",
+  "git_commit": "a9e4d1061fec9986d82362f78b42c0c269e6146e",
+  "source_hashes": {
+    "scripts/eval_roughness_gt.py": "1daf5556d7f8066389182f18c06de159c1cda75cfe68a9ac6edeed4773582846",
+    "utils/roughness_metrics.py": "3aa8b2980e9c67eafcb37ea1172d3c907a0c793eb0a89035ed5c4432b3eff5fb",
+    "gaussian_renderer/render_roughness.py": "fa9c84c055fc92d84ac6b826c97f5ebc86e16411f2a839bb6fc74a6f7a56bf23",
+    "gaussian_renderer/render_ir.py": "9a2c8fa9df66dc284bf07f54646f7d1c427d8120e5708d0ceac0e1d8acd3ddef",
+    "utils/albedo_metrics.py": "da3d5d5ede94b67ada50f3b17fbb782a26d9a87c18dee11654af104f5bc5486e",
+    "scripts/eval_albedo_gt.py": "e14a5b99453784c9ae5e92deb89f5d7768e6326dbf34bd022013c9ae8bf27f61",
+    "scripts/stage2_runtime.py": "ad9ef9b231d93571df683d3f76f698317fef12e29ec2d472f2005e5517174059",
+    "scene/gaussian_model.py": "ecc51a879b9de64c15d9ff3f4c56d642bb271351a2bca6065b2d091db0b5fd92",
+    "scene/dataset_readers.py": "f80470bd1b4ca933c23656cc35938b53f2e4c309e797ed3dc3182cdd7f737a60",
+    "scene/deform_model.py": "8c372f8b46ac3bc2793c9a0cca14ad8206c69fd9593108bf9f231f45cc493f4d",
+    "scene/stage2_source_deformation.py": "850be6af5b85743421fd4b269e5b8010efb30da257f95bc39bfaf9029a8f43bf",
+    "utils/camera_utils.py": "8300e9c4b03de754cdfc49f2fecabccc695c6aec5bbda58e1bb6d41429ecccbd"
+  },
+  "input_hashes": {
+    "/home/lihan/data/LH-data/transfer-dynamic/jumpingjacks_environment_light/transforms_train.json": "657fdfc2f3a2661c8b613f2c9526782175079f5bdf300a42deae247fb0dd567c",
+    "/home/lihan/data/LH-data/transfer-dynamic/jumpingjacks_environment_light/transforms_test.json": "8544dcff0bd338ec363dc6c081cc7ac3bca64395e486e4dd6d6de7a205764909",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-01-jumpingjacks_environment_light-原版LumiMotion两阶段训练/data_view/points3d.ply": "f9a2601f8b96bb7381e8b9086c70d97790c4d93026932e332838e0e9e256c971",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0010.exr": "0b6d49b1b5ca5f2865c94e840d949b2ee6940a3633bd5ed1fe0fa0ea7220ed06",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0020.exr": "73fd8412699abb455bfdcf75c436026df70db94cbde8185ce4f41a6d12f56935",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0030.exr": "03fe092ab58ed8f5f7d89620d2f52c43e0393b4cd999ecb07150efa4e0683a47",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0040.exr": "e18adda7bc5b8afff84cc3cfdeab783ff8be3fd0df063d42c890b1bae7dd638f",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0050.exr": "6419dbfc0b3e76b8125eaa2d1274ecaee92abe2b4d7e57b5d460511cae89e068",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0060.exr": "154ab09bea6c1ac06901f5d714095aa252041a7af6867bc7a4d52f7104b3551f",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0070.exr": "862ded25dd82782b469a04e9746057081ae63436f57308701b7641f7def46e21",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0080.exr": "79f0224a5a77e970a1642b4397a1b269154844661e5960816ab32f6fec3273e2",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0090.exr": "9927d163fcdec029b46e147405eaec123644b41bc6d7a2f8a8467fe50030a314",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0100.exr": "4a5afbd04d52b8d49cbc388b45cb1dd51f26ff8430968ff5799509045cb8972a",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0110.exr": "17e3e8b1492b4f4facdfd8cc772f94b574654bc77c888d36d8e4516c02fed1ac",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0120.exr": "454940e26518aeecb34d7337130950170e1a105c89491559c89687369b3cabb0",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0130.exr": "a1419d46a5b3e457f608cc5a533eec0f04dc5897b4bc870640328a6c9d421572",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0140.exr": "4a4cde3e8d08df9000889c7ef17271b967edbd746c7d5a1a7239329adca27657",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0150.exr": "89923a551ea89125bfdf010779f9a3eb4f5aa1e2f45aca9788bdf50210faa187",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/manifest.json": "df2f93bf9f643f4fc18cdda9ed85a4ed582a3de49de85953488781815d8f7740",
+    "/home/lihan/data/LH-data/danamic/jumpingjacks_environment_light/scene_snapshot.blend": "c4d208751ca317547411ea82c341ecee34810304e127bf0440c4a695195add0e",
+    "/home/lihan/data/LH-data/transfer-dynamic/jumpingjacks_environment_light/images/frame_0010.png": "6247d6e9938d3d12cee1b2ecaeb0b22ac104dde7fa2d017324a1b8316a953640",
+    "/home/lihan/data/LH-data/transfer-dynamic/jumpingjacks_environment_light/images/frame_0020.png": "dfcf7e6d2a3952d8cb7d4efb86a25fbb33afda58591ca7276ebbc7f1e5f981e3",
+    "/home/lihan/data/LH-data/transfer-dynamic/jumpingjacks_environment_light/images/frame_0030.png": "e90d0b8b2feccd66ba2329bedb395e91796be6efc9f7036c66ec17a06830899f",
+    "/home/lihan/data/LH-data/transfer-dynamic/jumpingjacks_environment_light/images/frame_0040.png": "021a093d45b503a84aae0af971adfa5408a68bc5a43ac232b4b4020e9356876b",
+    "/home/lihan/data/LH-data/transfer-dynamic/jumpingjacks_environment_light/images/frame_0050.png": "1905c06b0c53369e2bd73d31fcf2cada703e618e44a4159445537cf32e6cf977",
+    "/home/lihan/data/LH-data/transfer-dynamic/jumpingjacks_environment_light/images/frame_0060.png": "032b261e978b0ad036828863acc510e5acb01557ceebf1b062edb0654b38b362",
+    "/home/lihan/data/LH-data/transfer-dynamic/jumpingjacks_environment_light/images/frame_0070.png": "d6ed341c20c8e43fe9c3f72efdc8f50475f1d22f39a4abfa97c8ca06688b7ff8",
+    "/home/lihan/data/LH-data/transfer-dynamic/jumpingjacks_environment_light/images/frame_0080.png": "98491fdd2cb26c6757439e2522cb7fd7c0dda69f532b93e77a16e3b7fcd3ec06",
+    "/home/lihan/data/LH-data/transfer-dynamic/jumpingjacks_environment_light/images/frame_0090.png": "8b78570dbb75b7293c74f8c5e85d14d0fa93305f405d23a053039151a4f82322",
+    "/home/lihan/data/LH-data/transfer-dynamic/jumpingjacks_environment_light/images/frame_0100.png": "5dcb0e1a5512805bc6bfce76684871c7f023ce82dc2acc0f97ec68805dcc5ec8",
+    "/home/lihan/data/LH-data/transfer-dynamic/jumpingjacks_environment_light/images/frame_0110.png": "993c93f81d9880d931e2195b1cc20c0105fa9236e8fb59bb6bfe72cc69927c88",
+    "/home/lihan/data/LH-data/transfer-dynamic/jumpingjacks_environment_light/images/frame_0120.png": "a723a8513af5cd464136966054bec182116f580422d68011e7353a77896bf7c0",
+    "/home/lihan/data/LH-data/transfer-dynamic/jumpingjacks_environment_light/images/frame_0130.png": "6d45f3a608c7d3139dd4d809e020aa1ab5a3cc84d252bb10165a606cbfd0b70a",
+    "/home/lihan/data/LH-data/transfer-dynamic/jumpingjacks_environment_light/images/frame_0140.png": "a31e181130df55fc3f8ad91b894ecdd9073c8c6e2338958ab43da44db658094f",
+    "/home/lihan/data/LH-data/transfer-dynamic/jumpingjacks_environment_light/images/frame_0150.png": "f2fb05d63c24200a212c5807b2d61c8a95a903ec1a04beb2ca17a4681fcddd52",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-01-jumpingjacks_environment_light-原版LumiMotion两阶段训练/model_mlp/cfg_args": "5a5e715aafda1f0350f80470f58c83673bb6a656384a64076234ec3df0b3bd8c",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-01-jumpingjacks_environment_light-原版LumiMotion两阶段训练/model_mlp/point_cloud/iteration_55000/point_cloud.ply": "13f771af430d02266ecd4eff00ab432164ac2394ec01ec33e9690285a5173ec4",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-01-jumpingjacks_environment_light-原版LumiMotion两阶段训练/model_mlp/deform/iteration_55000/deform.pth": "868e22dcd83aed5c36790fe9f4a4da2ce2e30fccfc268498836ffae337408841",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-01-jumpingjacks_environment_light-原版LumiMotion两阶段训练/model_mlp/envmap/iteration_55000/envmap.pth": "89fcd5353365aaf1c5623f5ea73c1c87dcd09a44c4c560620759f8bc9b6219d5",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-01-jumpingjacks_environment_light-原版LumiMotion两阶段训练/model_mlp/envmap/iteration_55000/envmap.hdr": "b5747e534cd6b09b12d46782d340d5b4549bf9891a22bf9a22b2b35d52f1f707"
+  },
+  "effective_config": {
+    "convert_SHs_python": false,
+    "compute_cov3D_python": false,
+    "debug": false,
+    "depth_ratio": 1.0,
+    "light_sample_num": 0,
+    "diffuse_sample_num": 256,
+    "light_t_min": 0.1,
+    "wo_indirect": false,
+    "wo_indirect_relight": false,
+    "detach_indirect": false,
+    "wo_specular": false,
+    "data_device": "cuda",
+    "deform_type": "mlp",
+    "end_frame": -1,
+    "eval": true,
+    "hyper_dim": 1,
+    "images": "images",
+    "is_blender": true,
+    "load2gpu_on_the_fly": true,
+    "load_test_set_only": false,
+    "model_path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-01-jumpingjacks_environment_light-原版LumiMotion两阶段训练/model_mlp",
+    "no_binary_separation": false,
+    "pred_color": true,
+    "resolution": 2,
+    "sh_degree": 3,
+    "source_path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-01-jumpingjacks_environment_light-原版LumiMotion两阶段训练/data_view",
+    "start_frame": 0,
+    "test_light_folder": "images",
+    "train_light_folder": "images",
+    "white_background": false
+  },
+  "gt_manifest": {
+    "schema_version": 1,
+    "parameter": "roughness_r",
+    "source_blend": "/home/lihan/data/LH-data/danamic/jumpingjacks_environment_light/scene_snapshot.blend",
+    "source_blend_sha256": "c4d208751ca317547411ea82c341ecee34810304e127bf0440c4a695195add0e",
+    "transforms": "/home/lihan/data/LH-data/transfer-dynamic/jumpingjacks_environment_light/transforms_test.json",
+    "transforms_sha256": "8544dcff0bd338ec363dc6c081cc7ac3bca64395e486e4dd6d6de7a205764909",
+    "frames": {
+      "0010": {
+        "file": "roughness_0010.exr",
+        "sha256": "0b6d49b1b5ca5f2865c94e840d949b2ee6940a3633bd5ed1fe0fa0ea7220ed06",
+        "time": 0.06666666666666667,
+        "camera_to_world": [
+          [
+            0.9288420677185059,
+            -0.16270290315151215,
+            0.3328365087509155,
+            1.5556272268295288
+          ],
+          [
+            0.3704758584499359,
+            0.4079221487045288,
+            -0.8344742059707642,
+            -3.884077548980713
+          ],
+          [
+            0.0,
+            0.8984026312828064,
+            0.43917274475097656,
+            3.0395588874816895
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "0020": {
+        "file": "roughness_0020.exr",
+        "sha256": "73fd8412699abb455bfdcf75c436026df70db94cbde8185ce4f41a6d12f56935",
+        "time": 0.13333333333333333,
+        "camera_to_world": [
+          [
+            0.695837140083313,
+            -0.5879189968109131,
+            0.41250690817832947,
+            1.9005556106567383
+          ],
+          [
+            0.7181996703147888,
+            0.5696130394935608,
+            -0.39966270327568054,
+            -1.8867859840393066
+          ],
+          [
+            -1.4901162970204496e-08,
+            0.5743623971939087,
+            0.8186010718345642,
+            4.753918170928955
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "0030": {
+        "file": "roughness_0030.exr",
+        "sha256": "03fe092ab58ed8f5f7d89620d2f52c43e0393b4cd999ecb07150efa4e0683a47",
+        "time": 0.2,
+        "camera_to_world": [
+          [
+            0.3409191966056824,
+            -0.3612404465675354,
+            0.8679167628288269,
+            3.995750665664673
+          ],
+          [
+            0.9400925636291504,
+            0.1310017704963684,
+            -0.3147450387477875,
+            -1.4830365180969238
+          ],
+          [
+            7.4505797087454084e-09,
+            0.9232247471809387,
+            0.38426047563552856,
+            2.748213052749634
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "0040": {
+        "file": "roughness_0040.exr",
+        "sha256": "e18adda7bc5b8afff84cc3cfdeab783ff8be3fd0df063d42c890b1bae7dd638f",
+        "time": 0.26666666666666666,
+        "camera_to_world": [
+          [
+            -0.07372883707284927,
+            -0.020701054483652115,
+            0.997063398361206,
+            4.594864368438721
+          ],
+          [
+            0.9972783923149109,
+            -0.0015304299304261804,
+            0.07371294498443604,
+            0.2885618507862091
+          ],
+          [
+            0.0,
+            0.999784529209137,
+            0.02075754851102829,
+            1.1228327751159668
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "0050": {
+        "file": "roughness_0050.exr",
+        "sha256": "6419dbfc0b3e76b8125eaa2d1274ecaee92abe2b4d7e57b5d460511cae89e068",
+        "time": 0.3333333333333333,
+        "camera_to_world": [
+          [
+            -0.47545933723449707,
+            -0.5475378632545471,
+            0.688578724861145,
+            3.177736282348633
+          ],
+          [
+            0.8797377347946167,
+            -0.2959200143814087,
+            0.372146338224411,
+            1.7027896642684937
+          ],
+          [
+            1.4901161193847656e-08,
+            0.7827092409133911,
+            0.6223875880241394,
+            3.8800110816955566
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "0060": {
+        "file": "roughness_0060.exr",
+        "sha256": "154ab09bea6c1ac06901f5d714095aa252041a7af6867bc7a4d52f7104b3551f",
+        "time": 0.4,
+        "camera_to_world": [
+          [
+            -0.7938877940177917,
+            -0.4743342995643616,
+            0.3804590404033661,
+            1.7573050260543823
+          ],
+          [
+            0.6080642342567444,
+            -0.6192902326583862,
+            0.4967268407344818,
+            2.32267165184021
+          ],
+          [
+            -1.4901159417490817e-08,
+            0.625688910484314,
+            0.7800727486610413,
+            4.549173355102539
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "0070": {
+        "file": "roughness_0070.exr",
+        "sha256": "862ded25dd82782b469a04e9746057081ae63436f57308701b7641f7def46e21",
+        "time": 0.4666666666666667,
+        "camera_to_world": [
+          [
+            -0.9732247591018677,
+            -0.04389526695013046,
+            0.22562569379806519,
+            1.051253080368042
+          ],
+          [
+            0.2298559695482254,
+            -0.18585535883903503,
+            0.955313503742218,
+            4.449819087982178
+          ],
+          [
+            3.725290742551124e-09,
+            0.9815961718559265,
+            0.1909685879945755,
+            1.7696232795715332
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "0080": {
+        "file": "roughness_0080.exr",
+        "sha256": "79f0224a5a77e970a1642b4397a1b269154844661e5960816ab32f6fec3273e2",
+        "time": 0.5333333333333333,
+        "camera_to_world": [
+          [
+            -0.9820494055747986,
+            0.024779878556728363,
+            -0.18698905408382416,
+            -0.8328909873962402
+          ],
+          [
+            -0.1886238157749176,
+            -0.12901374697685242,
+            0.9735381603240967,
+            4.538178443908691
+          ],
+          [
+            -1.8626449271863521e-09,
+            0.9913332462310791,
+            0.13137193024158478,
+            1.4753119945526123
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "0090": {
+        "file": "roughness_0090.exr",
+        "sha256": "9927d163fcdec029b46e147405eaec123644b41bc6d7a2f8a8467fe50030a314",
+        "time": 0.6,
+        "camera_to_world": [
+          [
+            -0.8188160061836243,
+            0.4306560456752777,
+            -0.37957316637039185,
+            -1.7251302003860474
+          ],
+          [
+            -0.574056088924408,
+            -0.6142745614051819,
+            0.5414115190505981,
+            2.54429030418396
+          ],
+          [
+            1.4901161193847656e-08,
+            0.6612126231193542,
+            0.7501985430717468,
+            4.376522541046143
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "0100": {
+        "file": "roughness_0100.exr",
+        "sha256": "4a5afbd04d52b8d49cbc388b45cb1dd51f26ff8430968ff5799509045cb8972a",
+        "time": 0.6666666666666666,
+        "camera_to_world": [
+          [
+            -0.5121233463287354,
+            0.58100825548172,
+            -0.6325812935829163,
+            -2.904390573501587
+          ],
+          [
+            -0.8589119911193848,
+            -0.3464241921901703,
+            0.377174437046051,
+            1.7576261758804321
+          ],
+          [
+            0.0,
+            0.7364914417266846,
+            0.6764469742774963,
+            4.111598491668701
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "0110": {
+        "file": "roughness_0110.exr",
+        "sha256": "17e3e8b1492b4f4facdfd8cc772f94b574654bc77c888d36d8e4516c02fed1ac",
+        "time": 0.7333333333333333,
+        "camera_to_world": [
+          [
+            -0.11570509523153305,
+            0.050354551523923874,
+            -0.9920064806938171,
+            -4.564101219177246
+          ],
+          [
+            -0.9932836294174194,
+            -0.005865674465894699,
+            0.11555632203817368,
+            0.510015070438385
+          ],
+          [
+            -4.656612873077393e-10,
+            0.9987141489982605,
+            0.05069504678249359,
+            1.2884092330932617
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "0120": {
+        "file": "roughness_0120.exr",
+        "sha256": "454940e26518aeecb34d7337130950170e1a105c89491559c89687369b3cabb0",
+        "time": 0.8,
+        "camera_to_world": [
+          [
+            0.30098506808280945,
+            0.2966610789299011,
+            -0.9063112139701843,
+            -4.174222946166992
+          ],
+          [
+            -0.9536288380622864,
+            0.09363240748643875,
+            -0.2860506474971771,
+            -1.350981593132019
+          ],
+          [
+            7.450581485102248e-09,
+            0.9503815770149231,
+            0.311086505651474,
+            2.487478494644165
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "0130": {
+        "file": "roughness_0130.exr",
+        "sha256": "a1419d46a5b3e457f608cc5a533eec0f04dc5897b4bc870640328a6c9d421572",
+        "time": 0.8666666666666667,
+        "camera_to_world": [
+          [
+            0.6649417281150818,
+            0.6062648892402649,
+            -0.43622857332229614,
+            -2.0076608657836914
+          ],
+          [
+            -0.7468953132629395,
+            0.539742112159729,
+            -0.3883631229400635,
+            -1.828884482383728
+          ],
+          [
+            1.4901161193847656e-08,
+            0.5840559005737305,
+            0.8117135167121887,
+            4.753297328948975
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "0140": {
+        "file": "roughness_0140.exr",
+        "sha256": "4a4cde3e8d08df9000889c7ef17271b967edbd746c7d5a1a7239329adca27657",
+        "time": 0.9333333333333333,
+        "camera_to_world": [
+          [
+            0.9123984575271606,
+            0.20885562896728516,
+            -0.35200637578964233,
+            -1.5945260524749756
+          ],
+          [
+            -0.40930330753326416,
+            0.4655705690383911,
+            -0.7846750617027283,
+            -3.647317409515381
+          ],
+          [
+            0.0,
+            0.8600135445594788,
+            0.5102711319923401,
+            3.380300283432007
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "0150": {
+        "file": "roughness_0150.exr",
+        "sha256": "89923a551ea89125bfdf010779f9a3eb4f5aa1e2f45aca9788bdf50210faa187",
+        "time": 1.0,
+        "camera_to_world": [
+          [
+            1.0,
+            0.0,
+            0.0,
+            0.023895859718322754
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0,
+            -4.640604496002197
+          ],
+          [
+            0.0,
+            1.0,
+            0.0,
+            1.035266399383545
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      }
+    },
+    "width": 400,
+    "height": 400,
+    "method": "Principled Roughness -> emission mixed with original Alpha transparent branch -> raw float RGBA EXR",
+    "transparent_semantics": "alpha-weighted visible Principled r; not equivalent roughness of a mixed BSDF",
+    "render_engine": "BLENDER_EEVEE",
+    "alpha_association": "premultiplied_RGB",
+    "blender_version": "5.2.2 LTS"
+  }
+}

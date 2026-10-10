@@ -1,0 +1,35 @@
+{
+  "status": "FAILED_FOUR_CATEGORIES",
+  "iteration": 55000,
+  "rgb_test_frames_reviewed": [
+    "0010",
+    "0080",
+    "0150"
+  ],
+  "insight_frames_reviewed": [
+    "0001",
+    "0075",
+    "0150"
+  ],
+  "all150_manually_reviewed": false,
+  "rgb": "黑背景正常、人物平台存在；人物/衣服/头手斑驳稀疏，脚周平台伪结构和残影；GT背光本来暗，不单凭背面暗判失败",
+  "alpha": "主体平台轮廓大体完整；头手边毛糙、平台边及下方薄雾残影",
+  "normal": "平台整体较集中，脚周与平台局部异常方向、人体斑驳；未依据可视化编码声称GT角误差",
+  "albedo": "平台棋盘部分恢复；人体前后光照残留、头手和脚周污染",
+  "rgb_metrics": {
+    "psnr": 19.475974080557172,
+    "ssim": 0.8950952370961507,
+    "lpips": 0.11134533832470576,
+    "psnr_foreground": 12.349587008267934,
+    "ssim_foreground_bbox": 0.7730405648549398,
+    "lpips_foreground_bbox": 0.22556244830290476
+  },
+  "comparison": "B03同55k PSNR19.35354，本次19.47597，略提升但目检未通过",
+  "relight_normal_depth_review": "PENDING",
+  "full_seven_mae": "PENDING",
+  "commit_allowed": false,
+  "images": [
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/inspection/rgb_final_55000_comparison.png",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/inspection/four_categories_final_55000.png"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "status": "TRAIN_COMPLETED",
+  "started_at": "2026-10-10T04:30:08.950000+09:00",
+  "training_pid": 232645,
+  "process_start_ticks": "8458195",
+  "steps_planned": 20000,
+  "source_iteration": 35000,
+  "target_iteration": 55000,
+  "loss_preset": "pbr_gt_directional_anchor",
+  "session_id": 16086,
+  "finished_at": "2026-10-10T05:14:31.955921+09:00",
+  "iteration": 55000,
+  "steps_completed": 20000,
+  "log_completed_at": "2026-10-10T05:14:28+09:00",
+  "loop_duration": "44:01",
+  "training_exit_code": 0,
+  "verified_training_session_closed": true
+}

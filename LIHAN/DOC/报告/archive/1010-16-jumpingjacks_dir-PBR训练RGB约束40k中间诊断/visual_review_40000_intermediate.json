@@ -1,0 +1,20 @@
+{
+  "iteration": 40000,
+  "actual_images_viewed": true,
+  "images": [
+    "inspection/rgb_40000_comparison.png",
+    "normal_depth_40000_intermediate/comparison_0010.png",
+    "inspection/constraint_pixel_mass_40000/0001_RGB_confidence.png"
+  ],
+  "rgb_background": "实际首中尾对比B09同40k：黑背景正常、人物/平台出现；上衣/裤腿/手臂碎黑斑，脚周与地面黑灰伪形变，当前40k质量FAILED_EARLY。不把较暗的背光帧直接称缺失，GT中帧本身较暗。",
+  "scope": "40k中间RGB/GS/Depth诊断，未做完整材质/全Mesh/HDR/6视频，未代替55k完整四类/七MAE验收",
+  "status": "FAILED_EARLY",
+  "normal_goal": "FAILED_INTERMEDIATE_NOT_FINAL",
+  "actual_sessions_exit": {
+    "preview_86565": 0,
+    "geometry_27161": 0,
+    "geometry_CPU_21859": 0,
+    "native_pixel_mass_37263": 0
+  },
+  "actual_sessions_closed": true
+}

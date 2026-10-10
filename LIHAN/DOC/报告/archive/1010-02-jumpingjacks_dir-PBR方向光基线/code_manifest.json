@@ -1,0 +1,13 @@
+{
+  "arguments/stage2.py": "3762998206629de14d271d315a4d660376963da46b22f7ec6bbae45bc18d5b6e",
+  "scripts/train_stage2.py": "c5bb4ba266fde7772d2d1fded06ab092ee27958bd15fba84e86e3096b5341d15",
+  "scripts/loss_stage2.py": "5e86b5c0eafdcf3207515dc241d0c1055e4ef980979a0e9952f4b508ef0b8858",
+  "gaussian_renderer/render_ir.py": "9bf3f2fbdcf759766c15810ddc4763f3006bfabcd4c47a254a766fad2ab1ff26",
+  "scene/pbr_directional.py": "4590c0b4c0efdef8296a543b34e6020095e8e584935839e8e21eb0a23b467813",
+  "scripts/render_stage2.py": "cdbbc7d4547e16bba16a552b4cb5f6191e63f316ad95125c0c720c7e2a22b0b7",
+  "scripts/eval_albedo_gt.py": "e14a5b99453784c9ae5e92deb89f5d7768e6326dbf34bd022013c9ae8bf27f61",
+  "scripts/eval_geometry_gt.py": "0e81a53568f7b849607a3d926ce2cd79dd247f7009335d643a7ef15bde1216e8",
+  "scripts/eval_roughness_gt.py": "f0b3d4585ff9773516ade2ba47bdb6ecdfa46871e5db77ab349acf47d6b1b844",
+  "scripts/extract_geometry_mesh_dynamic.py": "810c134e4e96151d943f619ee5fff7776d566b8b854ffc5dc779301e08d86da8",
+  "utils/train_report_utils.py": "0c80e5ee4641573ad8e4792b7829ec9e3ffd54754f2d21624546c53f3fa612c8"
+}

@@ -1,0 +1,16 @@
+{
+  "status": "FINISHED_QUALITY_FAILED",
+  "step": "finished",
+  "pid": 271790,
+  "training_pid": 271624,
+  "updated_at": "2026-10-10T08:55:28.599327+09:00",
+  "iteration": 55000,
+  "frames": 15,
+  "pipeline_exit_code": 0,
+  "verified_session_closed": true,
+  "verified_terminal_observed_at": "2026-10-10T09:00:56.921233+09:00",
+  "terminal_evidence": "exec86673先前已返回并关闭；再次poll为Unknown process id；原PID已退出且9步历史全exit0，终态PIPELINE_COMPLETED_REVIEW_PENDING",
+  "reviewed_at": "2026-10-10T09:00:56.974578+09:00",
+  "final_gs_normal_mae_deg": 16.81871120018239,
+  "commit_allowed": false
+}

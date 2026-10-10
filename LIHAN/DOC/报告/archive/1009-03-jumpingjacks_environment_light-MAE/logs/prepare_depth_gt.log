@@ -1,0 +1,15 @@
+GT 0010: IoU=0.99895, mesh/EXR normal MAE=0.6849 deg
+GT 0020: IoU=0.99883, mesh/EXR normal MAE=0.7788 deg
+GT 0030: IoU=0.99845, mesh/EXR normal MAE=0.7736 deg
+GT 0040: IoU=0.99807, mesh/EXR normal MAE=1.0389 deg
+GT 0050: IoU=0.99881, mesh/EXR normal MAE=0.7398 deg
+GT 0060: IoU=0.99919, mesh/EXR normal MAE=0.8589 deg
+GT 0070: IoU=0.99919, mesh/EXR normal MAE=1.0122 deg
+GT 0080: IoU=0.99871, mesh/EXR normal MAE=1.0481 deg
+GT 0090: IoU=0.99898, mesh/EXR normal MAE=0.8477 deg
+GT 0100: IoU=0.99885, mesh/EXR normal MAE=0.8334 deg
+GT 0110: IoU=0.99793, mesh/EXR normal MAE=0.9359 deg
+GT 0120: IoU=0.99859, mesh/EXR normal MAE=0.7915 deg
+GT 0130: IoU=0.99893, mesh/EXR normal MAE=0.7800 deg
+GT 0140: IoU=0.99906, mesh/EXR normal MAE=0.6772 deg
+GT 0150: IoU=0.99879, mesh/EXR normal MAE=0.8170 deg
