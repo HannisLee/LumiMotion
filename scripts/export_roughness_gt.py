@@ -21,6 +21,10 @@ def main():
     parser.add_argument('--transforms', type=Path, required=True,
                         help='对应 split 的 transforms JSON，提供 source_frame、time 和相机。')
     parser.add_argument('--resolution', type=int, default=2, help='原始分辨率除数。')
+    parser.add_argument('--alpha_composite', action='store_true',
+                        help='允许单一Principled透明度；保持原Alpha，导出透射层alpha加权的有效roughness。')
+    parser.add_argument('--engine', choices=['cycles', 'eevee', 'source'], default='cycles',
+                        help='默认原有Cycles；透明数据推荐source以保留源引擎Alpha语义。')
     args = parser.parse_args(sys.argv[sys.argv.index('--') + 1:])
     if args.resolution < 1:
         parser.error('resolution 必须为正整数。')
@@ -35,7 +39,8 @@ def main():
     if len({f['source_frame'] for f in frames}) != len(frames):
         raise ValueError('source_frame 重复。')
     scene = bpy.context.scene
-    scene.render.engine = 'CYCLES'
+    if args.engine != 'source':
+        scene.render.engine = 'CYCLES' if args.engine == 'cycles' else 'BLENDER_EEVEE'
     scene.cycles.device = 'CPU'
     scene.cycles.samples = 16
     scene.cycles.use_denoising = False
@@ -67,7 +72,9 @@ def main():
         node = link.from_node
         if node.type != 'BSDF_PRINCIPLED' or node.mute:
             raise ValueError('首版仅支持直接连接的 Principled BSDF：' + material.name)
-        if node.inputs['Alpha'].is_linked or node.inputs['Alpha'].default_value != 1:
+        alpha = node.inputs['Alpha']
+        transparent = alpha.is_linked or alpha.default_value != 1
+        if transparent and not args.alpha_composite:
             raise ValueError('首版不支持透明材质：' + material.name)
         emission = tree.nodes.new('ShaderNodeEmission')
         emission.inputs['Strength'].default_value = 1
@@ -82,21 +89,43 @@ def main():
             tree.links.new(scalar.outputs[0], emission.inputs['Color'])
         else:
             emission.inputs['Color'].default_value = [roughness.default_value] * 3 + [1]
-            replacements.append((roughness, emission))
+            replacements.append((roughness, emission.inputs['Color'], True))
+        shader = emission.outputs[0]
+        if transparent:
+            # 透明层的材质参数没有唯一第一命中值；保留原alpha，定义为
+            # 各可见层按透射率×alpha加权的r，不将半透明头发强制变为不透明。
+            mix = tree.nodes.new('ShaderNodeMixShader')
+            clear = tree.nodes.new('ShaderNodeBsdfTransparent')
+            tree.links.new(clear.outputs[0], mix.inputs[1])
+            tree.links.new(shader, mix.inputs[2])
+            if alpha.is_linked:
+                scalar = tree.nodes.new('ShaderNodeMath')
+                scalar.operation = 'MULTIPLY'
+                scalar.inputs[1].default_value = 1
+                scalar.use_clamp = True
+                tree.links.new(alpha.links[0].from_socket, scalar.inputs[0])
+                tree.links.new(scalar.outputs[0], mix.inputs[0])
+            else:
+                mix.inputs[0].default_value = alpha.default_value
+                replacements.append((alpha, mix.inputs[0], False))
+            shader = mix.outputs[0]
         tree.links.remove(link)
-        tree.links.new(emission.outputs[0], output.inputs['Surface'])
+        tree.links.new(shader, output.inputs['Surface'])
     report = {'schema_version': 1, 'parameter': 'roughness_r', 'source_blend': str(blend),
               'source_blend_sha256': source_hash, 'transforms': str(args.transforms.resolve()),
               'transforms_sha256': digest(args.transforms), 'frames': {},
               'width': scene.render.resolution_x, 'height': scene.render.resolution_y,
               'method': 'Principled Roughness input -> emission -> raw float RGBA EXR',
               'alpha_association': 'premultiplied_RGB',
+              'render_engine': scene.render.engine,
+              'transparent_parameter_definition': ('transmittance-alpha weighted effective r'
+                                                    if args.alpha_composite else 'opaque only'),
               'blender_version': bpy.app.version_string}
     for record in frames:
         frame = int(record['source_frame'])
         scene.frame_set(frame)
-        for roughness, emission in replacements:
-            emission.inputs['Color'].default_value = [roughness.default_value] * 3 + [1]
+        for source, target, color in replacements:
+            target.default_value = [source.default_value] * 3 + [1] if color else source.default_value
         matrix = scene.camera.matrix_world
         if max(abs(matrix[y][x] - record['transform_matrix'][y][x]) for y in range(4) for x in range(4)) > 1e-5:
             raise ValueError('Blender 相机与评测 transforms 不匹配：' + str(frame))

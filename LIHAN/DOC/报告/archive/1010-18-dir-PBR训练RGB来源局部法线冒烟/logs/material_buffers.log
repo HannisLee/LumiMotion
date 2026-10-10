@@ -1,0 +1,86 @@
+Loading trained model at iteration 35020
+Found transforms_train.json file, assuming Blender data set!
+Reading Training Transforms
+Read Train Transforms with 135 cameras
+Loading Training Cameras
+Loading Test Cameras
+LOAD PLY
+/home/lihan/reproduce/LumiMotion-stage2-perlight/scene/__init__.py:103: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  unique_fids = [torch.tensor(val, dtype=torch.float32, device="cuda") for val in unique_values]
+################ gaussian_color params: 156934
+Loading trained model at iteration 35020
+Found transforms_train.json file, assuming Blender data set!
+Reading Training Transforms
+Read Train Transforms with 135 cameras
+Loading Training Cameras
+Loading Test Cameras
+LOAD PLY
+################ gaussian_color params: 156934
+{
+  "status": "PASS_NATIVE_MATERIAL_BUFFERS",
+  "iteration": 35020,
+  "rows": [
+    {
+      "frame": "0001",
+      "albedo": {
+        "frame": "0001",
+        "passed": true,
+        "max_abs_difference_linear": 0.0
+      },
+      "roughness": [
+        {
+          "background": "black",
+          "passed": true,
+          "max_abs_difference": 0.0
+        },
+        {
+          "background": "white",
+          "passed": true,
+          "max_abs_difference": 5.960464477539063e-08
+        }
+      ]
+    },
+    {
+      "frame": "0075",
+      "albedo": {
+        "frame": "0075",
+        "passed": true,
+        "max_abs_difference_linear": 0.0
+      },
+      "roughness": [
+        {
+          "background": "black",
+          "passed": true,
+          "max_abs_difference": 0.0
+        },
+        {
+          "background": "white",
+          "passed": true,
+          "max_abs_difference": 5.960464477539063e-08
+        }
+      ]
+    },
+    {
+      "frame": "0150",
+      "albedo": {
+        "frame": "0150",
+        "passed": true,
+        "max_abs_difference_linear": 0.0
+      },
+      "roughness": [
+        {
+          "background": "black",
+          "passed": true,
+          "max_abs_difference": 0.0
+        },
+        {
+          "background": "white",
+          "passed": true,
+          "max_abs_difference": 5.960464477539063e-08
+        }
+      ]
+    }
+  ],
+  "gt_material_inputs": false,
+  "optimizer_steps": 0
+}

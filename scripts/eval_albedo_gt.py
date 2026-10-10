@@ -74,6 +74,14 @@ class AlbedoRun:
         self.config = config
         self.checkpoint_hashes = {str(p.resolve()): file_sha256(p) for p in self.checkpoint_files}
         self.checkpoint_hashes.update(self.context.source_files)
+        if self.context.pbr_feature_gate_provenance is not None:
+            asset = self.context.source/'pbr_feature_gate.json'
+            self.checkpoint_hashes[str(asset)] = file_sha256(asset)
+        if self.context.pbr_rasterizer_provenance is not None:
+            from scene.pbr_rasterizer import ASSET,ROOT
+            native=self.context.pbr_rasterizer_provenance
+            self.checkpoint_hashes[str(self.context.source/ASSET)]=file_sha256(self.context.source/ASSET)
+            self.checkpoint_hashes.update({str(ROOT/relative):digest for relative,digest in native['source_files'].items()})
 
     @torch.no_grad()
     def render(self, camera):
@@ -81,7 +89,8 @@ class AlbedoRun:
         deformation = self.context.deformation(camera)
         albedo = self.context.pc.get_albedo if self.material is None else self.material.albedo
         pkg = render_albedo(camera, self.context.pc, albedo, deformation,
-                            self.mode == 'original_ir' and self.config.compute_cov3D_python)
+                            self.mode == 'original_ir' and self.config.compute_cov3D_python,
+                            getattr(self.config,'pbr_rasterizer_backend','installed'))
         self.context.unload_camera(camera)
         return {key: value.cpu().numpy() for key, value in pkg.items()}
 
@@ -92,7 +101,8 @@ class AlbedoRun:
         deformation = self.context.deformation(camera)
         albedo = self.context.pc.get_albedo if self.material is None else self.material.albedo
         pkg = render_albedo(camera, self.context.pc, albedo, deformation,
-                            self.mode == 'original_ir' and self.config.compute_cov3D_python)
+                            self.mode == 'original_ir' and self.config.compute_cov3D_python,
+                            getattr(self.config,'pbr_rasterizer_backend','installed'))
         if self.mode == 'original_ir':
             from gaussian_renderer.render_ir import render_ir
             legacy = render_ir(camera, self.context.pc, self.config, self.context.background,

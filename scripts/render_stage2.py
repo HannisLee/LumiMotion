@@ -39,11 +39,24 @@ class Stage2RenderRun:
             if not config.exists():raise ValueError('缺少 Stage2 配置：'+str(config))
             self.args=Namespace(**json.loads(config.read_text()))
             self.context=FrozenScene(self.args,output,iteration)
-            from scene.light import EnvLight
-            self.env=EnvLight(path=None,device='cuda',resolution=[self.args.envmap_resolution//2,self.args.envmap_resolution],
-                              max_res=self.args.envmap_resolution,activation=self.args.envmap_activation)
-            self.env.load_weights(str(output),iteration)
+            self.env=None
+            if getattr(self.args, 'pbr_light_mode', 'envmap') == 'gt_directional':
+                from scene.pbr_directional import load_gt_directional_lights, validate_directional_checkpoint
+                validate_directional_checkpoint(output, iteration, vars(self.args))
+                if getattr(self.args, 'pbr_learn_light_intensity', False):
+                    lighting=json.loads((output/'pbr_directional'/f'iteration_{iteration}'/'lighting.json').read_text())
+                    self.args.pbr_light_intensity_scale=lighting['effective_intensity_scale']
+                self.pbr_lights=load_gt_directional_lights(self.args.pbr_gt_lights_path)
+            else:
+                from scene.light import EnvLight
+                self.env=EnvLight(path=None,device='cuda',resolution=[self.args.envmap_resolution//2,self.args.envmap_resolution],
+                                  max_res=self.args.envmap_resolution,activation=self.args.envmap_activation)
+                self.env.load_weights(str(output),iteration)
             self.mode='original_ir';self.bvh=False
+
+    @property
+    def is_pbr_directional(self):
+        return self.mode=='original_ir' and getattr(self.args,'pbr_light_mode','envmap')=='gt_directional'
 
     @torch.no_grad()
     def render(self,camera,direction=None,intensity=None,hdr=None,time_override=None):
@@ -62,15 +75,32 @@ class Stage2RenderRun:
             return render_stage2_lambertian(camera,ctx.pc,self.material,deformation,ctx.background,
                 direction=direction,intensity=self.args.photometric_light_intensity if intensity is None else intensity,
                 hdr=hdr,depth_ratio=self.args.depth_ratio,**kwargs)
-        if direction is not None or hdr is not None:
+        if (direction is not None or hdr is not None) and not self.is_pbr_directional:
             raise ValueError('原始 IR 对照使用原始 HDR 工具；此重光照入口针对 Lambertian。')
+        if self.is_pbr_directional and time_override is not None and direction is None and hdr is None:
+            raise ValueError('替换time时请同时显式指定方向光或HDR，避免使用另一帧的GT光照。')
         from gaussian_renderer.render_ir import render_ir
         if not self.bvh:
             ctx.pc.build_bvh(d_rotation=deformation['d_rotation'],d_xyz=deformation['d_xyz'],d_scaling=deformation['d_scaling'])
             self.bvh=True
         else:ctx.pc.update_bvh(d_rotation=deformation['d_rotation'],d_xyz=deformation['d_xyz'],d_scaling=deformation['d_scaling'])
-        return render_ir(camera,ctx.pc,self.args,ctx.background,**{k:deformation[k] for k in ['d_xyz','d_rotation','d_scaling','d_opacity','d_color']},
-                         relight=False,training=False,env_light=self.env,opt=self.args)
+        lights=None;pipe=self.args
+        if direction is not None:
+            value=(self.pbr_lights.for_camera(camera,self.args.pbr_light_intensity_scale)[1].sum(0)
+                   if intensity is None else torch.full((3,),float(intensity),device='cuda'))
+            if not torch.isfinite(value).all() or (value<0).any():
+                raise ValueError('替换PBR方向光强度必须有限且非负。')
+            lights=(unit_vector(direction).reshape(1,3),value.reshape(1,3))
+        if hdr is not None:
+            import copy
+            pipe=copy.copy(self.args);pipe.diffuse_sample_num=hdr.pbr_samples
+        package=render_ir(camera,ctx.pc,pipe,ctx.background,**{k:deformation[k] for k in ['d_xyz','d_rotation','d_scaling','d_opacity','d_color']},
+                         relight=direction is not None or hdr is not None,training=False,
+                         env_light=hdr if hdr is not None else self.env,opt=self.args,directional_lights=lights)
+        if self.is_pbr_directional:
+            from scene.stage2_photometric import srgb_to_linear
+            package['render_linear']=srgb_to_linear(package['render'])
+        return package
 
 
 def ensure_directory(path):
@@ -144,7 +174,8 @@ def insights(run,output):
 
 @torch.no_grad()
 def directional_relight(run,output,key='0001',frames=72,intensity=None):
-    if run.mode!='photometric_lambertian':raise ValueError('方向光替换仅适用于 Lambertian。')
+    if run.mode!='photometric_lambertian' and not run.is_pbr_directional:
+        raise ValueError('方向光替换适用于Lambertian或GT方向光PBR。')
     if frames<4:raise ValueError('转灯视频至少4帧。')
     output=ensure_directory(output);camera=run.context.camera_by_key[key]
     # 在固定相机右/前方向形成闭合转灯轨迹，位置、时间和材质均保持不变。
@@ -164,16 +195,30 @@ def directional_relight(run,output,key='0001',frames=72,intensity=None):
             writer.append_data(to_image(pkg['render']));means.append(float(pkg['render'].mean()))
     finally:writer.close();run.context.unload_camera(camera)
     record={'frame_key':key,'frames':frames,'mean_brightness':means,'alpha_unchanged':True,
-            'intensity':run.args.photometric_light_intensity if intensity is None else intensity}
+            'intensity':(run.args.photometric_light_intensity if run.mode=='photometric_lambertian' else
+                         'frame light-table irradiance sum × saved scale') if intensity is None else intensity}
     if max(means)-min(means)<1e-5:raise AssertionError('转灯没有产生光照响应。')
     (output/'relight.json').write_text(json.dumps(record,indent=2)+'\n')
 
 
 @torch.no_grad()
 def hdr_relight(run,output,path,samples=2048,yaw=0.0,exposure=1.0):
-    if run.mode!='photometric_lambertian':raise ValueError('此 HDR 入口针对 Lambertian。')
+    if run.mode!='photometric_lambertian' and not run.is_pbr_directional:
+        raise ValueError('此HDR入口支持Lambertian或GT方向光PBR。')
     output=ensure_directory(output)
-    hdr=HDRIrradiance.from_file(path,samples=samples,yaw_degrees=yaw,exposure=exposure)
+    if run.is_pbr_directional:
+        from scene.light import EnvLight
+        if samples<=0 or not math.isfinite(exposure) or exposure<=0 or not math.isfinite(yaw):
+            raise ValueError('PBR HDR采样数、曝光须正，参数须有限。')
+        hdr=EnvLight(path=path,device='cuda',activation='none')
+        hdr.base.mul_(exposure);hdr.requires_grad_(False)
+        transform=torch.tensor([[0.,-1.,0.],[0.,0.,1.],[-1.,0.,0.]],device='cuda')
+        angle=math.radians(yaw)
+        rotation=torch.tensor([[math.cos(angle),-math.sin(angle),0.],
+                               [math.sin(angle),math.cos(angle),0.],[0.,0.,1.]],device='cuda')
+        hdr.set_transform(transform@rotation);hdr.build_mips();hdr.update_pdf();hdr.pbr_samples=samples
+    else:
+        hdr=HDRIrradiance.from_file(path,samples=samples,yaw_degrees=yaw,exposure=exposure)
     writer=video_writer(output/'hdr.mp4')
     cameras=sorted(run.context.train_cameras+run.context.test_cameras,key=lambda c:float(c.fid.item()))
     try:
@@ -187,7 +232,8 @@ def hdr_relight(run,output,path,samples=2048,yaw=0.0,exposure=1.0):
     (output/'hdr.json').write_text(json.dumps({'path':str(Path(path).resolve()),'sha256':file_sha256(path),
         'samples':samples,'yaw_degrees':yaw,'exposure':exposure,'world_up':'Z',
         'longitude':'atan2(-y,x)','axis_reference':'原始HDR脚本轴变换 [[0,-1,0],[0,0,1],[-1,0,0]]',
-        'integrator':'确定性均匀球面积分；直接漫反射，无遮挡/镜面/间接光'},ensure_ascii=False,indent=2)+'\n')
+        'integrator':('native PBR GGX + BVH visibility + native relight indirect' if run.is_pbr_directional else
+                      '确定性均匀球面积分；直接漫反射，无遮挡/镜面/间接光')},ensure_ascii=False,indent=2)+'\n')
 
 
 def run_cli(argv=None):
@@ -209,6 +255,10 @@ def run_cli(argv=None):
     (output/'code_diff.patch').write_bytes(subprocess.check_output(['git','diff'],cwd=repository))
     (output/'provenance.json').write_text(json.dumps(provenance,ensure_ascii=False,indent=2)+'\n')
     run=Stage2RenderRun(model,args.load_iter)
+    if getattr(run.args,'pbr_rasterizer_backend','installed')=='lumimotion':
+        from scene.pbr_rasterizer import native_module
+        provenance['pbr_rasterizer']=native_module().provenance
+        (output/'provenance.json').write_text(json.dumps(provenance,ensure_ascii=False,indent=2)+'\n')
     if args.task in {'eval','all'}:evaluate(run,output/'eval')
     if args.task in {'insights','materials','all'}:insights(run,output/'insights')
     if args.task in {'directional','all'}:directional_relight(run,output/'directional',args.frame_key,args.relight_frames,args.light_intensity)

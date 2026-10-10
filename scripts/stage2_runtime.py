@@ -110,6 +110,8 @@ class FrozenScene:
             if isinstance(value,torch.nn.Parameter):value.requires_grad_(False)
         self.deform.deform.requires_grad_(False);self.deform.deform.eval()
         self.iteration=source_iteration
+        from scene.pbr_rasterizer import validate_backend_model
+        self.pbr_rasterizer_provenance=validate_backend_model(self.source,args)
         self.background=torch.tensor([1.,1.,1.] if args.white_background else [0.,0.,0.],device='cuda')
         self.center=self.pc.get_xyz.detach().mean(0)
         self.fingerprint=tensor_fingerprint(self.pc,self.deform)
@@ -123,6 +125,26 @@ class FrozenScene:
         from scene.stage2_source_deformation import find_static_anchor_camera
         self.static_anchor_camera = find_static_anchor_camera(args, self.train_cameras, frame_key)
         self.static_deformation_cache = None
+        self.pbr_deformation_xyz = None
+        if getattr(args, 'pbr_deformation_anchor', False):
+            from scene.pbr_deformation import validate_deformation_anchor, load_deformation_anchor
+            validate_deformation_anchor(args)
+            self.pbr_deformation_xyz = load_deformation_anchor(self.source, self.pc.get_xyz, source_iteration)
+        self.pbr_plane_projection = None
+        if getattr(args, 'pbr_plane_projection', False):
+            from scene.pbr_plane_projection import load_plane_projection
+            self.pbr_plane_projection = load_plane_projection(
+                self.source, self.pc, self.deform, self.train_cameras, args, source_iteration)
+        from scene.pbr_feature_gate import validate_feature_gate_model
+        self.pbr_feature_gate_provenance = validate_feature_gate_model(
+            self.source, self.pc, self.deform, args, source_iteration)
+        self.pbr_rgb_normal = None
+        if getattr(args, 'pbr_source_local_rotation', False):
+            from scene.pbr_rgb_normal import load_rgb_normal, ASSET, METADATA, INPUT_ASSET, INPUT_METADATA
+            self.pbr_rgb_normal = load_rgb_normal(
+                self.source, self.pc, self.deform, self.train_cameras, args, source_iteration)
+            self.source_files.update({str(self.source/name): file_sha256(self.source/name)
+                for name in [ASSET, METADATA, INPUT_ASSET, INPUT_METADATA]})
 
     def load_camera(self,camera):
         if self.args.load2gpu_on_the_fly:camera.load2device()
@@ -139,9 +161,17 @@ class FrozenScene:
             time_override = None
         fid=camera.fid if time_override is None else torch.as_tensor([time_override],device='cuda')
         time_input=fid.to('cuda').unsqueeze(0).expand(len(self.pc.get_xyz),-1)
-        prediction = self.deform.step(self.pc.get_xyz.detach(),time_input,iteration=self.iteration,
+        xyz = self.pc.get_xyz.detach()
+        if getattr(self, 'pbr_deformation_xyz', None) is not None:
+            from scene.pbr_deformation import deformation_input
+            xyz = deformation_input(self.pc.get_xyz, self.pbr_deformation_xyz)
+        prediction = self.deform.step(xyz,time_input,iteration=self.iteration,
                                      feature=self.pc.get_binary_feature(),camera_center=camera.camera_center,
                                      is_training=False)
+        if getattr(self, 'pbr_rgb_normal', None) is not None:
+            prediction = self.pbr_rgb_normal.apply(self.pc, prediction)
+        if getattr(self, 'pbr_plane_projection', None) is not None:
+            prediction = self.pbr_plane_projection.apply(self.pc, prediction)
         if getattr(self, 'static_anchor_camera', None) is not None:
             self.static_deformation_cache = prediction
         return prediction

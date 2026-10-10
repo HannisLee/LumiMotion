@@ -1,0 +1,27 @@
+{
+  "status": "FAILED_SO_FAR_FINAL_RELIGHT",
+  "reviewed_at": "2026-10-10T07:56:04.688664+09:00",
+  "iteration": 55000,
+  "actual_viewed_HDR_frames": [
+    "0001",
+    "0076",
+    "0150"
+  ],
+  "actual_viewed_directional_frames": [
+    "0000",
+    "0036",
+    "0071"
+  ],
+  "comparison": "inspection/relight_final_55000.png",
+  "conclusion": "HDR/转灯黑背景正常、人物平台存在且照明改变有响应；HDR人体前后面/脚周平台仍斑驳伪起伏，转灯强光/背光均留结构和材质伪影。无重光照GT，不能声称重光照精度。",
+  "directional_alpha_unchanged": true,
+  "directional_brightness_range": [
+    0.018178116530179977,
+    0.07329406589269638
+  ],
+  "directional_intensity_actual": "sanitized white unit SUN table sum × saved train-RGB-fitted scale 6.611844539642334",
+  "directional_metadata_label_erratum": "relight.json现有generic字符串frame GT RGB irradiance sum × saved scale；本轮实际table白色单位，未使用原GT强度/颜色，保存历史字符串且报告澄清。后续源码修改需完整B06结果后再读GOAL。",
+  "complete_MAE": "PENDING",
+  "final_quality": "PENDING",
+  "commit_allowed": false
+}

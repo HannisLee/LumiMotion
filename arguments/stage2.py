@@ -5,12 +5,50 @@ from arguments import PipelineParams, OptimizationParams
 class Stage2PipelineParams(PipelineParams):
     def __init__(self, parser):
         self.render_mode = "original_ir"
+        self.pbr_light_mode = "envmap"
+        self.pbr_gt_lights_path = ""
+        self.pbr_light_intensity_scale = 1.0
+        self.pbr_learn_light_intensity = False
+        self.pbr_rasterizer_backend = "installed"
+        self.pbr_directional_actual_ray_budget = False
         super().__init__(parser)
 
 
 class Stage2OptimizationParams(OptimizationParams):
     def __init__(self, parser):
         self.loss_preset = "auto"
+        self.pbr_optimize_geometry = False
+        self.pbr_freeze_opacity = False
+        self.pbr_albedo_interior_init = False
+        self.pbr_albedo_project_after_step = False
+        self.pbr_albedo_init_margin = 0.001
+        self.pbr_deformation_anchor = False
+        self.pbr_plane_projection = False
+        self.pbr_optimize_feature_gate = False
+        self.pbr_feature_gate_parameterization = "raw_logit"
+        self.pbr_feature_gate_max_probability_delta = 1.0
+        self.pbr_feature_gate_lr = 0.001
+        self.pbr_feature_gate_max_logit_delta = 4.0
+        self.lambda_pbr_feature_gate_anchor = 0.001
+        self.pbr_source_local_rotation = False
+        self.pbr_rgb_normal_prior_path = ""
+        self.lambda_pbr_rgb_normal_prior = 0.0
+        self.pbr_plane_support_band = 0.2
+        self.pbr_plane_motion_span = 0.01
+        self.pbr_light_intensity_lr = 0.001
+        self.lambda_pbr_light_intensity_anchor = 0.001
+        self.pbr_geometry_warmup = 2000
+        self.pbr_geometry_xyz_lr = 0.00002
+        self.pbr_geometry_rotation_lr = 0.001
+        self.pbr_geometry_max_displacement = 0.08
+        self.pbr_geometry_max_angle = 60.0
+        self.pbr_plane_band = 0.08
+        self.lambda_pbr_normal_depth = 0.05
+        self.lambda_pbr_plane_normal = 0.5
+        self.lambda_pbr_plane_position = 0.1
+        self.lambda_pbr_xyz_anchor = 0.001
+        self.lambda_pbr_rotation_anchor = 0.001
+        self.lambda_pbr_silhouette = 0.1
         self.photometric_light_mode = "learned_directional"
         self.photometric_gt_lights_path = ""
         self.photometric_light_intensity = -1.0

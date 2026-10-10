@@ -1,0 +1,8 @@
+{
+  "commands/audit_rgb_direction_observability.py": "dee9176ce54320f1178b7823c2be0c8b57c3154f06cb77af4c600726591863ba",
+  "commands/audit_rgb_direction_observability_projection_verified.py": "6150674c3f0d679720126a01541c8e9ea7031a232ebd382457b8d16d41aafe30",
+  "logs/rgb_direction_observability_projection_verified.log": "b851f174d6e97cecff8b6b332b6d996f235c932001a84ae4988b2cfe3640c08d",
+  "logs/rgb_direction_observability.log": "2f1726a49401a809c8c056aea808d204e82e9a1821622449b403a909e406804d",
+  "inspection/rgb_direction_observability_projection_verified.json": "2ab886bee056d84bb6a189ce83d14fc04d6fdb0411f42fd6536a0a81abdb8372",
+  "inspection/rgb_direction_observability.json": "a75fbeb3e6db0a3db34581bf956a7e4e4120f59390ff73de8888ad5a580cb6d3"
+}

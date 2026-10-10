@@ -1,0 +1,590 @@
+{
+  "status": "PASS_READ_ONLY_RGB_DIRECTION_OBSERVABILITY",
+  "source_iteration": 35000,
+  "camera_frames": 135,
+  "geometry_from": "original source35k plus existing source-only plane projection",
+  "camera_and_network_container_checkpoint": 40000,
+  "learned_40k_xyz_quaternion_material_used": false,
+  "statistics": {
+    "all": {
+      "points": 99827,
+      "observations_ge12": 80388,
+      "conditioned_points": 77904,
+      "reliable_linear_points": 40948,
+      "relative_residual_median": 0.1872808188199997,
+      "unoriented_source_axis_difference_median_deg": 11.022283554077148
+    },
+    "source_static": {
+      "points": 54244,
+      "observations_ge12": 42617,
+      "conditioned_points": 41708,
+      "reliable_linear_points": 28716,
+      "relative_residual_median": 0.18109740316867828,
+      "unoriented_source_axis_difference_median_deg": 9.54464340209961
+    },
+    "source_dynamic": {
+      "points": 45583,
+      "observations_ge12": 37771,
+      "conditioned_points": 36196,
+      "reliable_linear_points": 12232,
+      "relative_residual_median": 0.20139333605766296,
+      "unoriented_source_axis_difference_median_deg": 15.82878589630127
+    },
+    "projected_source": {
+      "points": 15187,
+      "observations_ge12": 13543,
+      "conditioned_points": 13264,
+      "reliable_linear_points": 11327,
+      "relative_residual_median": 0.20508134365081787,
+      "unoriented_source_axis_difference_median_deg": 5.000063419342041
+    }
+  },
+  "rows": [
+    {
+      "frame": "0001",
+      "own_rgb_observations": 16206
+    },
+    {
+      "frame": "0002",
+      "own_rgb_observations": 16830
+    },
+    {
+      "frame": "0003",
+      "own_rgb_observations": 18662
+    },
+    {
+      "frame": "0004",
+      "own_rgb_observations": 22376
+    },
+    {
+      "frame": "0005",
+      "own_rgb_observations": 25819
+    },
+    {
+      "frame": "0006",
+      "own_rgb_observations": 29735
+    },
+    {
+      "frame": "0007",
+      "own_rgb_observations": 32735
+    },
+    {
+      "frame": "0008",
+      "own_rgb_observations": 35887
+    },
+    {
+      "frame": "0009",
+      "own_rgb_observations": 38855
+    },
+    {
+      "frame": "0011",
+      "own_rgb_observations": 42300
+    },
+    {
+      "frame": "0012",
+      "own_rgb_observations": 42847
+    },
+    {
+      "frame": "0013",
+      "own_rgb_observations": 44541
+    },
+    {
+      "frame": "0014",
+      "own_rgb_observations": 45150
+    },
+    {
+      "frame": "0015",
+      "own_rgb_observations": 44409
+    },
+    {
+      "frame": "0016",
+      "own_rgb_observations": 42969
+    },
+    {
+      "frame": "0017",
+      "own_rgb_observations": 40516
+    },
+    {
+      "frame": "0018",
+      "own_rgb_observations": 37114
+    },
+    {
+      "frame": "0019",
+      "own_rgb_observations": 36000
+    },
+    {
+      "frame": "0021",
+      "own_rgb_observations": 35402
+    },
+    {
+      "frame": "0022",
+      "own_rgb_observations": 35371
+    },
+    {
+      "frame": "0023",
+      "own_rgb_observations": 35633
+    },
+    {
+      "frame": "0024",
+      "own_rgb_observations": 35296
+    },
+    {
+      "frame": "0025",
+      "own_rgb_observations": 34835
+    },
+    {
+      "frame": "0026",
+      "own_rgb_observations": 34638
+    },
+    {
+      "frame": "0027",
+      "own_rgb_observations": 34743
+    },
+    {
+      "frame": "0028",
+      "own_rgb_observations": 34322
+    },
+    {
+      "frame": "0029",
+      "own_rgb_observations": 33779
+    },
+    {
+      "frame": "0031",
+      "own_rgb_observations": 31838
+    },
+    {
+      "frame": "0032",
+      "own_rgb_observations": 30130
+    },
+    {
+      "frame": "0033",
+      "own_rgb_observations": 28099
+    },
+    {
+      "frame": "0034",
+      "own_rgb_observations": 25455
+    },
+    {
+      "frame": "0035",
+      "own_rgb_observations": 23113
+    },
+    {
+      "frame": "0036",
+      "own_rgb_observations": 20696
+    },
+    {
+      "frame": "0037",
+      "own_rgb_observations": 18821
+    },
+    {
+      "frame": "0038",
+      "own_rgb_observations": 17891
+    },
+    {
+      "frame": "0039",
+      "own_rgb_observations": 17434
+    },
+    {
+      "frame": "0041",
+      "own_rgb_observations": 19942
+    },
+    {
+      "frame": "0042",
+      "own_rgb_observations": 22337
+    },
+    {
+      "frame": "0043",
+      "own_rgb_observations": 25095
+    },
+    {
+      "frame": "0044",
+      "own_rgb_observations": 27645
+    },
+    {
+      "frame": "0045",
+      "own_rgb_observations": 31467
+    },
+    {
+      "frame": "0046",
+      "own_rgb_observations": 35091
+    },
+    {
+      "frame": "0047",
+      "own_rgb_observations": 38168
+    },
+    {
+      "frame": "0048",
+      "own_rgb_observations": 40886
+    },
+    {
+      "frame": "0049",
+      "own_rgb_observations": 42921
+    },
+    {
+      "frame": "0051",
+      "own_rgb_observations": 45511
+    },
+    {
+      "frame": "0052",
+      "own_rgb_observations": 46452
+    },
+    {
+      "frame": "0053",
+      "own_rgb_observations": 48120
+    },
+    {
+      "frame": "0054",
+      "own_rgb_observations": 48366
+    },
+    {
+      "frame": "0055",
+      "own_rgb_observations": 46815
+    },
+    {
+      "frame": "0056",
+      "own_rgb_observations": 44767
+    },
+    {
+      "frame": "0057",
+      "own_rgb_observations": 42515
+    },
+    {
+      "frame": "0058",
+      "own_rgb_observations": 40853
+    },
+    {
+      "frame": "0059",
+      "own_rgb_observations": 39678
+    },
+    {
+      "frame": "0061",
+      "own_rgb_observations": 37674
+    },
+    {
+      "frame": "0062",
+      "own_rgb_observations": 38148
+    },
+    {
+      "frame": "0063",
+      "own_rgb_observations": 38751
+    },
+    {
+      "frame": "0064",
+      "own_rgb_observations": 39726
+    },
+    {
+      "frame": "0065",
+      "own_rgb_observations": 40089
+    },
+    {
+      "frame": "0066",
+      "own_rgb_observations": 40092
+    },
+    {
+      "frame": "0067",
+      "own_rgb_observations": 39801
+    },
+    {
+      "frame": "0068",
+      "own_rgb_observations": 39020
+    },
+    {
+      "frame": "0069",
+      "own_rgb_observations": 37706
+    },
+    {
+      "frame": "0071",
+      "own_rgb_observations": 29538
+    },
+    {
+      "frame": "0072",
+      "own_rgb_observations": 23408
+    },
+    {
+      "frame": "0073",
+      "own_rgb_observations": 18970
+    },
+    {
+      "frame": "0074",
+      "own_rgb_observations": 15752
+    },
+    {
+      "frame": "0075",
+      "own_rgb_observations": 13856
+    },
+    {
+      "frame": "0076",
+      "own_rgb_observations": 13164
+    },
+    {
+      "frame": "0077",
+      "own_rgb_observations": 13386
+    },
+    {
+      "frame": "0078",
+      "own_rgb_observations": 14436
+    },
+    {
+      "frame": "0079",
+      "own_rgb_observations": 17006
+    },
+    {
+      "frame": "0081",
+      "own_rgb_observations": 24996
+    },
+    {
+      "frame": "0082",
+      "own_rgb_observations": 27646
+    },
+    {
+      "frame": "0083",
+      "own_rgb_observations": 29492
+    },
+    {
+      "frame": "0084",
+      "own_rgb_observations": 30711
+    },
+    {
+      "frame": "0085",
+      "own_rgb_observations": 31728
+    },
+    {
+      "frame": "0086",
+      "own_rgb_observations": 32743
+    },
+    {
+      "frame": "0087",
+      "own_rgb_observations": 33752
+    },
+    {
+      "frame": "0088",
+      "own_rgb_observations": 34195
+    },
+    {
+      "frame": "0089",
+      "own_rgb_observations": 34371
+    },
+    {
+      "frame": "0091",
+      "own_rgb_observations": 36128
+    },
+    {
+      "frame": "0092",
+      "own_rgb_observations": 36562
+    },
+    {
+      "frame": "0093",
+      "own_rgb_observations": 36532
+    },
+    {
+      "frame": "0094",
+      "own_rgb_observations": 36714
+    },
+    {
+      "frame": "0095",
+      "own_rgb_observations": 36723
+    },
+    {
+      "frame": "0096",
+      "own_rgb_observations": 36365
+    },
+    {
+      "frame": "0097",
+      "own_rgb_observations": 35552
+    },
+    {
+      "frame": "0098",
+      "own_rgb_observations": 35040
+    },
+    {
+      "frame": "0099",
+      "own_rgb_observations": 34797
+    },
+    {
+      "frame": "0101",
+      "own_rgb_observations": 36984
+    },
+    {
+      "frame": "0102",
+      "own_rgb_observations": 37976
+    },
+    {
+      "frame": "0103",
+      "own_rgb_observations": 38648
+    },
+    {
+      "frame": "0104",
+      "own_rgb_observations": 37968
+    },
+    {
+      "frame": "0105",
+      "own_rgb_observations": 35849
+    },
+    {
+      "frame": "0106",
+      "own_rgb_observations": 32055
+    },
+    {
+      "frame": "0107",
+      "own_rgb_observations": 27783
+    },
+    {
+      "frame": "0108",
+      "own_rgb_observations": 24237
+    },
+    {
+      "frame": "0109",
+      "own_rgb_observations": 20817
+    },
+    {
+      "frame": "0111",
+      "own_rgb_observations": 16299
+    },
+    {
+      "frame": "0112",
+      "own_rgb_observations": 15038
+    },
+    {
+      "frame": "0113",
+      "own_rgb_observations": 15074
+    },
+    {
+      "frame": "0114",
+      "own_rgb_observations": 15560
+    },
+    {
+      "frame": "0115",
+      "own_rgb_observations": 17013
+    },
+    {
+      "frame": "0116",
+      "own_rgb_observations": 19494
+    },
+    {
+      "frame": "0117",
+      "own_rgb_observations": 22625
+    },
+    {
+      "frame": "0118",
+      "own_rgb_observations": 25568
+    },
+    {
+      "frame": "0119",
+      "own_rgb_observations": 28489
+    },
+    {
+      "frame": "0121",
+      "own_rgb_observations": 35271
+    },
+    {
+      "frame": "0122",
+      "own_rgb_observations": 38108
+    },
+    {
+      "frame": "0123",
+      "own_rgb_observations": 39432
+    },
+    {
+      "frame": "0124",
+      "own_rgb_observations": 40504
+    },
+    {
+      "frame": "0125",
+      "own_rgb_observations": 40908
+    },
+    {
+      "frame": "0126",
+      "own_rgb_observations": 40682
+    },
+    {
+      "frame": "0127",
+      "own_rgb_observations": 40555
+    },
+    {
+      "frame": "0128",
+      "own_rgb_observations": 40560
+    },
+    {
+      "frame": "0129",
+      "own_rgb_observations": 40475
+    },
+    {
+      "frame": "0131",
+      "own_rgb_observations": 39987
+    },
+    {
+      "frame": "0132",
+      "own_rgb_observations": 39944
+    },
+    {
+      "frame": "0133",
+      "own_rgb_observations": 39893
+    },
+    {
+      "frame": "0134",
+      "own_rgb_observations": 39768
+    },
+    {
+      "frame": "0135",
+      "own_rgb_observations": 39928
+    },
+    {
+      "frame": "0136",
+      "own_rgb_observations": 40224
+    },
+    {
+      "frame": "0137",
+      "own_rgb_observations": 39408
+    },
+    {
+      "frame": "0138",
+      "own_rgb_observations": 36977
+    },
+    {
+      "frame": "0139",
+      "own_rgb_observations": 33456
+    },
+    {
+      "frame": "0141",
+      "own_rgb_observations": 30572
+    },
+    {
+      "frame": "0142",
+      "own_rgb_observations": 29454
+    },
+    {
+      "frame": "0143",
+      "own_rgb_observations": 27956
+    },
+    {
+      "frame": "0144",
+      "own_rgb_observations": 26299
+    },
+    {
+      "frame": "0145",
+      "own_rgb_observations": 25002
+    },
+    {
+      "frame": "0146",
+      "own_rgb_observations": 23022
+    },
+    {
+      "frame": "0147",
+      "own_rgb_observations": 19345
+    },
+    {
+      "frame": "0148",
+      "own_rgb_observations": 16975
+    },
+    {
+      "frame": "0149",
+      "own_rgb_observations": 15992
+    }
+  ],
+  "optimizer_steps": 0,
+  "gt_labels_read": false,
+  "gt_light_photometry_read": false,
+  "training_target_vectors_or_prior_saved": false,
+  "source_file_sha": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+  "limitations": "只是Lambertian线性可观测性，不是原生GGX/影子模型拟合或GT normal验证。可见性用来源预测Z距.025与原RGBA/来源alpha，不是GT深度；固定来源旋转的切向运输与来源camera-facing符号只是近似。禁止从此统计宣称方向准确或7度达标。没有输出拟合法线/训练监督/评分掩码。"
+}

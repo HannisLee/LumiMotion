@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "output/1010-04-jumpingjacks_dir-PBR预测几何与RGB光强/commands/postprocess.py", line 25, in <module>
+    assert 'Training complete.' in (ROOT/'logs/train.log').read_text(errors='replace'), '训练没有正常完成'
+AssertionError: 训练没有正常完成

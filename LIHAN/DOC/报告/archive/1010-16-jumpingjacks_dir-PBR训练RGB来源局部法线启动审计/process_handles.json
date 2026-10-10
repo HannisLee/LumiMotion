@@ -1,0 +1,86 @@
+{
+  "train": {
+    "pid": 306459,
+    "start_ticks": "10865815",
+    "argv": [
+      "/home/lihan/miniconda3/envs/lumimotion/bin/python",
+      "-u",
+      "-m",
+      "scripts.train_stage2",
+      "--source_path",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/data_view",
+      "--stage1_model_path",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp",
+      "--model_path",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model",
+      "--load_iter",
+      "35000",
+      "--iterations",
+      "55000",
+      "--save_iterations",
+      "40000",
+      "50000",
+      "55000",
+      "--test_iterations",
+      "40000",
+      "55000",
+      "--render_mode",
+      "original_ir",
+      "--loss_preset",
+      "pbr_gt_directional_source_rgb_normal",
+      "--pbr_gt_lights_path",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/gt_directions_only.json",
+      "--pbr_light_intensity_scale",
+      "3.141592653589793",
+      "--depth_ratio",
+      "0",
+      "--resolution",
+      "2",
+      "--is_blender",
+      "--eval",
+      "--load2gpu_on_the_fly",
+      "--gt_alpha_mask_as_scene_mask",
+      "--train_light_folder",
+      "images",
+      "--test_light_folder",
+      "images",
+      "--deform-type",
+      "mlp",
+      "--sh_degree",
+      "3",
+      "--hyper_dim",
+      "1",
+      "--pbr_rgb_normal_prior_path",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-17-dir-训练RGB法线约束原型/candidate_assets"
+    ],
+    "cwd": "/home/lihan/reproduce/LumiMotion-stage2-perlight",
+    "started_at": "2026-10-10T11:11:25.974063+09:00"
+  },
+  "launcher_pid": 306458,
+  "unified_exec_sessions": {
+    "training_launcher": 4419,
+    "checkpoint_audit_waiter": 10940,
+    "postprocess": 65390
+  },
+  "postprocess": {
+    "pid": 306612,
+    "start_ticks": "10866691",
+    "argv": [
+      "/home/lihan/miniconda3/envs/lumimotion/bin/python",
+      "-u",
+      "output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/commands/postprocess.py",
+      "306459"
+    ],
+    "cwd": "/home/lihan/reproduce/LumiMotion-stage2-perlight"
+  },
+  "checkpoint_audit_waiter": {
+    "pid": 306613,
+    "start_ticks": "10866691",
+    "argv": [
+      "/home/lihan/miniconda3/envs/lumimotion/bin/python",
+      "-u",
+      "output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/commands/audit_checkpoints_when_saved.py"
+    ],
+    "cwd": "/home/lihan/reproduce/LumiMotion-stage2-perlight"
+  }
+}

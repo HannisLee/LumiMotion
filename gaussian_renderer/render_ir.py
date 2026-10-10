@@ -11,7 +11,7 @@
 
 import torch
 import math
-from diff_surfel_rasterization import GaussianRasterizationSettings, GaussianRasterizer
+from scene.pbr_rasterizer import rasterizer_classes
 from scene.gaussian_model import GaussianModel
 from utils.sh_utils import SH2RGB, RGB2SH
 from utils.point_utils import depth_to_normal
@@ -29,7 +29,7 @@ def render_ir(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
               detach_scale=False, detach_rot=False, detach_opacity=False, scale_const=None,
               d_rotation_bias=None, depth_filtering=False, raster_settings_override=None, opt=None,
               training=False, relight=False, env_light=None, base_color_scale=None, material_only=False, rot_env_x=None,
-              colmap_transform=False, override_dirs=None, skip_tracer=False):
+              colmap_transform=False, override_dirs=None, skip_tracer=False, directional_lights=None):
     """
     Render the scene. 
 
@@ -42,6 +42,8 @@ def render_ir(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
         screenspace_points.retain_grad()
     except:
         pass
+
+    GaussianRasterizationSettings, GaussianRasterizer = rasterizer_classes(pipe)
 
     # Set up rasterization configuration
     tanfovx = math.tan(viewpoint_camera.FoVx * 0.5)
@@ -254,12 +256,26 @@ def render_ir(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
         }
         return results
 
+    # 显式HDR替换优先；无HDR时按当前相机帧读取已知SUN。
+    if directional_lights is None and env_light is None and getattr(pipe, 'pbr_light_mode', 'envmap') == 'gt_directional':
+        from scene.pbr_directional import directional_lights_for_camera
+        directional_lights = directional_lights_for_camera(pipe, viewpoint_camera)
+    if directional_lights is None and env_light is None:
+        raise ValueError('PBR着色需要环境光或显式方向光。')
+    if directional_lights is not None and scales is None:
+        # Python covariance仅供光栅化；BVH trace仍需要实际动态scale/rotation。
+        scales = pc.get_scaling + d_scaling
+        rotations = pc.get_rotation_bias(d_rotation)
+
+    photo_ray_cost = photo_pixel_cap = None
     if training:
         if opt.train_ray:
             mask_alpha = render_alpha[0] > 0.9  # 0.0 originally
             mask_sum = mask_alpha.sum()
 
-            num_pixels = opt.trace_num_rays // (pipe.diffuse_sample_num + pipe.light_sample_num)
+            from scene.pbr_ray_budget import photo_pixel_budget
+            num_pixels, photo_ray_cost = photo_pixel_budget(pipe, opt, directional_lights, relight)
+            photo_pixel_cap = num_pixels
             if num_pixels > mask_sum:
                 ray_ids = torch.arange(mask_sum, device='cuda')
             else:
@@ -285,7 +301,8 @@ def render_ir(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
                                             camera_center=viewpoint_camera.camera_center,
                                             envlight=env_light, xyz=means3D, scales=scales, sh_features=sh_features, rotation=rotations,
                                             opacity=opacity, colmap_transform=colmap_transform,
-                                            override_dirs=None, rot_env_x=None, skip_tracer=False)
+                                            override_dirs=None, rot_env_x=None, skip_tracer=False,
+                                            directional_lights=directional_lights)
     else:
         render_results = rendering_equation_chunk(rendered_base_color.permute(1, 2, 0)[mask],
                                                   rendered_roughness.permute(1, 2, 0)[mask],
@@ -294,7 +311,8 @@ def render_ir(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
                                                   camera_center=viewpoint_camera.camera_center,
                                                   envlight=env_light, xyz=means3D, scales=scales, sh_features=sh_features, rotation=rotations,
                                                   opacity=opacity, rot_env_x=rot_env_x, colmap_transform=colmap_transform,
-                                                  override_dirs=override_dirs, skip_tracer=skip_tracer)
+                                                  override_dirs=override_dirs, skip_tracer=skip_tracer,
+                                                  directional_lights=directional_lights)
 
     diffuse = render_results['diffuse']
     specular = render_results['specular']
@@ -313,7 +331,8 @@ def render_ir(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
     final_image_sh = rendered_image_sh + bg_color[:, None, None] * (1 - render_alpha)
 
     # direct_lights = rgb_to_srgb(pc.get_envmap(rays_d, mode='pure_env').permute(2,0,1))
-    direct_lights = rgb_to_srgb(env_light(rays_d, mode='pure_env').permute(2, 0, 1))
+    direct_lights = (torch.zeros_like(rendered_image) if directional_lights is not None else
+                     rgb_to_srgb(env_light(rays_d, mode='pure_env').permute(2, 0, 1)))
     env_only = direct_lights
 
     results = {
@@ -323,6 +342,8 @@ def render_ir(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
         "diffuse": rgb_to_srgb(rendered_diffuse),
         "specular": rgb_to_srgb(rendered_specular),
         "mask": mask,
+        "photo_rays_per_pixel": photo_ray_cost,
+        "photo_pixel_budget": photo_pixel_cap,
         "roughness": rendered_roughness * render_alpha,
         "base_color": rgb_to_srgb(rendered_base_color) * render_alpha + bg_color[:, None, None] * (1 - render_alpha),
         "base_color_linear": rendered_base_color * render_alpha + bg_color[:, None, None] * (1 - render_alpha),
@@ -435,6 +456,11 @@ def rendering_equation_chunk(base_color, roughness, normal,
 def rendering_equation(base_color, roughness, normals, position, viewdirs, pc, pipe, training=False, f0=0.04,
                        relight=False, camera_center=None, envlight=None, xyz=None, scales=None, sh_features=None,
                        rotation=None, opacity=None, **kwargs):
+    if kwargs.get('directional_lights') is not None:
+        return rendering_equation_directional(base_color, roughness, normals, position, viewdirs, pc, pipe,
+            kwargs['directional_lights'], training=training, relight=relight, camera_center=camera_center,
+            xyz=xyz, scales=scales, sh_features=sh_features, rotation=rotation, opacity=opacity,
+            skip_tracer=kwargs.get('skip_tracer', False))
     # print(pipe.diffuse_sample_num)
     B = base_color.shape[0]
 
@@ -553,6 +579,61 @@ def rendering_equation(base_color, roughness, normals, position, viewdirs, pc, p
             "light_blocked": (trace_alpha * global_incident_lights).mean(dim=1),
         }
     return results
+
+
+def rendering_equation_directional(base_color, roughness, normals, position, viewdirs, pc, pipe,
+                                  lights, training=False, relight=False, camera_center=None,
+                                  xyz=None, scales=None, sh_features=None, rotation=None, opacity=None,
+                                  skip_tracer=False):
+    """SUN是离散delta光源：直接求和BRDF×辐照度×cos×透射率，不做半球面积加权。"""
+    directions, irradiances = lights
+    directions = directions.to(device=normals.device, dtype=normals.dtype)
+    irradiances = irradiances.to(device=normals.device, dtype=normals.dtype)
+    if (directions.ndim != 2 or directions.shape[-1] != 3 or not len(directions) or
+            irradiances.shape != directions.shape or not torch.isfinite(directions).all() or
+            not torch.isfinite(irradiances).all() or (irradiances < 0).any() or
+            (directions.norm(dim=-1) < 1e-8).any()):
+        raise ValueError('PBR方向光须为非空L×3方向与非负RGB辐照度。')
+    incident = F.normalize(directions, dim=-1).unsqueeze(0).expand(len(normals), -1, -1)
+    if len(normals) == 0:
+        rgb = base_color.new_zeros((0, 3))
+        return dict(diffuse=rgb, specular=rgb, light_direct=rgb, light_indirect=rgb,
+                    visibility=base_color.new_zeros((0, 1)), light=rgb, light_blocked=rgb)
+    if skip_tracer:
+        visibility = base_color.new_ones((len(normals), len(directions), 1))
+    else:
+        traced = pc.trace(position.unsqueeze(1) + incident * pipe.light_t_min, incident,
+                          camera_center=camera_center, xyz=xyz, scales=scales, rotation=rotation,
+                          opacity=opacity, use_zeros=True)
+        visibility = (1 - traced['alpha'][..., None]).clamp(0, 1)
+        if pipe.detach_indirect:
+            visibility = visibility.detach()
+    cosine = (normals[:, None] * incident).sum(-1, keepdim=True).clamp_min(0)
+    transport = irradiances[None] * visibility * cosine
+    diffuse = (base_color[:, None] / math.pi * transport).sum(1)
+    specular = (GGX_specular(normals, viewdirs, incident, roughness, fresnel=.04) * transport).sum(1)
+    local_mean = torch.zeros_like(base_color)
+    # 保留原生Stage1 SH间接光近似；转灯时仍是来源照明的近似，可用wo_indirect_relight关闭。
+    indirect_disabled = pipe.wo_indirect or (relight and pipe.wo_indirect_relight)
+    if not indirect_disabled and not skip_tracer:
+        incoming, areas = sample_incident_rays(normals, training, pipe.diffuse_sample_num)
+        traced = pc.trace(position.unsqueeze(1) + incoming * pipe.light_t_min, incoming,
+                          camera_center=camera_center, xyz=xyz, scales=scales, rotation=rotation,
+                          opacity=opacity, shs=sh_features)
+        local = srgb_to_rgb(traced['color'])
+        if pipe.detach_indirect:
+            local = local.detach()
+        local_mean = local.mean(1)
+        indirect_transport = local * areas * (normals[:, None] * incoming).sum(-1, keepdim=True).clamp_min(0)
+        diffuse = diffuse + (base_color[:, None] / math.pi * indirect_transport).mean(1)
+        specular = specular + (GGX_specular(normals, viewdirs, incoming, roughness, fresnel=.04) *
+                               indirect_transport).mean(1)
+    if pipe.wo_specular:
+        specular = specular * 0
+    direct = irradiances.sum(0).expand_as(base_color)
+    return dict(diffuse=diffuse, specular=specular, light_direct=direct, light_indirect=local_mean,
+                visibility=visibility.mean(1), light=transport.sum(1) / math.pi,
+                light_blocked=(irradiances[None] * (1-visibility)).sum(1))
 
 
 def GGX_specular(

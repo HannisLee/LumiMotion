@@ -1,0 +1,58 @@
+"""既有材质/HDR 命令自动识别独立 Lambertian checkpoint。"""
+import argparse
+import json
+import sys
+from pathlib import Path
+
+
+def build_legacy_hdr_parser():
+    """旧HDR入口保留checkpoint配置，目录定位保持原来的MLP默认。"""
+    from arguments import ModelParams, PipelineParams
+    parser=argparse.ArgumentParser(description='原始HDR重光照')
+    model=ModelParams(parser,sentinel=True);pipeline=PipelineParams(parser)
+    parser.set_defaults(deform_type='mlp')
+    parser.add_argument('--load_iter',type=int,default=-1)
+    parser.add_argument('--quiet',action='store_true')
+    parser.add_argument('--colmap_convention',action='store_true',default=False)
+    parser.add_argument('--hdr',type=str)
+    return parser,model,pipeline
+
+
+def find_stage2_config(model):
+    config=Path(model)/'stage2_config.json'
+    if config.exists():return config
+    # 只复制完整checkpoint后恢复的新目录只有resume配置。
+    candidates=list(Path(model).glob('resume_*_config.json'))
+    return max(candidates,key=lambda p:int(p.name.split('_')[1])) if candidates else None
+
+
+def dispatch(task):
+    probe=argparse.ArgumentParser(add_help=False)
+    probe.add_argument('--model_path',default='');probe.add_argument('--deform-type',dest='deform_type',default='mlp')
+    known,_=probe.parse_known_args()
+    if not known.model_path:return False
+    model=Path(known.model_path)
+    config=find_stage2_config(model)
+    if config is None:
+        model=Path(str(model)+'_'+known.deform_type);config=find_stage2_config(model)
+    if config is None:return False
+    saved=json.loads(config.read_text())
+    if (saved.get('render_mode')!='photometric_lambertian' and not
+            (saved.get('render_mode','original_ir')=='original_ir' and saved.get('pbr_light_mode')=='gt_directional')):
+        return False
+    parser=argparse.ArgumentParser(description='Stage2 '+task)
+    parser.add_argument('--model_path',required=True);parser.add_argument('--load_iter',type=int,required=True)
+    parser.add_argument('--deform-type',dest='deform_type',default='mlp')
+    parser.add_argument('--hdr_filepath','--hdr',default='example_envmaps/golden_bay_4k_32x16_rot330.hdr')
+    parser.add_argument('--output_path',default='');parser.add_argument('--hdr_samples','--diffuse_sample_num',type=int,default=2048)
+    parser.add_argument('--hdr_yaw',type=float,default=0.0);parser.add_argument('--hdr_exposure',type=float,default=1.0)
+    # 旧入口惯用模型/数据参数由 checkpoint 配置负责；显式未识别参数拒绝，避免静默丢弃。
+    parser.add_argument('--quiet',action='store_true')
+    args=parser.parse_args()
+    from scripts.render_stage2 import run_cli
+    command=['--model_path',str(model),'--load_iter',str(args.load_iter),'--task',task,
+             '--hdr_filepath',args.hdr_filepath,'--hdr_samples',str(args.hdr_samples),
+             '--hdr_yaw',str(args.hdr_yaw),'--hdr_exposure',str(args.hdr_exposure)]
+    command+=['--output_path',args.output_path or str(model/('stage2_'+task)/('ours_'+str(args.load_iter)))]
+    run_cli(command)
+    return True

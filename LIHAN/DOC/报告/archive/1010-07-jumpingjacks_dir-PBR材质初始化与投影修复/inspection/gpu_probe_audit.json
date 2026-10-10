@@ -1,0 +1,87 @@
+{
+  "status": "PASS",
+  "kind": "one_frame_forward_backward_material_initialization_no_training",
+  "gt_material_geometry_inputs": false,
+  "camera": "frame_0001",
+  "plane": {
+    "method": "source_prediction_static_RANSAC_SVD",
+    "seed": 1010,
+    "source_points": 99827,
+    "eligible_points": 12603,
+    "ransac_inlier_fraction": 0.5946203284932159,
+    "plane_normal": [
+      -0.0029613651534769734,
+      -0.002400413027768733,
+      0.9999927341404656
+    ],
+    "plane_offset": 0.008403862980894893,
+    "band": 0.08,
+    "support_points": 14556,
+    "gt_normal_inputs": false,
+    "gt_geometry_inputs": false,
+    "gt_material_inputs": false
+  },
+  "material_initialization": {
+    "method": "source_prediction_native_DC_interior_projection",
+    "margin": 0.001,
+    "interval": [
+      0.031,
+      0.969
+    ],
+    "points": 99827,
+    "source_clamped_channels_fraction": 0.4350292682647705,
+    "initialized_channels_fraction": 0.4378875494003296,
+    "after_clamped_channels_fraction": 0.0,
+    "max_initial_appearance_difference_srgb": 0.001000046730041504,
+    "gt_material_inputs": false,
+    "gt_normal_inputs": false,
+    "gt_geometry_inputs": false,
+    "stage1_SH_source_modified": false
+  },
+  "input_audit": {
+    "status": "PASS",
+    "mask_source": "original-image-alpha",
+    "frames": 150,
+    "raw_RGB_RGBA_verified": true,
+    "material_geometry_GT_opened": false,
+    "manifest_sha256": "2c9b3ad5e4f4541e4a65213cfedae256919575a40cddee5b74267bea5c4bfff8"
+  },
+  "light_log_scale_gradient": -0.13988928496837616,
+  "loss": 0.2696216404438019,
+  "terms": {
+    "pbr_normal_depth": 0.15579909086227417,
+    "pbr_plane_normal": 0.13092286884784698,
+    "pbr_plane_position": 0.10710978507995605,
+    "pbr_xyz_anchor": 0.0,
+    "pbr_rotation_anchor": 5.839436667542941e-08,
+    "pbr_silhouette": 0.03305429965257645
+  },
+  "gradients": {
+    "xyz": {
+      "mean_abs": 9.474911348661408e-05,
+      "max_abs": 0.504455029964447,
+      "nonzero": 169371
+    },
+    "rotation": {
+      "mean_abs": 7.677504072489683e-06,
+      "max_abs": 0.014513546600937843,
+      "nonzero": 310780
+    },
+    "albedo": {
+      "mean_abs": 5.857647806806199e-07,
+      "max_abs": 0.0004568162839859724,
+      "nonzero": 64124
+    },
+    "roughness": {
+      "mean_abs": 5.9391151552290466e-08,
+      "max_abs": 5.2609855629270896e-05,
+      "nonzero": 21449
+    }
+  },
+  "previously_clamped_channels_with_nonzero_GPU_photo_gradient": 33951,
+  "optimizer_steps": 0,
+  "source_hashes": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/point_cloud/iteration_35000/point_cloud.ply": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/deform/iteration_35000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+  }
+}

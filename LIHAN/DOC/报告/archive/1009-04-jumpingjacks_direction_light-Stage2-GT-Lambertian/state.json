@@ -1,0 +1,10 @@
+{
+  "status": "COMPLETED",
+  "step": "finished",
+  "updated_at": "2026-10-09T20:12:46.051089+09:00",
+  "pid": 144878,
+  "iteration": 55000,
+  "frames": 15,
+  "acceptance": "PASS",
+  "acceptance_scope": "训练/产物/数值/真值与代表图验收，非模型质量阈值"
+}

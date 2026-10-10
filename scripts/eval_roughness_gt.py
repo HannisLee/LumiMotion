@@ -30,15 +30,20 @@ def validate_model(model, iteration):
     if config.get('geometry_source_deformation_mode', 'dynamic') != 'dynamic':
         raise ValueError('评测必须使用每帧真实 time 的原版形变。')
     ply = model / 'point_cloud' / f'iteration_{iteration}' / 'point_cloud.ply'
-    env = model / 'envmap' / f'iteration_{iteration}'
-    if not env.is_dir() or not any(env.iterdir()):
-        raise ValueError('缺少同 iteration 的 PBR envmap，不能将 Stage1 当作已训练材质。')
+    if config.get('pbr_light_mode', 'envmap') == 'gt_directional':
+        from scene.pbr_directional import validate_directional_checkpoint
+        light_files = validate_directional_checkpoint(model, iteration, config)
+    else:
+        env = model / 'envmap' / f'iteration_{iteration}'
+        if not env.is_dir() or not any(env.iterdir()):
+            raise ValueError('缺少同 iteration 的 PBR envmap，不能将 Stage1 当作已训练材质。')
+        light_files = list(env.rglob('*'))
     data = PlyData.read(ply)
     if 'roughness' not in data['vertex'].data.dtype.names:
         raise ValueError('checkpoint 没有 roughness，禁止使用加载器的初始化默认值。')
     if not np.isfinite(data['vertex']['roughness']).all():
         raise ValueError('checkpoint roughness 包含 NaN/Inf。')
-    return config, config_path, list(env.rglob('*'))
+    return config, config_path, light_files
 
 
 class RoughnessRun:
@@ -57,6 +62,13 @@ class RoughnessRun:
         self.files = {str(config_path.resolve()): file_sha256(config_path)}
         self.files.update(self.context.source_files)
         self.files.update({str(p.resolve()): file_sha256(p) for p in env_files if p.is_file()})
+        if self.context.pbr_feature_gate_provenance is not None:
+            asset = self.context.source/'pbr_feature_gate.json'
+            self.files[str(asset)] = file_sha256(asset)
+        if self.context.pbr_rasterizer_provenance is not None:
+            from scene.pbr_rasterizer import ROOT
+            self.files.update({str(ROOT/relative):digest for relative,digest in
+                               self.context.pbr_rasterizer_provenance['source_files'].items()})
         self.torch = torch
 
     def render(self, camera, verify=False):
@@ -67,7 +79,8 @@ class RoughnessRun:
         try:
             with torch.no_grad():
                 deformation = ctx.deformation(camera)
-                pkg = render_roughness(camera, ctx.pc, deformation, self.config.compute_cov3D_python)
+                pkg = render_roughness(camera, ctx.pc, deformation, self.config.compute_cov3D_python,
+                                       getattr(self.config,'pbr_rasterizer_backend','installed'))
                 if verify:
                     from gaussian_renderer.render_ir import render_ir
                     # 同时核验黑、白背景；原版输出=(S+bg*(1-A))*A。
@@ -230,7 +243,9 @@ def evaluate(args, destination):
     for path, digest in provenance['source_hashes'].items():
         if file_sha256(ROOT / path) != digest:
             raise AssertionError('评测期间依赖代码变化：' + path)
-    report = {'schema_version': 2, 'mode': 'original_ir', 'source_path': str(source),
+    report = {'schema_version': 2, 'mode': 'original_ir',
+              'pbr_light_mode': run.config.pbr_light_mode if hasattr(run.config, 'pbr_light_mode') else 'envmap',
+              'source_path': str(source),
               'model_path': str(args.model_path), 'iteration': args.iteration,
               'protocol': {'split': args.split, 'frames': keys, 'region': 'GT foreground interior; no material/object subsets',
                   'parameter': 'r (not r_squared)', 'gt_alpha_threshold': args.gt_alpha_threshold,

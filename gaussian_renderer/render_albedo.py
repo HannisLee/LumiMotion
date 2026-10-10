@@ -1,14 +1,17 @@
 """从训练材质直接光栅化线性 albedo；不执行光照或 SH 外观计算。"""
 import math
+from types import SimpleNamespace
 
 import torch
-from diff_surfel_rasterization import GaussianRasterizationSettings, GaussianRasterizer
+from scene.pbr_rasterizer import rasterizer_classes
 
 from scene.stage2_photometric import srgb_to_linear
 
 
 @torch.no_grad()
-def render_albedo(camera, pc, albedo_srgb, deformation, compute_cov3D_python=False):
+def render_albedo(camera, pc, albedo_srgb, deformation, compute_cov3D_python=False, rasterizer_backend='installed'):
+    GaussianRasterizationSettings,GaussianRasterizer=rasterizer_classes(SimpleNamespace(
+        pbr_rasterizer_backend=rasterizer_backend,compute_cov3D_python=compute_cov3D_python))
     means = pc.get_xyz + deformation['d_xyz']
     opacity = pc.get_opacity
     if deformation['d_opacity'] is not None:

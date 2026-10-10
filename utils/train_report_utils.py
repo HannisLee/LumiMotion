@@ -236,14 +236,15 @@ def training_report(tb_writer, iteration, Ll1, loss, l1_loss, elapsed, testing_i
 
 def training_report_relight_screen_space(tb_writer, iteration, Ll1, loss, elapsed, testing_iterations,
                                          scene: Scene,
-                                         renderArgs, deform, load2gpu_on_the_fly, env_light):
+                                         renderArgs, deform, load2gpu_on_the_fly, env_light,
+                                         source_deformation_xyz=None, plane_projection=None, rgb_normal=None):
     if tb_writer:
         tb_writer.add_scalar('train_loss_patches/l1_loss', Ll1.item(), iteration)
         tb_writer.add_scalar('train_loss_patches/total_loss', loss.item(), iteration)
         tb_writer.add_scalar('iter_time', elapsed, iteration)
 
     if iteration in testing_iterations:
-        if tb_writer:
+        if tb_writer and env_light is not None:
             env_dict = env_light.render_env_map()
             env2_map = env_dict["env2"].permute(2, 0, 1)
             env2_map_unscaled = env2_map.clone()
@@ -283,10 +284,18 @@ def training_report_relight_screen_space(tb_writer, iteration, Ll1, loss, elapse
                     else:
                         time_input = 0
 
-                    d_values = deform.step(xyz.detach(), time_input,
+                    deformation_xyz = xyz.detach()
+                    if source_deformation_xyz is not None:
+                        from scene.pbr_deformation import deformation_input
+                        deformation_xyz = deformation_input(xyz, source_deformation_xyz)
+                    d_values = deform.step(deformation_xyz, time_input,
                                            feature=scene.gaussians.get_binary_feature(),
                                            is_training=False,
                                            camera_center=viewpoint.camera_center)
+                    if rgb_normal is not None:
+                        d_values = rgb_normal.apply(scene.gaussians, d_values)
+                    if plane_projection is not None:
+                        d_values = plane_projection.apply(scene.gaussians, d_values)
 
                     d_xyz, d_rotation, d_scaling, d_opacity, d_color = d_values['d_xyz'], \
                                                                        d_values['d_rotation'], d_values['d_scaling'], \

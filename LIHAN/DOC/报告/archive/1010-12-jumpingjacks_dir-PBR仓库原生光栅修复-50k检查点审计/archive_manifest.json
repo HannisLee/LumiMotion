@@ -1,0 +1,11 @@
+{
+  "README.md": "8f5e7037377ab5a36955cb90894a4e8c88b713caa2002a3a7027eb79aa1fea29",
+  "process_handles.json": "ba5323d479a825de56cdf30eb75eae6dbef628842a5e4261510fce6e93da7212",
+  "commands/audit_checkpoint.py": "72fe73b5f5630fbbf962e7a91bc2bf5574650a00e20b88e1ddcabbcaef39a5e6",
+  "commands/audit_50000_when_saved.py": "ad5f146c8bd0edb5eb0ad1f5dc516410a809618695e9b866ffc86031d2e6515a",
+  "logs/checkpoint_50000_audit.log": "707c9daa4cbdc25402abe708b2ef7e46fa0c3cf88d78f5c5253f9577905fc219",
+  "logs/audit_50000_when_saved.log": "66dc3fbe3f919790add541001e653fde9592592e4353180c0c25f2715989e0b0",
+  "inspection/checkpoint_50000_audit.json": "38b3bcef272688fcfcbc373bb155a72e43e0f45b5c3345cbd178ab575e7e84e9",
+  "inspection/audit_50000_wait_state.json": "6f976fe55ba7fd0fceccd231e925befcf9c29b8e079abc02a6bf2119cf10d7c1",
+  "model_mlp/pbr_directional/iteration_50000/lighting.json": "d40104ea1b968367f2e9419dc181986f4d0fd4694c5e1c48399b78a90fe69616"
+}

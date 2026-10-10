@@ -35,8 +35,12 @@ def dispatch(task):
     config=find_stage2_config(model)
     if config is None:
         model=Path(str(model)+'_'+known.deform_type);config=find_stage2_config(model)
-    if config is None or json.loads(config.read_text()).get('render_mode')!='photometric_lambertian':return False
-    parser=argparse.ArgumentParser(description='Stage2 Lambertian '+task)
+    if config is None:return False
+    saved=json.loads(config.read_text())
+    if (saved.get('render_mode')!='photometric_lambertian' and not
+            (saved.get('render_mode','original_ir')=='original_ir' and saved.get('pbr_light_mode')=='gt_directional')):
+        return False
+    parser=argparse.ArgumentParser(description='Stage2 '+task)
     parser.add_argument('--model_path',required=True);parser.add_argument('--load_iter',type=int,required=True)
     parser.add_argument('--deform-type',dest='deform_type',default='mlp')
     parser.add_argument('--hdr_filepath','--hdr',default='example_envmaps/golden_bay_4k_32x16_rot330.hdr')

@@ -1,0 +1,21 @@
+{
+  "generated_at": "2026-10-10T11:54:52.820177+09:00",
+  "source_metrics_sha256": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/archive/1010-02-jumpingjacks_dir-PBR方向光基线/metrics_summary.json": "5a5a084a93ebb6003b30a8758cee37c8920192ba35b7c5b7809c338978cc3b8b",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/archive/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/metrics_summary.json": "7ad387bc9c8b722d9ec37f86c0f32f5a4a45feabdcdea61297577efe3998ca9f",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/archive/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/metrics_summary.json": "ef3bc339f87492d67758211679183a0086e2d761673c21ab6a67ddecab8b8b05",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/archive/1010-11-jumpingjacks_dir-PBR固定来源形变锚定-几何重评/metrics_summary.json": "b4e08aafb66f351289623bf73c9197f2f8cd862e39500c8792e7631e45650544",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/archive/1010-10-jumpingjacks_dir-PBR来源平面几何投影/metrics_summary.json": "9b66723c5a75a85ce28e6dbdcd76b3dd4588f5c5cee30bb9dbd94c93823bff0d",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/archive/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复/metrics_summary.json": "7ef47d93e3969de471878f194ba0fd2d6956f7f2ee2ee775333407861857ab58",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/archive/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/metrics_summary.json": "c5c9be88c8dbc0e103c1ef4979c75d8dcc0d52487d36473e8794e527a40ae11b",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/archive/1010-14-jumpingjacks_dir-PBR来源输出gate微调/metrics_summary.json": "11c02ea76be37f704236143716ad88ef7a30afce8722f565ca4384d91dd24e2c",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/archive/1010-15-jumpingjacks_dir-PBR概率gate优化/metrics_summary.json": "d571de820368b5d2211a457926d15619ef232a9a1eba916b910e480ef3084bb8",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/metrics_summary.json": "485d3b1745e8b188017bbd355e42fdcaf0a58e899a608d7c8ce5e5eb16b41394",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/archive/1009-03-jumpingjacks_environment_light-MAE/metrics_summary.json": "4ffa6b891431bb2f6255e47079fb3da322a2b0a1798f84147f772c103a2460d4",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/archive/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/metrics_summary.json": "e81d925448d9db1a17f48379b1d397c7183a6a40989109a5631875f1b7a66ed0"
+  },
+  "branch": "1001-stage2-perlight",
+  "HEAD": "a9e4d1061fec9986d82362f78b42c0c269e6146e",
+  "iterations_stopped": true,
+  "new_training_started": false
+}

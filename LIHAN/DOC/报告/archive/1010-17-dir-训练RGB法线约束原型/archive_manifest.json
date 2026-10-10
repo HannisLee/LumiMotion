@@ -1,0 +1,16 @@
+{
+  "README.md": "12f5266df95ac70b62c4c40e72653587349d29b8570c2d7092bfda174b551dfd",
+  "prototype_state.json": "f22f20ed24a94cc7b3a6592802d3ff99311b645a1c772a7a4adbaa871a396d79",
+  "candidate_assets/training_rgb_normal_constraint.json": "40d6b721ae4082522394c446270f1d37484c26832dfb4261aafe6b5e6b6e171e",
+  "candidate_assets/training_rgb_normal_constraint.npz": "87752217f37e9fe9b96835f892ee2289c3740560d2f4592029652db52d03bc15",
+  "commands/source_readonly_rgb_observability_reference.py": "3e752e9b083ddee5581984ee46d971232beeff2130dfedfb681c7fa9a77106a5",
+  "commands/verify_training_rgb_constraint.py": "05f5fe0d4739e92bc3b60a078e86fc0c0af564647948270281aa91aa9cfb982e",
+  "commands/build_training_rgb_constraint_retry.py": "68b51505dca01e186b1112ef47cc7e6791f0410d78869de905c2e16fa521cf82",
+  "commands/build_training_rgb_constraint.py": "214f2322256f4bea5b57297c45fc4ee2f95a1ac244a8e137761923cd0fda47b6",
+  "logs/verify_constraint.log": "c8aea58db4b344109db0e5f8c546d7f8d9fa22895331360b2381a056cda4723d",
+  "logs/build_constraint_retry.log": "155bdb06ed9f5d6431efe373e4018c07f0a7a533bc77985e460362b5329ee99c",
+  "logs/build_constraint.log": "18458ffeb1ccf0a1a8c9801f209099802f5208aa7c3d6bfc771624fc6da713fa",
+  "inspection/constraint_independent_audit.json": "c8aea58db4b344109db0e5f8c546d7f8d9fa22895331360b2381a056cda4723d",
+  "inspection/first_builder_failure.json": "c432d50b0e522ed59de98b83a5ac24bfeb33fe7ca6b9f4f25cf5a5357a034d42",
+  "inspection/build_constraint.json": "40d6b721ae4082522394c446270f1d37484c26832dfb4261aafe6b5e6b6e171e"
+}

@@ -1,0 +1,23 @@
+{
+  "status": "TRAINING_CURVE_SNAPSHOT_ONLY",
+  "stage2_steps": 3929,
+  "created_at": "2026-10-10T08:19:36.842940+09:00",
+  "snapshots": {
+    "B06 native + indirect": {
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复/model_mlp/events.out.tfevents.1791583211.venus.258688.0",
+      "snapshot": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/inspection/early_training/B06.tfevents",
+      "bytes": 4735929,
+      "sha256": "b2a876a4c3a5cdc7f59e54b2a8e3a91cf5a9436a5429b5bab26a2e5cb676bcec"
+    },
+    "B07 native Direct SUN": {
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/events.out.tfevents.1791587646.venus.271624.0",
+      "snapshot": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/inspection/early_training/B07.tfevents",
+      "bytes": 733444,
+      "sha256": "e9959486696d7e43333850b5c297a8a1ff86615ea91322a3ec8f681c961da089"
+    }
+  },
+  "optimizer_steps": 0,
+  "gt_labels_read": false,
+  "loss_selection": "B06 sampled 1024 versus B07 all-eligible alpha>.9; different physical models",
+  "limitations": "训练loss和RGB拟合光强，不是GT材质/法线MAE，不由曲线声明质量或7度通过。"
+}

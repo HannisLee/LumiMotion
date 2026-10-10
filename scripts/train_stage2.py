@@ -62,6 +62,23 @@ class Trainer:
                                        fea_dim=gs_fea_dim)
 
         self.scene = Scene(dataset, self.gaussians, load_iteration=load_iter)
+        self.pbr_deformation_xyz = None
+        self.pbr_deformation_anchor_sha = None
+        if getattr(opt, 'pbr_deformation_anchor', False):
+            from scene.pbr_deformation import create_deformation_anchor
+            self.pbr_deformation_xyz, anchor_record = create_deformation_anchor(
+                args.model_path, self.gaussians.get_xyz, load_iter)
+            self.pbr_deformation_anchor_sha = anchor_record['asset_sha256']
+
+        if getattr(opt, 'pbr_albedo_interior_init', False):
+            from scene.pbr_material import initialize_native_albedo
+            from pathlib import Path
+            import json
+            initialization = initialize_native_albedo(self.gaussians, opt.pbr_albedo_init_margin)
+            initialization.update(source_iteration=load_iter, source_model=args.stage1_model_path,
+                source_files=json.loads((Path(args.model_path)/'stage1_source.json').read_text()))
+            (Path(args.model_path)/'pbr_albedo_initialization.json').write_text(
+                json.dumps(initialization, indent=2)+'\n')
 
         # lower lr for most of gaussian params
         lr_scale = 0.1
@@ -75,18 +92,56 @@ class Trainer:
 
         self.gaussians.training_setup(opt)
 
-        # optimizer - only train colors and roughness and opacity
-        remaining_params = [group for group in self.gaussians.optimizer.param_groups if
-                            group["name"] in ["albedo_dc", "albedo_dc_stage1", "albedo_rest", "roughness", "opacity"]]
+        # 默认原生材质范围；独立几何preset才开放真实PLY的xyz/rotation。
+        allowed = {"albedo_dc", "albedo_dc_stage1", "albedo_rest", "roughness", "opacity"}
+        self.pbr_feature_gate = None
+        if getattr(opt, "pbr_optimize_feature_gate", False):
+            from scene.pbr_feature_gate import NativePBRFeatureGate
+            self.pbr_feature_gate = NativePBRFeatureGate(args.model_path, self.gaussians, self.deform, args, load_iter)
+            allowed.add("feature")
+            for group in self.gaussians.optimizer.param_groups:
+                if group['name'] == 'feature':
+                    group['params'] = self.pbr_feature_gate.optimizer_parameters(self.gaussians)
+        self.pbr_geometry = None
+        if getattr(opt, 'pbr_optimize_geometry', False):
+            from scene.pbr_geometry import NativePBRGeometry
+            self.pbr_geometry = NativePBRGeometry(self.gaussians, opt)
+            allowed.update({'xyz', 'rotation'})
+            if opt.pbr_freeze_opacity:
+                allowed.remove('opacity')
+            import json
+            from pathlib import Path
+            record = dict(self.pbr_geometry.record, source_iteration=load_iter,
+                          source_model=args.stage1_model_path, optimizer_groups=sorted(allowed),
+                          source_files=json.loads((Path(args.model_path)/'stage1_source.json').read_text()))
+            (Path(args.model_path)/'pbr_geometry_source.json').write_text(json.dumps(record, indent=2)+'\n')
+        self.pbr_plane_projection = None
+        self.pbr_plane_projection_sha = None
+        if getattr(opt, 'pbr_plane_projection', False):
+            from scene.pbr_plane_projection import create_plane_projection
+            self.pbr_plane_projection, plane_record = create_plane_projection(
+                args.model_path, self.gaussians, self.deform, self.scene.getTrainCameras(), args, load_iter)
+            self.pbr_plane_projection_sha = plane_record['asset_sha256']
+        self.pbr_rgb_normal = None
+        if getattr(opt, 'pbr_source_local_rotation', False):
+            from scene.pbr_rgb_normal import create_rgb_normal
+            self.pbr_rgb_normal = create_rgb_normal(args.model_path, self.gaussians, self.deform,
+                self.scene.getTrainCameras(), args, load_iter)
+        remaining_params = [group for group in self.gaussians.optimizer.param_groups if group['name'] in allowed]
         self.gaussians.optimizer.param_groups.clear()
         self.gaussians.optimizer.param_groups.extend(remaining_params)
         self.gaussians.optimizer.state.clear()
-
+        if self.pbr_geometry is not None:
+            retained = {id(p) for g in remaining_params for p in g['params']}
+            for value in vars(self.gaussians).values():
+                if isinstance(value, torch.nn.Parameter):
+                    value.requires_grad_(id(value) in retained)
 
         # optimize also mlp deform, but keep only color-related head
         before = sum(p.numel() for g in self.deform.optimizer.param_groups for p in g["params"])
 
-        remaining_params = [group for group in self.deform.optimizer.param_groups if group["name"] in ["mlp_color"]]
+        remaining_params = ([] if self.pbr_feature_gate is not None else
+                            [group for group in self.deform.optimizer.param_groups if group["name"] in ["mlp_color"]])
         self.deform.optimizer.param_groups.clear()
         self.deform.optimizer.param_groups.extend(remaining_params)
         self.deform.optimizer.state.clear()
@@ -100,11 +155,28 @@ class Trainer:
 
         self.N = self.gaussians.get_xyz.shape[0]
 
-        self.env_light = EnvLight(path=None, device='cuda',
-                                  resolution=[opt.envmap_resolution // 2, opt.envmap_resolution],
-                                  max_res=opt.envmap_resolution, init_value=opt.envmap_init_value,
-                                  activation=opt.envmap_activation)
-        self.env_light.training_setup(opt)
+        self.pbr_lights = None
+        self.env_light = None
+        self.log_pbr_intensity = None
+        self.pbr_intensity_optimizer = None
+        if getattr(args, 'pbr_learn_light_intensity', False):
+            import math
+            self.log_pbr_intensity = torch.nn.Parameter(torch.tensor(
+                math.log(args.pbr_light_intensity_scale), device='cuda'))
+            self.pbr_intensity_optimizer = torch.optim.Adam([self.log_pbr_intensity],
+                lr=opt.pbr_light_intensity_lr)
+            self.initial_log_pbr_intensity = self.log_pbr_intensity.detach().clone()
+        if getattr(pipe, 'pbr_light_mode', 'envmap') == 'gt_directional':
+            from scene.pbr_directional import load_gt_directional_lights
+            self.pbr_lights = load_gt_directional_lights(pipe.pbr_gt_lights_path)
+            for camera in self.original_train_cameras + self.scene.getTestCameras():
+                self.pbr_lights.for_camera(camera, pipe.pbr_light_intensity_scale, device='cpu')
+        else:
+            self.env_light = EnvLight(path=None, device='cuda',
+                                      resolution=[opt.envmap_resolution // 2, opt.envmap_resolution],
+                                      max_res=opt.envmap_resolution, init_value=opt.envmap_init_value,
+                                      activation=opt.envmap_activation)
+            self.env_light.training_setup(opt)
 
         bg_color = [1, 1, 1] if dataset.white_background else [0, 0, 0]
         self.background = torch.tensor(bg_color, dtype=torch.float32, device="cuda")
@@ -132,6 +204,23 @@ class Trainer:
 
     def train_step(self):
         self.iter_start.record()
+        geometry_active = (self.pbr_geometry is not None and
+                           self.iteration > self.load_iter + self.opt.pbr_geometry_warmup)
+        if self.pbr_geometry is not None:
+            steps = self.iteration-self.load_iter-self.opt.pbr_geometry_warmup
+            duration = self.opt.iterations-self.load_iter-self.opt.pbr_geometry_warmup
+            ramp = max(0., min(steps/1000., 1.))
+            decay = max(.1, 1-.9*max(steps, 0)/duration)
+            for group in self.gaussians.optimizer.param_groups:
+                if group['name'] == 'xyz':
+                    group['lr'] = self.opt.pbr_geometry_xyz_lr*ramp*decay
+                elif group['name'] == 'rotation':
+                    group['lr'] = self.opt.pbr_geometry_rotation_lr*ramp*decay
+                elif group['name'] == 'feature' and self.pbr_feature_gate is not None:
+                    group['lr'] = self.opt.pbr_feature_gate_lr*ramp*decay
+
+        if self.log_pbr_intensity is not None:
+            self.pipe.pbr_light_intensity_scale = self.log_pbr_intensity.exp()
 
         # Pick a random Camera
         if not self.viewpoint_stack:
@@ -146,11 +235,20 @@ class Trainer:
 
         time_input = fid.unsqueeze(0).expand(self.N, -1)
 
-        # careful with no grad
-        with torch.no_grad():
-            d_values = self.deform.step(self.gaussians.get_xyz.detach(), time_input, iteration=self.iteration,
-                                        feature=self.gaussians.get_binary_feature(),
+        # gate候选只对输出feature乘法可导；NN全部冻结，输入仍detach。
+        with torch.set_grad_enabled(self.pbr_feature_gate is not None):
+            deformation_xyz = self.gaussians.get_xyz.detach()
+            if self.pbr_deformation_xyz is not None:
+                from scene.pbr_deformation import deformation_input
+                deformation_xyz = deformation_input(self.gaussians.get_xyz, self.pbr_deformation_xyz)
+            d_values = self.deform.step(deformation_xyz, time_input, iteration=self.iteration,
+                                        feature=(self.pbr_feature_gate.output(self.gaussians) if self.pbr_feature_gate is not None
+                                                 else self.gaussians.get_binary_feature()),
                                         camera_center=viewpoint_cam.camera_center)
+        if self.pbr_rgb_normal is not None:
+            d_values = self.pbr_rgb_normal.apply(self.gaussians, d_values)
+        if self.pbr_plane_projection is not None:
+            d_values = self.pbr_plane_projection.apply(self.gaussians, d_values)
         d_xyz, d_rotation, d_scaling, d_opacity, d_color = d_values['d_xyz'], d_values['d_rotation'], \
                                                            d_values['d_scaling'], d_values['d_opacity'], d_values[
                                                                'd_color']
@@ -180,6 +278,25 @@ class Trainer:
         gt_image = viewpoint_cam.original_image_train_light.cuda()
         loss_result = self.stage2_loss.compute(self, render_pkg_re, gt_image, image_non_masked)
         Ll1, loss = loss_result.l1, loss_result.total
+        if self.log_pbr_intensity is not None:
+            intensity_anchor = (self.log_pbr_intensity-self.initial_log_pbr_intensity).square()
+            loss = loss + self.opt.lambda_pbr_light_intensity_anchor*intensity_anchor
+            if self.tb_writer and self.iteration % 100 == 0:
+                self.tb_writer.add_scalar('pbr_light/intensity_scale', self.log_pbr_intensity.exp().item(), self.iteration)
+        if geometry_active:
+            extra, geometry_terms = self.pbr_geometry.losses(self.gaussians, render_pkg_re, viewpoint_cam)
+            loss = loss + extra*ramp
+            if self.pbr_feature_gate is not None:
+                gate_anchor = self.pbr_feature_gate.loss(self.gaussians)
+                loss = loss + self.opt.lambda_pbr_feature_gate_anchor*gate_anchor*ramp
+                geometry_terms['pbr_feature_gate_anchor'] = gate_anchor
+            if self.pbr_rgb_normal is not None:
+                rgb_axis = self.pbr_rgb_normal.loss(self.gaussians)
+                loss = loss + self.opt.lambda_pbr_rgb_normal_prior*rgb_axis*ramp
+                geometry_terms['pbr_TRAIN_rgb_axis'] = rgb_axis
+            if self.tb_writer and self.iteration % 100 == 0:
+                for name, value in geometry_terms.items():
+                    self.tb_writer.add_scalar('pbr_geometry/'+name, value.item(), self.iteration)
         loss.backward()
         self.iter_end.record()
 
@@ -201,22 +318,64 @@ class Trainer:
                                                  self.testing_iterations, self.scene,
                                                  (self.pipe, self.background), self.deform,
                                                  self.dataset.load2gpu_on_the_fly,
-                                                 env_light=self.env_light)
+                                                 env_light=self.env_light,
+                                                 source_deformation_xyz=self.pbr_deformation_xyz,
+                                                 plane_projection=self.pbr_plane_projection,
+                                                 rgb_normal=self.pbr_rgb_normal)
 
             if self.iteration in self.saving_iterations or self.iteration == self.opt.warm_up - 1:
                 print("\n[ITER {}] Saving Gaussians".format(self.iteration))
                 self.scene.save(self.iteration)
                 self.deform.save_weights(self.args.model_path, self.iteration)
-                self.env_light.save_weights(self.args.model_path, self.iteration)
+                if self.env_light is not None:
+                    self.env_light.save_weights(self.args.model_path, self.iteration)
+                else:
+                    import json
+                    from pathlib import Path
+                    destination = Path(self.args.model_path)/'pbr_directional'/f'iteration_{self.iteration}'
+                    destination.mkdir(parents=True, exist_ok=True)
+                    lighting_record = dict(format_version=1, iteration=self.iteration,
+                        lights_sha256=self.pbr_lights.sha256, intensity_scale=self.args.pbr_light_intensity_scale)
+                    if self.log_pbr_intensity is not None:
+                        lighting_record.update(effective_intensity_scale=float(self.log_pbr_intensity.exp()),
+                            intensity_fitted_from_train_rgb=True)
+                    if self.pbr_deformation_anchor_sha is not None:
+                        lighting_record['deformation_anchor_sha256'] = self.pbr_deformation_anchor_sha
+                    if self.pbr_plane_projection_sha is not None:
+                        lighting_record['plane_projection_sha256'] = self.pbr_plane_projection_sha
+                    if self.pbr_feature_gate is not None:
+                        lighting_record['feature_gate_metadata_sha256'] = self.pbr_feature_gate.metadata_sha
+                    if self.pbr_rgb_normal is not None:
+                        lighting_record['rgb_normal_metadata_sha256'] = self.pbr_rgb_normal.metadata_sha
+                    if getattr(self.args, 'pbr_rasterizer_backend', 'installed') == 'lumimotion':
+                        from scene.pbr_rasterizer import validate_backend_model
+                        native = validate_backend_model(self.args.model_path, self.args)
+                        lighting_record['rasterizer_source_sha256'] = native['source_sha256']
+                    (destination/'lighting.json').write_text(json.dumps(lighting_record, indent=2)+'\n')
 
             # Optimizer step
             if self.iteration < self.opt.iterations and self.iteration % 4 == 0:
+                if geometry_active:
+                    torch.nn.utils.clip_grad_norm_([self.gaussians._xyz, self.gaussians._rotation], 10.)
                 self.gaussians.optimizer.step()
-                self.gaussians.update_learning_rate(self.iteration)
+                if getattr(self.opt, 'pbr_albedo_project_after_step', False):
+                    from scene.pbr_material import project_native_albedo
+                    project_native_albedo(self.gaussians, self.opt.pbr_albedo_init_margin)
+                if self.pbr_geometry is None:
+                    self.gaussians.update_learning_rate(self.iteration)
+                elif geometry_active:
+                    self.pbr_geometry.project(self.gaussians)
+                    if self.pbr_feature_gate is not None:
+                        self.pbr_feature_gate.project(self.gaussians)
                 self.gaussians.optimizer.zero_grad(set_to_none=True)
+                if self.pbr_intensity_optimizer is not None:
+                    self.pbr_intensity_optimizer.step()
+                    self.log_pbr_intensity.clamp_(min=-4.605170186, max=4.605170186)
+                    self.pbr_intensity_optimizer.zero_grad(set_to_none=True)
 
-                self.env_light.optimizer.step()
-                self.env_light.optimizer.zero_grad(set_to_none=True)
+                if self.env_light is not None:
+                    self.env_light.optimizer.step()
+                    self.env_light.optimizer.zero_grad(set_to_none=True)
 
                 self.deform.optimizer.step()
                 self.deform.optimizer.zero_grad(set_to_none=True)
@@ -290,6 +449,49 @@ if __name__ == "__main__":
         sys.exit(0)
     if args.resume_iteration is not None:
         parser.error("完整状态恢复仅适用于 photometric_lambertian。")
+    if args.pbr_light_mode not in {'envmap', 'gt_directional'}:
+        parser.error('未知PBR光照模式。')
+    if args.pbr_learn_light_intensity:
+        import math
+        if (args.pbr_light_mode != 'gt_directional' or not .01 <= args.pbr_light_intensity_scale <= 100 or
+                not math.isfinite(args.pbr_light_intensity_lr) or args.pbr_light_intensity_lr <= 0 or
+                not math.isfinite(args.lambda_pbr_light_intensity_anchor) or args.lambda_pbr_light_intensity_anchor < 0):
+            parser.error('学习光强仅适用于GT方向光，初值在[.01,100]，学习率正且锚定权重非负。')
+    if args.pbr_light_mode == 'gt_directional':
+        from pathlib import Path
+        import json, shutil, math
+        from scene.pbr_directional import GTDirectionalLights
+        if not args.stage1_model_path or args.load_iter <= 0:
+            parser.error('GT方向光PBR首次训练需要独立 --stage1_model_path 和正的 --load_iter。')
+        if not args.pbr_gt_lights_path:
+            parser.error('GT方向光PBR需要 --pbr_gt_lights_path。')
+        if not math.isfinite(args.pbr_light_intensity_scale) or args.pbr_light_intensity_scale <= 0:
+            parser.error('PBR方向光强度倍率必须有限且为正。')
+        if any(getattr(args, k) != 0 for k in ('d_lower_hemisphere_weight', 'lambda_light', 'lambda_light_smooth')):
+            parser.error('已知方向光没有环境光可优化，请将环境光正则权重设为0。')
+        if args.diffuse_sample_num <= 0 or args.light_sample_num != 0:
+            parser.error('当前PBR方向光的原生SH间接光需要正的diffuse_sample_num和light_sample_num=0。')
+        if args.iterations <= args.load_iter:
+            parser.error('GT方向光PBR目标iteration必须大于Stage1来源iteration。')
+        gt_lights = GTDirectionalLights(args.pbr_gt_lights_path)
+        from scene.pbr_directional import validate_directional_training_inputs
+        rgb_alpha_audit = validate_directional_training_inputs(args.source_path)
+    from scene.pbr_ray_budget import validate_actual_ray_budget
+    validate_actual_ray_budget(args)
+    from scene.pbr_rasterizer import validate_backend, prepare_backend
+    validate_backend(args)
+    from scene.pbr_geometry import validate_pbr_geometry
+    validate_pbr_geometry(args)
+    from scene.pbr_material import validate_albedo_initialization
+    validate_albedo_initialization(args)
+    from scene.pbr_deformation import validate_deformation_anchor
+    validate_deformation_anchor(args)
+    from scene.pbr_plane_projection import validate_plane_projection
+    validate_plane_projection(args)
+    from scene.pbr_feature_gate import validate_feature_gate
+    validate_feature_gate(args)
+    from scene.pbr_rgb_normal import validate_rgb_normal
+    validate_rgb_normal(args)
     if args.stage1_model_path:
         from scripts.stage2_runtime import model_dir, file_sha256
         from pathlib import Path
@@ -311,6 +513,14 @@ if __name__ == "__main__":
             hashes[str(original)] = file_sha256(original)
         (output / "stage1_source.json").write_text(json.dumps(hashes, indent=2)+"\n")
         (output / "stage2_config.json").write_text(json.dumps(vars(args), indent=2)+"\n")
+    if args.pbr_light_mode == 'gt_directional':
+        (Path(args.model_path)/'rgb_alpha_provenance.json').write_text(json.dumps(rgb_alpha_audit, indent=2)+'\n')
+        snapshot = Path(args.model_path)/'pbr_gt_lights.json'
+        if gt_lights.path != snapshot.resolve():
+            shutil.copy2(gt_lights.path, snapshot)
+        args.pbr_gt_lights_path = str(snapshot.resolve())
+        (Path(args.model_path)/'stage2_config.json').write_text(json.dumps(vars(args), indent=2)+'\n')
+    prepare_backend(args.model_path, args)
     trainer = Trainer(args=args, dataset=lp.extract(args), opt=op.extract(args), pipe=pp.extract(args),
               testing_iterations=args.test_iterations, saving_iterations=args.save_iterations,
               load_iter=args.load_iter)

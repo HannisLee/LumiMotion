@@ -1,0 +1,200 @@
+Loading trained model at iteration 40000
+Found transforms_train.json file, assuming Blender data set!
+Reading Training Transforms
+Read Train Transforms with 135 cameras
+Loading Training Cameras
+Loading Test Cameras
+LOAD PLY
+/home/lihan/reproduce/LumiMotion-stage2-perlight/scene/__init__.py:103: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  unique_fids = [torch.tensor(val, dtype=torch.float32, device="cuda") for val in unique_values]
+################ gaussian_color params: 156934
+{"frame": "0001", "buffer_max_errors": {"alpha": 0.0, "worldnormal": 0.0, "expectedZ": 0.0, "second_pass_buffer": 0.0, "group_sum_alpha": 6.556510925292969e-07}, "joint_groups": {"existing_projected": {"points": 15187, "accumulated_weight_sum": 2034.833984375, "dominant_alpha05_pixels": 1804}, "source_static_near_unprojected": {"points": 1542, "accumulated_weight_sum": 640.2666015625, "dominant_alpha05_pixels": 422}, "source_dynamic_near_unprojected": {"points": 6836, "accumulated_weight_sum": 4711.9296875, "dominant_alpha05_pixels": 5117}, "other": {"points": 76262, "accumulated_weight_sum": 12982.77734375, "dominant_alpha05_pixels": 12855}}}
+{"frame": "0075", "buffer_max_errors": {"alpha": 0.0, "worldnormal": 0.0, "expectedZ": 0.0, "second_pass_buffer": 0.0, "group_sum_alpha": 5.364418029785156e-07}, "joint_groups": {"existing_projected": {"points": 15187, "accumulated_weight_sum": 2473.44287109375, "dominant_alpha05_pixels": 2474}, "source_static_near_unprojected": {"points": 1542, "accumulated_weight_sum": 652.7410888671875, "dominant_alpha05_pixels": 498}, "source_dynamic_near_unprojected": {"points": 6836, "accumulated_weight_sum": 2967.5478515625, "dominant_alpha05_pixels": 2903}, "other": {"points": 76262, "accumulated_weight_sum": 10882.587890625, "dominant_alpha05_pixels": 10966}}}
+{"frame": "0149", "buffer_max_errors": {"alpha": 0.0, "worldnormal": 0.0, "expectedZ": 0.0, "second_pass_buffer": 0.0, "group_sum_alpha": 6.556510925292969e-07}, "joint_groups": {"existing_projected": {"points": 15187, "accumulated_weight_sum": 1972.14404296875, "dominant_alpha05_pixels": 1690}, "source_static_near_unprojected": {"points": 1542, "accumulated_weight_sum": 542.1270751953125, "dominant_alpha05_pixels": 298}, "source_dynamic_near_unprojected": {"points": 6836, "accumulated_weight_sum": 4902.642578125, "dominant_alpha05_pixels": 5310}, "other": {"points": 76262, "accumulated_weight_sum": 13219.95703125, "dominant_alpha05_pixels": 13154}}}
+{
+  "status": "PASS_READ_ONLY_UNPROJECTED_PLANE_JOINT_AUDIT",
+  "iteration": 40000,
+  "frames": [
+    "0001",
+    "0075",
+    "0149"
+  ],
+  "source_stats": {
+    "existing_projected": {
+      "points": 15187,
+      "motion_span_percentiles": {
+        "0.0": 4.020400401483215e-10,
+        "0.5": 9.160867193713784e-06,
+        "0.9": 0.0010914632584899664,
+        "0.99": 0.007534231524914503,
+        "1.0": 0.009974987246096134
+      },
+      "motion_threshold_counts": {
+        "0.01": 15187,
+        "0.02": 15187,
+        "0.04": 15187,
+        "0.08": 15187,
+        "0.16": 15187
+      }
+    },
+    "source_static_near_unprojected": {
+      "points": 1542,
+      "motion_span_percentiles": {
+        "0.0": 0.010052726604044437,
+        "0.5": 0.051010653376579285,
+        "0.9": 0.22969727218151093,
+        "0.99": 0.4685591757297516,
+        "1.0": 0.6823481321334839
+      },
+      "motion_threshold_counts": {
+        "0.01": 0,
+        "0.02": 349,
+        "0.04": 664,
+        "0.08": 968,
+        "0.16": 1277
+      }
+    },
+    "source_dynamic_near_unprojected": {
+      "points": 6836,
+      "motion_span_percentiles": {
+        "0.0": 0.06519520282745361,
+        "0.5": 0.3901749849319458,
+        "0.9": 0.8935463428497314,
+        "0.99": 1.32382333278656,
+        "1.0": 1.8066930770874023
+      },
+      "motion_threshold_counts": {
+        "0.01": 0,
+        "0.02": 0,
+        "0.04": 0,
+        "0.08": 1,
+        "0.16": 298
+      }
+    },
+    "other": {
+      "points": 76262,
+      "motion_span_percentiles": {
+        "0.0": 4.821705257285203e-10,
+        "0.5": 0.21180400252342224,
+        "0.9": 1.2059974670410156,
+        "0.99": 1.8217405080795288,
+        "1.0": 2.4414618015289307
+      },
+      "motion_threshold_counts": {
+        "0.01": 35684,
+        "0.02": 36104,
+        "0.04": 36470,
+        "0.08": 36817,
+        "0.16": 37239
+      }
+    }
+  },
+  "rows": [
+    {
+      "frame": "0001",
+      "buffer_max_errors": {
+        "alpha": 0.0,
+        "worldnormal": 0.0,
+        "expectedZ": 0.0,
+        "second_pass_buffer": 0.0,
+        "group_sum_alpha": 6.556510925292969e-07
+      },
+      "joint_groups": {
+        "existing_projected": {
+          "points": 15187,
+          "accumulated_weight_sum": 2034.833984375,
+          "dominant_alpha05_pixels": 1804
+        },
+        "source_static_near_unprojected": {
+          "points": 1542,
+          "accumulated_weight_sum": 640.2666015625,
+          "dominant_alpha05_pixels": 422
+        },
+        "source_dynamic_near_unprojected": {
+          "points": 6836,
+          "accumulated_weight_sum": 4711.9296875,
+          "dominant_alpha05_pixels": 5117
+        },
+        "other": {
+          "points": 76262,
+          "accumulated_weight_sum": 12982.77734375,
+          "dominant_alpha05_pixels": 12855
+        }
+      }
+    },
+    {
+      "frame": "0075",
+      "buffer_max_errors": {
+        "alpha": 0.0,
+        "worldnormal": 0.0,
+        "expectedZ": 0.0,
+        "second_pass_buffer": 0.0,
+        "group_sum_alpha": 5.364418029785156e-07
+      },
+      "joint_groups": {
+        "existing_projected": {
+          "points": 15187,
+          "accumulated_weight_sum": 2473.44287109375,
+          "dominant_alpha05_pixels": 2474
+        },
+        "source_static_near_unprojected": {
+          "points": 1542,
+          "accumulated_weight_sum": 652.7410888671875,
+          "dominant_alpha05_pixels": 498
+        },
+        "source_dynamic_near_unprojected": {
+          "points": 6836,
+          "accumulated_weight_sum": 2967.5478515625,
+          "dominant_alpha05_pixels": 2903
+        },
+        "other": {
+          "points": 76262,
+          "accumulated_weight_sum": 10882.587890625,
+          "dominant_alpha05_pixels": 10966
+        }
+      }
+    },
+    {
+      "frame": "0149",
+      "buffer_max_errors": {
+        "alpha": 0.0,
+        "worldnormal": 0.0,
+        "expectedZ": 0.0,
+        "second_pass_buffer": 0.0,
+        "group_sum_alpha": 6.556510925292969e-07
+      },
+      "joint_groups": {
+        "existing_projected": {
+          "points": 15187,
+          "accumulated_weight_sum": 1972.14404296875,
+          "dominant_alpha05_pixels": 1690
+        },
+        "source_static_near_unprojected": {
+          "points": 1542,
+          "accumulated_weight_sum": 542.1270751953125,
+          "dominant_alpha05_pixels": 298
+        },
+        "source_dynamic_near_unprojected": {
+          "points": 6836,
+          "accumulated_weight_sum": 4902.642578125,
+          "dominant_alpha05_pixels": 5310
+        },
+        "other": {
+          "points": 76262,
+          "accumulated_weight_sum": 13219.95703125,
+          "dominant_alpha05_pixels": 13154
+        }
+      }
+    }
+  ],
+  "optimizer_steps": 0,
+  "GT_geometry_normal_material_inputs": false,
+  "training_modified": false,
+  "final_mae": false,
+  "all_gaussian_opacity_retained": true,
+  "source_files": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/point_cloud/iteration_40000/point_cloud.ply": "0b1ecef8fa45646c7926ee505cd94818b0e8cef626f958eaa3c6e57223273e44",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/deform/iteration_40000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+  },
+  "limits": "source near-plane与static/dynamic是固定35k预测分类，不是真实平台或物体标签；只改诊断颜色，所有99827点/原opacity/geometry保留。无训练先验/新监督/评分mask输出。"
+}

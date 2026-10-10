@@ -75,6 +75,45 @@ class GeometryRun:
         ply = geometry_model/'point_cloud'/f'iteration_{geometry_iteration}'/'point_cloud.ply'
         pth = geometry_model/'deform'/f'iteration_{geometry_iteration}'/'deform.pth'
         self.files.update({str(p): file_sha256(p) for p in (ply, pth)})
+        if config.get('pbr_rasterizer_backend','installed')=='lumimotion':
+            from argparse import Namespace
+            from scene.pbr_rasterizer import validate_backend_model,ASSET,ROOT
+            native=validate_backend_model(geometry_model,Namespace(**config))
+            asset=geometry_model/ASSET
+            self.files[str(asset)]=file_sha256(asset)
+            self.files.update({str(ROOT/relative):digest for relative,digest in native['source_files'].items()})
+            if config.get('pbr_light_mode')=='gt_directional' and iteration>config.get('load_iter',-1):
+                from scene.pbr_directional import validate_directional_checkpoint
+                for path in validate_directional_checkpoint(geometry_model,iteration,config):
+                    self.files[str(path)]=file_sha256(path)
+        self.context = None
+        if (config.get('pbr_deformation_anchor', False) or config.get('pbr_plane_projection', False) or
+                config.get('pbr_source_local_rotation', False)):
+            if self.mode != 'original_ir' or photo.is_file():
+                raise ValueError('PBR来源形变与平面模型只能用于原生PBR几何评测。')
+            from argparse import Namespace
+            from scripts.stage2_runtime import FrozenScene
+            runtime_config = dict(config, source_path=str(self.source))
+            self.context = FrozenScene(Namespace(**runtime_config), geometry_model, geometry_iteration)
+            self.pc, self.deform = self.context.pc, self.context.deform
+            self.files.update(self.context.source_files)
+            if self.context.pbr_feature_gate_provenance is not None:
+                metadata = geometry_model/'pbr_feature_gate.json'
+                self.files[str(metadata)] = file_sha256(metadata)
+            for enabled, prefix in [(config.get('pbr_deformation_anchor', False), 'pbr_deformation_anchor'),
+                                    (config.get('pbr_plane_projection', False), 'pbr_plane_projection')]:
+                if enabled:
+                    metadata = geometry_model/(prefix+'.json')
+                    asset = geometry_model/(prefix+'.npz')
+                    self.files.update({str(p): file_sha256(p) for p in (metadata, asset)})
+                    record = json.loads(metadata.read_text())
+                    self.files.update(record['source_files'])
+                    for relative, digest in record['source_snapshots'].items():
+                        self.files[str(geometry_model/relative)] = digest
+            marker = geometry_model/'pbr_directional'/f'iteration_{geometry_iteration}'/'lighting.json'
+            if marker.is_file():
+                self.files[str(marker)] = file_sha256(marker)
+            return
         self.pc = GaussianModel(config.get('sh_degree', 3), config.get('no_binary_separation', False),
                                 fea_dim=config.get('hyper_dim', 1))
         self.pc.load_ply(str(ply))
@@ -89,6 +128,15 @@ class GeometryRun:
         if not self.deform.load_weights(str(geometry_model), geometry_iteration):
             raise FileNotFoundError(pth)
         self.deform.deform.eval().requires_grad_(False)
+
+    def deformation(self, camera):
+        """几何评测/逐time Mesh与训练共享来源查询及真实几何模型。"""
+        if self.context is not None:
+            return self.context.deformation(camera)
+        count = len(self.pc.get_xyz)
+        return self.deform.step(self.pc.get_xyz.detach(), camera.fid.unsqueeze(0).expand(count, -1),
+            iteration=self.iteration, feature=self.pc.get_binary_feature(), camera_center=camera.camera_center,
+            is_training=False)
 
     def camera(self, metadata, record, divisor):
         import torch
@@ -119,12 +167,11 @@ class GeometryRun:
 
     def render(self, camera, c2w, intrinsics):
         import torch
-        from diff_surfel_rasterization import GaussianRasterizationSettings, GaussianRasterizer
+        from argparse import Namespace
+        from scene.pbr_rasterizer import rasterizer_classes
+        GaussianRasterizationSettings,GaussianRasterizer=rasterizer_classes(Namespace(**self.config))
         with torch.no_grad():
-            count = len(self.pc.get_xyz)
-            deformation = self.deform.step(self.pc.get_xyz.detach(), camera.fid.unsqueeze(0).expand(count, -1),
-                iteration=self.iteration, feature=self.pc.get_binary_feature(), camera_center=camera.camera_center,
-                is_training=False)
+            deformation = self.deformation(camera)
             means = self.pc.get_xyz + deformation['d_xyz']
             rotations = self.pc.get_rotation_bias(deformation['d_rotation'])
             scales = self.pc.get_scaling+deformation['d_scaling']

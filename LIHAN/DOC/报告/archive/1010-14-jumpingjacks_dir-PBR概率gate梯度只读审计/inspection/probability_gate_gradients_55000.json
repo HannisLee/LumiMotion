@@ -1,0 +1,2526 @@
+{
+  "status": "PASS_READ_ONLY_PROBABILITY_GATE_GRADIENT_DIAGNOSTIC",
+  "iteration": 55000,
+  "rows": [
+    {
+      "frame": "0001",
+      "losses": {
+        "native_photo": 0.05282619595527649,
+        "PBR_photo": 0.043033942580223083,
+        "SH_photo": 0.009792252443730831,
+        "normal_depth": 0.007862619124352932,
+        "input_alpha": 0.0030714094173163176,
+        "combined_feature_dependent": 0.06376022845506668
+      },
+      "gradient_groups": {
+        "native_photo": {
+          "all": {
+            "points": 99827,
+            "L2": 0.000866425281856209,
+            "nonzero_points": 33903,
+            "positive_fraction_among_nonzero": 0.5175353288650513,
+            "gradient_sum": 6.44872197881341e-05,
+            "probability_gradient_L2": 0.010277335532009602,
+            "sigmoid_derivative": {
+              "mean": 0.016390259506163126,
+              "median": 4.2676016164477915e-05,
+              "p99": 0.4450120955705649,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 48703,
+            "raw_first_Adam_probability_delta": {
+              "mean": 4.761216336935491e-06,
+              "median": 0.0,
+              "p99": 0.00018986701965332219,
+              "maximum": 0.0004998445510864258
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0002240590942249303,
+              "median": 0.0,
+              "p99": 0.0009996294975280762,
+              "maximum": 0.0010000020265579224
+            }
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 2.49367326432548e-06,
+            "nonzero_points": 5478,
+            "positive_fraction_among_nonzero": 0.522270917892456,
+            "gradient_sum": -3.121320787613513e-06,
+            "probability_gradient_L2": 0.0001628581085242331,
+            "sigmoid_derivative": {
+              "mean": 0.0018115263030886622,
+              "median": 3.9769383874954656e-05,
+              "p99": 0.03563515089452264,
+              "maximum": 0.27540192008018494
+            },
+            "probability_gradient_nonzero": 11739,
+            "raw_first_Adam_probability_delta": {
+              "mean": 2.149110420901486e-07,
+              "median": 0.0,
+              "p99": 2.860021777451004e-06,
+              "maximum": 0.0002630650997161865
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00027350614000866815,
+              "median": 3.960635876865126e-05,
+              "p99": 0.000996236684732139,
+              "maximum": 0.000999794458039105
+            }
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 0.00022856421128381044,
+            "nonzero_points": 4229,
+            "positive_fraction_among_nonzero": 0.5568692684173584,
+            "gradient_sum": -0.00012306973803788424,
+            "probability_gradient_L2": 0.00439242972061038,
+            "sigmoid_derivative": {
+              "mean": 0.05128262692675544,
+              "median": 0.0005147323827259243,
+              "p99": 0.4954574048519134,
+              "maximum": 0.49999940395355225
+            },
+            "probability_gradient_nonzero": 4844,
+            "raw_first_Adam_probability_delta": {
+              "mean": 2.3259064689444267e-05,
+              "median": 0.0,
+              "p99": 0.00046465098857879623,
+              "maximum": 0.0004998445510864258
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0004339051471599157,
+              "median": 0.00023615360260009766,
+              "p99": 0.0009998679161071777,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 8.676232391735539e-05,
+            "nonzero_points": 20227,
+            "positive_fraction_among_nonzero": 0.5126810669898987,
+            "gradient_sum": -1.8256905605085194e-05,
+            "probability_gradient_L2": 0.00701761431992054,
+            "sigmoid_derivative": {
+              "mean": 0.014152945557868498,
+              "median": 7.533743337262422e-05,
+              "p99": 0.41537910699844366,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 25697,
+            "raw_first_Adam_probability_delta": {
+              "mean": 2.8478039228756492e-06,
+              "median": 0.0,
+              "p99": 6.9091320037842e-05,
+              "maximum": 0.0004988014698028564
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0003140361854472394,
+              "median": 1.6987323760986328e-05,
+              "p99": 0.0009998083114624023,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 0.0008312142454087734,
+            "nonzero_points": 3969,
+            "positive_fraction_among_nonzero": 0.4938271939754486,
+            "gradient_sum": 0.00020893511828035116,
+            "probability_gradient_L2": 0.006087425630539656,
+            "sigmoid_derivative": {
+              "mean": 0.018171558659259745,
+              "median": 1.0732133887358941e-05,
+              "p99": 0.4567149400711062,
+              "maximum": 0.49999910593032837
+            },
+            "probability_gradient_nonzero": 6423,
+            "raw_first_Adam_probability_delta": {
+              "mean": 5.1896270695222975e-06,
+              "median": 0.0,
+              "p99": 0.00021387755870819116,
+              "maximum": 0.0004989802837371826
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 7.88405097004661e-05,
+              "median": 0.0,
+              "p99": 0.0009977325424551963,
+              "maximum": 0.0010000020265579224
+            }
+          }
+        },
+        "PBR_photo": {
+          "all": {
+            "points": 99827,
+            "L2": 0.0008711584378033876,
+            "nonzero_points": 30904,
+            "positive_fraction_among_nonzero": 0.5139787793159485,
+            "gradient_sum": -0.00014634255785495043,
+            "probability_gradient_L2": 0.010046010836958885,
+            "sigmoid_derivative": {
+              "mean": 0.016390259506163126,
+              "median": 4.2676016164477915e-05,
+              "p99": 0.4450120955705649,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 44980,
+            "raw_first_Adam_probability_delta": {
+              "mean": 4.458206292723418e-06,
+              "median": 0.0,
+              "p99": 0.0001679848134517678,
+              "maximum": 0.0004998445510864258
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00020215150690938117,
+              "median": 0.0,
+              "p99": 0.0009996294975280762,
+              "maximum": 0.0010000020265579224
+            }
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 1.7832975345299928e-06,
+            "nonzero_points": 5075,
+            "positive_fraction_among_nonzero": 0.5184236764907837,
+            "gradient_sum": -2.1803641629958292e-06,
+            "probability_gradient_L2": 0.0001474971795687452,
+            "sigmoid_derivative": {
+              "mean": 0.0018115263030886622,
+              "median": 3.9769383874954656e-05,
+              "p99": 0.03563515089452264,
+              "maximum": 0.27540192008018494
+            },
+            "probability_gradient_nonzero": 11478,
+            "raw_first_Adam_probability_delta": {
+              "mean": 2.0276953537687105e-07,
+              "median": 0.0,
+              "p99": 2.5080982595682104e-06,
+              "maximum": 0.0002501457929611206
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00025179578687804685,
+              "median": 3.278183794463985e-05,
+              "p99": 0.000996077130548656,
+              "maximum": 0.0009998033056035638
+            }
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 0.00023027135466691107,
+            "nonzero_points": 4117,
+            "positive_fraction_among_nonzero": 0.5610882043838501,
+            "gradient_sum": -0.00020295471767894924,
+            "probability_gradient_L2": 0.004356181249022484,
+            "sigmoid_derivative": {
+              "mean": 0.05128262692675544,
+              "median": 0.0005147323827259243,
+              "p99": 0.4954574048519134,
+              "maximum": 0.49999940395355225
+            },
+            "probability_gradient_nonzero": 4832,
+            "raw_first_Adam_probability_delta": {
+              "mean": 2.2147182155032126e-05,
+              "median": 0.0,
+              "p99": 0.0004595130681991573,
+              "maximum": 0.0004998445510864258
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00041788299837748583,
+              "median": 0.00019949674606323242,
+              "p99": 0.0009998679161071777,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 8.636983693577349e-05,
+            "nonzero_points": 17985,
+            "positive_fraction_among_nonzero": 0.5062552094459534,
+            "gradient_sum": -3.293683403171599e-05,
+            "probability_gradient_L2": 0.0067435153760015965,
+            "sigmoid_derivative": {
+              "mean": 0.014152945557868498,
+              "median": 7.533743337262422e-05,
+              "p99": 0.41537910699844366,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 22556,
+            "raw_first_Adam_probability_delta": {
+              "mean": 2.6919310928594006e-06,
+              "median": 0.0,
+              "p99": 6.244778633117702e-05,
+              "maximum": 0.0004988610744476318
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0002762807914019277,
+              "median": 6.198883056640625e-06,
+              "p99": 0.0009998083114624023,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 0.0008357207989320159,
+            "nonzero_points": 3727,
+            "positive_fraction_among_nonzero": 0.4931580424308777,
+            "gradient_sum": 9.172919089905918e-05,
+            "probability_gradient_L2": 0.0060373228043317795,
+            "sigmoid_derivative": {
+              "mean": 0.018171558659259745,
+              "median": 1.0732133887358941e-05,
+              "p99": 0.4567149400711062,
+              "maximum": 0.49999910593032837
+            },
+            "probability_gradient_nonzero": 6114,
+            "raw_first_Adam_probability_delta": {
+              "mean": 4.7691196810586896e-06,
+              "median": 0.0,
+              "p99": 0.00019182294607162633,
+              "maximum": 0.0004989206790924072
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 7.15481440860002e-05,
+              "median": 0.0,
+              "p99": 0.0009970522858202457,
+              "maximum": 0.0010000020265579224
+            }
+          }
+        },
+        "SH_photo": {
+          "all": {
+            "points": 99827,
+            "L2": 4.697379335993901e-05,
+            "nonzero_points": 27269,
+            "positive_fraction_among_nonzero": 0.5233415365219116,
+            "gradient_sum": 0.00021082990861032158,
+            "probability_gradient_L2": 0.0016039100009948015,
+            "sigmoid_derivative": {
+              "mean": 0.016390259506163126,
+              "median": 4.2676016164477915e-05,
+              "p99": 0.4450120955705649,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 47834,
+            "raw_first_Adam_probability_delta": {
+              "mean": 3.388716304207759e-06,
+              "median": 0.0,
+              "p99": 0.0001173126697540305,
+              "maximum": 0.0004985928535461426
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00017501865901673684,
+              "median": 0.0,
+              "p99": 0.0009976886468939484,
+              "maximum": 0.000999990850687027
+            }
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 1.0045894214272266e-06,
+            "nonzero_points": 4249,
+            "positive_fraction_among_nonzero": 0.5274181962013245,
+            "gradient_sum": -9.409566246176837e-07,
+            "probability_gradient_L2": 5.396114647737704e-05,
+            "sigmoid_derivative": {
+              "mean": 0.0018115263030886622,
+              "median": 3.9769383874954656e-05,
+              "p99": 0.03563515089452264,
+              "maximum": 0.27540192008018494
+            },
+            "probability_gradient_nonzero": 11702,
+            "raw_first_Adam_probability_delta": {
+              "mean": 1.1821060930781034e-07,
+              "median": 0.0,
+              "p99": 9.428896009922011e-07,
+              "maximum": 0.0002667456865310669
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00020121005716745543,
+              "median": 1.7439379007555544e-05,
+              "p99": 0.0009829581435769794,
+              "maximum": 0.0009994907304644585
+            }
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 3.092195402132347e-05,
+            "nonzero_points": 3826,
+            "positive_fraction_among_nonzero": 0.5303188562393188,
+            "gradient_sum": 7.988495053723454e-05,
+            "probability_gradient_L2": 0.00033248160616494715,
+            "sigmoid_derivative": {
+              "mean": 0.05128262692675544,
+              "median": 0.0005147323827259243,
+              "p99": 0.4954574048519134,
+              "maximum": 0.49999940395355225
+            },
+            "probability_gradient_nonzero": 4838,
+            "raw_first_Adam_probability_delta": {
+              "mean": 1.751003713897964e-05,
+              "median": 0.0,
+              "p99": 0.0004179030656814574,
+              "maximum": 0.0004985928535461426
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00035653177882022087,
+              "median": 0.00010794401168823242,
+              "p99": 0.0009985566139221191,
+              "maximum": 0.0009999275207519531
+            }
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 5.292362857289845e-06,
+            "nonzero_points": 15737,
+            "positive_fraction_among_nonzero": 0.5227171182632446,
+            "gradient_sum": 1.4679886589874513e-05,
+            "probability_gradient_L2": 0.0010788865620270371,
+            "sigmoid_derivative": {
+              "mean": 0.014152945557868498,
+              "median": 7.533743337262422e-05,
+              "p99": 0.41537910699844366,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 24976,
+            "raw_first_Adam_probability_delta": {
+              "mean": 1.8814328341563201e-06,
+              "median": 0.0,
+              "p99": 3.186106681823736e-05,
+              "maximum": 0.0004903674125671387
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0002500571128423498,
+              "median": 9.298324584960938e-06,
+              "p99": 0.000998854637145996,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 3.494784687063657e-05,
+            "nonzero_points": 3457,
+            "positive_fraction_among_nonzero": 0.5134509801864624,
+            "gradient_sum": 0.00011720602924469858,
+            "probability_gradient_L2": 0.0011380137875676155,
+            "sigmoid_derivative": {
+              "mean": 0.018171558659259745,
+              "median": 1.0732133887358941e-05,
+              "p99": 0.4567149400711062,
+              "maximum": 0.49999910593032837
+            },
+            "probability_gradient_nonzero": 6318,
+            "raw_first_Adam_probability_delta": {
+              "mean": 3.6841443549036145e-06,
+              "median": 0.0,
+              "p99": 0.00013322144746780434,
+              "maximum": 0.0004977583885192871
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 5.862192037647754e-05,
+              "median": 0.0,
+              "p99": 0.0009832817781716585,
+              "maximum": 0.000999990850687027
+            }
+          }
+        },
+        "normal_depth": {
+          "all": {
+            "points": 99827,
+            "L2": 8.030817843973637e-05,
+            "nonzero_points": 26101,
+            "positive_fraction_among_nonzero": 0.5093674659729004,
+            "gradient_sum": 2.8113236112403683e-05,
+            "probability_gradient_L2": 0.0011794011807069182,
+            "sigmoid_derivative": {
+              "mean": 0.016390259506163126,
+              "median": 4.2676016164477915e-05,
+              "p99": 0.4450120955705649,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 48374,
+            "raw_first_Adam_probability_delta": {
+              "mean": 3.394732031647511e-06,
+              "median": 0.0,
+              "p99": 0.00011235475540161133,
+              "maximum": 0.0004991888999938965
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0001650901570449275,
+              "median": 0.0,
+              "p99": 0.0009977175155654549,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 1.649528229563657e-07,
+            "nonzero_points": 2883,
+            "positive_fraction_among_nonzero": 0.4717308282852173,
+            "gradient_sum": 2.0031947656207194e-07,
+            "probability_gradient_L2": 3.266835119575262e-05,
+            "sigmoid_derivative": {
+              "mean": 0.0018115263030886622,
+              "median": 3.9769383874954656e-05,
+              "p99": 0.03563515089452264,
+              "maximum": 0.27540192008018494
+            },
+            "probability_gradient_nonzero": 11532,
+            "raw_first_Adam_probability_delta": {
+              "mean": 7.319468571355425e-08,
+              "median": 0.0,
+              "p99": 3.1491741538047736e-07,
+              "maximum": 0.00017286837100982666
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00013246588776861994,
+              "median": 7.812789590389002e-06,
+              "p99": 0.0009623772476334124,
+              "maximum": 0.000996326212771237
+            }
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 2.3280859750229865e-05,
+            "nonzero_points": 3779,
+            "positive_fraction_among_nonzero": 0.5146864056587219,
+            "gradient_sum": 2.1686450054403394e-05,
+            "probability_gradient_L2": 0.0004927669069729745,
+            "sigmoid_derivative": {
+              "mean": 0.05128262692675544,
+              "median": 0.0005147323827259243,
+              "p99": 0.4954574048519134,
+              "maximum": 0.49999940395355225
+            },
+            "probability_gradient_nonzero": 4834,
+            "raw_first_Adam_probability_delta": {
+              "mean": 1.7891178586596004e-05,
+              "median": 0.0,
+              "p99": 0.00042485892772674554,
+              "maximum": 0.0004991888999938965
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00036659879711303464,
+              "median": 0.00010466575622558594,
+              "p99": 0.000998714566230774,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 6.5607014221313875e-06,
+            "nonzero_points": 16246,
+            "positive_fraction_among_nonzero": 0.5164347887039185,
+            "gradient_sum": 2.68394637714664e-06,
+            "probability_gradient_L2": 0.000880945473909378,
+            "sigmoid_derivative": {
+              "mean": 0.014152945557868498,
+              "median": 7.533743337262422e-05,
+              "p99": 0.41537910699844366,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 25749,
+            "raw_first_Adam_probability_delta": {
+              "mean": 1.930221667193621e-06,
+              "median": 0.0,
+              "p99": 3.138422966003423e-05,
+              "maximum": 0.00048679113388061523
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00025777146864371797,
+              "median": 1.1980533599853516e-05,
+              "p99": 0.0009987950325012207,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 7.657894457224756e-05,
+            "nonzero_points": 3193,
+            "positive_fraction_among_nonzero": 0.5010961294174194,
+            "gradient_sum": 3.542543709045276e-06,
+            "probability_gradient_L2": 0.0006091270479373634,
+            "sigmoid_derivative": {
+              "mean": 0.018171558659259745,
+              "median": 1.0732133887358941e-05,
+              "p99": 0.4567149400711062,
+              "maximum": 0.49999910593032837
+            },
+            "probability_gradient_nonzero": 6259,
+            "raw_first_Adam_probability_delta": {
+              "mean": 3.6019128728428413e-06,
+              "median": 0.0,
+              "p99": 0.00012743353843689374,
+              "maximum": 0.0004987716674804688
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 5.056085201574874e-05,
+              "median": 0.0,
+              "p99": 0.0009855772927403466,
+              "maximum": 0.0009999722242355347
+            }
+          }
+        },
+        "input_alpha": {
+          "all": {
+            "points": 99827,
+            "L2": 1.0650716149029904e-06,
+            "nonzero_points": 12586,
+            "positive_fraction_among_nonzero": 0.5906562805175781,
+            "gradient_sum": 1.1059014468628448e-06,
+            "probability_gradient_L2": 0.000189426020369865,
+            "sigmoid_derivative": {
+              "mean": 0.016390259506163126,
+              "median": 4.2676016164477915e-05,
+              "p99": 0.4450120955705649,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 47547,
+            "raw_first_Adam_probability_delta": {
+              "mean": 4.864201985975188e-07,
+              "median": 0.0,
+              "p99": 4.649162292480469e-06,
+              "maximum": 0.0004488825798034668
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 7.107401901891054e-05,
+              "median": 0.0,
+              "p99": 0.0009754240338224919,
+              "maximum": 0.0009998679161071777
+            }
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 4.3135233163127396e-09,
+            "nonzero_points": 1268,
+            "positive_fraction_among_nonzero": 0.539432168006897,
+            "gradient_sum": 5.2230664238095414e-11,
+            "probability_gradient_L2": 2.744286348388414e-06,
+            "sigmoid_derivative": {
+              "mean": 0.0018115263030886622,
+              "median": 3.9769383874954656e-05,
+              "p99": 0.03563515089452264,
+              "maximum": 0.27540192008018494
+            },
+            "probability_gradient_nonzero": 11326,
+            "raw_first_Adam_probability_delta": {
+              "mean": 6.7738076760677515e-09,
+              "median": 0.0,
+              "p99": 4.357192665338503e-08,
+              "maximum": 2.3543834686279297e-05
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 4.19903309461771e-05,
+              "median": 1.8145819922210649e-06,
+              "p99": 0.0007435787888243791,
+              "maximum": 0.0009784364374354482
+            }
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 7.337131933127239e-07,
+            "nonzero_points": 1936,
+            "positive_fraction_among_nonzero": 0.6255164742469788,
+            "gradient_sum": 8.030316962504003e-07,
+            "probability_gradient_L2": 1.7296624719165266e-05,
+            "sigmoid_derivative": {
+              "mean": 0.05128262692675544,
+              "median": 0.0005147323827259243,
+              "p99": 0.4954574048519134,
+              "maximum": 0.49999940395355225
+            },
+            "probability_gradient_nonzero": 4804,
+            "raw_first_Adam_probability_delta": {
+              "mean": 2.3900690903225583e-06,
+              "median": 0.0,
+              "p99": 6.614029407501175e-05,
+              "maximum": 0.00038057565689086914
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 7.77110204562728e-05,
+              "median": 8.404254913330078e-06,
+              "p99": 0.0008811354637145987,
+              "maximum": 0.000999152660369873
+            }
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 2.780446948236204e-07,
+            "nonzero_points": 7185,
+            "positive_fraction_among_nonzero": 0.6098816990852356,
+            "gradient_sum": 1.053792288985278e-06,
+            "probability_gradient_L2": 0.0001860400807345286,
+            "sigmoid_derivative": {
+              "mean": 0.014152945557868498,
+              "median": 7.533743337262422e-05,
+              "p99": 0.41537910699844366,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 25452,
+            "raw_first_Adam_probability_delta": {
+              "mean": 2.6899505271343556e-07,
+              "median": 0.0,
+              "p99": 1.0132789611816406e-06,
+              "maximum": 0.0004488825798034668
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00013342576840432916,
+              "median": 3.5762786865234375e-06,
+              "p99": 0.0009913444519042969,
+              "maximum": 0.0009998679161071777
+            }
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 7.202186225185869e-07,
+            "nonzero_points": 2197,
+            "positive_fraction_among_nonzero": 0.5266271829605103,
+            "gradient_sum": -7.509746637879289e-07,
+            "probability_gradient_L2": 3.1057974410941824e-05,
+            "sigmoid_derivative": {
+              "mean": 0.018171558659259745,
+              "median": 1.0732133887358941e-05,
+              "p99": 0.4567149400711062,
+              "maximum": 0.49999910593032837
+            },
+            "probability_gradient_nonzero": 5965,
+            "raw_first_Adam_probability_delta": {
+              "mean": 5.554377381592434e-07,
+              "median": 0.0,
+              "p99": 6.859302520752057e-06,
+              "maximum": 0.0003637373447418213
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 1.936447131934272e-05,
+              "median": 0.0,
+              "p99": 0.0007237642584368589,
+              "maximum": 0.0009996156441047788
+            }
+          }
+        },
+        "combined_feature_dependent": {
+          "all": {
+            "points": 99827,
+            "L2": 0.0008494836511090398,
+            "nonzero_points": 34923,
+            "positive_fraction_among_nonzero": 0.51994389295578,
+            "gradient_sum": 9.370618499815464e-05,
+            "probability_gradient_L2": 0.010315651074051857,
+            "sigmoid_derivative": {
+              "mean": 0.016390259506163126,
+              "median": 4.2676016164477915e-05,
+              "p99": 0.4450120955705649,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 49210,
+            "raw_first_Adam_probability_delta": {
+              "mean": 4.959908354100749e-06,
+              "median": 0.0,
+              "p99": 0.00019869089126586977,
+              "maximum": 0.0004998445510864258
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00023277969777595376,
+              "median": 0.0,
+              "p99": 0.0009996891021728516,
+              "maximum": 0.0010000020265579224
+            }
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 2.3924396828078898e-06,
+            "nonzero_points": 5532,
+            "positive_fraction_among_nonzero": 0.5175343751907349,
+            "gradient_sum": -2.9209475087554893e-06,
+            "probability_gradient_L2": 0.00016625691205263138,
+            "sigmoid_derivative": {
+              "mean": 0.0018115263030886622,
+              "median": 3.9769383874954656e-05,
+              "p99": 0.03563515089452264,
+              "maximum": 0.27540192008018494
+            },
+            "probability_gradient_nonzero": 11758,
+            "raw_first_Adam_probability_delta": {
+              "mean": 2.1987416974102363e-07,
+              "median": 0.0,
+              "p99": 2.844836562871915e-06,
+              "maximum": 0.0002620220184326172
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0002771836434908011,
+              "median": 4.0090515540214255e-05,
+              "p99": 0.0009964495175518095,
+              "maximum": 0.0009997941087931395
+            }
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 0.0002235310385003686,
+            "nonzero_points": 4271,
+            "positive_fraction_among_nonzero": 0.5537344813346863,
+            "gradient_sum": -0.00010058064799522981,
+            "probability_gradient_L2": 0.004568896722048521,
+            "sigmoid_derivative": {
+              "mean": 0.05128262692675544,
+              "median": 0.0005147323827259243,
+              "p99": 0.4954574048519134,
+              "maximum": 0.49999940395355225
+            },
+            "probability_gradient_nonzero": 4847,
+            "raw_first_Adam_probability_delta": {
+              "mean": 2.4071387235988576e-05,
+              "median": 0.0,
+              "p99": 0.0004688471555709838,
+              "maximum": 0.0004998445510864258
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0004440592531051602,
+              "median": 0.0002632737159729004,
+              "p99": 0.0009998679161071777,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 8.607828203821555e-05,
+            "nonzero_points": 21044,
+            "positive_fraction_among_nonzero": 0.5213837623596191,
+            "gradient_sum": -1.4519166143145412e-05,
+            "probability_gradient_L2": 0.007061866112053394,
+            "sigmoid_derivative": {
+              "mean": 0.014152945557868498,
+              "median": 7.533743337262422e-05,
+              "p99": 0.41537910699844366,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 26119,
+            "raw_first_Adam_probability_delta": {
+              "mean": 2.9607307810314144e-06,
+              "median": 0.0,
+              "p99": 8.034348487854061e-05,
+              "maximum": 0.0004987418651580811
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00032938289970607947,
+              "median": 2.014636993408203e-05,
+              "p99": 0.0009998083114624023,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 0.0008150099311023951,
+            "nonzero_points": 4076,
+            "positive_fraction_among_nonzero": 0.48037290573120117,
+            "gradient_sum": 0.00021172684500925243,
+            "probability_gradient_L2": 0.005969945807009935,
+            "sigmoid_derivative": {
+              "mean": 0.018171558659259745,
+              "median": 1.0732133887358941e-05,
+              "p99": 0.4567149400711062,
+              "maximum": 0.49999910593032837
+            },
+            "probability_gradient_nonzero": 6486,
+            "raw_first_Adam_probability_delta": {
+              "mean": 5.4413319899407646e-06,
+              "median": 0.0,
+              "p99": 0.00022162914276123175,
+              "maximum": 0.0004990994930267334
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 8.269766308336538e-05,
+              "median": 0.0,
+              "p99": 0.0009980827942490578,
+              "maximum": 0.0010000020265579224
+            }
+          }
+        }
+      }
+    },
+    {
+      "frame": "0075",
+      "losses": {
+        "native_photo": 0.09771102666854858,
+        "PBR_photo": 0.08720017969608307,
+        "SH_photo": 0.010510843247175217,
+        "normal_depth": 0.009152545593678951,
+        "input_alpha": 0.0021154365967959166,
+        "combined_feature_dependent": 0.1089790090918541
+      },
+      "gradient_groups": {
+        "native_photo": {
+          "all": {
+            "points": 99827,
+            "L2": 0.001188221969641745,
+            "nonzero_points": 29854,
+            "positive_fraction_among_nonzero": 0.5028471946716309,
+            "gradient_sum": 0.00033351394813507795,
+            "probability_gradient_L2": 0.015430215746164322,
+            "sigmoid_derivative": {
+              "mean": 0.016390259506163126,
+              "median": 4.2676016164477915e-05,
+              "p99": 0.4450120955705649,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 47485,
+            "raw_first_Adam_probability_delta": {
+              "mean": 6.582754549561868e-06,
+              "median": 0.0,
+              "p99": 0.0002766007184982311,
+              "maximum": 0.0004999637603759766
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0002118674317928209,
+              "median": 0.0,
+              "p99": 0.000999748706817627,
+              "maximum": 0.0010000020265579224
+            }
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 2.2151659777591703e-06,
+            "nonzero_points": 7565,
+            "positive_fraction_among_nonzero": 0.4946464002132416,
+            "gradient_sum": -2.3101051738194656e-08,
+            "probability_gradient_L2": 0.0008324147784151137,
+            "sigmoid_derivative": {
+              "mean": 0.0018115263030886622,
+              "median": 3.9769383874954656e-05,
+              "p99": 0.03563515089452264,
+              "maximum": 0.27540192008018494
+            },
+            "probability_gradient_nonzero": 13454,
+            "raw_first_Adam_probability_delta": {
+              "mean": 4.1027576405621967e-07,
+              "median": 1.3500311979441904e-13,
+              "p99": 7.4613932520150805e-06,
+              "maximum": 0.00025762617588043213
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.000390538106533891,
+              "median": 0.0001457447069697082,
+              "p99": 0.0009982278011739253,
+              "maximum": 0.000999872456304729
+            }
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 0.0004852800921071321,
+            "nonzero_points": 4512,
+            "positive_fraction_among_nonzero": 0.4997783601284027,
+            "gradient_sum": -0.00029341058689169586,
+            "probability_gradient_L2": 0.0031322126742452383,
+            "sigmoid_derivative": {
+              "mean": 0.05128262692675544,
+              "median": 0.0005147323827259243,
+              "p99": 0.4954574048519134,
+              "maximum": 0.49999940395355225
+            },
+            "probability_gradient_nonzero": 5054,
+            "raw_first_Adam_probability_delta": {
+              "mean": 3.183736193940401e-05,
+              "median": 0.0,
+              "p99": 0.00048251599073410027,
+              "maximum": 0.0004999637603759766
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0004608715252788392,
+              "median": 0.0002785325050354004,
+              "p99": 0.0009999275207519531,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 0.000306653615552932,
+            "nonzero_points": 13634,
+            "positive_fraction_among_nonzero": 0.5190699696540833,
+            "gradient_sum": 0.0005622138269245625,
+            "probability_gradient_L2": 0.012204747647047043,
+            "sigmoid_derivative": {
+              "mean": 0.014152945557868498,
+              "median": 7.533743337262422e-05,
+              "p99": 0.41537910699844366,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 21699,
+            "raw_first_Adam_probability_delta": {
+              "mean": 3.929558155825669e-06,
+              "median": 0.0,
+              "p99": 0.0001312911510467532,
+              "maximum": 0.0004998445510864258
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00022785331623463226,
+              "median": 2.6226043701171875e-06,
+              "p99": 0.0009998679161071777,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 0.0010403525084257126,
+            "nonzero_points": 4143,
+            "positive_fraction_among_nonzero": 0.46777698397636414,
+            "gradient_sum": 6.473390385508537e-05,
+            "probability_gradient_L2": 0.008867470547556877,
+            "sigmoid_derivative": {
+              "mean": 0.018171558659259745,
+              "median": 1.0732133887358941e-05,
+              "p99": 0.4567149400711062,
+              "maximum": 0.49999910593032837
+            },
+            "probability_gradient_nonzero": 7278,
+            "raw_first_Adam_probability_delta": {
+              "mean": 7.194791824995464e-06,
+              "median": 0.0,
+              "p99": 0.0002980554103851323,
+              "maximum": 0.0004986226558685303
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 8.29515246614509e-05,
+              "median": 0.0,
+              "p99": 0.0009991609817370773,
+              "maximum": 0.0010000020265579224
+            }
+          }
+        },
+        "PBR_photo": {
+          "all": {
+            "points": 99827,
+            "L2": 0.0011842547683045268,
+            "nonzero_points": 23450,
+            "positive_fraction_among_nonzero": 0.5031556487083435,
+            "gradient_sum": 0.00028862740145996213,
+            "probability_gradient_L2": 0.015351447276771069,
+            "sigmoid_derivative": {
+              "mean": 0.016390259506163126,
+              "median": 4.2676016164477915e-05,
+              "p99": 0.4450120955705649,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 32317,
+            "raw_first_Adam_probability_delta": {
+              "mean": 5.900684306450852e-06,
+              "median": 0.0,
+              "p99": 0.00024853736162185817,
+              "maximum": 0.0004999637603759766
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00016962438915708625,
+              "median": 0.0,
+              "p99": 0.000999748706817627,
+              "maximum": 0.0010000020265579224
+            }
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 2.1537025531870313e-06,
+            "nonzero_points": 7135,
+            "positive_fraction_among_nonzero": 0.48997896909713745,
+            "gradient_sum": -6.719130851706723e-08,
+            "probability_gradient_L2": 0.0008283646893687546,
+            "sigmoid_derivative": {
+              "mean": 0.0018115263030886622,
+              "median": 3.9769383874954656e-05,
+              "p99": 0.03563515089452264,
+              "maximum": 0.27540192008018494
+            },
+            "probability_gradient_nonzero": 12521,
+            "raw_first_Adam_probability_delta": {
+              "mean": 3.586789681279837e-07,
+              "median": 8.171241461241152e-14,
+              "p99": 6.42458908259859e-06,
+              "maximum": 0.0002416372299194336
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00036664643852158497,
+              "median": 9.739344386616722e-05,
+              "p99": 0.0009980625798925757,
+              "maximum": 0.0009998755995184183
+            }
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 0.0004776620480697602,
+            "nonzero_points": 4268,
+            "positive_fraction_among_nonzero": 0.49906280636787415,
+            "gradient_sum": -0.0003294265770819038,
+            "probability_gradient_L2": 0.0030857401434332132,
+            "sigmoid_derivative": {
+              "mean": 0.05128262692675544,
+              "median": 0.0005147323827259243,
+              "p99": 0.4954574048519134,
+              "maximum": 0.49999940395355225
+            },
+            "probability_gradient_nonzero": 4768,
+            "raw_first_Adam_probability_delta": {
+              "mean": 3.0441404766615125e-05,
+              "median": 0.0,
+              "p99": 0.0004815518856048581,
+              "maximum": 0.0004999637603759766
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00043719900786144266,
+              "median": 0.00017434358596801758,
+              "p99": 0.0009999275207519531,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 0.00030156844877637923,
+            "nonzero_points": 8889,
+            "positive_fraction_among_nonzero": 0.527618408203125,
+            "gradient_sum": 0.000526763207744807,
+            "probability_gradient_L2": 0.012062890455126762,
+            "sigmoid_derivative": {
+              "mean": 0.014152945557868498,
+              "median": 7.533743337262422e-05,
+              "p99": 0.41537910699844366,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 10200,
+            "raw_first_Adam_probability_delta": {
+              "mean": 3.045866264018175e-06,
+              "median": 0.0,
+              "p99": 7.486343383789062e-05,
+              "maximum": 0.0004998445510864258
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00014808557170570893,
+              "median": 0.0,
+              "p99": 0.0009998679161071777,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 0.0010408411035314202,
+            "nonzero_points": 3158,
+            "positive_fraction_among_nonzero": 0.46960100531578064,
+            "gradient_sum": 9.135785512626171e-05,
+            "probability_gradient_L2": 0.008941231295466423,
+            "sigmoid_derivative": {
+              "mean": 0.018171558659259745,
+              "median": 1.0732133887358941e-05,
+              "p99": 0.4567149400711062,
+              "maximum": 0.49999910593032837
+            },
+            "probability_gradient_nonzero": 4828,
+            "raw_first_Adam_probability_delta": {
+              "mean": 6.592537359618411e-06,
+              "median": 0.0,
+              "p99": 0.00028536975383758583,
+              "maximum": 0.0004982352256774902
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 6.754923240226372e-05,
+              "median": 0.0,
+              "p99": 0.0009991346299648286,
+              "maximum": 0.0010000020265579224
+            }
+          }
+        },
+        "SH_photo": {
+          "all": {
+            "points": 99827,
+            "L2": 5.518947000382468e-05,
+            "nonzero_points": 24840,
+            "positive_fraction_among_nonzero": 0.5235506892204285,
+            "gradient_sum": 4.488671402214095e-05,
+            "probability_gradient_L2": 0.0018032017396762967,
+            "sigmoid_derivative": {
+              "mean": 0.016390259506163126,
+              "median": 4.2676016164477915e-05,
+              "p99": 0.4450120955705649,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 47066,
+            "raw_first_Adam_probability_delta": {
+              "mean": 4.523139813505019e-06,
+              "median": 0.0,
+              "p99": 0.00017380669713020446,
+              "maximum": 0.0004990696907043457
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00016674626866116222,
+              "median": 0.0,
+              "p99": 0.000997006893157959,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 3.672661819109635e-07,
+            "nonzero_points": 5398,
+            "positive_fraction_among_nonzero": 0.5207484364509583,
+            "gradient_sum": 4.4088260153785086e-08,
+            "probability_gradient_L2": 7.767448551021516e-05,
+            "sigmoid_derivative": {
+              "mean": 0.0018115263030886622,
+              "median": 3.9769383874954656e-05,
+              "p99": 0.03563515089452264,
+              "maximum": 0.27540192008018494
+            },
+            "probability_gradient_nonzero": 13417,
+            "raw_first_Adam_probability_delta": {
+              "mean": 2.220973069614114e-07,
+              "median": 0.0,
+              "p99": 2.0101387053727993e-06,
+              "maximum": 0.00024262070655822754
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00026219091046187216,
+              "median": 5.3195664804661646e-05,
+              "p99": 0.0009901976468972861,
+              "maximum": 0.0009995163418352604
+            }
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 3.7968926335452124e-05,
+            "nonzero_points": 3939,
+            "positive_fraction_among_nonzero": 0.5024117827415466,
+            "gradient_sum": 3.601592470658943e-05,
+            "probability_gradient_L2": 0.0003040291485376656,
+            "sigmoid_derivative": {
+              "mean": 0.05128262692675544,
+              "median": 0.0005147323827259243,
+              "p99": 0.4954574048519134,
+              "maximum": 0.49999940395355225
+            },
+            "probability_gradient_nonzero": 5040,
+            "raw_first_Adam_probability_delta": {
+              "mean": 2.069396798969222e-05,
+              "median": 0.0,
+              "p99": 0.00044144988059997424,
+              "maximum": 0.0004987120628356934
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00035754334445303824,
+              "median": 0.00011289119720458984,
+              "p99": 0.0009982585906982422,
+              "maximum": 0.0009999275207519531
+            }
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 1.6495334421051666e-05,
+            "nonzero_points": 11800,
+            "positive_fraction_among_nonzero": 0.540084719657898,
+            "gradient_sum": 3.545066647347994e-05,
+            "probability_gradient_L2": 0.0017565041780471802,
+            "sigmoid_derivative": {
+              "mean": 0.014152945557868498,
+              "median": 7.533743337262422e-05,
+              "p99": 0.41537910699844366,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 21416,
+            "raw_first_Adam_probability_delta": {
+              "mean": 2.8684060367506747e-06,
+              "median": 0.0,
+              "p99": 7.401585578918493e-05,
+              "maximum": 0.0004990696907043457
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.000199915170377278,
+              "median": 2.0265579223632812e-06,
+              "p99": 0.0009984970092773438,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 3.6496676329988986e-05,
+            "nonzero_points": 3703,
+            "positive_fraction_among_nonzero": 0.49743449687957764,
+            "gradient_sum": -2.6623953090165742e-05,
+            "probability_gradient_L2": 0.00026031307061202824,
+            "sigmoid_derivative": {
+              "mean": 0.018171558659259745,
+              "median": 1.0732133887358941e-05,
+              "p99": 0.4567149400711062,
+              "maximum": 0.49999910593032837
+            },
+            "probability_gradient_nonzero": 7193,
+            "raw_first_Adam_probability_delta": {
+              "mean": 5.0068462113943244e-06,
+              "median": 0.0,
+              "p99": 0.000207582712173463,
+              "maximum": 0.0004974007606506348
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 6.333325639870003e-05,
+              "median": 0.0,
+              "p99": 0.0009862285479903222,
+              "maximum": 0.0009999219328165054
+            }
+          }
+        },
+        "normal_depth": {
+          "all": {
+            "points": 99827,
+            "L2": 0.00014623516472056508,
+            "nonzero_points": 27133,
+            "positive_fraction_among_nonzero": 0.5174879431724548,
+            "gradient_sum": -0.00035412076977081597,
+            "probability_gradient_L2": 0.0020994581282138824,
+            "sigmoid_derivative": {
+              "mean": 0.016390259506163126,
+              "median": 4.2676016164477915e-05,
+              "p99": 0.4450120955705649,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 48815,
+            "raw_first_Adam_probability_delta": {
+              "mean": 4.605198174053168e-06,
+              "median": 0.0,
+              "p99": 0.000178974866867067,
+              "maximum": 0.0004990100860595703
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0001768514542821075,
+              "median": 0.0,
+              "p99": 0.0009985425020568074,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 1.8329990325582912e-07,
+            "nonzero_points": 4092,
+            "positive_fraction_among_nonzero": 0.47605082392692566,
+            "gradient_sum": -9.217865226673894e-08,
+            "probability_gradient_L2": 3.19489226967562e-05,
+            "sigmoid_derivative": {
+              "mean": 0.0018115263030886622,
+              "median": 3.9769383874954656e-05,
+              "p99": 0.03563515089452264,
+              "maximum": 0.27540192008018494
+            },
+            "probability_gradient_nonzero": 13336,
+            "raw_first_Adam_probability_delta": {
+              "mean": 1.2325416080706419e-07,
+              "median": 0.0,
+              "p99": 9.780842810869209e-07,
+              "maximum": 0.0001337677240371704
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00019327475878867174,
+              "median": 3.068755904678255e-05,
+              "p99": 0.0009759387571830301,
+              "maximum": 0.0009987306548282504
+            }
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 4.0491868276149035e-05,
+            "nonzero_points": 3743,
+            "positive_fraction_among_nonzero": 0.5060111880302429,
+            "gradient_sum": -4.650231858249754e-05,
+            "probability_gradient_L2": 0.0005127862677909434,
+            "sigmoid_derivative": {
+              "mean": 0.05128262692675544,
+              "median": 0.0005147323827259243,
+              "p99": 0.4954574048519134,
+              "maximum": 0.49999940395355225
+            },
+            "probability_gradient_nonzero": 5025,
+            "raw_first_Adam_probability_delta": {
+              "mean": 1.896120882508628e-05,
+              "median": 0.0,
+              "p99": 0.0004292458295822142,
+              "maximum": 0.0004976987838745117
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00032764168607693375,
+              "median": 7.170438766479492e-05,
+              "p99": 0.0009992718696594238,
+              "maximum": 0.0009999275207519531
+            }
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 2.0220488295308314e-05,
+            "nonzero_points": 14890,
+            "positive_fraction_among_nonzero": 0.5398253798484802,
+            "gradient_sum": -2.7010708436137065e-05,
+            "probability_gradient_L2": 0.0017588260816410184,
+            "sigmoid_derivative": {
+              "mean": 0.014152945557868498,
+              "median": 7.533743337262422e-05,
+              "p99": 0.41537910699844366,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 22905,
+            "raw_first_Adam_probability_delta": {
+              "mean": 3.179040657097802e-06,
+              "median": 0.0,
+              "p99": 8.884787559509293e-05,
+              "maximum": 0.0004971027374267578
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0002484965066582193,
+              "median": 6.794929504394531e-06,
+              "p99": 0.0009990930557250977,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 0.00013905478408560157,
+            "nonzero_points": 4408,
+            "positive_fraction_among_nonzero": 0.4902450144290924,
+            "gradient_sum": -0.0002805155818350613,
+            "probability_gradient_L2": 0.0010248336475342512,
+            "sigmoid_derivative": {
+              "mean": 0.018171558659259745,
+              "median": 1.0732133887358941e-05,
+              "p99": 0.4567149400711062,
+              "maximum": 0.49999910593032837
+            },
+            "probability_gradient_nonzero": 7549,
+            "raw_first_Adam_probability_delta": {
+              "mean": 5.250125337639101e-06,
+              "median": 0.0,
+              "p99": 0.00020801723003387564,
+              "maximum": 0.0004990100860595703
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 7.299673951886854e-05,
+              "median": 0.0,
+              "p99": 0.0009967763349413871,
+              "maximum": 0.0009999722242355347
+            }
+          }
+        },
+        "input_alpha": {
+          "all": {
+            "points": 99827,
+            "L2": 3.729202944668941e-06,
+            "nonzero_points": 12017,
+            "positive_fraction_among_nonzero": 0.5138553977012634,
+            "gradient_sum": -4.586078830470797e-06,
+            "probability_gradient_L2": 0.00018310545419808477,
+            "sigmoid_derivative": {
+              "mean": 0.016390259506163126,
+              "median": 4.2676016164477915e-05,
+              "p99": 0.4450120955705649,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 47009,
+            "raw_first_Adam_probability_delta": {
+              "mean": 7.500939119093598e-07,
+              "median": 0.0,
+              "p99": 8.58306884765625e-06,
+              "maximum": 0.0004706382751464844
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 5.4949610459457044e-05,
+              "median": 0.0,
+              "p99": 0.0009572505950927734,
+              "maximum": 0.0009995102882385254
+            }
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 4.3295234064544275e-09,
+            "nonzero_points": 858,
+            "positive_fraction_among_nonzero": 0.4277389347553253,
+            "gradient_sum": 8.46707415291803e-09,
+            "probability_gradient_L2": 2.0342195057310164e-06,
+            "sigmoid_derivative": {
+              "mean": 0.0018115263030886622,
+              "median": 3.9769383874954656e-05,
+              "p99": 0.03563515089452264,
+              "maximum": 0.27540192008018494
+            },
+            "probability_gradient_nonzero": 12704,
+            "raw_first_Adam_probability_delta": {
+              "mean": 6.665393536115122e-09,
+              "median": 0.0,
+              "p99": 1.862645149230957e-08,
+              "maximum": 2.3983418941497803e-05
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 2.1326670724007346e-05,
+              "median": 2.4109322112053633e-06,
+              "p99": 0.00029538581147789845,
+              "maximum": 0.0009782599518075585
+            }
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 4.679200173995923e-07,
+            "nonzero_points": 2119,
+            "positive_fraction_among_nonzero": 0.5285512208938599,
+            "gradient_sum": -5.702130465579103e-07,
+            "probability_gradient_L2": 7.841070328140631e-06,
+            "sigmoid_derivative": {
+              "mean": 0.05128262692675544,
+              "median": 0.0005147323827259243,
+              "p99": 0.4954574048519134,
+              "maximum": 0.49999940395355225
+            },
+            "probability_gradient_nonzero": 5020,
+            "raw_first_Adam_probability_delta": {
+              "mean": 3.0438760660627977e-06,
+              "median": 0.0,
+              "p99": 9.372830390930067e-05,
+              "maximum": 0.0004706382751464844
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 9.733879466793425e-05,
+              "median": 1.0251998901367188e-05,
+              "p99": 0.0009476333856582641,
+              "maximum": 0.0009975433349609375
+            }
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 2.6727543627202976e-06,
+            "nonzero_points": 6534,
+            "positive_fraction_among_nonzero": 0.5319865345954895,
+            "gradient_sum": 3.2002606076275697e-06,
+            "probability_gradient_L2": 0.00018155647558160126,
+            "sigmoid_derivative": {
+              "mean": 0.014152945557868498,
+              "median": 7.533743337262422e-05,
+              "p99": 0.41537910699844366,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 22519,
+            "raw_first_Adam_probability_delta": {
+              "mean": 6.401034592997598e-07,
+              "median": 0.0,
+              "p99": 4.0531158447265625e-06,
+              "maximum": 0.0004698634147644043
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 9.664606948967925e-05,
+              "median": 1.5497207641601562e-06,
+              "p99": 0.0009861040115356446,
+              "maximum": 0.0009995102882385254
+            }
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 2.558196683821734e-06,
+            "nonzero_points": 2506,
+            "positive_fraction_among_nonzero": 0.48363927006721497,
+            "gradient_sum": -7.2245939009008e-06,
+            "probability_gradient_L2": 2.2343456294038333e-05,
+            "sigmoid_derivative": {
+              "mean": 0.018171558659259745,
+              "median": 1.0732133887358941e-05,
+              "p99": 0.4567149400711062,
+              "maximum": 0.49999910593032837
+            },
+            "probability_gradient_nonzero": 6766,
+            "raw_first_Adam_probability_delta": {
+              "mean": 7.468154770578795e-07,
+              "median": 0.0,
+              "p99": 1.019202172756258e-05,
+              "maximum": 0.0004374384880065918
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 1.923889085654602e-05,
+              "median": 0.0,
+              "p99": 0.0006818569265306014,
+              "maximum": 0.000998751143924892
+            }
+          }
+        },
+        "combined_feature_dependent": {
+          "all": {
+            "points": 99827,
+            "L2": 0.0011641972232609987,
+            "nonzero_points": 34522,
+            "positive_fraction_among_nonzero": 0.5191472172737122,
+            "gradient_sum": -2.519265399314463e-05,
+            "probability_gradient_L2": 0.015449737198650837,
+            "sigmoid_derivative": {
+              "mean": 0.016390259506163126,
+              "median": 4.2676016164477915e-05,
+              "p99": 0.4450120955705649,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 49417,
+            "raw_first_Adam_probability_delta": {
+              "mean": 7.102549779463741e-06,
+              "median": 0.0,
+              "p99": 0.0002949744462966927,
+              "maximum": 0.0004999637603759766
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0002437160855574553,
+              "median": 0.0,
+              "p99": 0.000999748706817627,
+              "maximum": 0.0010000020265579224
+            }
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 2.283976755279582e-06,
+            "nonzero_points": 7591,
+            "positive_fraction_among_nonzero": 0.4933474063873291,
+            "gradient_sum": -1.0681276307877852e-07,
+            "probability_gradient_L2": 0.0008426292915828526,
+            "sigmoid_derivative": {
+              "mean": 0.0018115263030886622,
+              "median": 3.9769383874954656e-05,
+              "p99": 0.03563515089452264,
+              "maximum": 0.27540192008018494
+            },
+            "probability_gradient_nonzero": 13456,
+            "raw_first_Adam_probability_delta": {
+              "mean": 4.20152601408726e-07,
+              "median": 1.4210854715202004e-13,
+              "p99": 7.326975464820861e-06,
+              "maximum": 0.00025647878646850586
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00039252489569828914,
+              "median": 0.00015222278307192028,
+              "p99": 0.0009982102620415389,
+              "maximum": 0.0009998702444136143
+            }
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 0.0004880056658294052,
+            "nonzero_points": 4521,
+            "positive_fraction_among_nonzero": 0.49745631217956543,
+            "gradient_sum": -0.0003404831513762474,
+            "probability_gradient_L2": 0.0032244184985756874,
+            "sigmoid_derivative": {
+              "mean": 0.05128262692675544,
+              "median": 0.0005147323827259243,
+              "p99": 0.4954574048519134,
+              "maximum": 0.49999940395355225
+            },
+            "probability_gradient_nonzero": 5063,
+            "raw_first_Adam_probability_delta": {
+              "mean": 3.207712109985932e-05,
+              "median": 0.0,
+              "p99": 0.0004829764366149898,
+              "maximum": 0.0004999637603759766
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.000463436229613317,
+              "median": 0.00029724836349487305,
+              "p99": 0.0009999275207519531,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 0.0003030116204172373,
+            "nonzero_points": 17411,
+            "positive_fraction_among_nonzero": 0.5436792969703674,
+            "gradient_sum": 0.0005384035175666213,
+            "probability_gradient_L2": 0.012359687127172947,
+            "sigmoid_derivative": {
+              "mean": 0.014152945557868498,
+              "median": 7.533743337262422e-05,
+              "p99": 0.41537910699844366,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 23165,
+            "raw_first_Adam_probability_delta": {
+              "mean": 4.566692689417205e-06,
+              "median": 0.0,
+              "p99": 0.00016691684722900443,
+              "maximum": 0.0004998445510864258
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0002926818819376079,
+              "median": 9.5367431640625e-06,
+              "p99": 0.0009998679161071777,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 0.001012612716294825,
+            "nonzero_points": 4999,
+            "positive_fraction_among_nonzero": 0.492498517036438,
+            "gradient_sum": -0.00022300600539892912,
+            "probability_gradient_L2": 0.008650179021060467,
+            "sigmoid_derivative": {
+              "mean": 0.018171558659259745,
+              "median": 1.0732133887358941e-05,
+              "p99": 0.4567149400711062,
+              "maximum": 0.49999910593032837
+            },
+            "probability_gradient_nonzero": 7733,
+            "raw_first_Adam_probability_delta": {
+              "mean": 7.845470409950732e-06,
+              "median": 0.0,
+              "p99": 0.0003139084577560439,
+              "maximum": 0.000498652458190918
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 9.881903722510797e-05,
+              "median": 0.0,
+              "p99": 0.0009992877952754498,
+              "maximum": 0.0010000020265579224
+            }
+          }
+        }
+      }
+    },
+    {
+      "frame": "0149",
+      "losses": {
+        "native_photo": 0.05163050442934036,
+        "PBR_photo": 0.04111502319574356,
+        "SH_photo": 0.010515479370951653,
+        "normal_depth": 0.007670929189771414,
+        "input_alpha": 0.0033065923489630222,
+        "combined_feature_dependent": 0.0626080259680748
+      },
+      "gradient_groups": {
+        "native_photo": {
+          "all": {
+            "points": 99827,
+            "L2": 0.0007188763120211661,
+            "nonzero_points": 33973,
+            "positive_fraction_among_nonzero": 0.5177346467971802,
+            "gradient_sum": 0.0012134970165789127,
+            "probability_gradient_L2": 0.012128069065511227,
+            "sigmoid_derivative": {
+              "mean": 0.016390259506163126,
+              "median": 4.2676016164477915e-05,
+              "p99": 0.4450120955705649,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 48734,
+            "raw_first_Adam_probability_delta": {
+              "mean": 4.759324113108308e-06,
+              "median": 0.0,
+              "p99": 0.00018686711788177537,
+              "maximum": 0.0004994869232177734
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00022256495015574883,
+              "median": 0.0,
+              "p99": 0.0009996891021728516,
+              "maximum": 0.000999998301267624
+            }
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 2.4161761302821105e-06,
+            "nonzero_points": 5335,
+            "positive_fraction_among_nonzero": 0.5229616165161133,
+            "gradient_sum": -5.531857823370956e-06,
+            "probability_gradient_L2": 0.00020171160576865077,
+            "sigmoid_derivative": {
+              "mean": 0.0018115263030886622,
+              "median": 3.9769383874954656e-05,
+              "p99": 0.03563515089452264,
+              "maximum": 0.27540192008018494
+            },
+            "probability_gradient_nonzero": 11817,
+            "raw_first_Adam_probability_delta": {
+              "mean": 1.8841699334887907e-07,
+              "median": 0.0,
+              "p99": 2.188067883253096e-06,
+              "maximum": 0.0002695322036743164
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0002677639201584024,
+              "median": 4.1676070395624265e-05,
+              "p99": 0.0009952095616608857,
+              "maximum": 0.0009997750166803598
+            }
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 0.0001515169715275988,
+            "nonzero_points": 4286,
+            "positive_fraction_among_nonzero": 0.5471302270889282,
+            "gradient_sum": 8.251763210864738e-05,
+            "probability_gradient_L2": 0.0033525412436574697,
+            "sigmoid_derivative": {
+              "mean": 0.05128262692675544,
+              "median": 0.0005147323827259243,
+              "p99": 0.4954574048519134,
+              "maximum": 0.49999940395355225
+            },
+            "probability_gradient_nonzero": 4938,
+            "raw_first_Adam_probability_delta": {
+              "mean": 2.2940958902946057e-05,
+              "median": 0.0,
+              "p99": 0.00045942515134811385,
+              "maximum": 0.0004994869232177734
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00043700782134213455,
+              "median": 0.00025582313537597656,
+              "p99": 0.0009998083114624023,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 3.181701686116867e-05,
+            "nonzero_points": 20556,
+            "positive_fraction_among_nonzero": 0.5102646350860596,
+            "gradient_sum": 5.059239629190415e-05,
+            "probability_gradient_L2": 0.009221380576491356,
+            "sigmoid_derivative": {
+              "mean": 0.014152945557868498,
+              "median": 7.533743337262422e-05,
+              "p99": 0.41537910699844366,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 25749,
+            "raw_first_Adam_probability_delta": {
+              "mean": 2.9630559267350303e-06,
+              "median": 0.0,
+              "p99": 7.93206691741947e-05,
+              "maximum": 0.0004982650279998779
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0003189013890027354,
+              "median": 1.8477439880371094e-05,
+              "p99": 0.0009998679161071777,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 0.0007020025514066219,
+            "nonzero_points": 3796,
+            "positive_fraction_among_nonzero": 0.5176501274108887,
+            "gradient_sum": 0.0010859190952032804,
+            "probability_gradient_L2": 0.007125727366656065,
+            "sigmoid_derivative": {
+              "mean": 0.018171558659259745,
+              "median": 1.0732133887358941e-05,
+              "p99": 0.4567149400711062,
+              "maximum": 0.49999910593032837
+            },
+            "probability_gradient_nonzero": 6230,
+            "raw_first_Adam_probability_delta": {
+              "mean": 5.1364322991405414e-06,
+              "median": 0.0,
+              "p99": 0.00020489335060120024,
+              "maximum": 0.000498652458190918
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 7.188475913071823e-05,
+              "median": 0.0,
+              "p99": 0.0009960639663040638,
+              "maximum": 0.000999998301267624
+            }
+          }
+        },
+        "PBR_photo": {
+          "all": {
+            "points": 99827,
+            "L2": 0.0007081025396473706,
+            "nonzero_points": 31045,
+            "positive_fraction_among_nonzero": 0.514028012752533,
+            "gradient_sum": 0.0011618481948971748,
+            "probability_gradient_L2": 0.011795183643698692,
+            "sigmoid_derivative": {
+              "mean": 0.016390259506163126,
+              "median": 4.2676016164477915e-05,
+              "p99": 0.4450120955705649,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 44899,
+            "raw_first_Adam_probability_delta": {
+              "mean": 4.467741195551433e-06,
+              "median": 0.0,
+              "p99": 0.00017249003052711499,
+              "maximum": 0.0004994869232177734
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00020065892525715024,
+              "median": 0.0,
+              "p99": 0.0009996294975280762,
+              "maximum": 0.000999998301267624
+            }
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 1.997814024434774e-06,
+            "nonzero_points": 4967,
+            "positive_fraction_among_nonzero": 0.5186229348182678,
+            "gradient_sum": -4.502778210735414e-06,
+            "probability_gradient_L2": 0.00019020659965462983,
+            "sigmoid_derivative": {
+              "mean": 0.0018115263030886622,
+              "median": 3.9769383874954656e-05,
+              "p99": 0.03563515089452264,
+              "maximum": 0.27540192008018494
+            },
+            "probability_gradient_nonzero": 11426,
+            "raw_first_Adam_probability_delta": {
+              "mean": 1.6478318740204804e-07,
+              "median": 0.0,
+              "p99": 1.6856566071510307e-06,
+              "maximum": 0.0002640187740325928
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.000245193737233734,
+              "median": 3.453118188190274e-05,
+              "p99": 0.0009948642924427985,
+              "maximum": 0.0009997631423175335
+            }
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 0.00013749691424891353,
+            "nonzero_points": 4152,
+            "positive_fraction_among_nonzero": 0.5544316172599792,
+            "gradient_sum": 8.002940739970654e-05,
+            "probability_gradient_L2": 0.003148815594613552,
+            "sigmoid_derivative": {
+              "mean": 0.05128262692675544,
+              "median": 0.0005147323827259243,
+              "p99": 0.4954574048519134,
+              "maximum": 0.49999940395355225
+            },
+            "probability_gradient_nonzero": 4927,
+            "raw_first_Adam_probability_delta": {
+              "mean": 2.215208672096047e-05,
+              "median": 0.0,
+              "p99": 0.0004587262868881223,
+              "maximum": 0.0004994869232177734
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0004184862512674438,
+              "median": 0.00018513202667236328,
+              "p99": 0.0009998083114624023,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 3.073338666581549e-05,
+            "nonzero_points": 18395,
+            "positive_fraction_among_nonzero": 0.5029627680778503,
+            "gradient_sum": 4.18283452745527e-05,
+            "probability_gradient_L2": 0.008892270736396313,
+            "sigmoid_derivative": {
+              "mean": 0.014152945557868498,
+              "median": 7.533743337262422e-05,
+              "p99": 0.41537910699844366,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 22736,
+            "raw_first_Adam_probability_delta": {
+              "mean": 2.7509388758861954e-06,
+              "median": 0.0,
+              "p99": 6.427288055419964e-05,
+              "maximum": 0.0004980266094207764
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00028268732043036486,
+              "median": 7.152557373046875e-06,
+              "p99": 0.0009998679161071777,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 0.000693941896315664,
+            "nonzero_points": 3531,
+            "positive_fraction_among_nonzero": 0.5177003741264343,
+            "gradient_sum": 0.0010444929357618093,
+            "probability_gradient_L2": 0.0070783235132694244,
+            "sigmoid_derivative": {
+              "mean": 0.018171558659259745,
+              "median": 1.0732133887358941e-05,
+              "p99": 0.4567149400711062,
+              "maximum": 0.49999910593032837
+            },
+            "probability_gradient_nonzero": 5810,
+            "raw_first_Adam_probability_delta": {
+              "mean": 4.74886306200655e-06,
+              "median": 0.0,
+              "p99": 0.00019189953804016162,
+              "maximum": 0.0004988908767700195
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 6.383909736787832e-05,
+              "median": 0.0,
+              "p99": 0.0009953896887600422,
+              "maximum": 0.000999998301267624
+            }
+          }
+        },
+        "SH_photo": {
+          "all": {
+            "points": 99827,
+            "L2": 3.377694883965887e-05,
+            "nonzero_points": 27337,
+            "positive_fraction_among_nonzero": 0.5203936100006104,
+            "gradient_sum": 5.164910544408485e-05,
+            "probability_gradient_L2": 0.0014575270470231771,
+            "sigmoid_derivative": {
+              "mean": 0.016390259506163126,
+              "median": 4.2676016164477915e-05,
+              "p99": 0.4450120955705649,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 47875,
+            "raw_first_Adam_probability_delta": {
+              "mean": 3.350653099653885e-06,
+              "median": 0.0,
+              "p99": 0.00011057198047638049,
+              "maximum": 0.0004976987838745117
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00017269413968429973,
+              "median": 0.0,
+              "p99": 0.0009976029396057129,
+              "maximum": 0.0009999275207519531
+            }
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 6.322677563730394e-07,
+            "nonzero_points": 4051,
+            "positive_fraction_among_nonzero": 0.5262898206710815,
+            "gradient_sum": -1.029079044201353e-06,
+            "probability_gradient_L2": 4.40349722339306e-05,
+            "sigmoid_derivative": {
+              "mean": 0.0018115263030886622,
+              "median": 3.9769383874954656e-05,
+              "p99": 0.03563515089452264,
+              "maximum": 0.27540192008018494
+            },
+            "probability_gradient_nonzero": 11770,
+            "raw_first_Adam_probability_delta": {
+              "mean": 1.1834344061375406e-07,
+              "median": 0.0,
+              "p99": 8.272286504506959e-07,
+              "maximum": 0.00026351213455200195
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0001972764311731488,
+              "median": 1.848107967816759e-05,
+              "p99": 0.0009809279209002852,
+              "maximum": 0.000999449985101819
+            }
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 2.8054459107806906e-05,
+            "nonzero_points": 3807,
+            "positive_fraction_among_nonzero": 0.5256107449531555,
+            "gradient_sum": 2.488220161467325e-06,
+            "probability_gradient_L2": 0.0003288448497187346,
+            "sigmoid_derivative": {
+              "mean": 0.05128262692675544,
+              "median": 0.0005147323827259243,
+              "p99": 0.4954574048519134,
+              "maximum": 0.49999940395355225
+            },
+            "probability_gradient_nonzero": 4930,
+            "raw_first_Adam_probability_delta": {
+              "mean": 1.709521767198865e-05,
+              "median": 0.0,
+              "p99": 0.0004161745309829702,
+              "maximum": 0.0004946589469909668
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0003573705925621995,
+              "median": 0.00012218952178955078,
+              "p99": 0.0009986549615859986,
+              "maximum": 0.0009999275207519531
+            }
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 4.079215159435989e-06,
+            "nonzero_points": 16141,
+            "positive_fraction_among_nonzero": 0.5177498459815979,
+            "gradient_sum": 8.76404646987794e-06,
+            "probability_gradient_L2": 0.0013465255033224821,
+            "sigmoid_derivative": {
+              "mean": 0.014152945557868498,
+              "median": 7.533743337262422e-05,
+              "p99": 0.41537910699844366,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 25054,
+            "raw_first_Adam_probability_delta": {
+              "mean": 1.9676858946182228e-06,
+              "median": 0.0,
+              "p99": 3.6400556564331315e-05,
+              "maximum": 0.0004943013191223145
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00024991820634594366,
+              "median": 9.417533874511719e-06,
+              "p99": 0.0009989738464355469,
+              "maximum": 0.0009999275207519531
+            }
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 1.8351838662056252e-05,
+            "nonzero_points": 3338,
+            "positive_fraction_among_nonzero": 0.5200719237327576,
+            "gradient_sum": 4.142591933486983e-05,
+            "probability_gradient_L2": 0.0004485267272684723,
+            "sigmoid_derivative": {
+              "mean": 0.018171558659259745,
+              "median": 1.0732133887358941e-05,
+              "p99": 0.4567149400711062,
+              "maximum": 0.49999910593032837
+            },
+            "probability_gradient_nonzero": 6121,
+            "raw_first_Adam_probability_delta": {
+              "mean": 3.5738416105195128e-06,
+              "median": 0.0,
+              "p99": 0.00012624859809875566,
+              "maximum": 0.0004976987838745117
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 5.4201157538891964e-05,
+              "median": 0.0,
+              "p99": 0.0009764987346716226,
+              "maximum": 0.0009998679161071777
+            }
+          }
+        },
+        "normal_depth": {
+          "all": {
+            "points": 99827,
+            "L2": 6.04648666922003e-05,
+            "nonzero_points": 26414,
+            "positive_fraction_among_nonzero": 0.5046944618225098,
+            "gradient_sum": -1.8684851966099814e-05,
+            "probability_gradient_L2": 0.0011787454131990671,
+            "sigmoid_derivative": {
+              "mean": 0.016390259506163126,
+              "median": 4.2676016164477915e-05,
+              "p99": 0.4450120955705649,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 48561,
+            "raw_first_Adam_probability_delta": {
+              "mean": 3.3384164278282145e-06,
+              "median": 0.0,
+              "p99": 0.00010653436183929521,
+              "maximum": 0.0004988908767700195
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00016591639676676048,
+              "median": 0.0,
+              "p99": 0.0009974241256713867,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 1.9826160269076354e-07,
+            "nonzero_points": 2923,
+            "positive_fraction_among_nonzero": 0.48546016216278076,
+            "gradient_sum": -8.76186589948702e-09,
+            "probability_gradient_L2": 2.8407775971572846e-05,
+            "sigmoid_derivative": {
+              "mean": 0.0018115263030886622,
+              "median": 3.9769383874954656e-05,
+              "p99": 0.03563515089452264,
+              "maximum": 0.27540192008018494
+            },
+            "probability_gradient_nonzero": 11692,
+            "raw_first_Adam_probability_delta": {
+              "mean": 7.970003593064192e-08,
+              "median": 0.0,
+              "p99": 3.2281968742608685e-07,
+              "maximum": 0.00019243359565734863
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00013452861482073214,
+              "median": 8.19214983494021e-06,
+              "p99": 0.0009630650642793625,
+              "maximum": 0.0009972701082006097
+            }
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 1.5100029486347921e-05,
+            "nonzero_points": 3833,
+            "positive_fraction_among_nonzero": 0.5157840251922607,
+            "gradient_sum": -4.055320005136309e-06,
+            "probability_gradient_L2": 0.00022282575082499534,
+            "sigmoid_derivative": {
+              "mean": 0.05128262692675544,
+              "median": 0.0005147323827259243,
+              "p99": 0.4954574048519134,
+              "maximum": 0.49999940395355225
+            },
+            "probability_gradient_nonzero": 4925,
+            "raw_first_Adam_probability_delta": {
+              "mean": 1.7891468500937544e-05,
+              "median": 0.0,
+              "p99": 0.000421661138534545,
+              "maximum": 0.0004988908767700195
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0003671938822658666,
+              "median": 0.00010764598846435547,
+              "p99": 0.0009983181953430176,
+              "maximum": 0.0009999275207519531
+            }
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 6.246330030990066e-06,
+            "nonzero_points": 16387,
+            "positive_fraction_among_nonzero": 0.5076585412025452,
+            "gradient_sum": 1.2664559108088724e-06,
+            "probability_gradient_L2": 0.001040013157762587,
+            "sigmoid_derivative": {
+              "mean": 0.014152945557868498,
+              "median": 7.533743337262422e-05,
+              "p99": 0.41537910699844366,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 25728,
+            "raw_first_Adam_probability_delta": {
+              "mean": 1.93730170894082e-06,
+              "median": 0.0,
+              "p99": 3.383278846740738e-05,
+              "maximum": 0.0004832744598388672
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0002591480014339387,
+              "median": 1.1920928955078125e-05,
+              "p99": 0.0009987354278564453,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 5.821454760734923e-05,
+            "nonzero_points": 3271,
+            "positive_fraction_among_nonzero": 0.49403852224349976,
+            "gradient_sum": -1.5887235349509865e-05,
+            "probability_gradient_L2": 0.000507301592733711,
+            "sigmoid_derivative": {
+              "mean": 0.018171558659259745,
+              "median": 1.0732133887358941e-05,
+              "p99": 0.4567149400711062,
+              "maximum": 0.49999910593032837
+            },
+            "probability_gradient_nonzero": 6216,
+            "raw_first_Adam_probability_delta": {
+              "mean": 3.4483699287295356e-06,
+              "median": 0.0,
+              "p99": 0.00011610656976699871,
+              "maximum": 0.00049591064453125
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 5.040082638253466e-05,
+              "median": 0.0,
+              "p99": 0.000980290621519089,
+              "maximum": 0.0009999738540500402
+            }
+          }
+        },
+        "input_alpha": {
+          "all": {
+            "points": 99827,
+            "L2": 1.286388737753441e-06,
+            "nonzero_points": 12802,
+            "positive_fraction_among_nonzero": 0.599281370639801,
+            "gradient_sum": -2.662570750544546e-07,
+            "probability_gradient_L2": 0.00018247976549901068,
+            "sigmoid_derivative": {
+              "mean": 0.016390259506163126,
+              "median": 4.2676016164477915e-05,
+              "p99": 0.4450120955705649,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 47765,
+            "raw_first_Adam_probability_delta": {
+              "mean": 4.974638405924029e-07,
+              "median": 0.0,
+              "p99": 4.351139068603516e-06,
+              "maximum": 0.0004477500915527344
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 7.340420608241279e-05,
+              "median": 0.0,
+              "p99": 0.0009758913516998294,
+              "maximum": 0.0009998679161071777
+            }
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 7.0707160126914914e-09,
+            "nonzero_points": 1299,
+            "positive_fraction_among_nonzero": 0.5219399333000183,
+            "gradient_sum": 8.360609982105416e-09,
+            "probability_gradient_L2": 4.547450316749746e-06,
+            "sigmoid_derivative": {
+              "mean": 0.0018115263030886622,
+              "median": 3.9769383874954656e-05,
+              "p99": 0.03563515089452264,
+              "maximum": 0.27540192008018494
+            },
+            "probability_gradient_nonzero": 11521,
+            "raw_first_Adam_probability_delta": {
+              "mean": 8.225357327481581e-09,
+              "median": 0.0,
+              "p99": 3.603752702474567e-08,
+              "maximum": 5.310773849487305e-05
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 4.3578246842563034e-05,
+              "median": 2.136597231583437e-06,
+              "p99": 0.0007661708840169012,
+              "maximum": 0.0009663814562372863
+            }
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 4.806284437108843e-07,
+            "nonzero_points": 1945,
+            "positive_fraction_among_nonzero": 0.5994858741760254,
+            "gradient_sum": 3.853634495953884e-07,
+            "probability_gradient_L2": 1.941013579198625e-05,
+            "sigmoid_derivative": {
+              "mean": 0.05128262692675544,
+              "median": 0.0005147323827259243,
+              "p99": 0.4954574048519134,
+              "maximum": 0.49999940395355225
+            },
+            "probability_gradient_nonzero": 4874,
+            "raw_first_Adam_probability_delta": {
+              "mean": 2.500286675671376e-06,
+              "median": 0.0,
+              "p99": 7.419586181640599e-05,
+              "maximum": 0.0003623366355895996
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 7.886845659902739e-05,
+              "median": 9.894371032714844e-06,
+              "p99": 0.0009054064750671385,
+              "maximum": 0.0009993314743041992
+            }
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 2.943025094737095e-07,
+            "nonzero_points": 7341,
+            "positive_fraction_among_nonzero": 0.628797173500061,
+            "gradient_sum": 1.2697948932327563e-06,
+            "probability_gradient_L2": 0.0001805939245969057,
+            "sigmoid_derivative": {
+              "mean": 0.014152945557868498,
+              "median": 7.533743337262422e-05,
+              "p99": 0.41537910699844366,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 25514,
+            "raw_first_Adam_probability_delta": {
+              "mean": 2.9486931717577e-07,
+              "median": 0.0,
+              "p99": 1.0889768600464127e-06,
+              "maximum": 0.0004477500915527344
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00013931322653721196,
+              "median": 3.814697265625e-06,
+              "p99": 0.0009918212890625,
+              "maximum": 0.0009998679161071777
+            }
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 1.1563427051441977e-06,
+            "nonzero_points": 2217,
+            "positive_fraction_among_nonzero": 0.5466846823692322,
+            "gradient_sum": -1.9297758626635186e-06,
+            "probability_gradient_L2": 1.6948970369412564e-05,
+            "sigmoid_derivative": {
+              "mean": 0.018171558659259745,
+              "median": 1.0732133887358941e-05,
+              "p99": 0.4567149400711062,
+              "maximum": 0.49999910593032837
+            },
+            "probability_gradient_nonzero": 5856,
+            "raw_first_Adam_probability_delta": {
+              "mean": 5.38140235184122e-07,
+              "median": 0.0,
+              "p99": 6.463527679443498e-06,
+              "maximum": 0.0003758668899536133
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 1.865951014780228e-05,
+              "median": 0.0,
+              "p99": 0.0007227551937103319,
+              "maximum": 0.000999201089143753
+            }
+          }
+        },
+        "combined_feature_dependent": {
+          "all": {
+            "points": 99827,
+            "L2": 0.0007261800928972661,
+            "nonzero_points": 35059,
+            "positive_fraction_among_nonzero": 0.5197523832321167,
+            "gradient_sum": 0.0011945458827540278,
+            "probability_gradient_L2": 0.012277406640350819,
+            "sigmoid_derivative": {
+              "mean": 0.016390259506163126,
+              "median": 4.2676016164477915e-05,
+              "p99": 0.4450120955705649,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 49329,
+            "raw_first_Adam_probability_delta": {
+              "mean": 4.99807578777492e-06,
+              "median": 0.0,
+              "p99": 0.00019794225692749273,
+              "maximum": 0.0004996061325073242
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0002311796298753349,
+              "median": 0.0,
+              "p99": 0.0009996891021728516,
+              "maximum": 0.000999998301267624
+            }
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 2.4343262339243665e-06,
+            "nonzero_points": 5516,
+            "positive_fraction_among_nonzero": 0.5232052206993103,
+            "gradient_sum": -5.532258910534438e-06,
+            "probability_gradient_L2": 0.0002039762184722349,
+            "sigmoid_derivative": {
+              "mean": 0.0018115263030886622,
+              "median": 3.9769383874954656e-05,
+              "p99": 0.03563515089452264,
+              "maximum": 0.27540192008018494
+            },
+            "probability_gradient_nonzero": 11938,
+            "raw_first_Adam_probability_delta": {
+              "mean": 2.0253775053965007e-07,
+              "median": 0.0,
+              "p99": 2.4431198835372914e-06,
+              "maximum": 0.00026963651180267334
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0002736396737021162,
+              "median": 4.484583041630685e-05,
+              "p99": 0.0009951975708827375,
+              "maximum": 0.0009997750166803598
+            }
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 0.00014954095240682364,
+            "nonzero_points": 4345,
+            "positive_fraction_among_nonzero": 0.5459148287773132,
+            "gradient_sum": 7.88476609159261e-05,
+            "probability_gradient_L2": 0.0032351736444979906,
+            "sigmoid_derivative": {
+              "mean": 0.05128262692675544,
+              "median": 0.0005147323827259243,
+              "p99": 0.4954574048519134,
+              "maximum": 0.49999940395355225
+            },
+            "probability_gradient_nonzero": 4949,
+            "raw_first_Adam_probability_delta": {
+              "mean": 2.3983379704970378e-05,
+              "median": 0.0,
+              "p99": 0.0004627883434295654,
+              "maximum": 0.0004996061325073242
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.0004474941931006642,
+              "median": 0.0002849698066711426,
+              "p99": 0.0009998470544815064,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 3.2873656891752034e-05,
+            "nonzero_points": 21252,
+            "positive_fraction_among_nonzero": 0.5169866681098938,
+            "gradient_sum": 5.312863868311979e-05,
+            "probability_gradient_L2": 0.009395333006978035,
+            "sigmoid_derivative": {
+              "mean": 0.014152945557868498,
+              "median": 7.533743337262422e-05,
+              "p99": 0.41537910699844366,
+              "maximum": 0.49999991059303284
+            },
+            "probability_gradient_nonzero": 26098,
+            "raw_first_Adam_probability_delta": {
+              "mean": 3.082865539217228e-06,
+              "median": 0.0,
+              "p99": 8.662104606628517e-05,
+              "maximum": 0.0004982650279998779
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 0.00033077136511636167,
+              "median": 2.110004425048828e-05,
+              "p99": 0.0009998679161071777,
+              "maximum": 0.0009999871253967285
+            }
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 0.0007098509231582284,
+            "nonzero_points": 3946,
+            "positive_fraction_among_nonzero": 0.5010136961936951,
+            "gradient_sum": 0.00106810184661299,
+            "probability_gradient_L2": 0.007207945920526981,
+            "sigmoid_derivative": {
+              "mean": 0.018171558659259745,
+              "median": 1.0732133887358941e-05,
+              "p99": 0.4567149400711062,
+              "maximum": 0.49999910593032837
+            },
+            "probability_gradient_nonzero": 6344,
+            "raw_first_Adam_probability_delta": {
+              "mean": 5.439864714072608e-06,
+              "median": 0.0,
+              "p99": 0.00021678268909454488,
+              "maximum": 0.0004987716674804688
+            },
+            "direct_first_Adam_probability_delta": {
+              "mean": 7.800739429170726e-05,
+              "median": 0.0,
+              "p99": 0.0009966839849948883,
+              "maximum": 0.000999998301267624
+            }
+          }
+        }
+      }
+    }
+  ],
+  "optimizer_steps": 0,
+  "feature_values_changed": false,
+  "mlp_weights_changed": false,
+  "gt_labels_read": false,
+  "new_training_prior_saved": false,
+  "current_training_modified": false,
+  "final_mae": false,
+  "source_files": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-14-jumpingjacks_dir-PBR来源输出gate微调/model_mlp/point_cloud/iteration_55000/point_cloud.ply": "9c32096f31f11a6abd42cc486d32278e92005cd347c2cd45e7e3662f0c79ac5b",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-14-jumpingjacks_dir-PBR来源输出gate微调/model_mlp/deform/iteration_55000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+  },
+  "hypothetical_first_Adam_lr": 0.001,
+  "hypothetical_optimizer_step": false,
+  "probability_gradient_chain_rule_verified": true,
+  "limits": "RAM中只估算无动量首Adam步，当前实际gate/任何权重不更新；不能当真实训练或7°指标。只证明在同预测状态开放输出乘法gate的RGB/Alpha/ND梯度；candidate由source预测筛选，不是真实物体标注；不据此宣称训练后质量或7°，后续需完整新训练评测。"
+}

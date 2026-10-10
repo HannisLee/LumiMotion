@@ -1,0 +1,15 @@
+{
+  "status": "SOURCE_TRAIN_RGB_CANDIDATE_BUILT_AND_CPU_VERIFIED_NOT_ACCEPTED",
+  "created_at": "2026-10-10T10:42:33.274030+09:00",
+  "generation_session_id": 56679,
+  "generation_exit_code": 0,
+  "generation_session_closed": true,
+  "independent_CPU_audit_exit_code": 0,
+  "source_points": 99827,
+  "confidence_points": 29621,
+  "GT_labels_used": false,
+  "production_pipeline_changed": false,
+  "full_stage2_started": false,
+  "formal_MAE_evaluated": false,
+  "normal_7_degree_claimed": false
+}

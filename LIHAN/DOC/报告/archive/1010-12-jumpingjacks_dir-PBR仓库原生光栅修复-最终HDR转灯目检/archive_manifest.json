@@ -1,0 +1,10 @@
+{
+  "README.md": "60b337c920f6f11897025ebd9f49477a306fb1b08a806e1852c2230ad6071c1e",
+  "runtime_history.jsonl": "ce4363d9aee5517440830a980b2d83e7dae79fe1927e0979119deb0e0d3b07ca",
+  "commands/make_final_relight_comparison.py": "719322a91dc93b99e4a5442ef9368bdc59794474cd098c9f19df404bd41bad9c",
+  "inspection/final_55000_relight_review.json": "1f213ce8a2c9ced53dd907b63bae13d90d58e89b1e2aec74d6bafa0e94d3c5a4",
+  "inspection/relight_final_55000.png": "c862cdd04ac6904d4a312b4d04263bc8dd1ee437fbb7ed8e025d813b7b3fc2ee",
+  "model_mlp/renders_stage2/ours_55000/RENDER_COMPLETED": "722cdd399249d70c5dac1ff2b103a0b271d8fb9816fa52af6ce6b88eda1d389a",
+  "model_mlp/renders_stage2/ours_55000/hdr/hdr.json": "79301c77160f28684dd5b73369790a98d2fee7176e1c60ea3fe8cb8ef89d2932",
+  "model_mlp/renders_stage2/ours_55000/directional/relight.json": "77b1ee9bd1a071fe74a08b0eac9d857cc7c225f3e9d14dfed4ed11b10e0747f5"
+}

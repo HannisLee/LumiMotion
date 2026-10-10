@@ -1,0 +1,33 @@
+{
+  "status": "FAILED_SO_FAR_RGB_ONLY",
+  "iteration": 40000,
+  "reviewed_at": "2026-10-10T08:22:54.566226+09:00",
+  "reviewed_frames": [
+    10,
+    80,
+    150
+  ],
+  "actual_viewed": "inspection/rgb_40000_comparison.png",
+  "rgb": {
+    "psnr": 18.055981592794627,
+    "ssim": 0.899448827902476,
+    "lpips": 0.11159734278917313,
+    "psnr_foreground": 10.840379814378556,
+    "ssim_foreground_bbox": 0.7803961118062337,
+    "lpips_foreground_bbox": 0.22812511424223583
+  },
+  "B06_same_iteration_rgb": {
+    "psnr": 18.514171736955014,
+    "ssim": 0.8879236896832784,
+    "lpips": 0.10788123557964961,
+    "psnr_foreground": 11.461610424097136,
+    "ssim_foreground_bbox": 0.7571394244829813,
+    "lpips_foreground_bbox": 0.22566056847572327
+  },
+  "conclusion": "背景正常/主体平台存在，但头手/衣服斑驳破碎、脚周平台伪凸起和黑色阴影污染明显；B07前景/脚周更暗更高对比，GT0080自身背光暗，不能仅以暗失败。总体未通过质量，未推断最终Normal MAE。",
+  "full_seven_mae": false,
+  "normal_goal": "PENDING",
+  "commit_allowed": false,
+  "preview_process_actual_exit_code": 0,
+  "audit_process_actual_exit_code": 0
+}

@@ -1,0 +1,33 @@
+{
+  "status": "FAILED_SO_FAR",
+  "iteration": 55000,
+  "reviewed_test_frames": [
+    10,
+    80,
+    150
+  ],
+  "reviewed_insight_frames": [
+    1,
+    75,
+    150
+  ],
+  "rgb": {
+    "psnr": 19.375063141094465,
+    "ssim": 0.8948765238126118,
+    "lpips": 0.11125242908795675,
+    "psnr_foreground": 12.246959743787187,
+    "ssim_foreground_bbox": 0.7720984180768331,
+    "lpips_foreground_bbox": 0.22454677522182465
+  },
+  "normal_mae": "PENDING_FULL_PIPELINE",
+  "background": "黑背景正常，主体和平台存在。",
+  "foreground": "人物头手、衣服斑驳和稀疏，脚周平台伪起伏、灰块与残影仍明显。与B04同55k较近，未见足以PASS的修复；GT背光本来暗，不单凭暗判失败。",
+  "alpha": "主体平台覆盖大致完整，身体边缘仍有细薄雾化与稀疏残影。",
+  "albedo": "衣服/人体仍烘入正背面光照，平台棋盘格与脚周污染。",
+  "normal": "人体斑驳、脚周异常；0075平台整体green/yellow，待只读实际光栅分组核验坐标与来源投影。",
+  "images": [
+    "inspection/rgb_final_55000_comparison.png",
+    "inspection/four_categories_final_55000.png"
+  ],
+  "commit_allowed": false
+}

@@ -1,0 +1,17 @@
+{
+  "README.md": "42bf788fe7ad179f0ff5ed4a48b8505d47a89f39cb0560b79178cf18aa89dc13",
+  "process_handles.json": "03f44a2a8ec0b036b6ab30b8a86375b03dcd06d587b0de5dc29fa3b5754e375d",
+  "train_argv.json": "968b5a7567c0fba4aff587f1748172d386b10c5013465c15e2679aa008063bf4",
+  "postprocess_state.json": "12ca7dceedfb7497f838b87135a6aceeeba98ae33f35ce16bd9ff098258b493b",
+  "training_runtime.json": "66297c14c275b2a4ca6ea3a9a4cd35d165f52dd7369b4602e15f985012eb6005",
+  "planned_commands.json": "d67a26f6d919862c37980dd604eeafc22a6e6b6310373e319e974b054a482873",
+  "commands/audit_launch.py": "8e7b0e1826e26bcf37456345176d27aa5096ae3c256d66f6dddfc8e1e6999751",
+  "logs/launch_audit.log": "61643561453cc27d1f7f9475e38b79106b5dfc83bca21b9dd1193b7deec75e50",
+  "model_mlp/pbr_geometry_source.json": "0906a5876b6ef9770f113f78f5ff3575f8d71d3d9cf90b30d0a8e62102390df5",
+  "model_mlp/pbr_plane_projection.json": "e91d72275bf8a4295223eb6caf4fc8391395f6245dbd33b5404e9e4ac150b82a",
+  "model_mlp/pbr_feature_gate.json": "440949e1ff25fb2d190ff8f6fd0c83f1bada0ed834564a595b10fd34a05da154",
+  "model_mlp/rgb_alpha_provenance.json": "b239e8268c91a02932dada593b7b24fd4944c1a45ddf306d2c33b369cfaadc9a",
+  "model_mlp/stage1_source.json": "d8fa32998608b95e9a2ee0d56a8ca7c47c34e3a84c7263ca1500754a16b924b0",
+  "model_mlp/stage2_config.json": "2888ed06017f738a99070b6ebe188fb38043fb8560adcf88577001ba199eca61",
+  "inspection/launch_audit.json": "61643561453cc27d1f7f9475e38b79106b5dfc83bca21b9dd1193b7deec75e50"
+}

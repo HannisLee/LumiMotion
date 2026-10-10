@@ -1,0 +1,250 @@
+Loading trained model at iteration 40000
+Found transforms_train.json file, assuming Blender data set!
+Reading Training Transforms
+Read Train Transforms with 135 cameras
+Loading Training Cameras
+Loading Test Cameras
+LOAD PLY
+/home/lihan/reproduce/LumiMotion-stage2-perlight/scene/__init__.py:103: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  unique_fids = [torch.tensor(val, dtype=torch.float32, device="cuda") for val in unique_values]
+################ gaussian_color params: 156934
+{
+  "status": "PASS_READ_ONLY_SHADOW_VISIBILITY_DIAGNOSTIC",
+  "iteration": 40000,
+  "rows": [
+    {
+      "frame": "0001",
+      "variants": {
+        "native": {
+          "shadow_ray_bias": 0.1,
+          "depth_ratio": 0.0,
+          "skip_tracer": false,
+          "native_photo_eligible_pixels": 18960,
+          "photo_L1": 0.06200587376952171,
+          "own_bright_pixels": 13809,
+          "own_bright_photo_L1": 0.048076651990413666,
+          "own_bright_mean_visibility": 0.9546524882316589,
+          "own_bright_visibility_below_01_fraction": 0.021724961698055267,
+          "mean_visibility": 0.9121347069740295,
+          "predicted_normal_alpha_buffers_bit_exact": true
+        },
+        "unoccluded": {
+          "shadow_ray_bias": 0.1,
+          "depth_ratio": 0.0,
+          "skip_tracer": true,
+          "native_photo_eligible_pixels": 18960,
+          "photo_L1": 0.058534640818834305,
+          "own_bright_pixels": 13809,
+          "own_bright_photo_L1": 0.03440282121300697,
+          "own_bright_mean_visibility": 0.9999999403953552,
+          "own_bright_visibility_below_01_fraction": 0.0,
+          "mean_visibility": 1.0,
+          "predicted_normal_alpha_buffers_bit_exact": true
+        },
+        "bias_002": {
+          "shadow_ray_bias": 0.02,
+          "depth_ratio": 0.0,
+          "skip_tracer": false,
+          "native_photo_eligible_pixels": 18960,
+          "photo_L1": 0.11891680210828781,
+          "own_bright_pixels": 13809,
+          "own_bright_photo_L1": 0.12996861338615417,
+          "own_bright_mean_visibility": 0.7496002316474915,
+          "own_bright_visibility_below_01_fraction": 0.10609022527933121,
+          "mean_visibility": 0.6804834604263306,
+          "predicted_normal_alpha_buffers_bit_exact": true
+        },
+        "bias_005": {
+          "shadow_ray_bias": 0.05,
+          "depth_ratio": 0.0,
+          "skip_tracer": false,
+          "native_photo_eligible_pixels": 18960,
+          "photo_L1": 0.07548538595438004,
+          "own_bright_pixels": 13809,
+          "own_bright_photo_L1": 0.06913958489894867,
+          "own_bright_mean_visibility": 0.8927130103111267,
+          "own_bright_visibility_below_01_fraction": 0.04793974757194519,
+          "mean_visibility": 0.82839435338974,
+          "predicted_normal_alpha_buffers_bit_exact": true
+        },
+        "depth_mix_half": {
+          "shadow_ray_bias": 0.1,
+          "depth_ratio": 0.5,
+          "skip_tracer": false,
+          "native_photo_eligible_pixels": 18960,
+          "photo_L1": 0.06196247413754463,
+          "own_bright_pixels": 13809,
+          "own_bright_photo_L1": 0.04795227199792862,
+          "own_bright_mean_visibility": 0.9544140696525574,
+          "own_bright_visibility_below_01_fraction": 0.021580127999186516,
+          "mean_visibility": 0.9117836356163025,
+          "predicted_normal_alpha_buffers_bit_exact": true
+        }
+      }
+    },
+    {
+      "frame": "0075",
+      "variants": {
+        "native": {
+          "shadow_ray_bias": 0.1,
+          "depth_ratio": 0.0,
+          "skip_tracer": false,
+          "native_photo_eligible_pixels": 15940,
+          "photo_L1": 0.1194550022482872,
+          "own_bright_pixels": 8110,
+          "own_bright_photo_L1": 0.21632836759090424,
+          "own_bright_mean_visibility": 0.81446772813797,
+          "own_bright_visibility_below_01_fraction": 0.13403205573558807,
+          "mean_visibility": 0.6163173913955688,
+          "predicted_normal_alpha_buffers_bit_exact": true
+        },
+        "unoccluded": {
+          "shadow_ray_bias": 0.1,
+          "depth_ratio": 0.0,
+          "skip_tracer": true,
+          "native_photo_eligible_pixels": 15940,
+          "photo_L1": 0.10437177121639252,
+          "own_bright_pixels": 8110,
+          "own_bright_photo_L1": 0.15065129101276398,
+          "own_bright_mean_visibility": 1.0,
+          "own_bright_visibility_below_01_fraction": 0.0,
+          "mean_visibility": 1.0,
+          "predicted_normal_alpha_buffers_bit_exact": true
+        },
+        "bias_002": {
+          "shadow_ray_bias": 0.02,
+          "depth_ratio": 0.0,
+          "skip_tracer": false,
+          "native_photo_eligible_pixels": 15940,
+          "photo_L1": 0.17422567307949066,
+          "own_bright_pixels": 8110,
+          "own_bright_photo_L1": 0.3295438587665558,
+          "own_bright_mean_visibility": 0.5794984698295593,
+          "own_bright_visibility_below_01_fraction": 0.2779284715652466,
+          "mean_visibility": 0.3903907239437103,
+          "predicted_normal_alpha_buffers_bit_exact": true
+        },
+        "bias_005": {
+          "shadow_ray_bias": 0.05,
+          "depth_ratio": 0.0,
+          "skip_tracer": false,
+          "native_photo_eligible_pixels": 15940,
+          "photo_L1": 0.13582466542720795,
+          "own_bright_pixels": 8110,
+          "own_bright_photo_L1": 0.2514285445213318,
+          "own_bright_mean_visibility": 0.7298734188079834,
+          "own_bright_visibility_below_01_fraction": 0.19506782293319702,
+          "mean_visibility": 0.5104292631149292,
+          "predicted_normal_alpha_buffers_bit_exact": true
+        },
+        "depth_mix_half": {
+          "shadow_ray_bias": 0.1,
+          "depth_ratio": 0.5,
+          "skip_tracer": false,
+          "native_photo_eligible_pixels": 15940,
+          "photo_L1": 0.12160863727331161,
+          "own_bright_pixels": 8110,
+          "own_bright_photo_L1": 0.22071495652198792,
+          "own_bright_mean_visibility": 0.8072811365127563,
+          "own_bright_visibility_below_01_fraction": 0.13945746421813965,
+          "mean_visibility": 0.612494945526123,
+          "predicted_normal_alpha_buffers_bit_exact": true
+        }
+      }
+    },
+    {
+      "frame": "0149",
+      "variants": {
+        "native": {
+          "shadow_ray_bias": 0.1,
+          "depth_ratio": 0.0,
+          "skip_tracer": false,
+          "native_photo_eligible_pixels": 19214,
+          "photo_L1": 0.061325803399086,
+          "own_bright_pixels": 14014,
+          "own_bright_photo_L1": 0.046618830412626266,
+          "own_bright_mean_visibility": 0.95745450258255,
+          "own_bright_visibility_below_01_fraction": 0.021121736615896225,
+          "mean_visibility": 0.9219657778739929,
+          "predicted_normal_alpha_buffers_bit_exact": true
+        },
+        "unoccluded": {
+          "shadow_ray_bias": 0.1,
+          "depth_ratio": 0.0,
+          "skip_tracer": true,
+          "native_photo_eligible_pixels": 19214,
+          "photo_L1": 0.05798719823360443,
+          "own_bright_pixels": 14014,
+          "own_bright_photo_L1": 0.03363068029284477,
+          "own_bright_mean_visibility": 1.0,
+          "own_bright_visibility_below_01_fraction": 0.0,
+          "mean_visibility": 1.0,
+          "predicted_normal_alpha_buffers_bit_exact": true
+        },
+        "bias_002": {
+          "shadow_ray_bias": 0.02,
+          "depth_ratio": 0.0,
+          "skip_tracer": false,
+          "native_photo_eligible_pixels": 19214,
+          "photo_L1": 0.11716984957456589,
+          "own_bright_pixels": 14014,
+          "own_bright_photo_L1": 0.12933336198329926,
+          "own_bright_mean_visibility": 0.7607685327529907,
+          "own_bright_visibility_below_01_fraction": 0.10246895998716354,
+          "mean_visibility": 0.6977254152297974,
+          "predicted_normal_alpha_buffers_bit_exact": true
+        },
+        "bias_005": {
+          "shadow_ray_bias": 0.05,
+          "depth_ratio": 0.0,
+          "skip_tracer": false,
+          "native_photo_eligible_pixels": 19214,
+          "photo_L1": 0.07596796751022339,
+          "own_bright_pixels": 14014,
+          "own_bright_photo_L1": 0.0697096660733223,
+          "own_bright_mean_visibility": 0.8988082408905029,
+          "own_bright_visibility_below_01_fraction": 0.049450550228357315,
+          "mean_visibility": 0.842647135257721,
+          "predicted_normal_alpha_buffers_bit_exact": true
+        },
+        "depth_mix_half": {
+          "shadow_ray_bias": 0.1,
+          "depth_ratio": 0.5,
+          "skip_tracer": false,
+          "native_photo_eligible_pixels": 19214,
+          "photo_L1": 0.06138845533132553,
+          "own_bright_pixels": 14014,
+          "own_bright_photo_L1": 0.04697888344526291,
+          "own_bright_mean_visibility": 0.9563324451446533,
+          "own_bright_visibility_below_01_fraction": 0.021478522568941116,
+          "mean_visibility": 0.9208202362060547,
+          "predicted_normal_alpha_buffers_bit_exact": true
+        }
+      }
+    }
+  ],
+  "optimizer_steps": 0,
+  "GT_labels_read": false,
+  "original_TRAIN_RGB_and_own_alpha_only": true,
+  "production_pipeline_changed": false,
+  "training_prior_saved": false,
+  "images": [
+    "inspection/shadow_visibility/0001_native.png",
+    "inspection/shadow_visibility/0001_unoccluded.png",
+    "inspection/shadow_visibility/0001_bias_002.png",
+    "inspection/shadow_visibility/0001_bias_005.png",
+    "inspection/shadow_visibility/0001_depth_mix_half.png",
+    "inspection/shadow_visibility/0075_native.png",
+    "inspection/shadow_visibility/0075_unoccluded.png",
+    "inspection/shadow_visibility/0075_bias_002.png",
+    "inspection/shadow_visibility/0075_bias_005.png",
+    "inspection/shadow_visibility/0075_depth_mix_half.png",
+    "inspection/shadow_visibility/0149_native.png",
+    "inspection/shadow_visibility/0149_unoccluded.png",
+    "inspection/shadow_visibility/0149_bias_002.png",
+    "inspection/shadow_visibility/0149_bias_005.png",
+    "inspection/shadow_visibility/0149_depth_mix_half.png"
+  ],
+  "created_at": "2026-10-10T10:22:11.864137+09:00",
+  "limitations": "各variant只读同40k checkpoint原生GGX/BVH；阴影关闭或bias变化不是新Preset或训练结果，不能作为GT normal/7度结论。own bright group来自原RGB自身Alpha仅诊断，非训练/GT评分mask；所有点/评分/当前训练保持。depth_ratio半混合改变着色射线起点/预测surf normal，GS normal与alpha仍逐bit相同。"
+}

@@ -1,0 +1,9 @@
+{
+  "arguments/stage2.py": "980edfc7cdf7d8fd4349c6d805fed5903e75518a6379642c95d3a705a88921e4",
+  "scripts/loss_stage2.py": "d13a50ddf51712556cfddbad257012e35800d2f7093025f5903f66dd0b9da130",
+  "gaussian_renderer/render_ir.py": "9a63032dafcad3b5c5a7084de92d93566bda72f063b7ec58b7c86bbc5cd1a4be",
+  "scripts/train_stage2.py": "482ae0b803825bfd2123f7d137e7b64b090f4b1ba3a5c748894ab7de8a238678",
+  "scripts/render_stage2.py": "7ee0fb28a17e2816426624c604fcd107a6b9739888c37c213ecd4add4052c38e",
+  "scene/pbr_ray_budget.py": "56e6567e16d2737373c4b3410b23888b0575296c1dfb609580eb9ace694e7cfb",
+  "tests/test_pbr_ray_budget.py": "23baca9c87655ee0dbb911c6b11a90bd5476639188c5e816a8c3db19a9794e51"
+}

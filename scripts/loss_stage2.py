@@ -235,7 +235,87 @@ class IRGSBaselineLossPreset:
         return Stage2LossResult(total, terms, rgb_l1)
 
 
+class PBRGTDirectionalLossPreset(IRGSBaselineLossPreset):
+    """原生PBR材质/SH损失；已知SUN不优化环境光或加入环境光正则。"""
+    overrides = {"pbr_light_mode": "gt_directional", "d_lower_hemisphere_weight": 0.,
+                 "lambda_light": 0., "lambda_light_smooth": 0.}
+
+
+class PBRGTDirectionalGeometryLossPreset(PBRGTDirectionalLossPreset):
+    """真实原生PLY几何微调；附加项由Trainer从来源预测和当前训练图像计算。"""
+    overrides = dict(PBRGTDirectionalLossPreset.overrides, pbr_optimize_geometry=True,
+                     pbr_freeze_opacity=True, pbr_learn_light_intensity=True)
+
+
+class PBRGTDirectionalRefineLossPreset(PBRGTDirectionalGeometryLossPreset):
+    """预测DC初始化解除硬clamp梯度死区；保留原生材质公式和预测几何约束。"""
+    overrides = dict(PBRGTDirectionalGeometryLossPreset.overrides,
+                     pbr_albedo_interior_init=True, pbr_albedo_project_after_step=True)
+
+
+class PBRGTDirectionalAnchorLossPreset(PBRGTDirectionalRefineLossPreset):
+    """固定来源XYZ作为MLP输入；真实PBR渲染几何仍参与优化。"""
+    overrides = dict(PBRGTDirectionalRefineLossPreset.overrides, pbr_deformation_anchor=True)
+
+
+class PBRGTDirectionalPlaneLossPreset(PBRGTDirectionalAnchorLossPreset):
+    """来源时间稳定平面几何投影，保持原生PBR/GGX与全部评测口径。"""
+    overrides = dict(PBRGTDirectionalAnchorLossPreset.overrides, pbr_plane_projection=True)
+
+
+class PBRGTDirectionalNativeLossPreset(PBRGTDirectionalLossPreset):
+    """方向光原生PBR显式构建仓库CUDA，实现逐Gaussian观察射线法线定向。"""
+    overrides = dict(PBRGTDirectionalLossPreset.overrides, pbr_rasterizer_backend='lumimotion')
+
+
+class PBRGTDirectionalPlaneNativeLossPreset(PBRGTDirectionalPlaneLossPreset):
+    """来源plane实际几何与仓库原生CUDA；训练/评测共享，损失参数不改。"""
+    overrides = dict(PBRGTDirectionalPlaneLossPreset.overrides, pbr_rasterizer_backend='lumimotion')
+
+
+class PBRGTDirectionalNativeDirectLossPreset(PBRGTDirectionalNativeLossPreset):
+    """原生SUN直接光，关闭来源SH间接近似并按实际光线预算训练。"""
+    overrides = dict(PBRGTDirectionalNativeLossPreset.overrides, wo_indirect=True,
+                     wo_indirect_relight=True, pbr_directional_actual_ray_budget=True)
+
+
+class PBRGTDirectionalPlaneNativeDirectLossPreset(PBRGTDirectionalPlaneNativeLossPreset):
+    """保留来源plane几何与原生CUDA的直接SUN训练。"""
+    overrides = dict(PBRGTDirectionalPlaneNativeLossPreset.overrides, wo_indirect=True,
+                     wo_indirect_relight=True, pbr_directional_actual_ray_budget=True)
+
+
+class PBRGTDirectionalPlaneNativeDirectGateLossPreset(PBRGTDirectionalPlaneNativeDirectLossPreset):
+    """仅新增原生feature输出gate优化，来源MLP全部冻结。"""
+    overrides = dict(PBRGTDirectionalPlaneNativeDirectLossPreset.overrides,
+                     pbr_optimize_feature_gate=True)
+
+
+class PBRGTDirectionalPlaneNativeDirectProbabilityGateLossPreset(PBRGTDirectionalPlaneNativeDirectGateLossPreset):
+    """优化原生输出gate的概率坐标，保存仍用PLY feature。"""
+    overrides = dict(PBRGTDirectionalPlaneNativeDirectGateLossPreset.overrides,
+                     pbr_feature_gate_parameterization='probability')
+
+
+class PBRGTDirectionalSourceRGBNormalLossPreset(PBRGTDirectionalPlaneNativeDirectProbabilityGateLossPreset):
+    """以原TRAIN RGB方向候选约束canonical轴，世界旋转采用来源局部运输。"""
+    overrides = dict(PBRGTDirectionalPlaneNativeDirectProbabilityGateLossPreset.overrides,
+                     pbr_source_local_rotation=True, lambda_pbr_rgb_normal_prior=2.)
+
+
 LOSS_PRESETS = {"irgs_baseline": IRGSBaselineLossPreset,
+                "pbr_gt_directional": PBRGTDirectionalLossPreset,
+                "pbr_gt_directional_geometry": PBRGTDirectionalGeometryLossPreset,
+                "pbr_gt_directional_refine": PBRGTDirectionalRefineLossPreset,
+                "pbr_gt_directional_anchor": PBRGTDirectionalAnchorLossPreset,
+                "pbr_gt_directional_plane": PBRGTDirectionalPlaneLossPreset,
+                "pbr_gt_directional_native": PBRGTDirectionalNativeLossPreset,
+                "pbr_gt_directional_plane_native": PBRGTDirectionalPlaneNativeLossPreset,
+                "pbr_gt_directional_native_direct": PBRGTDirectionalNativeDirectLossPreset,
+                "pbr_gt_directional_plane_native_direct": PBRGTDirectionalPlaneNativeDirectLossPreset,
+                "pbr_gt_directional_plane_native_direct_gate": PBRGTDirectionalPlaneNativeDirectGateLossPreset,
+                "pbr_gt_directional_plane_native_direct_probability_gate": PBRGTDirectionalPlaneNativeDirectProbabilityGateLossPreset,
+                "pbr_gt_directional_source_rgb_normal": PBRGTDirectionalSourceRGBNormalLossPreset,
                 "lambertian_default": LambertianLossPreset,
                 "lambertian_gt": LambertianGTLossPreset,
                 "lambertian_geometry": LambertianGeometryLossPreset,
@@ -273,15 +353,55 @@ def resolve_preset(opt, mode):
     mode = normalize_render_mode(mode)
     name = opt.loss_preset
     if name == "auto":
-        name = "irgs_baseline" if mode == "original_ir" else (
+        native = getattr(opt, 'pbr_rasterizer_backend', 'installed') == 'lumimotion'
+        direct = (native and getattr(opt, 'pbr_directional_actual_ray_budget', False) and
+                  getattr(opt, 'wo_indirect', False))
+        name = (("pbr_gt_directional_source_rgb_normal" if getattr(opt, 'pbr_source_local_rotation', False) else
+                 "pbr_gt_directional_plane_native_direct_probability_gate" if direct and getattr(opt, 'pbr_plane_projection', False) and
+                 getattr(opt, 'pbr_optimize_feature_gate', False) and
+                 getattr(opt, 'pbr_feature_gate_parameterization', 'raw_logit') == 'probability' else
+                 "pbr_gt_directional_plane_native_direct_gate" if direct and getattr(opt, 'pbr_plane_projection', False) and
+                 getattr(opt, 'pbr_optimize_feature_gate', False) else
+                 "pbr_gt_directional_plane_native_direct" if direct and getattr(opt, 'pbr_plane_projection', False) else
+                 "pbr_gt_directional_native_direct" if direct else
+                 "pbr_gt_directional_plane_native" if native and getattr(opt, 'pbr_plane_projection', False) else
+                 "pbr_gt_directional_native" if native and not (getattr(opt, 'pbr_optimize_geometry', False) or
+                  getattr(opt, 'pbr_deformation_anchor', False) or getattr(opt, 'pbr_albedo_interior_init', False) or
+                  getattr(opt, 'pbr_albedo_project_after_step', False)) else
+                 "pbr_gt_directional_plane" if getattr(opt, 'pbr_plane_projection', False) else
+                 "pbr_gt_directional_anchor" if getattr(opt, 'pbr_deformation_anchor', False) else
+                 "pbr_gt_directional_refine" if (getattr(opt, 'pbr_albedo_interior_init', False) or
+                 getattr(opt, 'pbr_albedo_project_after_step', False)) else
+                 "pbr_gt_directional_geometry" if getattr(opt, 'pbr_optimize_geometry', False) else
+                 "pbr_gt_directional") if getattr(opt, 'pbr_light_mode', 'envmap') == 'gt_directional'
+                else "irgs_baseline") if mode == "original_ir" else (
             "lambertian_gt" if opt.photometric_light_mode == "gt_directional" else "lambertian_default")
     if name not in LOSS_PRESETS:
         raise ValueError("未知 Stage2 loss preset：" + name)
     if mode not in {"original_ir", "photometric_lambertian"}:
         raise ValueError("未知 Stage2 render mode：" + mode)
-    if (name == "irgs_baseline") != (mode == "original_ir"):
+    if getattr(opt, 'pbr_optimize_geometry', False) and mode != 'original_ir':
+        raise ValueError('PBR几何参数仅适用于original_ir。')
+    if getattr(opt, 'pbr_learn_light_intensity', False) and mode != 'original_ir':
+        raise ValueError('PBR光强拟合仅适用于original_ir。')
+    if getattr(opt, 'pbr_deformation_anchor', False) and mode != 'original_ir':
+        raise ValueError('PBR形变输入锚定仅适用于original_ir。')
+    if getattr(opt, 'pbr_plane_projection', False) and mode != 'original_ir':
+        raise ValueError('PBR平面几何投影仅适用于original_ir。')
+    if getattr(opt, 'pbr_optimize_feature_gate', False) and mode != 'original_ir':
+        raise ValueError('PBR输出gate仅适用于original_ir。')
+    if getattr(opt, 'pbr_rasterizer_backend', 'installed') == 'lumimotion' and mode != 'original_ir':
+        raise ValueError('仓库原生PBR光栅仅适用于original_ir。')
+    if getattr(opt, 'pbr_directional_actual_ray_budget', False) and mode != 'original_ir':
+        raise ValueError('实际SUN光线预算仅适用于original_ir。')
+    if (getattr(opt, 'pbr_albedo_interior_init', False) or
+            getattr(opt, 'pbr_albedo_project_after_step', False)) and mode != 'original_ir':
+        raise ValueError('PBR材质初始化仅适用于original_ir。')
+    if issubclass(LOSS_PRESETS[name], IRGSBaselineLossPreset) != (mode == "original_ir"):
         raise ValueError("loss preset 与 render mode 不匹配。")
     if mode == "photometric_lambertian":
+        if getattr(opt, 'pbr_light_mode', 'envmap') != 'envmap':
+            raise ValueError('PBR光照参数仅适用于original_ir。')
         if opt.photometric_light_mode not in {"learned_directional", "gt_directional"}:
             raise ValueError("未知光照模式。")
         if issubclass(LOSS_PRESETS[name],LambertianGTLossPreset) != (opt.photometric_light_mode == "gt_directional"):
@@ -291,12 +411,18 @@ def resolve_preset(opt, mode):
 
 def apply_loss_preset(args, argv=None):
     name = resolve_preset(args, args.render_mode)
-    if args.loss_preset == "auto":
+    if args.loss_preset == "auto" and not name.startswith('pbr_gt_directional'):
         return
     explicit = {t[2:].split('=')[0].replace('-','_') for t in (sys.argv[1:] if argv is None else argv) if t.startswith('--')}
     for key, value in LOSS_PRESETS[name].overrides.items():
         if key not in explicit:
             setattr(args, key, value)
+    if name.startswith('pbr_gt_directional'):
+        args.loss_preset = name
+        if args.pbr_light_mode != 'gt_directional':
+            raise ValueError('pbr_gt_directional preset要求pbr_light_mode=gt_directional。')
+    elif getattr(args, 'pbr_light_mode', 'envmap') != 'envmap':
+        raise ValueError('GT方向光PBR请使用pbr_gt_directional或auto preset。')
 
 
 def build_loss_preset(opt, mode):

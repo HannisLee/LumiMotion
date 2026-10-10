@@ -1,12 +1,15 @@
 """只读光栅化原版 PBR 的 roughness 参数；零背景、单通道、无颜色变换。"""
 import math
+from types import SimpleNamespace
 
 import torch
-from diff_surfel_rasterization import GaussianRasterizationSettings, GaussianRasterizer
+from scene.pbr_rasterizer import rasterizer_classes
 
 
 @torch.no_grad()
-def render_roughness(camera, pc, deformation, compute_cov3D_python=False):
+def render_roughness(camera, pc, deformation, compute_cov3D_python=False, rasterizer_backend='installed'):
+    GaussianRasterizationSettings,GaussianRasterizer=rasterizer_classes(SimpleNamespace(
+        pbr_rasterizer_backend=rasterizer_backend,compute_cov3D_python=compute_cov3D_python))
     if hasattr(pc, 'stage2_geometry'):
         raise ValueError('roughness 评测只支持原版 PBR 几何。')
     means = pc.get_xyz + deformation['d_xyz']

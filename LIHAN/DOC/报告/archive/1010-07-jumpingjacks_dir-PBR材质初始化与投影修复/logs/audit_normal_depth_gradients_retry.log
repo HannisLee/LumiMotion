@@ -1,0 +1,133 @@
+Loading trained model at iteration 40000
+Found transforms_train.json file, assuming Blender data set!
+Reading Training Transforms
+Read Train Transforms with 135 cameras
+Loading Training Cameras
+Loading Test Cameras
+LOAD PLY
+/home/lihan/reproduce/LumiMotion-stage2-perlight/scene/__init__.py:103: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  unique_fids = [torch.tensor(val, dtype=torch.float32, device="cuda") for val in unique_values]
+################ gaussian_color params: 156934
+{
+  "status": "PASS_READ_ONLY_GRADIENT_DIAGNOSTIC",
+  "iteration": 40000,
+  "frames": [
+    1,
+    75,
+    149
+  ],
+  "rows": [
+    {
+      "frame": "0001",
+      "valid_pixels": 18126,
+      "losses": {
+        "native_rgb_and_SH": 0.1086733341217041,
+        "normal_depth_full": 0.008034439757466316,
+        "normal_depth_GS_side": 0.008034439757466316,
+        "normal_depth_depth_side": 0.008034439757466316
+      },
+      "parameters": {
+        "xyz": {
+          "gradient_L2": {
+            "native_rgb_and_SH": 0.9283546805381775,
+            "normal_depth_full": 0.04980555176734924,
+            "normal_depth_GS_side": 0.046601615846157074,
+            "normal_depth_depth_side": 0.022292571142315865
+          },
+          "full_branch_sum_max_difference": 4.6566128730773926e-09,
+          "RGB_SH_and_full_consistency_gradient_cosine": -0.01860714703798294,
+          "RGB_SH_and_GS_side_gradient_cosine": -0.02795412763953209
+        },
+        "rotation": {
+          "gradient_L2": {
+            "native_rgb_and_SH": 0.10920180380344391,
+            "normal_depth_full": 0.004639404360204935,
+            "normal_depth_GS_side": 0.0042057461105287075,
+            "normal_depth_depth_side": 0.0021673301234841347
+          },
+          "full_branch_sum_max_difference": 1.280568540096283e-09,
+          "RGB_SH_and_full_consistency_gradient_cosine": -0.1067662462592125,
+          "RGB_SH_and_GS_side_gradient_cosine": -0.05719345808029175
+        }
+      }
+    },
+    {
+      "frame": "0075",
+      "valid_pixels": 15554,
+      "losses": {
+        "native_rgb_and_SH": 0.15892940759658813,
+        "normal_depth_full": 0.020858176052570343,
+        "normal_depth_GS_side": 0.020858176052570343,
+        "normal_depth_depth_side": 0.020858176052570343
+      },
+      "parameters": {
+        "xyz": {
+          "gradient_L2": {
+            "native_rgb_and_SH": 11.977788925170898,
+            "normal_depth_full": 0.1316749006509781,
+            "normal_depth_GS_side": 0.1248445212841034,
+            "normal_depth_depth_side": 0.04454643651843071
+          },
+          "full_branch_sum_max_difference": 8.381903171539307e-09,
+          "RGB_SH_and_full_consistency_gradient_cosine": -0.1881212741136551,
+          "RGB_SH_and_GS_side_gradient_cosine": -0.19566722214221954
+        },
+        "rotation": {
+          "gradient_L2": {
+            "native_rgb_and_SH": 0.699560284614563,
+            "normal_depth_full": 0.01153454277664423,
+            "normal_depth_GS_side": 0.010540165938436985,
+            "normal_depth_depth_side": 0.004957904107868671
+          },
+          "full_branch_sum_max_difference": 6.984919309616089e-10,
+          "RGB_SH_and_full_consistency_gradient_cosine": -0.2321714609861374,
+          "RGB_SH_and_GS_side_gradient_cosine": -0.2538944184780121
+        }
+      }
+    },
+    {
+      "frame": "0149",
+      "valid_pixels": 18404,
+      "losses": {
+        "native_rgb_and_SH": 0.11301327496767044,
+        "normal_depth_full": 0.007658431772142649,
+        "normal_depth_GS_side": 0.007658431772142649,
+        "normal_depth_depth_side": 0.007658431772142649
+      },
+      "parameters": {
+        "xyz": {
+          "gradient_L2": {
+            "native_rgb_and_SH": 1.7948808670043945,
+            "normal_depth_full": 0.04694226011633873,
+            "normal_depth_GS_side": 0.04086237773299217,
+            "normal_depth_depth_side": 0.021545834839344025
+          },
+          "full_branch_sum_max_difference": 3.3760443329811096e-09,
+          "RGB_SH_and_full_consistency_gradient_cosine": 0.08965898305177689,
+          "RGB_SH_and_GS_side_gradient_cosine": 0.1288481056690216
+        },
+        "rotation": {
+          "gradient_L2": {
+            "native_rgb_and_SH": 0.1219363883137703,
+            "normal_depth_full": 0.00505070760846138,
+            "normal_depth_GS_side": 0.0043799192644655704,
+            "normal_depth_depth_side": 0.0022054091095924377
+          },
+          "full_branch_sum_max_difference": 9.313225746154785e-10,
+          "RGB_SH_and_full_consistency_gradient_cosine": 0.09897761791944504,
+          "RGB_SH_and_GS_side_gradient_cosine": 0.11451925337314606
+        }
+      }
+    }
+  ],
+  "model_files": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/point_cloud/iteration_40000/point_cloud.ply": "97dbbc0af55a74ff781b24866d273bc6d20fcbc5a45db83325b4c6adec783404",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/deform/iteration_40000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+  },
+  "gt_material_normal_geometry_inputs": false,
+  "original_test_RGB_used": false,
+  "optimizer_steps": 0,
+  "current_training_modified": false,
+  "final_mae": false,
+  "limitations": "三训练帧梯度量级与冲突仅证明优化机制，不证明GT准确性；不替代全15帧MAE或完整训练。"
+}

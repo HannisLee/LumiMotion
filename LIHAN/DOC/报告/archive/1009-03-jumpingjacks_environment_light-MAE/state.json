@@ -1,0 +1,9 @@
+{
+  "status": "COMPLETED",
+  "step": "finished",
+  "pid": 133378,
+  "updated_at": "2026-10-09T19:22:16.860208+09:00",
+  "iteration": 55000,
+  "acceptance": "PASS",
+  "frames": 15
+}
