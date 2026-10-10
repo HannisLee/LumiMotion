@@ -1,0 +1,30 @@
+{
+  "status": "PASS_CONFIGURATION_ISOLATION",
+  "changes": {
+    "loss_preset": [
+      "pbr_gt_directional_refine",
+      "pbr_gt_directional_anchor"
+    ],
+    "model_path": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp"
+    ],
+    "pbr_deformation_anchor": [
+      "ABSENT",
+      true
+    ],
+    "pbr_gt_lights_path": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/pbr_gt_lights.json",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/pbr_gt_lights.json"
+    ],
+    "source_path": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/data_view",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/data_view"
+    ]
+  },
+  "same_light_table": true,
+  "same_stage1_source": true,
+  "same_other_hyperparameters": true,
+  "source_code_frozen_at_launch": true,
+  "final_mae": false
+}

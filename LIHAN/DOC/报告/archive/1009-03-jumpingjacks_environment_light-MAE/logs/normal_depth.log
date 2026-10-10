@@ -1,0 +1,270 @@
+################ gaussian_color params: 156934
+0010: GS Render Normal MAE=8.967905416655578 deg / coverage=1.0, Depth Normal MAE=15.132618334438689 deg / coverage=0.9454470260921873, Mesh Normal MAE=10.346590626115663 deg / coverage=0.9999248063764192
+0020: GS Render Normal MAE=11.879513674988276 deg / coverage=0.9760705289672544, Depth Normal MAE=17.582681030152855 deg / coverage=0.940465654571448, Mesh Normal MAE=13.532322408086275 deg / coverage=0.9883586357137994
+0030: GS Render Normal MAE=12.726962928088316 deg / coverage=0.9632569654576177, Depth Normal MAE=17.677424076177555 deg / coverage=0.9123668801823398, Mesh Normal MAE=13.461970922926877 deg / coverage=0.9681298384878375
+0040: GS Render Normal MAE=14.720551389122273 deg / coverage=0.8679680086756134, Depth Normal MAE=17.46681332815873 deg / coverage=0.7905652704351362, Mesh Normal MAE=13.727969520672604 deg / coverage=0.8557679273417378
+0050: GS Render Normal MAE=9.86643163128417 deg / coverage=0.9997911154435315, Depth Normal MAE=16.387034203953917 deg / coverage=0.9593023255813954, Mesh Normal MAE=10.95883349246001 deg / coverage=0.996483776632781
+0060: GS Render Normal MAE=10.102697905683758 deg / coverage=0.9979254523194123, Depth Normal MAE=17.39556599588273 deg / coverage=0.9658549857162291, Mesh Normal MAE=11.969134462718502 deg / coverage=0.9971432458168956
+0070: GS Render Normal MAE=11.743906551408038 deg / coverage=1.0, Depth Normal MAE=17.58708710011024 deg / coverage=0.9385187020064404, Mesh Normal MAE=12.484353227272353 deg / coverage=0.999950458261085
+0080: GS Render Normal MAE=15.174947735541906 deg / coverage=0.9245811590222467, Depth Normal MAE=20.70722163906905 deg / coverage=0.8630046690469652, Mesh Normal MAE=14.4815050476297 deg / coverage=0.9241417193078825
+0090: GS Render Normal MAE=14.673089022320486 deg / coverage=0.9547366649840148, Depth Normal MAE=21.764451188984292 deg / coverage=0.9226989735823659, Mesh Normal MAE=15.179054071470752 deg / coverage=0.9742890795894329
+0100: GS Render Normal MAE=10.93214131522716 deg / coverage=0.9892092453279777, Depth Normal MAE=17.85667949174238 deg / coverage=0.9520032678626136, Mesh Normal MAE=12.922844940673269 deg / coverage=0.9889369234435103
+0110: GS Render Normal MAE=12.874445233587362 deg / coverage=0.9759332023575639, Depth Normal MAE=15.757059044635811 deg / coverage=0.899987721021611, Mesh Normal MAE=11.806865123554408 deg / coverage=0.9572691552062869
+0120: GS Render Normal MAE=12.163430745176234 deg / coverage=0.964297520661157, Depth Normal MAE=18.10728804890468 deg / coverage=0.9124380165289256, Mesh Normal MAE=12.799646317821404 deg / coverage=0.9670247933884297
+0130: GS Render Normal MAE=11.857676953313442 deg / coverage=0.9756485809117388, Depth Normal MAE=17.945426194059806 deg / coverage=0.9388335704125178, Mesh Normal MAE=12.868324654960698 deg / coverage=0.9879428300480932
+0140: GS Render Normal MAE=13.773998443431317 deg / coverage=0.9457496796240923, Depth Normal MAE=20.6476912741394 deg / coverage=0.9008258578954863, Mesh Normal MAE=14.776445289220272 deg / coverage=0.9547558023636622
+0150: GS Render Normal MAE=16.379002415572767 deg / coverage=0.9529956967891426, Depth Normal MAE=15.908122777808675 deg / coverage=0.850446871896723, Mesh Normal MAE=15.384919452919016 deg / coverage=0.9490235021516055
+{
+  "foreground": {
+    "frames": 15,
+    "gt_pixels": 415433,
+    "normal": {
+      "angular_deg": {
+        "frame_mean": 14.438466394185806,
+        "pixel_mean": 13.889867645864298,
+        "valid_frames": 15,
+        "valid_pixels": 386085
+      },
+      "axis_deg": {
+        "frame_mean": 14.167038171861675,
+        "pixel_mean": 13.649650790782136,
+        "valid_frames": 15,
+        "valid_pixels": 386085
+      },
+      "component_l1": {
+        "frame_mean": 0.11984275885320295,
+        "pixel_mean": 0.11561260637870588,
+        "valid_frames": 15,
+        "valid_pixels": 386085
+      },
+      "cosine_loss": {
+        "frame_mean": 0.09386107309834356,
+        "pixel_mean": 0.0901539204146044,
+        "valid_frames": 15,
+        "valid_pixels": 386085
+      },
+      "angular_with_missing_deg": {
+        "frame_mean": 26.902819527251683,
+        "pixel_mean": 25.6246122721438,
+        "valid_frames": 15,
+        "valid_pixels": 415433
+      },
+      "depth_derived_angular_deg": {
+        "frame_mean": 19.10947925393528,
+        "pixel_mean": 18.922640487946197,
+        "valid_frames": 15,
+        "valid_pixels": 367122
+      },
+      "depth_derived_axis_deg": {
+        "frame_mean": 17.773866885796615,
+        "pixel_mean": 17.642777085545763,
+        "valid_frames": 15,
+        "valid_pixels": 367122
+      }
+    },
+    "depth": {
+      "expected": {
+        "mae_frame_mean": 0.05875840173633591,
+        "mae_pixel_mean": 0.05899602401932292,
+        "abs_rel_frame_mean": 0.012325570272047719,
+        "coverage": 0.9293556361675649,
+        "valid_frames": 15,
+        "valid_pixels": 386085
+      },
+      "median": {
+        "mae_frame_mean": 0.05903383735314616,
+        "mae_pixel_mean": 0.05912711922333235,
+        "abs_rel_frame_mean": 0.012396085858824889,
+        "coverage": 0.9293556361675649,
+        "valid_frames": 15,
+        "valid_pixels": 386085
+      }
+    },
+    "normal_coverage": 0.9293556361675649,
+    "normal_metrics": {
+      "gs_render": {
+        "label": "GS Render Normal MAE",
+        "reference": "GT unit world-space Normal EXR",
+        "status": "evaluated",
+        "mae_frame_mean_deg": 14.438466394185806,
+        "mae_pixel_mean_deg": 13.889867645864298,
+        "coverage": 0.9293556361675649,
+        "gt_pixels": 415433,
+        "valid_pixels": 386085,
+        "valid_frames": 15
+      },
+      "depth_normal": {
+        "label": "Depth Normal MAE",
+        "reference": "GT unit world-space Normal EXR",
+        "status": "evaluated",
+        "mae_frame_mean_deg": 19.10947925393528,
+        "mae_pixel_mean_deg": 18.922640487946197,
+        "coverage": 0.883709286455337,
+        "gt_pixels": 415433,
+        "valid_pixels": 367122,
+        "valid_frames": 15
+      },
+      "mesh": {
+        "label": "Mesh Normal MAE",
+        "reference": "GT unit world-space Normal EXR",
+        "status": "evaluated",
+        "mae_frame_mean_deg": 15.361214803065552,
+        "mae_pixel_mean_deg": 14.957262857211683,
+        "coverage": 0.9394222413722549,
+        "gt_pixels": 415433,
+        "valid_pixels": 390267,
+        "valid_frames": 15
+      }
+    },
+    "common_normal_metrics": {
+      "methods": [
+        "gs_render",
+        "depth_normal",
+        "mesh"
+      ],
+      "gt_pixels": 415433,
+      "valid_pixels": 366343,
+      "coverage": 0.8818341345054437,
+      "angular_deg": {
+        "gs_render": {
+          "mae_frame_mean_deg": 13.042455945354318,
+          "mae_pixel_mean_deg": 12.622846205484528
+        },
+        "depth_normal": {
+          "mae_frame_mean_deg": 18.996127873435128,
+          "mae_pixel_mean_deg": 18.837130420876548
+        },
+        "mesh": {
+          "mae_frame_mean_deg": 13.840566464032557,
+          "mae_pixel_mean_deg": 13.563316265555063
+        }
+      }
+    }
+  },
+  "interior": {
+    "frames": 15,
+    "gt_pixels": 364998,
+    "normal": {
+      "angular_deg": {
+        "frame_mean": 12.522446757426739,
+        "pixel_mean": 12.193357870892852,
+        "valid_frames": 15,
+        "valid_pixels": 354101
+      },
+      "axis_deg": {
+        "frame_mean": 12.305874184534416,
+        "pixel_mean": 12.000560063392504,
+        "valid_frames": 15,
+        "valid_pixels": 354101
+      },
+      "component_l1": {
+        "frame_mean": 0.10369200825453156,
+        "pixel_mean": 0.10143997349515413,
+        "valid_frames": 15,
+        "valid_pixels": 354101
+      },
+      "cosine_loss": {
+        "frame_mean": 0.07696780618711302,
+        "pixel_mean": 0.07576100365079474,
+        "valid_frames": 15,
+        "valid_pixels": 354101
+      },
+      "angular_with_missing_deg": {
+        "frame_mean": 18.184808453510854,
+        "pixel_mean": 17.203218142129625,
+        "valid_frames": 15,
+        "valid_pixels": 364998
+      },
+      "depth_derived_angular_deg": {
+        "frame_mean": 17.86154424854792,
+        "pixel_mean": 17.94964646979205,
+        "valid_frames": 15,
+        "valid_pixels": 336264
+      },
+      "depth_derived_axis_deg": {
+        "frame_mean": 16.541422108244937,
+        "pixel_mean": 16.67919967971554,
+        "valid_frames": 15,
+        "valid_pixels": 336264
+      }
+    },
+    "depth": {
+      "expected": {
+        "mae_frame_mean": 0.05691052358370293,
+        "mae_pixel_mean": 0.05772689305188161,
+        "abs_rel_frame_mean": 0.01191892528078985,
+        "coverage": 0.9701450418906405,
+        "valid_frames": 15,
+        "valid_pixels": 354101
+      },
+      "median": {
+        "mae_frame_mean": 0.05708444531225143,
+        "mae_pixel_mean": 0.05775626960001864,
+        "abs_rel_frame_mean": 0.011967119493968064,
+        "coverage": 0.9701450418906405,
+        "valid_frames": 15,
+        "valid_pixels": 354101
+      }
+    },
+    "normal_coverage": 0.9701450418906405,
+    "normal_metrics": {
+      "gs_render": {
+        "label": "GS Render Normal MAE",
+        "reference": "GT unit world-space Normal EXR",
+        "status": "evaluated",
+        "mae_frame_mean_deg": 12.522446757426739,
+        "mae_pixel_mean_deg": 12.193357870892852,
+        "coverage": 0.9701450418906405,
+        "gt_pixels": 364998,
+        "valid_pixels": 354101,
+        "valid_frames": 15
+      },
+      "depth_normal": {
+        "label": "Depth Normal MAE",
+        "reference": "GT unit world-space Normal EXR",
+        "status": "evaluated",
+        "mae_frame_mean_deg": 17.86154424854792,
+        "mae_pixel_mean_deg": 17.94964646979205,
+        "coverage": 0.9212762809659231,
+        "gt_pixels": 364998,
+        "valid_pixels": 336264,
+        "valid_frames": 15
+      },
+      "mesh": {
+        "label": "Mesh Normal MAE",
+        "reference": "GT unit world-space Normal EXR",
+        "status": "evaluated",
+        "mae_frame_mean_deg": 13.11338530390012,
+        "mae_pixel_mean_deg": 13.01934795911079,
+        "coverage": 0.9730683455799758,
+        "gt_pixels": 364998,
+        "valid_pixels": 355168,
+        "valid_frames": 15
+      }
+    },
+    "common_normal_metrics": {
+      "methods": [
+        "gs_render",
+        "depth_normal",
+        "mesh"
+      ],
+      "gt_pixels": 364998,
+      "valid_pixels": 335879,
+      "coverage": 0.9202214806656475,
+      "angular_deg": {
+        "gs_render": {
+          "mae_frame_mean_deg": 11.702736509259818,
+          "mae_pixel_mean_deg": 11.490144710027778
+        },
+        "depth_normal": {
+          "mae_frame_mean_deg": 17.794162288473327,
+          "mae_pixel_mean_deg": 17.9000964218657
+        },
+        "mesh": {
+          "mae_frame_mean_deg": 12.449174379752483,
+          "mae_pixel_mean_deg": 12.440138744264509
+        }
+      }
+    }
+  }
+}

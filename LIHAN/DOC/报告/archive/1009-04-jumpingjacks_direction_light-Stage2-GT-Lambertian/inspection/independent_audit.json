@@ -1,0 +1,41 @@
+{
+  "status": "PASS",
+  "iteration": 55000,
+  "frames": 15,
+  "independently_recomputed_normal": {
+    "gs_render": {
+      "mae_deg": 21.525043464883158,
+      "coverage": 0.9293748931837384,
+      "common_mae_deg": 20.55943718581084
+    },
+    "depth_normal": {
+      "mae_deg": 27.60512757914095,
+      "coverage": 0.8832326753050431,
+      "common_mae_deg": 27.554078717625135
+    },
+    "mesh": {
+      "mae_deg": 22.88577861576241,
+      "coverage": 0.9364735107706899,
+      "common_mae_deg": 21.878720007610397
+    }
+  },
+  "independently_recomputed_depth": {
+    "expected": {
+      "mae": 0.08970386013396546,
+      "coverage": 0.9293748931837384
+    },
+    "median": {
+      "mae": 0.09224995946218349,
+      "coverage": 0.9293748931837384
+    }
+  },
+  "independently_recomputed_albedo": {
+    "mae_linear": 0.23996674698407316,
+    "coverage_pct": 96.15998862380906
+  },
+  "source_hashes_verified": 84,
+  "dynamic_meshes": 15,
+  "train_poses_per_time": 135,
+  "common_normal_pixels": 366157,
+  "roughness_mae": "N/A: Lambertian has no roughness output"
+}

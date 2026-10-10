@@ -1,0 +1,96 @@
+{
+  "status": "PASS_OFFLINE_DIAGNOSTIC_ONLY",
+  "run": "B07",
+  "iteration": 55000,
+  "frames": 15,
+  "original_mae_deg": 16.81871120018239,
+  "original_gt_pixels": 415433,
+  "original_valid_pixels": 394675,
+  "original_scoring_unchanged": true,
+  "source_sha": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/normal_depth/prediction_0010.npz": "45c917bda5d8817e8a484fe29300f766d92e949777c17f2fd41c5c27788a2888",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/normal_depth/prediction_0020.npz": "722c9d49b17033cc1fd73d94d3c719417a28ec27893269845ef9f16827711718",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/normal_depth/prediction_0030.npz": "fcd5e6d404a0443d6d1f5bd809e9ab08ed31779f51017d486d51f90eed0f6c4d",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/normal_depth/prediction_0040.npz": "97b686526e8825ff8184d2ce02249509015fb5779a321ff1df54d193c2099d9d",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/normal_depth/prediction_0050.npz": "98b3af03b5b1595e4ec7d8aad9f7f83787921298cd1fefd823e8747a9da62fec",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/normal_depth/prediction_0060.npz": "6a770d7a0a110d4499f8109af2e6d5d837554aec74c2147179d38a33ba17dbd0",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/normal_depth/prediction_0070.npz": "7c1afb7b8d79d68c99f57069036dfd4799c2ef982e6c365109116d7b0f856ba2",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/normal_depth/prediction_0080.npz": "74c43cf31a12ebe0741fd470892154c645af4ee165465280b559f6df177e4ad0",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/normal_depth/prediction_0090.npz": "4d9edd9c3ecf92e107d548ad3f1bab7945a01ea5d44a8caf6ea9f140c9d3cfa3",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/normal_depth/prediction_0100.npz": "d7d3eccb4e5873c607537a1b81e5eadf91a9c7ec1b0b20026c31cb3d027fb85f",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/normal_depth/prediction_0110.npz": "575690180f82309dd23e5b591a60075071b222b0d8e2bbc759e8d847a4d28cb6",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/normal_depth/prediction_0120.npz": "49621e659421485cd3016271836d9b9f5c89f6efa8f971a4597f6b52d8d2329e",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/normal_depth/prediction_0130.npz": "a90adb47b363fe11b2ece2c79069fe97b261dd47cee807ad8381d721aeb3e0a3",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/normal_depth/prediction_0140.npz": "85b6eb819c5a795eaca9eb57c6b8a0252b5205179baf611baf8a6b0fecc4d16f",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/normal_depth/prediction_0150.npz": "bb923fffb5fb5896f66be72a0a35ecb05a0146764d24eb361cec538f2f2c5a5b"
+  },
+  "gt_direction_bins": {
+    "GT方向距来源正plane轴0至5度": {
+      "gt_pixels": 301901,
+      "valid_pixels": 298101,
+      "error_sum": 2993956.8670004485,
+      "mae_deg": 10.043431142466643,
+      "fraction_of_original_valid_pixels": 0.7553075315132705,
+      "contribution_to_original_mae_deg": 7.585879184139984,
+      "coverage": 0.9874130923713402
+    },
+    "GT方向距来源正plane轴5至30度": {
+      "gt_pixels": 5008,
+      "valid_pixels": 4247,
+      "error_sum": 167039.07175930945,
+      "mae_deg": 39.33107411332928,
+      "fraction_of_original_valid_pixels": 0.01076075251789447,
+      "contribution_to_original_mae_deg": 0.42323195479650205,
+      "coverage": 0.8480431309904153
+    },
+    "GT方向距来源正plane轴大于30度": {
+      "gt_pixels": 108524,
+      "valid_pixels": 92327,
+      "error_sum": 3476928.9041722263,
+      "mae_deg": 37.65885281848458,
+      "fraction_of_original_valid_pixels": 0.2339317159688351,
+      "contribution_to_original_mae_deg": 8.809600061245902,
+      "coverage": 0.8507519074121853
+    }
+  },
+  "error_tail_bins": {
+    "0至7度": {
+      "valid_pixels": 192431,
+      "error_sum": 505176.2749078787,
+      "mae_deg": 2.625233329909831,
+      "fraction_of_original_valid_pixels": 0.4875682523595363,
+      "contribution_to_original_mae_deg": 1.2799804267001424
+    },
+    "7至15度": {
+      "valid_pixels": 60137,
+      "error_sum": 632267.7469543304,
+      "mae_deg": 10.513789297010664,
+      "fraction_of_original_valid_pixels": 0.1523709381136378,
+      "contribution_to_original_mae_deg": 1.6019959383146396
+    },
+    "15至30度": {
+      "valid_pixels": 62190,
+      "error_sum": 1354047.116684734,
+      "mae_deg": 21.772746690540824,
+      "fraction_of_original_valid_pixels": 0.15757268638753405,
+      "contribution_to_original_mae_deg": 3.4307901860638093
+    },
+    "30至60度": {
+      "valid_pixels": 57958,
+      "error_sum": 2449038.380344595,
+      "mae_deg": 42.25539839788458,
+      "fraction_of_original_valid_pixels": 0.14684993982390573,
+      "contribution_to_original_mae_deg": 6.205202711964515
+    },
+    "60至180度": {
+      "valid_pixels": 21959,
+      "error_sum": 1697395.324040447,
+      "mae_deg": 77.29838899951942,
+      "fraction_of_original_valid_pixels": 0.05563818331538608,
+      "contribution_to_original_mae_deg": 4.300741937139284
+    }
+  },
+  "optimizer_steps": 0,
+  "training_inputs_generated": false,
+  "limitations": "仅B07完整评测浮点数组的误差分解，不是B08结果；GT方向分箱不是物体分割；不筛帧/点/难像素，不输出任何训练监督或掩码。"
+}

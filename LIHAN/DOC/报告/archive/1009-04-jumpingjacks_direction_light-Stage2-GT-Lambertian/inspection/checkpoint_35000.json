@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "iteration": 35000,
+  "source_iteration": 35000,
+  "gaussians": 99827,
+  "finite_tensors": 6,
+  "source_hashes_unchanged": true,
+  "frozen_fingerprint_unchanged": true,
+  "light_state_unchanged": true,
+  "optimizer_groups": [
+    "albedo"
+  ],
+  "intensity": 3.0964135864977482,
+  "calibration_train_frames": 135,
+  "gt_direction_max_difference": 1.1920928955078125e-07,
+  "checkpoint_sha256": "20f95b77cd50f5b3552aa04f10dbf3807aa3d8e240352df65fd1504a41ae19f3"
+}

@@ -1,0 +1,195 @@
+{
+  "status": "FAILED_QUALITY",
+  "model_path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp",
+  "iteration": 55000,
+  "frames": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150
+  ],
+  "metrics": [
+    {
+      "metric": "Albedo MAE",
+      "mae": 0.15432221395780332,
+      "unit": "linear RGB",
+      "coverage_pct": 96.66097857119416
+    },
+    {
+      "metric": "Roughness MAE",
+      "mae": 0.21168067528635645,
+      "unit": "r",
+      "coverage_pct": 96.93599329013256
+    },
+    {
+      "metric": "GS Render Normal MAE",
+      "mae": 17.73081983765733,
+      "unit": "degree",
+      "coverage_pct": 93.88493451410937
+    },
+    {
+      "metric": "Depth Normal MAE",
+      "mae": 26.212827571250934,
+      "unit": "degree",
+      "coverage_pct": 89.25602925140757
+    },
+    {
+      "metric": "Mesh Normal MAE",
+      "mae": 20.414000024130647,
+      "unit": "degree",
+      "coverage_pct": 94.33434512905812
+    },
+    {
+      "metric": "Expected Z Depth MAE",
+      "mae": 0.08031496873547225,
+      "unit": "m",
+      "coverage_pct": 93.88493451410937
+    },
+    {
+      "metric": "Median Z Depth MAE",
+      "mae": 0.08444845007768859,
+      "unit": "m",
+      "coverage_pct": 93.88493451410937
+    }
+  ],
+  "rgb": {
+    "psnr": 19.375063141094465,
+    "ssim": 0.8948765238126118,
+    "lpips": 0.11125242908795675,
+    "psnr_foreground": 12.246959743787187,
+    "ssim_foreground_bbox": 0.7720984180768331,
+    "lpips_foreground_bbox": 0.22454677522182465
+  },
+  "normal_common_pixels": {
+    "methods": [
+      "gs_render",
+      "depth_normal",
+      "mesh"
+    ],
+    "gt_pixels": 415433,
+    "valid_pixels": 369930,
+    "coverage": 0.8904684991322307,
+    "angular_deg": {
+      "gs_render": {
+        "mae_frame_mean_deg": 17.750967373592776,
+        "mae_pixel_mean_deg": 16.77003773292595
+      },
+      "depth_normal": {
+        "mae_frame_mean_deg": 26.671248655123957,
+        "mae_pixel_mean_deg": 26.15792625971809
+      },
+      "mesh": {
+        "mae_frame_mean_deg": 19.91123034080916,
+        "mae_pixel_mean_deg": 19.370265472281066
+      }
+    }
+  },
+  "gs_normal_missing_180_penalty_deg": 27.65368646800242,
+  "independent_audit": {
+    "status": "PASS",
+    "iteration": 55000,
+    "frames": 15,
+    "independently_recomputed_normal": {
+      "gs_render": {
+        "mae_deg": 17.73081983765733,
+        "coverage": 0.9388493451410937,
+        "common_mae_deg": 16.77003773292595
+      },
+      "depth_normal": {
+        "mae_deg": 26.212827571250934,
+        "coverage": 0.8925602925140756,
+        "common_mae_deg": 26.15792625971809
+      },
+      "mesh": {
+        "mae_deg": 20.414000024130647,
+        "coverage": 0.9433434512905812,
+        "common_mae_deg": 19.370265472281066
+      }
+    },
+    "independently_recomputed_depth": {
+      "expected": {
+        "mae": 0.08031496824094331,
+        "coverage": 0.9388493451410937
+      },
+      "median": {
+        "mae": 0.08444844837709584,
+        "coverage": 0.9388493451410937
+      }
+    },
+    "independently_recomputed_albedo": {
+      "mae_linear": 0.15432221397030135,
+      "coverage_pct": 96.66097857119418
+    },
+    "source_hashes_verified": 92,
+    "dynamic_meshes": 15,
+    "train_poses_per_time": 135,
+    "common_normal_pixels": 369930,
+    "roughness_mae": 0.21168067528635645
+  },
+  "training_gt_inputs": [
+    "light_direction_only"
+  ],
+  "material_geometry_gt_used_for_training": false,
+  "light_GT_photometry_used": false,
+  "light_intensity": 6.492673397064209,
+  "source_plane_diagnostic_only": false,
+  "manual_review": {
+    "status": "FAILED",
+    "reviewed_at": "2026-10-10T06:50:04.859858+09:00",
+    "iteration": 55000,
+    "rgb_background": "黑背景正常且主体平台存在；人物头手/衣服仍明显斑驳、稀疏，平台脚周伪起伏/灰块；与B04相近，PSNR略低。GT背光本来暗，不仅凭暗失败。",
+    "alpha": "主体平台基本覆盖，边缘薄雾化与稀疏残影；完整数值覆盖率已报告。",
+    "albedo_static_dynamic": "正背面光照仍烘入衣服/身体，平台棋盘格和脚周污染；冻结feature未修复源静动态误分类。",
+    "normal_depth": "GS身体斑驳、平台脚周伪起伏/异常轴；Depth更噪，Mesh局部头手腿缺面，0080明显。15187 plane组实际轴正确，但旧installed kernel在0075等三个训练帧错误反向；不是评分后翻转。",
+    "relighting": "HDR与转灯背景黑、人物平台可见且有照明响应；人体/脚周斑驳仍明显。未提供重光照GT，不作精度声明。",
+    "reviewed_test_frames": [
+      10,
+      80,
+      150
+    ],
+    "reviewed_insight_frames": [
+      1,
+      75,
+      150
+    ],
+    "reviewed_hdr_frames": [
+      1,
+      76,
+      150
+    ],
+    "reviewed_directional_frames": [
+      0,
+      36,
+      71
+    ],
+    "images": [
+      "inspection/rgb_final_55000_comparison.png",
+      "inspection/four_categories_final_55000.png",
+      "inspection/relight.png",
+      "normal_depth/comparison_0010.png",
+      "normal_depth/comparison_0080.png",
+      "normal_depth/comparison_0150.png",
+      "inspection/plane_raster_group_comparison.png"
+    ],
+    "normal_goal": "FAILED",
+    "commit_allowed": false,
+    "subsequent_native_kernel_diagnostic_is_final_training": false
+  },
+  "normal_goal": "FAILED",
+  "commit_allowed": false,
+  "pipeline_exit_code": 0,
+  "verified_postprocess_session_closed": true,
+  "source_code_manifest_verified": true,
+  "kernel_runtime_provenance": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/inspection/raster_kernel_provenance.json"
+}

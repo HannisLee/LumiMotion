@@ -1,0 +1,168 @@
+Loading trained model at iteration 35020
+Found transforms_train.json file, assuming Blender data set!
+Reading Training Transforms
+Read Train Transforms with 135 cameras
+Loading Training Cameras
+Loading Test Cameras
+LOAD PLY
+/home/lihan/reproduce/LumiMotion-stage2-perlight/scene/__init__.py:103: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  unique_fids = [torch.tensor(val, dtype=torch.float32, device="cuda") for val in unique_values]
+################ gaussian_color params: 156934
+/home/lihan/miniconda3/envs/lumimotion/lib/python3.8/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at ../aten/src/ATen/native/TensorShape.cpp:3526.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Using /home/lihan/.cache/torch_extensions/py38_cu121 as PyTorch extensions root...
+Detected CUDA files, patching ldflags
+Emitting ninja build file /home/lihan/.cache/torch_extensions/py38_cu121/renderutils_plugin/build.ninja...
+Building extension module renderutils_plugin...
+Using envvar MAX_JOBS (4) as the number of workers...
+ninja: no work to do.
+Loading extension module renderutils_plugin...
+Without indirect in relight
+Without indirect in relight
+Without indirect in relight
+{
+  "status": "PASS_NATIVE_PRESET_PBR_GGX_BVH_GRADIENTS_AND_RELIGHT",
+  "iteration": 35020,
+  "rows": [
+    {
+      "frame": "0001",
+      "eligible_pixels": 18843,
+      "photo_pixels": 18843,
+      "actual_trace_calls": [
+        {
+          "shape": [
+            18843,
+            1,
+            3
+          ],
+          "rays": 18843
+        }
+      ],
+      "loss": 0.20928415656089783,
+      "gradients": {
+        "albedo": 0.0023831557482481003,
+        "roughness": 0.00013712618965655565,
+        "xyz": 0.31979236006736755,
+        "rotation": 0.02047950029373169,
+        "feature": 0.0008569268975406885
+      }
+    },
+    {
+      "frame": "0075",
+      "eligible_pixels": 15904,
+      "photo_pixels": 15904,
+      "actual_trace_calls": [
+        {
+          "shape": [
+            15904,
+            1,
+            3
+          ],
+          "rays": 15904
+        }
+      ],
+      "loss": 0.24454335868358612,
+      "gradients": {
+        "albedo": 0.0011532646603882313,
+        "roughness": 7.355137495324016e-05,
+        "xyz": 2.215073347091675,
+        "rotation": 0.46000123023986816,
+        "feature": 0.0026949907187372446
+      }
+    },
+    {
+      "frame": "0149",
+      "eligible_pixels": 19137,
+      "photo_pixels": 19137,
+      "actual_trace_calls": [
+        {
+          "shape": [
+            19137,
+            1,
+            3
+          ],
+          "rays": 19137
+        }
+      ],
+      "loss": 0.21227584779262543,
+      "gradients": {
+        "albedo": 0.0024205672089010477,
+        "roughness": 0.00013751047663390636,
+        "xyz": 0.29936063289642334,
+        "rotation": 0.022463224828243256,
+        "feature": 0.0003055631532333791
+      }
+    }
+  ],
+  "budget_variants": [
+    {
+      "name": "legacy_direct",
+      "selected_pixels": 1024,
+      "budget": 262144,
+      "cost": 256,
+      "actual_trace_calls": [
+        {
+          "shape": [
+            1024,
+            1,
+            3
+          ],
+          "rays": 1024
+        }
+      ],
+      "gradients_finite_nonzero": true
+    },
+    {
+      "name": "actual_three_sun",
+      "selected_pixels": 170,
+      "budget": 512,
+      "cost": 3,
+      "actual_trace_calls": [
+        {
+          "shape": [
+            170,
+            3,
+            3
+          ],
+          "rays": 510
+        }
+      ],
+      "gradients_finite_nonzero": true
+    },
+    {
+      "name": "actual_with_indirect",
+      "selected_pixels": 1020,
+      "budget": 262144,
+      "cost": 257,
+      "actual_trace_calls": [
+        {
+          "shape": [
+            1020,
+            1,
+            3
+          ],
+          "rays": 1020
+        },
+        {
+          "shape": [
+            1020,
+            256,
+            3
+          ],
+          "rays": 261120
+        }
+      ],
+      "gradients_finite_nonzero": true
+    }
+  ],
+  "parameter_sha_unchanged": true,
+  "source_files": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-15-dir-PBR来源输出gate/model_mlp/point_cloud/iteration_35020/point_cloud.ply": "666efb01f87e183785743567b70fda61124431e9cf40983fe081ca09820889f9",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-15-dir-PBR来源输出gate/model_mlp/deform/iteration_35020/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+  },
+  "optimizer_steps": 0,
+  "gt_material_normal_geometry_inputs": false,
+  "hdr_samples": 16,
+  "full_training_mae": false,
+  "limitations": "仅20步smoke checkpoint的功能/非零有限梯度；HDR16仅smoke，最终仍150帧2048，不作为质量或7°结论。"
+}

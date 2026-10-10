@@ -1,0 +1,2402 @@
+{
+  "0001": {
+    "type": "directional",
+    "light_dir_world": [
+      0.3748101592063904,
+      -0.3748101592063904,
+      0.8479592204093933
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0002": {
+    "type": "directional",
+    "light_dir_world": [
+      0.40160050988197327,
+      -0.33899182081222534,
+      0.8507654070854187
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0003": {
+    "type": "directional",
+    "light_dir_world": [
+      0.42532026767730713,
+      -0.3015401065349579,
+      0.8533324599266052
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0004": {
+    "type": "directional",
+    "light_dir_world": [
+      0.4459092915058136,
+      -0.2626958191394806,
+      0.855661153793335
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0005": {
+    "type": "directional",
+    "light_dir_world": [
+      0.46332329511642456,
+      -0.22269511222839355,
+      0.8577519655227661
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0006": {
+    "type": "directional",
+    "light_dir_world": [
+      0.47753313183784485,
+      -0.18176914751529694,
+      0.8596057891845703
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0007": {
+    "type": "directional",
+    "light_dir_world": [
+      0.48852238059043884,
+      -0.14014345407485962,
+      0.8612233400344849
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0008": {
+    "type": "directional",
+    "light_dir_world": [
+      0.49628663063049316,
+      -0.09803784638643265,
+      0.8626054525375366
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0009": {
+    "type": "directional",
+    "light_dir_world": [
+      0.500831663608551,
+      -0.055666472762823105,
+      0.8637527823448181
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0010": {
+    "type": "directional",
+    "light_dir_world": [
+      0.5021728277206421,
+      -0.013238153420388699,
+      0.8646660447120667
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0011": {
+    "type": "directional",
+    "light_dir_world": [
+      0.5003335475921631,
+      0.02904311940073967,
+      0.8653454780578613
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0012": {
+    "type": "directional",
+    "light_dir_world": [
+      0.4953451156616211,
+      0.0709776058793068,
+      0.8657918572425842
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0013": {
+    "type": "directional",
+    "light_dir_world": [
+      0.48724547028541565,
+      0.11236925423145294,
+      0.8660051822662354
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0014": {
+    "type": "directional",
+    "light_dir_world": [
+      0.4760798215866089,
+      0.15302477777004242,
+      0.8659858107566833
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0015": {
+    "type": "directional",
+    "light_dir_world": [
+      0.4619000256061554,
+      0.19275307655334473,
+      0.8657336831092834
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0016": {
+    "type": "directional",
+    "light_dir_world": [
+      0.44476476311683655,
+      0.23136435449123383,
+      0.8652485013008118
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0017": {
+    "type": "directional",
+    "light_dir_world": [
+      0.42474040389060974,
+      0.26866990327835083,
+      0.8645300269126892
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0018": {
+    "type": "directional",
+    "light_dir_world": [
+      0.40190112590789795,
+      0.30448123812675476,
+      0.8635778427124023
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0019": {
+    "type": "directional",
+    "light_dir_world": [
+      0.3763301968574524,
+      0.33860984444618225,
+      0.8623915314674377
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0020": {
+    "type": "directional",
+    "light_dir_world": [
+      0.34812045097351074,
+      0.3708673119544983,
+      0.860970139503479
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0021": {
+    "type": "directional",
+    "light_dir_world": [
+      0.3173758387565613,
+      0.4010652005672455,
+      0.8593131899833679
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0022": {
+    "type": "directional",
+    "light_dir_world": [
+      0.28421226143836975,
+      0.4290156364440918,
+      0.8574199676513672
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0023": {
+    "type": "directional",
+    "light_dir_world": [
+      0.24875879287719727,
+      0.45453161001205444,
+      0.8552895784378052
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0024": {
+    "type": "directional",
+    "light_dir_world": [
+      0.21115894615650177,
+      0.4774278998374939,
+      0.8529211282730103
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0025": {
+    "type": "directional",
+    "light_dir_world": [
+      0.17157161235809326,
+      0.49752277135849,
+      0.8503142595291138
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0026": {
+    "type": "directional",
+    "light_dir_world": [
+      0.13017228245735168,
+      0.5146386027336121,
+      0.8474681973457336
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0027": {
+    "type": "directional",
+    "light_dir_world": [
+      0.08715365082025528,
+      0.52860426902771,
+      0.8443825244903564
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0028": {
+    "type": "directional",
+    "light_dir_world": [
+      0.04272640123963356,
+      0.5392565131187439,
+      0.8410570025444031
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0029": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.0028804128523916006,
+      0.546442449092865,
+      0.8374917507171631
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0030": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.04941932484507561,
+      0.5500215888023376,
+      0.8336870074272156
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0031": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.09662462025880814,
+      0.5498685836791992,
+      0.8296433687210083
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0032": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.14421284198760986,
+      0.5458754301071167,
+      0.8253621459007263
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0033": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.1918836534023285,
+      0.5379544496536255,
+      0.8208445906639099
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0034": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.23932108283042908,
+      0.5260400772094727,
+      0.8160926699638367
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0035": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.2861954867839813,
+      0.5100923776626587,
+      0.8111090660095215
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0036": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.3321651816368103,
+      0.4900987148284912,
+      0.8058968186378479
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0037": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.37687885761260986,
+      0.4660760760307312,
+      0.8004595637321472
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0038": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.41997888684272766,
+      0.43807315826416016,
+      0.7948017120361328
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0039": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.46110352873802185,
+      0.4061720073223114,
+      0.7889283299446106
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0040": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.49989110231399536,
+      0.370489239692688,
+      0.7828452587127686
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0041": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.5359832048416138,
+      0.3311774432659149,
+      0.7765588760375977
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0042": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.5690284967422485,
+      0.28842487931251526,
+      0.770076334476471
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0043": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.5986868739128113,
+      0.24245643615722656,
+      0.7634062170982361
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0044": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.6246335506439209,
+      0.1935327798128128,
+      0.7565567493438721
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0045": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.6465627551078796,
+      0.1419496238231659,
+      0.7495378255844116
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0046": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.6641924977302551,
+      0.08803632855415344,
+      0.7423597574234009
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0047": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.6772677302360535,
+      0.032153818756341934,
+      0.7350337505340576
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0048": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.6855646371841431,
+      -0.025307388976216316,
+      0.7275717258453369
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0049": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.6888942718505859,
+      -0.08393038064241409,
+      0.7199863791465759
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0050": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.6871052980422974,
+      -0.14327500760555267,
+      0.7122911214828491
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0051": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.6800873875617981,
+      -0.20288164913654327,
+      0.7044999599456787
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0052": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.6677736043930054,
+      -0.2622752785682678,
+      0.696627676486969
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0053": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.6501423716545105,
+      -0.3209698498249054,
+      0.6886895895004272
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0054": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.6272189617156982,
+      -0.3784729540348053,
+      0.6807016134262085
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0055": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.599077045917511,
+      -0.4342907667160034,
+      0.6726799607276917
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0056": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.5658382773399353,
+      -0.48793289065361023,
+      0.6646417379379272
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0057": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.5276730060577393,
+      -0.5389176607131958,
+      0.6566041111946106
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0058": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.4847993850708008,
+      -0.5867770910263062,
+      0.6485847234725952
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0059": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.43748214840888977,
+      -0.6310617923736572,
+      0.6406015753746033
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0060": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.3860307037830353,
+      -0.6713461875915527,
+      0.6326726078987122
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0061": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.3307971954345703,
+      -0.7072327733039856,
+      0.6248160600662231
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0062": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.27217307686805725,
+      -0.7383567094802856,
+      0.6170504689216614
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0063": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.21058663725852966,
+      -0.764390230178833,
+      0.6093939542770386
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0064": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.14649857580661774,
+      -0.7850456833839417,
+      0.6018649935722351
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0065": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.08039811998605728,
+      -0.8000797629356384,
+      0.5944817662239075
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0066": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.012798774056136608,
+      -0.8092957139015198,
+      0.5872620344161987
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0067": {
+    "type": "directional",
+    "light_dir_world": [
+      0.05576672777533531,
+      -0.812545657157898,
+      0.5802238583564758
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0068": {
+    "type": "directional",
+    "light_dir_world": [
+      0.12475117295980453,
+      -0.809732973575592,
+      0.5733843445777893
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0069": {
+    "type": "directional",
+    "light_dir_world": [
+      0.19359815120697021,
+      -0.8008133769035339,
+      0.5667607188224792
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0070": {
+    "type": "directional",
+    "light_dir_world": [
+      0.26174700260162354,
+      -0.7857953906059265,
+      0.560369610786438
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0071": {
+    "type": "directional",
+    "light_dir_world": [
+      0.32863837480545044,
+      -0.7647413611412048,
+      0.5542269349098206
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0072": {
+    "type": "directional",
+    "light_dir_world": [
+      0.39371952414512634,
+      -0.7377663254737854,
+      0.5483483076095581
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0073": {
+    "type": "directional",
+    "light_dir_world": [
+      0.4564492404460907,
+      -0.7050376534461975,
+      0.5427486896514893
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0074": {
+    "type": "directional",
+    "light_dir_world": [
+      0.516302764415741,
+      -0.6667739152908325,
+      0.5374422073364258
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0075": {
+    "type": "directional",
+    "light_dir_world": [
+      0.5727774500846863,
+      -0.6232423782348633,
+      0.5324424505233765
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0076": {
+    "type": "directional",
+    "light_dir_world": [
+      0.625396728515625,
+      -0.5747573971748352,
+      0.527762234210968
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0077": {
+    "type": "directional",
+    "light_dir_world": [
+      0.6737144589424133,
+      -0.5216770768165588,
+      0.5234136581420898
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0078": {
+    "type": "directional",
+    "light_dir_world": [
+      0.7173197865486145,
+      -0.4644007086753845,
+      0.5194077491760254
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0079": {
+    "type": "directional",
+    "light_dir_world": [
+      0.7558398246765137,
+      -0.40336474776268005,
+      0.5157548189163208
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0080": {
+    "type": "directional",
+    "light_dir_world": [
+      0.7889440059661865,
+      -0.33903926610946655,
+      0.5124645233154297
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0081": {
+    "type": "directional",
+    "light_dir_world": [
+      0.8163465261459351,
+      -0.2719234824180603,
+      0.5095449686050415
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0082": {
+    "type": "directional",
+    "light_dir_world": [
+      0.8378090262413025,
+      -0.20254188776016235,
+      0.5070037841796875
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0083": {
+    "type": "directional",
+    "light_dir_world": [
+      0.8531426787376404,
+      -0.13143905997276306,
+      0.5048477053642273
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0084": {
+    "type": "directional",
+    "light_dir_world": [
+      0.8622103333473206,
+      -0.0591752827167511,
+      0.5030820965766907
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0085": {
+    "type": "directional",
+    "light_dir_world": [
+      0.8649267554283142,
+      0.013678548857569695,
+      0.5017116665840149
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0086": {
+    "type": "directional",
+    "light_dir_world": [
+      0.8612602949142456,
+      0.08654600381851196,
+      0.5007399916648865
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0087": {
+    "type": "directional",
+    "light_dir_world": [
+      0.8512327671051025,
+      0.15884985029697418,
+      0.5001693964004517
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0088": {
+    "type": "directional",
+    "light_dir_world": [
+      0.8349195718765259,
+      0.23001722991466522,
+      0.5000013709068298
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0089": {
+    "type": "directional",
+    "light_dir_world": [
+      0.812448263168335,
+      0.2994847595691681,
+      0.5002365112304688
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0090": {
+    "type": "directional",
+    "light_dir_world": [
+      0.7839986681938171,
+      0.36670324206352234,
+      0.5008741617202759
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0091": {
+    "type": "directional",
+    "light_dir_world": [
+      0.7497999668121338,
+      0.4311424493789673,
+      0.5019125938415527
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0092": {
+    "type": "directional",
+    "light_dir_world": [
+      0.7101298570632935,
+      0.49229592084884644,
+      0.5033491849899292
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0093": {
+    "type": "directional",
+    "light_dir_world": [
+      0.6653115153312683,
+      0.5496851205825806,
+      0.5051801204681396
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0094": {
+    "type": "directional",
+    "light_dir_world": [
+      0.6157107949256897,
+      0.6028637886047363,
+      0.5074007511138916
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0095": {
+    "type": "directional",
+    "light_dir_world": [
+      0.5617331266403198,
+      0.6514217853546143,
+      0.5100054144859314
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0096": {
+    "type": "directional",
+    "light_dir_world": [
+      0.5038202404975891,
+      0.6949886679649353,
+      0.5129873156547546
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0097": {
+    "type": "directional",
+    "light_dir_world": [
+      0.4424455165863037,
+      0.7332367897033691,
+      0.5163387656211853
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0098": {
+    "type": "directional",
+    "light_dir_world": [
+      0.37811076641082764,
+      0.765884518623352,
+      0.5200511813163757
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0099": {
+    "type": "directional",
+    "light_dir_world": [
+      0.3113407790660858,
+      0.7926982641220093,
+      0.5241149067878723
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0100": {
+    "type": "directional",
+    "light_dir_world": [
+      0.24267935752868652,
+      0.8134948015213013,
+      0.5285195708274841
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0101": {
+    "type": "directional",
+    "light_dir_world": [
+      0.17268411815166473,
+      0.8281428217887878,
+      0.5332538485527039
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0102": {
+    "type": "directional",
+    "light_dir_world": [
+      0.10192148387432098,
+      0.8365639448165894,
+      0.5383055806159973
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0103": {
+    "type": "directional",
+    "light_dir_world": [
+      0.03096151165664196,
+      0.8387331366539001,
+      0.543661892414093
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0104": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.0396270677447319,
+      0.8346791863441467,
+      0.5493090748786926
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0105": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.10928235948085785,
+      0.8244840502738953,
+      0.55523282289505
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0106": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.17745427787303925,
+      0.8082820773124695,
+      0.5614179372787476
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0107": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.24360962212085724,
+      0.7862581610679626,
+      0.5678489804267883
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0108": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.30723682045936584,
+      0.7586461901664734,
+      0.574509859085083
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0109": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.36785078048706055,
+      0.7257266044616699,
+      0.581383466720581
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0110": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.4249972403049469,
+      0.6878228187561035,
+      0.5884532332420349
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0111": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.4782566726207733,
+      0.6452987790107727,
+      0.5957013368606567
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0112": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.5272482633590698,
+      0.5985543727874756,
+      0.6031102538108826
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0113": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.5716328620910645,
+      0.5480220317840576,
+      0.6106616854667664
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0114": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.6111162900924683,
+      0.4941614270210266,
+      0.6183376908302307
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0115": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.645451009273529,
+      0.4374553859233856,
+      0.6261196732521057
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0116": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.6744385361671448,
+      0.37840452790260315,
+      0.6339895129203796
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0117": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.6979305148124695,
+      0.3175223469734192,
+      0.6419288516044617
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0118": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.7158292531967163,
+      0.25533002614974976,
+      0.6499192714691162
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0119": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.7280880808830261,
+      0.19235090911388397,
+      0.6579429507255554
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0120": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.7347107529640198,
+      0.12910567224025726,
+      0.6659818887710571
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0121": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.7357506155967712,
+      0.06610706448554993,
+      0.6740185022354126
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0122": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.7313087582588196,
+      0.0038548256270587444,
+      0.6820356249809265
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0123": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.72153240442276,
+      -0.057168520987033844,
+      0.6900164484977722
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0124": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.7066118717193604,
+      -0.11650270223617554,
+      0.6979447603225708
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0125": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.6867777705192566,
+      -0.17371304333209991,
+      0.7058045268058777
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0126": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.6622978448867798,
+      -0.22839458286762238,
+      0.7135807871818542
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0127": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.6334728598594666,
+      -0.28017517924308777,
+      0.7212586402893066
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0128": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.6006326675415039,
+      -0.3287179172039032,
+      0.7288243174552917
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0129": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.5641322135925293,
+      -0.37372371554374695,
+      0.7362645268440247
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0130": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.5243468284606934,
+      -0.4149325489997864,
+      0.7435666918754578
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0131": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.4816679060459137,
+      -0.45212522149086,
+      0.7507190108299255
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0132": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.43649822473526,
+      -0.4851230978965759,
+      0.7577102780342102
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0133": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.3892477750778198,
+      -0.5137891173362732,
+      0.7645304799079895
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0134": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.34032922983169556,
+      -0.5380266904830933,
+      0.7711700797080994
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0135": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.2901538014411926,
+      -0.5577790141105652,
+      0.7776203155517578
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0136": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.23912715911865234,
+      -0.5730277299880981,
+      0.7838733196258545
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0137": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.18764613568782806,
+      -0.5837913155555725,
+      0.7899219393730164
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0138": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.13609488308429718,
+      -0.5901224613189697,
+      0.7957597374916077
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0139": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.08484245091676712,
+      -0.5921063423156738,
+      0.8013811707496643
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0140": {
+    "type": "directional",
+    "light_dir_world": [
+      -0.034239742904901505,
+      -0.5898573994636536,
+      0.8067812919616699
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0141": {
+    "type": "directional",
+    "light_dir_world": [
+      0.015382486395537853,
+      -0.5835164189338684,
+      0.8119555711746216
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0142": {
+    "type": "directional",
+    "light_dir_world": [
+      0.0637153834104538,
+      -0.5732481479644775,
+      0.8169008493423462
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0143": {
+    "type": "directional",
+    "light_dir_world": [
+      0.11047330498695374,
+      -0.5592373609542847,
+      0.8216137886047363
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0144": {
+    "type": "directional",
+    "light_dir_world": [
+      0.1553947925567627,
+      -0.5416865348815918,
+      0.8260921835899353
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0145": {
+    "type": "directional",
+    "light_dir_world": [
+      0.19824299216270447,
+      -0.5208121538162231,
+      0.8303338885307312
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0146": {
+    "type": "directional",
+    "light_dir_world": [
+      0.23880594968795776,
+      -0.49684232473373413,
+      0.8343377113342285
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0147": {
+    "type": "directional",
+    "light_dir_world": [
+      0.2768961489200592,
+      -0.47001343965530396,
+      0.8381026387214661
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0148": {
+    "type": "directional",
+    "light_dir_world": [
+      0.3123501241207123,
+      -0.4405677318572998,
+      0.8416278958320618
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0149": {
+    "type": "directional",
+    "light_dir_world": [
+      0.3450275957584381,
+      -0.4087509214878082,
+      0.8449134230613708
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  },
+  "0150": {
+    "type": "directional",
+    "light_dir_world": [
+      0.3748101592063904,
+      -0.3748101592063904,
+      0.8479592204093933
+    ],
+    "direction_convention": "unit vector from surface toward light, for max(n dot l, 0)",
+    "source_type": "SUN",
+    "intensity": 6.0,
+    "source_light_names": [
+      "MVPS_Moving_Sun",
+      "MVPS_Moving_Sun.001"
+    ],
+    "intensity_unit": "sum of Blender SUN parameters; trainer uses calibrated scalar"
+  }
+}

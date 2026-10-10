@@ -1,0 +1,11 @@
+{
+  "status": "TRAIN_COMPLETED",
+  "finished_at": "2026-10-10T02:54:35.135740+09:00",
+  "iteration": 55000,
+  "training_pid": 208981,
+  "started_at": "2026-10-10T02:10:11.814472+09:00",
+  "training_log_completed_at": "2026-10-10T02:54:30+09:00",
+  "training_loop_elapsed": "44:02",
+  "steps_completed": 20000,
+  "exit_code": 0
+}

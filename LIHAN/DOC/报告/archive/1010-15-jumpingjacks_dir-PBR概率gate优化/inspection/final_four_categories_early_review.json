@@ -1,0 +1,20 @@
+{
+  "status": "FAILED_EARLY_FOUR_CATEGORIES_ONLY",
+  "iteration": 55000,
+  "actual_images_viewed": true,
+  "images": [
+    "inspection/four_categories_final_55000.png"
+  ],
+  "insight_frames": [
+    1,
+    75,
+    150
+  ],
+  "reviewed_at": "2026-10-10T10:35:21.393426+09:00",
+  "rgb_background": "黑背景正常；人物/平台存在，但肢体与衣服光度斑驳，脚周黑灰伪凸起，背光帧与原RGB轮廓差异。",
+  "alpha": "人物/平台主体完整且大部饱和；手臂、身侧与平台边缘细碎残影/薄雾仍存在，不把黑RGB区域误称Alpha缺失。",
+  "albedo_static_dynamic": "前后光照/阴影/衣服亮暗色差烘入材质，脚周灰黑污染；平台棋盘格可见但污染较重。",
+  "normal_depth": "实际GS Normal平台整体上向，脚周伪凸起和人体混合轴斑驳明显。Depth/Mesh尚待评测，未宣称已审阅。",
+  "full_manual_review_completed": false,
+  "normal_GT_metric_claimed": false
+}

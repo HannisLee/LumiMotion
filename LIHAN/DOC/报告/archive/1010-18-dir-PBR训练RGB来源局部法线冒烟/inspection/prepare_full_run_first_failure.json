@@ -1,0 +1,10 @@
+{
+  "exit_code": 1,
+  "stage": "before_execution_syntax_parse",
+  "training_started": false,
+  "production_changed": false,
+  "reason": "quoted folder list and nested helper docstring escaping in preparation script",
+  "original_script": "commands/prepare_full_run.py",
+  "original_log": "logs/prepare_full_run.log",
+  "nonexistent_retry_launch_exit": 2
+}

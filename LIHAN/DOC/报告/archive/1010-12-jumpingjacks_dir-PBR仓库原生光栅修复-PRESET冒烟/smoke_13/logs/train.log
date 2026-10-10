@@ -1,0 +1,48 @@
+Setting up [LPIPS] perceptual loss: trunk [alex], v[0.1], spatial [off]
+/home/lihan/miniconda3/envs/lumimotion/lib/python3.8/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/home/lihan/miniconda3/envs/lumimotion/lib/python3.8/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=AlexNet_Weights.IMAGENET1K_V1`. You can also use `weights=AlexNet_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+Loading model from: /home/lihan/miniconda3/envs/lumimotion/lib/python3.8/site-packages/lpips/weights/v0.1/alex.pth
+/home/lihan/miniconda3/envs/lumimotion/lib/python3.8/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=VGG16_Weights.IMAGENET1K_V1`. You can also use `weights=VGG16_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+Optimizing /home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-13-dir-PBR原生CUDA与Preset冒烟/model_mlp
+Output folder: /home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-13-dir-PBR原生CUDA与Preset冒烟/model_mlp [10/10 06:54:12]
+################ gaussian_color params: 156934 [10/10 06:54:12]
+Loading trained model at iteration 35000 [10/10 06:54:12]
+Found transforms_train.json file, assuming Blender data set! [10/10 06:54:12]
+Reading Training Transforms [10/10 06:54:12]
+Read Train Transforms with 135 cameras [10/10 06:54:18]
+Loading Training Cameras [10/10 06:54:19]
+Loading Test Cameras [10/10 06:54:21]
+LOAD PLY [10/10 06:54:22]
+/home/lihan/reproduce/LumiMotion-stage2-perlight/scene/__init__.py:103: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  unique_fids = [torch.tensor(val, dtype=torch.float32, device="cuda") for val in unique_values]
+######## Optimizer params: before=678,957 | after=156,934 [10/10 06:54:24]
+Training progress:   0%|          | 0/35020 [00:00<?, ?it/s]
+  0%|          | 0/20 [00:00<?, ?it/s][AStage2 material training | EMA loss=0.0990304:   0%|          | 0/35020 [00:00<?, ?it/s]
+  5%|▌         | 1/20 [00:00<00:04,  4.30it/s][AStage2 material training | EMA loss=0.1615647:   0%|          | 0/35020 [00:00<?, ?it/s]
+ 10%|█         | 2/20 [00:00<00:02,  6.08it/s][AStage2 material training | EMA loss=0.1824768:   0%|          | 0/35020 [00:00<?, ?it/s]
+ 15%|█▌        | 3/20 [00:00<00:02,  6.69it/s][AStage2 material training | EMA loss=0.1992043:   0%|          | 0/35020 [00:00<?, ?it/s]
+ 20%|██        | 4/20 [00:00<00:02,  6.06it/s][AStage2 material training | EMA loss=0.2074536:   0%|          | 0/35020 [00:00<?, ?it/s]
+ 25%|██▌       | 5/20 [00:00<00:02,  6.60it/s][AStage2 material training | EMA loss=0.2246561:   0%|          | 0/35020 [00:00<?, ?it/s]
+ 30%|███       | 6/20 [00:00<00:01,  7.06it/s][AStage2 material training | EMA loss=0.2465474:   0%|          | 0/35020 [00:01<?, ?it/s]
+ 35%|███▌      | 7/20 [00:01<00:01,  7.52it/s][AStage2 material training | EMA loss=0.2736651:   0%|          | 0/35020 [00:01<?, ?it/s]
+ 40%|████      | 8/20 [00:01<00:01,  7.56it/s][AStage2 material training | EMA loss=0.2584771:   0%|          | 0/35020 [00:01<?, ?it/s]
+ 45%|████▌     | 9/20 [00:01<00:01,  7.73it/s][AStage2 material training | EMA loss=0.2584771:   0%|          | 0/35020 [00:01<?, ?it/s, Loss=0.2423896]Stage2 material training | EMA loss=0.2584771:   0%|          | 10/35020 [00:01<1:23:06,  7.02it/s, Loss=0.2423896]Stage2 material training | EMA loss=0.2423896:   0%|          | 10/35020 [00:01<1:23:06,  7.02it/s, Loss=0.2423896]
+ 50%|█████     | 10/20 [00:01<00:01,  7.61it/s][AStage2 material training | EMA loss=0.2293689:   0%|          | 10/35020 [00:01<1:23:06,  7.02it/s, Loss=0.2423896]
+ 55%|█████▌    | 11/20 [00:01<00:01,  7.93it/s][AStage2 material training | EMA loss=0.2613592:   0%|          | 10/35020 [00:01<1:23:06,  7.02it/s, Loss=0.2423896]
+ 60%|██████    | 12/20 [00:01<00:01,  7.63it/s][AStage2 material training | EMA loss=0.2422920:   0%|          | 10/35020 [00:01<1:23:06,  7.02it/s, Loss=0.2423896]
+ 65%|██████▌   | 13/20 [00:01<00:00,  7.89it/s][AStage2 material training | EMA loss=0.2457433:   0%|          | 10/35020 [00:01<1:23:06,  7.02it/s, Loss=0.2423896]
+ 70%|███████   | 14/20 [00:01<00:00,  8.08it/s][AStage2 material training | EMA loss=0.2400898:   0%|          | 10/35020 [00:02<1:23:06,  7.02it/s, Loss=0.2423896]
+ 75%|███████▌  | 15/20 [00:02<00:00,  8.18it/s][AStage2 material training | EMA loss=0.2378122:   0%|          | 10/35020 [00:02<1:23:06,  7.02it/s, Loss=0.2423896]
+ 80%|████████  | 16/20 [00:02<00:00,  7.51it/s][AStage2 material training | EMA loss=0.2624355:   0%|          | 10/35020 [00:02<1:23:06,  7.02it/s, Loss=0.2423896]
+ 85%|████████▌ | 17/20 [00:02<00:00,  7.54it/s][AStage2 material training | EMA loss=0.2642458:   0%|          | 10/35020 [00:02<1:23:06,  7.02it/s, Loss=0.2423896]
+ 90%|█████████ | 18/20 [00:02<00:00,  7.86it/s][AStage2 material training | EMA loss=0.2791126:   0%|          | 10/35020 [00:02<1:23:06,  7.02it/s, Loss=0.2423896]
+ 95%|█████████▌| 19/20 [00:02<00:00,  7.76it/s][AStage2 material training | EMA loss=0.2791126:   0%|          | 10/35020 [00:02<1:23:06,  7.02it/s, Loss=0.2667510]Stage2 material training | EMA loss=0.2791126:   0%|          | 20/35020 [00:02<1:17:26,  7.53it/s, Loss=0.2667510]Stage2 material training | EMA loss=0.2791126:   0%|          | 20/35020 [00:02<1:18:17,  7.45it/s, Loss=0.2667510]
+
+[ITER 35020] Saving Gaussians [10/10 06:54:27]
+
+100%|██████████| 20/20 [00:03<00:00,  2.44it/s][A100%|██████████| 20/20 [00:03<00:00,  5.50it/s]
+
+Training complete. [10/10 06:54:28]

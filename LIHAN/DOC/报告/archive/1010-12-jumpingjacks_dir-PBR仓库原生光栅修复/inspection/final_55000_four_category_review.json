@@ -1,0 +1,19 @@
+{
+  "status": "FAILED_SO_FAR_FINAL_FOUR_CATEGORIES",
+  "reviewed_at": "2026-10-10T07:47:59.665924+09:00",
+  "iteration": 55000,
+  "actual_viewed_frames": [
+    "0001",
+    "0075",
+    "0150"
+  ],
+  "comparison": "inspection/four_categories_final_55000.png",
+  "rgb_background": "黑背景正常，主体平台可见；人体头手/衣服和脚周平台仍明显斑驳/伪影；0075背光暗需结合GT，不仅凭暗判失败。",
+  "alpha": "主体和平台基本完整覆盖；人体腰手边缘及脚周有薄雾/细碎残影，不凭alpha饱和视为几何正确。",
+  "albedo_static_dynamic": "正背面照明依旧烘入材质：背面人体显著暗、前面衣服偏亮；平台棋盘格和脚周污染，源静动态混合仍在。",
+  "normal_depth": "GS平台整体向上blue/purple、0075不再旧installed整个plane反向，身体和脚周混合轴/斑驳仍明显；Depth/Mesh暂待生成，不从GS图代替全量GT评分。",
+  "relighting": "PENDING",
+  "seven_MAE": "PENDING",
+  "final_quality": "PENDING",
+  "commit_allowed": false
+}

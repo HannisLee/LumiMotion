@@ -1,0 +1,41 @@
+{
+  "status": "PASS",
+  "iteration": 55000,
+  "frames": 15,
+  "independently_recomputed_normal": {
+    "gs_render": {
+      "mae_deg": 19.407437046633817,
+      "coverage": 0.9369404934128969,
+      "common_mae_deg": 18.519645207688434
+    },
+    "depth_normal": {
+      "mae_deg": 27.60153970792207,
+      "coverage": 0.8906899548182258,
+      "common_mae_deg": 27.546641879291943
+    },
+    "mesh": {
+      "mae_deg": 22.243800704120574,
+      "coverage": 0.9407220899639653,
+      "common_mae_deg": 21.26382697791657
+    }
+  },
+  "independently_recomputed_depth": {
+    "expected": {
+      "mae": 0.08647351128286004,
+      "coverage": 0.9369404934128969
+    },
+    "median": {
+      "mae": 0.09010209394222352,
+      "coverage": 0.9369404934128969
+    }
+  },
+  "independently_recomputed_albedo": {
+    "mae_linear": 0.18603245190190493,
+    "coverage_pct": 96.51740885373938
+  },
+  "source_hashes_verified": 83,
+  "dynamic_meshes": 15,
+  "train_poses_per_time": 135,
+  "common_normal_pixels": 369136,
+  "roughness_mae": 0.24401020600830156
+}

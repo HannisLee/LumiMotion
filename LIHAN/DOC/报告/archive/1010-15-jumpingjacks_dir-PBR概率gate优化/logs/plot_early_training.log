@@ -1,0 +1,61 @@
+{
+  "status": "TRAINING_CURVE_SNAPSHOT_ONLY",
+  "stage2_steps": 3327,
+  "created_at": "2026-10-10T10:08:34.058321+09:00",
+  "snapshots": {
+    "B08 Direct SUN + raw gate": {
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-14-jumpingjacks_dir-PBR来源输出gate微调/model_mlp/events.out.tfevents.1791591039.venus.282299.0",
+      "snapshot": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-15-jumpingjacks_dir-PBR概率gate优化/inspection/early_training/B08.tfevents",
+      "bytes": 4813149,
+      "sha256": "4e61824e146882cb887b999d0a5b0372e20aa26d916f28d5a43c9c112b00cea4"
+    },
+    "B09 Direct SUN + probability gate": {
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-15-jumpingjacks_dir-PBR概率gate优化/model_mlp/events.out.tfevents.1791594233.venus.291976.0",
+      "snapshot": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-15-jumpingjacks_dir-PBR概率gate优化/inspection/early_training/B09.tfevents",
+      "bytes": 620784,
+      "sha256": "7a9ef846b389017b31302e3eaff4c50476b8ab3597020c5b236d278c54dd0f67"
+    }
+  },
+  "pointwise_differences": {
+    "train_loss_patches/l1_loss": {
+      "warmup": {
+        "points": 2000,
+        "mean_delta": -2.16066837310791e-09,
+        "max_abs_delta": 2.682209014892578e-07
+      },
+      "geometry": {
+        "points": 1327,
+        "mean_delta": -0.001353684540475861,
+        "max_abs_delta": 0.006780371069908142
+      }
+    },
+    "train_loss_patches/total_loss": {
+      "warmup": {
+        "points": 2000,
+        "mean_delta": -2.4065375328063966e-09,
+        "max_abs_delta": 3.2782554626464844e-07
+      },
+      "geometry": {
+        "points": 1327,
+        "mean_delta": -0.0016596451311876833,
+        "max_abs_delta": 0.008461341261863708
+      }
+    },
+    "pbr_light/intensity_scale": {
+      "warmup": {
+        "points": 20,
+        "mean_delta": 1.1920928955078125e-07,
+        "max_abs_delta": 1.430511474609375e-06
+      },
+      "geometry": {
+        "points": 13,
+        "mean_delta": 0.0011021173917330229,
+        "max_abs_delta": 0.003567218780517578
+      }
+    }
+  },
+  "optimizer_steps": 0,
+  "gt_labels_read": false,
+  "loss_selection": "B08/B09均all-eligible alpha>.9、相同Direct SUN/native GGX/BVH；B08 raw logit/source±4、B09概率坐标/[0,1]，total各含不同坐标弱source anchor，训练loss不代表法线MAE",
+  "limitations": "训练loss和RGB拟合光强，不是GT材质/法线MAE，不由曲线声明质量或7度通过。"
+}

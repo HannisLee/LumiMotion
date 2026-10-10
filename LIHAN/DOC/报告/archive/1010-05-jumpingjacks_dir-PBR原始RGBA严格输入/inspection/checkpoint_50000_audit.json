@@ -1,0 +1,12 @@
+{
+  "status": "PASS_CHECKPOINT_ONLY",
+  "iteration": 50000,
+  "gaussians": 99827,
+  "all_finite": true,
+  "opacity_scale_feature_frozen": true,
+  "max_displacement": 0.06531433016061783,
+  "max_rotation_deg": 60.000064849853516,
+  "clamped_albedo_channel_fraction": 0.7175313234329224,
+  "actual_light_scale": 4.703611850738525,
+  "final_mae": false
+}

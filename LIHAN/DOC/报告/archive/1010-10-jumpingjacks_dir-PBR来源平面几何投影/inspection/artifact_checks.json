@@ -1,0 +1,246 @@
+{
+  "automatic_status": "PASS",
+  "scope": "实际权重有限性、几何信赖域和opacity/scale/feature冻结、roughness已变化、全量图片与6视频解码、15帧背景数值；人工实际审阅FAILED；自动文件/数值PASS不等于质量PASS",
+  "manual_review": "FAILED",
+  "checkpoint": {
+    "40000": {
+      "gaussians": 99827,
+      "finite": true,
+      "geometry_unchanged": false,
+      "max_displacement": 0.03536596521735191,
+      "max_rotation_deg": 60.000038146972656,
+      "opacity_scale_feature_unchanged": true,
+      "roughness_range": [
+        0.48200008273124695,
+        0.8817993402481079
+      ],
+      "ply_sha256": "3a7071836c6be5413488b20b5b4bd3f14f57528a2bc6f4a0beb1f7288255a594",
+      "deform_sha256": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5",
+      "deform_finite_tensors": 32
+    },
+    "50000": {
+      "gaussians": 99827,
+      "finite": true,
+      "geometry_unchanged": false,
+      "max_displacement": 0.07999999821186066,
+      "max_rotation_deg": 60.000038146972656,
+      "opacity_scale_feature_unchanged": true,
+      "roughness_range": [
+        0.11813069134950638,
+        0.9820526242256165
+      ],
+      "ply_sha256": "ea61fab82d82bc1168a8a1bd824050da5b9b5b676a9ba13a306f0ebc18128740",
+      "deform_sha256": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5",
+      "deform_finite_tensors": 32
+    },
+    "55000": {
+      "gaussians": 99827,
+      "finite": true,
+      "geometry_unchanged": false,
+      "max_displacement": 0.08000001311302185,
+      "max_rotation_deg": 60.000038146972656,
+      "opacity_scale_feature_unchanged": true,
+      "roughness_range": [
+        0.07468847185373306,
+        0.9903694987297058
+      ],
+      "ply_sha256": "004214808c1e713e7a46c07e77a30f3b7a308dcbff53b8a981d1ec170e73cb61",
+      "deform_sha256": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5",
+      "deform_finite_tensors": 32
+    }
+  },
+  "rgb": {
+    "psnr": 19.375063141094465,
+    "ssim": 0.8948765238126118,
+    "lpips": 0.11125242908795675,
+    "psnr_foreground": 12.246959743787187,
+    "ssim_foreground_bbox": 0.7720984180768331,
+    "lpips_foreground_bbox": 0.22454677522182465
+  },
+  "images": {
+    "rgb": 150,
+    "alpha": 150,
+    "normal": 150,
+    "albedo": 150,
+    "directional": 72,
+    "hdr": 150
+  },
+  "videos": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/directional/rotating_directional.mp4": 72,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/hdr/hdr.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/insights/albedo.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/insights/alpha.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/insights/normal.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/insights/rgb.mp4": 150
+  },
+  "representatives": {
+    "rgb": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/insights/rgb/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/insights/rgb/0075.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/insights/rgb/0150.png"
+    ],
+    "alpha": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/insights/alpha/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/insights/alpha/0075.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/insights/alpha/0150.png"
+    ],
+    "normal": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/insights/normal/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/insights/normal/0075.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/insights/normal/0150.png"
+    ],
+    "albedo": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/insights/albedo/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/insights/albedo/0075.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/insights/albedo/0150.png"
+    ],
+    "directional": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/directional/0000.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/directional/0036.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/directional/0071.png"
+    ],
+    "hdr": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/hdr/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/hdr/0076.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/renders_stage2/ours_55000/hdr/0150.png"
+    ]
+  },
+  "background": [
+    {
+      "frame": "0010",
+      "mean_rgb_background_all": 0.00173389060197022,
+      "mean_rgb_background_core": 9.776441840211723e-05,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0020",
+      "mean_rgb_background_all": 0.008556334211915978,
+      "mean_rgb_background_core": 0.0008810878486330747,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0030",
+      "mean_rgb_background_all": 0.004873727533365617,
+      "mean_rgb_background_core": 0.000726081292792019,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0040",
+      "mean_rgb_background_all": 0.003293614325611669,
+      "mean_rgb_background_core": 0.0010810067098169928,
+      "p99_background_core": 0.00392156862745098
+    },
+    {
+      "frame": "0050",
+      "mean_rgb_background_all": 0.002001311231007919,
+      "mean_rgb_background_core": 2.0335801273466007e-06,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0060",
+      "mean_rgb_background_all": 0.003660953756279554,
+      "mean_rgb_background_core": 4.128399548152043e-05,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0070",
+      "mean_rgb_background_all": 0.0004466976055089865,
+      "mean_rgb_background_core": 2.08423029672889e-07,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0080",
+      "mean_rgb_background_all": 0.001799165660890927,
+      "mean_rgb_background_core": 0.0003308535726287717,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0090",
+      "mean_rgb_background_all": 0.005198788038628579,
+      "mean_rgb_background_core": 0.0014101091891967378,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0100",
+      "mean_rgb_background_all": 0.0033177317500634436,
+      "mean_rgb_background_core": 0.00011981962289202473,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0110",
+      "mean_rgb_background_all": 0.0036143389150831953,
+      "mean_rgb_background_core": 0.00013640743449540863,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0120",
+      "mean_rgb_background_all": 0.006170469174227838,
+      "mean_rgb_background_core": 0.0007796192396328735,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0130",
+      "mean_rgb_background_all": 0.0059697640106627725,
+      "mean_rgb_background_core": 0.00047047246217909154,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0140",
+      "mean_rgb_background_all": 0.007920890734717299,
+      "mean_rgb_background_core": 0.001367961441882579,
+      "p99_background_core": 0.0196078431372549
+    },
+    {
+      "frame": "0150",
+      "mean_rgb_background_all": 0.0025800448797111556,
+      "mean_rgb_background_core": 0.00024176342216536913,
+      "p99_background_core": 0.0
+    }
+  ],
+  "source_files": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/point_cloud/iteration_35000/point_cloud.ply": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/deform/iteration_35000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+  },
+  "visual_review": {
+    "status": "FAILED",
+    "reviewed_at": "2026-10-10T06:50:04.859858+09:00",
+    "iteration": 55000,
+    "rgb_background": "黑背景正常且主体平台存在；人物头手/衣服仍明显斑驳、稀疏，平台脚周伪起伏/灰块；与B04相近，PSNR略低。GT背光本来暗，不仅凭暗失败。",
+    "alpha": "主体平台基本覆盖，边缘薄雾化与稀疏残影；完整数值覆盖率已报告。",
+    "albedo_static_dynamic": "正背面光照仍烘入衣服/身体，平台棋盘格和脚周污染；冻结feature未修复源静动态误分类。",
+    "normal_depth": "GS身体斑驳、平台脚周伪起伏/异常轴；Depth更噪，Mesh局部头手腿缺面，0080明显。15187 plane组实际轴正确，但旧installed kernel在0075等三个训练帧错误反向；不是评分后翻转。",
+    "relighting": "HDR与转灯背景黑、人物平台可见且有照明响应；人体/脚周斑驳仍明显。未提供重光照GT，不作精度声明。",
+    "reviewed_test_frames": [
+      10,
+      80,
+      150
+    ],
+    "reviewed_insight_frames": [
+      1,
+      75,
+      150
+    ],
+    "reviewed_hdr_frames": [
+      1,
+      76,
+      150
+    ],
+    "reviewed_directional_frames": [
+      0,
+      36,
+      71
+    ],
+    "images": [
+      "inspection/rgb_final_55000_comparison.png",
+      "inspection/four_categories_final_55000.png",
+      "inspection/relight.png",
+      "normal_depth/comparison_0010.png",
+      "normal_depth/comparison_0080.png",
+      "normal_depth/comparison_0150.png",
+      "inspection/plane_raster_group_comparison.png"
+    ],
+    "normal_goal": "FAILED",
+    "commit_allowed": false,
+    "subsequent_native_kernel_diagnostic_is_final_training": false
+  }
+}

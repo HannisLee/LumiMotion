@@ -1,0 +1,32 @@
+............E...E.........................................../home/lihan/miniconda3/envs/lumimotion/lib/python3.8/site-packages/einops/_torch_specific.py:108: ImportWarning: allow_ops_in_compiled_graph failed to import torch: ensure pytorch >=2.0
+  warnings.warn("allow_ops_in_compiled_graph failed to import torch: ensure pytorch >=2.0", ImportWarning)
+.............................................................................................................................................
+======================================================================
+ERROR: test_anchor_initialization_uses_shared_runtime_and_hashes_assets (test_geometry_eval_source_runtime.GeometrySourceRuntimeTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/lihan/reproduce/LumiMotion-stage2-perlight/tests/test_geometry_eval_source_runtime.py", line 38, in test_anchor_initialization_uses_shared_runtime_and_hashes_assets
+    run = GeometryRun(self.model, 55000)
+  File "/home/lihan/reproduce/LumiMotion-stage2-perlight/scripts/eval_geometry_gt.py", line 99, in __init__
+    if self.context.pbr_feature_gate_provenance is not None:
+AttributeError: 'types.SimpleNamespace' object has no attribute 'pbr_feature_gate_provenance'
+
+======================================================================
+ERROR: test_plane_runtime_records_both_assets_and_source_snapshots (test_geometry_eval_source_runtime.GeometrySourceRuntimeTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/lihan/reproduce/LumiMotion-stage2-perlight/tests/test_geometry_eval_source_runtime.py", line 48, in test_plane_runtime_records_both_assets_and_source_snapshots
+    run = GeometryRun(self.model, 55000, source_override='/override')
+  File "/home/lihan/reproduce/LumiMotion-stage2-perlight/scripts/eval_geometry_gt.py", line 99, in __init__
+    if self.context.pbr_feature_gate_provenance is not None:
+AttributeError: 'types.SimpleNamespace' object has no attribute 'pbr_feature_gate_provenance'
+
+----------------------------------------------------------------------
+Ran 201 tests in 0.979s
+
+FAILED (errors=2)
+[1;33m[Open3D WARNING] geometry::TriangleMesh appears to be a geometry::PointCloud (only contains vertices, but no triangles).[0;m
+Looking for config file in /tmp/tmp21vwo82t/model_mlp/cfg_args
+Config file found: /tmp/tmp21vwo82t/model_mlp/cfg_args
+Looking for config file in /tmp/tmp21vwo82t/model_mlp/cfg_args
+Config file found: /tmp/tmp21vwo82t/model_mlp/cfg_args
