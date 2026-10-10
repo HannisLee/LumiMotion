@@ -70,6 +70,8 @@ def geometry():
                 totals[key][2] += int(depth_eligible.sum())
     summary = metrics['summary']['foreground']
     for key, (count, total, eligible) in totals.items():
+        if not count or not eligible:
+            raise AssertionError('缺少可评分像素，不能报告该MAE通过：' + key)
         score = total / count if count else None
         definition = summary['normal_metrics'][key] if key in common_total else summary['depth'][key]
         if count:
