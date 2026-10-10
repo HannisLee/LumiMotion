@@ -15,14 +15,18 @@ review = out / 'inspection'
 review.mkdir(exist_ok=True)
 report = {'视频': [], '检查点': [], '代表图': [], '人工目检': 'PENDING'}
 errors = []
+configuration = json.loads((out.parent / '1011-07-六组训练总控/batch.json').read_text())
+experiment = next(e for e in configuration['experiments'] if Path(e['output']) == out)
 for path in sorted(model.glob('point_cloud/iteration_*/point_cloud.ply')):
     if path.parent.name not in {'iteration_35000', 'iteration_55000'}:
         continue
     vertices = PlyData.read(path)['vertex']
+    finite = True
     for name in vertices.data.dtype.names:
         if not np.isfinite(vertices[name]).all():
+            finite = False
             errors.append(str(path) + '非有限字段：' + name)
-    report['检查点'].append({'文件': str(path), '高斯数': len(vertices), '有限性': True})
+    report['检查点'].append({'文件': str(path), '高斯数': len(vertices), '有限性': finite})
 
 
 def check_tensors(value, label):
@@ -73,6 +77,11 @@ for path in sorted(model.rglob('*.mp4')):
         report['代表图'].append(str(target))
     report['视频'].append(record)
 report['图像数'] = len(list(model.rglob('*.png')))
+minimum_videos = 10 if experiment['kind'] == 'native' else 6
+if len(report['视频']) < minimum_videos:
+    errors.append(f'视频数量不足：{len(report["视频"])}，预期至少{minimum_videos}')
+if report['图像数'] < (1050 if experiment['kind'] == 'native' else 600):
+    errors.append('渲染PNG数量不足，必须检查全部时序输出。')
 report['错误'] = errors
 report['产物核验'] = 'FAILED' if errors else 'PASS'
 (review / 'artifacts.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
