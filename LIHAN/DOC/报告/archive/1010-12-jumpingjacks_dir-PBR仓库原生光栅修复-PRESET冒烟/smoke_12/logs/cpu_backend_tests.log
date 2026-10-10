@@ -1,0 +1,85 @@
+test_asset_create_validate_tamper_and_no_overwrite (tests.test_pbr_rasterizer.NativeRasterizerTest) ... ok
+test_checkpoint_requires_native_binding (tests.test_pbr_rasterizer.NativeRasterizerTest) ... ok
+test_explicit_backend_override (tests.test_pbr_rasterizer.NativeRasterizerTest) ... ok
+test_invalid_backend_mode_and_covariance (tests.test_pbr_rasterizer.NativeRasterizerTest) ... ok
+test_native_dispatch_does_not_replace_installed (tests.test_pbr_rasterizer.NativeRasterizerTest) ... ok
+test_new_presets_and_auto_selection (tests.test_pbr_rasterizer.NativeRasterizerTest) ... ok
+test_old_pipeline_defaults (tests.test_pbr_rasterizer.NativeRasterizerTest) ... ok
+test_source_manifest_uses_repository_cuda (tests.test_pbr_rasterizer.NativeRasterizerTest) ... ok
+test_bvh_visibility_scales_diffuse (tests.test_pbr_directional.DirectionalPBRTest) ... ok
+test_checkpoint_rejects_stage1_and_changed_metadata (tests.test_pbr_directional.DirectionalPBRTest) ... ok
+test_delta_diffuse_and_material_gradients (tests.test_pbr_directional.DirectionalPBRTest) ... ok
+test_fitted_scale_requires_checkpoint_value_and_keeps_gradient (tests.test_pbr_directional.DirectionalPBRTest) ... ok
+test_invalid_direction_and_point_lights_rejected (tests.test_pbr_directional.DirectionalPBRTest) ... ok
+test_metadata_multiple_suns_and_exact_frame_selection (tests.test_pbr_directional.DirectionalPBRTest) ... ok
+test_native_preset_and_old_envmap_defaults (tests.test_pbr_directional.DirectionalPBRTest) ... ok
+test_geometry_preset_opt_in_and_validation (tests.test_pbr_geometry.PBRGeometryTest) ... ok
+test_plane_derived_from_tilted_source_positions (tests.test_pbr_geometry.PBRGeometryTest) ... ok
+test_projection_shortest_arc_and_world_distance (tests.test_pbr_geometry.PBRGeometryTest) ... ok
+test_quaternion_normal_has_finite_rotation_gradient (tests.test_pbr_geometry.PBRGeometryTest) ... ok
+test_source_without_static_support_is_rejected (tests.test_pbr_geometry.PBRGeometryTest) ... ok
+test_auto_mode_selects_refine_for_explicit_initializer (tests.test_pbr_material.PBRMaterialTest) ... ok
+test_nonfinite_shape_margin_and_shared_source_rejected (tests.test_pbr_material.PBRMaterialTest) ... ok
+test_projection_keeps_gradient_after_adam_crosses_native_boundary (tests.test_pbr_material.PBRMaterialTest) ... /home/lihan/miniconda3/envs/lumimotion/lib/python3.8/site-packages/einops/_torch_specific.py:108: ImportWarning: allow_ops_in_compiled_graph failed to import torch: ensure pytorch >=2.0
+  warnings.warn("allow_ops_in_compiled_graph failed to import torch: ensure pytorch >=2.0", ImportWarning)
+ok
+test_projection_keeps_sh_source_and_validates_margin (tests.test_pbr_material.PBRMaterialTest) ... ok
+test_refine_preset_only_enables_new_initializer (tests.test_pbr_material.PBRMaterialTest) ... ok
+test_source_projection_restores_gradient_and_keeps_sh_source (tests.test_pbr_material.PBRMaterialTest) ... ok
+test_anchor_preset_and_auto (tests.test_pbr_deformation.PBRDeformationTest) ... ok
+test_asset_tampering_rejected_even_with_new_sha (tests.test_pbr_deformation.PBRDeformationTest) ... ok
+test_checkpoint_marker_required_and_bound (tests.test_pbr_deformation.PBRDeformationTest) ... ok
+test_creation_rejects_wrong_source_and_overwrite (tests.test_pbr_deformation.PBRDeformationTest) ... ok
+test_current_move_only_changes_render_position (tests.test_pbr_deformation.PBRDeformationTest) ... ok
+test_incompatible_mode_rejected (tests.test_pbr_deformation.PBRDeformationTest) ... ok
+test_metadata_gt_or_source_changes_rejected (tests.test_pbr_deformation.PBRDeformationTest) ... ok
+test_modified_local_source_rejected (tests.test_pbr_deformation.PBRDeformationTest) ... ok
+test_roundtrip_source_and_updated_checkpoint (tests.test_pbr_deformation.PBRDeformationTest) ... ok
+test_shared_storage_shape_dtype_rejected (tests.test_pbr_deformation.PBRDeformationTest) ... ok
+test_asset_fake_support_rejected_after_sha_rewrite (tests.test_pbr_plane_projection.PBRPlaneProjectionTests) ... ok
+test_camera_change_rejected (tests.test_pbr_plane_projection.PBRPlaneProjectionTests) ... ok
+test_invalid_mode_and_thresholds (tests.test_pbr_plane_projection.PBRPlaneProjectionTests) ... ok
+test_marker_binding_required_for_trained_iteration (tests.test_pbr_plane_projection.PBRPlaneProjectionTests) ... ok
+test_preset_and_default_compatibility (tests.test_pbr_plane_projection.PBRPlaneProjectionTests) ... ok
+test_projection_changes_real_geometry_and_preserves_other_predictions (tests.test_pbr_plane_projection.PBRPlaneProjectionTests) ... ok
+test_quaternion_antipodal_and_raw_norm (tests.test_pbr_plane_projection.PBRPlaneProjectionTests) ... ok
+test_roundtrip_filters_temporally_moving_source_point (tests.test_pbr_plane_projection.PBRPlaneProjectionTests) ... ok
+test_source_network_change_rejected (tests.test_pbr_plane_projection.PBRPlaneProjectionTests) ... ok
+test_source_xyz_and_asset_overwrite_rejected (tests.test_pbr_plane_projection.PBRPlaneProjectionTests) ... ok
+test_anchor_initialization_uses_shared_runtime_and_hashes_assets (tests.test_geometry_eval_source_runtime.GeometrySourceRuntimeTests) ... ok
+test_legacy_deformation_preserves_current_xyz_query_and_iteration (tests.test_geometry_eval_source_runtime.GeometrySourceRuntimeTests) ... ok
+test_loader_rejection_propagates_instead_of_silent_legacy_fallback (tests.test_geometry_eval_source_runtime.GeometrySourceRuntimeTests) ... ok
+test_non_native_mode_rejects_pbr_runtime_flags (tests.test_geometry_eval_source_runtime.GeometrySourceRuntimeTests) ... ok
+test_plane_runtime_records_both_assets_and_source_snapshots (tests.test_geometry_eval_source_runtime.GeometrySourceRuntimeTests) ... ok
+test_runtime_deformation_receives_actual_camera_time (tests.test_geometry_eval_source_runtime.GeometrySourceRuntimeTests) ... ok
+test_changed_alpha_is_rejected_even_with_updated_output_hash (tests.test_pbr_rgb_alpha_provenance.RGBAlphaProvenanceTest) ... ok
+test_changed_source_sha_is_rejected (tests.test_pbr_rgb_alpha_provenance.RGBAlphaProvenanceTest) ... ok
+test_known_albedo_alpha_source_is_rejected (tests.test_pbr_rgb_alpha_provenance.RGBAlphaProvenanceTest) ... ok
+test_original_rgba_is_verified_without_material_gt (tests.test_pbr_rgb_alpha_provenance.RGBAlphaProvenanceTest) ... ok
+test_stage1_loss (unittest.loader._FailedTest) ... ERROR
+test_stage2_loss (unittest.loader._FailedTest) ... ERROR
+
+======================================================================
+ERROR: test_stage1_loss (unittest.loader._FailedTest)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_stage1_loss
+Traceback (most recent call last):
+  File "/home/lihan/miniconda3/envs/lumimotion/lib/python3.8/unittest/loader.py", line 154, in loadTestsFromName
+    module = __import__(module_name)
+ModuleNotFoundError: No module named 'tests.test_stage1_loss'
+
+
+======================================================================
+ERROR: test_stage2_loss (unittest.loader._FailedTest)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_stage2_loss
+Traceback (most recent call last):
+  File "/home/lihan/miniconda3/envs/lumimotion/lib/python3.8/unittest/loader.py", line 154, in loadTestsFromName
+    module = __import__(module_name)
+ModuleNotFoundError: No module named 'tests.test_stage2_loss'
+
+
+----------------------------------------------------------------------
+Ran 58 tests in 0.710s
+
+FAILED (errors=2)

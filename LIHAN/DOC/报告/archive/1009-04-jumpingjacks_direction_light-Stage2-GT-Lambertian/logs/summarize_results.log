@@ -1,0 +1,187 @@
+{
+  "status": "CALCULATED_REVIEW_PENDING",
+  "model_path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/model_mlp",
+  "iteration": 55000,
+  "split": "test",
+  "frames": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150
+  ],
+  "resolution": [
+    400,
+    400
+  ],
+  "metrics": [
+    {
+      "metric": "Albedo MAE",
+      "mae": 0.2399667469938792,
+      "unit": "linear RGB",
+      "coverage_pct": 96.15998862380906
+    },
+    {
+      "metric": "GS Render Normal MAE",
+      "mae": 21.525043464883158,
+      "unit": "degree",
+      "coverage_pct": 92.93748931837385
+    },
+    {
+      "metric": "Depth Normal MAE",
+      "mae": 27.60512757914095,
+      "unit": "degree",
+      "coverage_pct": 88.32326753050431
+    },
+    {
+      "metric": "Mesh Normal MAE",
+      "mae": 22.88577861576241,
+      "unit": "degree",
+      "coverage_pct": 93.64735107706899
+    },
+    {
+      "metric": "Expected Z Depth MAE",
+      "mae": 0.08970386075333393,
+      "unit": "m",
+      "coverage_pct": 92.93748931837385
+    },
+    {
+      "metric": "Median Z Depth MAE",
+      "mae": 0.09224996114676697,
+      "unit": "m",
+      "coverage_pct": 92.93748931837385
+    },
+    {
+      "metric": "GS Normal XYZ component MAE (supplementary)",
+      "mae": 0.17537826838210147,
+      "unit": "unit normal XYZ",
+      "coverage_pct": 92.93748931837385
+    },
+    {
+      "metric": "Roughness MAE",
+      "mae": null,
+      "unit": "r",
+      "coverage_pct": null,
+      "status": "NOT_APPLICABLE",
+      "reason": "Lambertian has no roughness output"
+    }
+  ],
+  "normal_common_pixels": {
+    "methods": [
+      "gs_render",
+      "depth_normal",
+      "mesh"
+    ],
+    "gt_pixels": 415433,
+    "valid_pixels": 366157,
+    "coverage": 0.8813864088794101,
+    "angular_deg": {
+      "gs_render": {
+        "mae_frame_mean_deg": 21.950571707625976,
+        "mae_pixel_mean_deg": 20.55943718581084
+      },
+      "depth_normal": {
+        "mae_frame_mean_deg": 28.077533720978252,
+        "mae_pixel_mean_deg": 27.554078717625135
+      },
+      "mesh": {
+        "mae_frame_mean_deg": 22.54435351539104,
+        "mae_pixel_mean_deg": 21.878720007610397
+      }
+    }
+  },
+  "gs_normal_missing_180_penalty_deg": 32.717354197878194,
+  "albedo_raw": {
+    "pixels": 365676,
+    "mae_linear": 0.2399667469938792,
+    "rmse_linear": 0.2842558200009754,
+    "p95_pixel_mae_linear": 0.4191875134309066,
+    "below_0_05_pct": 2.071505923276343,
+    "coverage_pct": 96.15998862380906,
+    "high_alpha_mae_linear_diagnostic": 0.23720329237697757,
+    "bias_rgb_linear": [
+      0.13863154931040564,
+      0.10995766880782883,
+      0.1903700433587834
+    ],
+    "mean_prediction_rgb_linear": [
+      0.8328809453514294,
+      0.8129444300527249,
+      0.7874589715853972
+    ],
+    "mean_gt_rgb_linear": [
+      0.6942493960410213,
+      0.7029867612448804,
+      0.5970889282266287
+    ],
+    "prediction_std_rgb_linear": [
+      0.313390498200241,
+      0.33278751449884053,
+      0.36165824086251963
+    ],
+    "chromaticity_angle_deg_diagnostic": 9.335359120821044,
+    "relative_luminance_mae_diagnostic": 0.3103594387513375
+  },
+  "rgb": {
+    "psnr": 17.018605672315413,
+    "ssim": 0.8803908109664917,
+    "lpips": 0.12505544771750768,
+    "psnr_foreground": 10.157665129149127,
+    "ssim_foreground_bbox": 0.7475665450096131,
+    "lpips_foreground_bbox": 0.26391008992989856,
+    "light_angle_degrees": 0.0
+  },
+  "intensity": 3.0964135864977482,
+  "source_model_unchanged": true,
+  "independent_audit": {
+    "status": "PASS",
+    "iteration": 55000,
+    "frames": 15,
+    "independently_recomputed_normal": {
+      "gs_render": {
+        "mae_deg": 21.525043464883158,
+        "coverage": 0.9293748931837384,
+        "common_mae_deg": 20.55943718581084
+      },
+      "depth_normal": {
+        "mae_deg": 27.60512757914095,
+        "coverage": 0.8832326753050431,
+        "common_mae_deg": 27.554078717625135
+      },
+      "mesh": {
+        "mae_deg": 22.88577861576241,
+        "coverage": 0.9364735107706899,
+        "common_mae_deg": 21.878720007610397
+      }
+    },
+    "independently_recomputed_depth": {
+      "expected": {
+        "mae": 0.08970386013396546,
+        "coverage": 0.9293748931837384
+      },
+      "median": {
+        "mae": 0.09224995946218349,
+        "coverage": 0.9293748931837384
+      }
+    },
+    "independently_recomputed_albedo": {
+      "mae_linear": 0.23996674698407316,
+      "coverage_pct": 96.15998862380906
+    },
+    "source_hashes_verified": 84,
+    "dynamic_meshes": 15,
+    "train_poses_per_time": 135,
+    "common_normal_pixels": 366157,
+    "roughness_mae": "N/A: Lambertian has no roughness output"
+  }
+}

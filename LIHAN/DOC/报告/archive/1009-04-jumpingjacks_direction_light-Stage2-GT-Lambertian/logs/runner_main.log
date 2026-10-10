@@ -1,0 +1,13 @@
+{'status': 'RUNNING', 'step': 'train', 'updated_at': '2026-10-09T19:56:27.644251+09:00', 'pid': 144878}
+{'status': 'RUNNING', 'step': 'train', 'updated_at': '2026-10-09T19:56:27.645148+09:00', 'pid': 144878, 'child_pid': 144881}
+{'status': 'RUNNING', 'step': 'render', 'updated_at': '2026-10-09T20:07:33.092965+09:00', 'pid': 144878}
+{'status': 'RUNNING', 'step': 'render', 'updated_at': '2026-10-09T20:07:33.094491+09:00', 'pid': 144878, 'child_pid': 146764}
+{'status': 'RUNNING', 'step': 'albedo', 'updated_at': '2026-10-09T20:08:31.972267+09:00', 'pid': 144878}
+{'status': 'RUNNING', 'step': 'albedo', 'updated_at': '2026-10-09T20:08:31.973611+09:00', 'pid': 144878, 'child_pid': 147157}
+{'status': 'RUNNING', 'step': 'predicted_meshes', 'updated_at': '2026-10-09T20:08:46.575970+09:00', 'pid': 144878}
+{'status': 'RUNNING', 'step': 'predicted_meshes', 'updated_at': '2026-10-09T20:08:46.577589+09:00', 'pid': 144878, 'child_pid': 147208}
+{'status': 'RUNNING', 'step': 'normal_depth', 'updated_at': '2026-10-09T20:10:31.446760+09:00', 'pid': 144878}
+{'status': 'RUNNING', 'step': 'normal_depth', 'updated_at': '2026-10-09T20:10:31.447861+09:00', 'pid': 144878, 'child_pid': 147645}
+{'status': 'RUNNING', 'step': 'verify_all_mae', 'updated_at': '2026-10-09T20:10:42.254329+09:00', 'pid': 144878}
+{'status': 'RUNNING', 'step': 'verify_all_mae', 'updated_at': '2026-10-09T20:10:42.255555+09:00', 'pid': 144878, 'child_pid': 147709}
+{'status': 'PIPELINE_COMPLETED_REVIEW_PENDING', 'step': 'finished', 'updated_at': '2026-10-09T20:10:43.844875+09:00', 'pid': 144878, 'iteration': 55000, 'frames': 15}

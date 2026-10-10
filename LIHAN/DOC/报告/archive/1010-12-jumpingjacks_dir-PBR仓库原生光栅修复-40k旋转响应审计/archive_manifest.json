@@ -1,0 +1,8 @@
+{
+  "README.md": "56650ca15f38bdb41350b2929235cbb98c6132f3eec2d864e83d8f04fcb0b335",
+  "commands/audit_rotation_response.py": "f04bf8c3bd775d0912d1630939527d742b6246b1f5633ce8e3f1cba3c37f9fbe",
+  "commands/audit_rotation_response_before_camera_device_fix.py": "b6c9f886a5e00e0dab95fa6f9b44b70af556d6c62512ebbcbfc53164df875486",
+  "logs/audit_rotation_response.log": "277a3db9ea68166cb7886f57a4084addf3e1e09aee5ee2ed63602ad469a9e8d0",
+  "logs/audit_rotation_response_retry.log": "25c49cc0839d26d7c27800e948bdd0297f77ba90c226dd595db8d65258091431",
+  "inspection/rotation_response.json": "67fabd9ac353c01337250eec5f29e225219cc6697b8875b7428002e6de6b2cf9"
+}

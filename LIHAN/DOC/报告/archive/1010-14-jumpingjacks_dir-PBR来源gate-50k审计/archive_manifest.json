@@ -1,0 +1,10 @@
+{
+  "README.md": "709c11728d376865a66605baf8f9d1a0fc967a73e6e7a6a40dd82e769292c30e",
+  "commands/audit_checkpoints_when_saved.py": "7b975638e3e55772df4477048433bdc1f19ccc40b5b2f9463533fb21608e19f4",
+  "commands/audit_checkpoint.py": "6eaef56316abb652f0b79f2ad52594429e59e03d6f21cc607f84d1f796ac221d",
+  "logs/checkpoint_audits_wait.log": "5a8cfed00fac03151c8ffea60bb2ed2727126697268902fb567b4115817301f7",
+  "logs/checkpoint_50000_audit.log": "16a52ced7a3f88309b5d6c8c877b0ade81624225205bad75834923cf5960e64f",
+  "inspection/checkpoint_50000_audit.json": "28318b3bebbc2660f62ffcf8ab38c10f95d4b9a1487e1a88f8e8bf9ea23693c9",
+  "inspection/checkpoint_wait_state.json": "1998be79e6a2e0741c63f3e216b4922e13aafa5dbbb75f5e05ddf96be7330151",
+  "model_mlp/pbr_directional/iteration_50000/lighting.json": "cb384ff6bc580ece628cbf21b02b1e2a6491dcc29b62c92d0598884f7d16e1cd"
+}

@@ -1,0 +1,23 @@
+{
+  "status": "COMPLETED_CHECKPOINT_AUDITS",
+  "completed": [
+    {
+      "iteration": 40000,
+      "exit_code": 0,
+      "completed_at": "2026-10-10T11:19:14.237478+09:00"
+    },
+    {
+      "iteration": 50000,
+      "exit_code": 0,
+      "completed_at": "2026-10-10T11:34:21.381588+09:00"
+    },
+    {
+      "iteration": 55000,
+      "exit_code": 0,
+      "completed_at": "2026-10-10T11:42:00.149812+09:00"
+    }
+  ],
+  "verified_session_closed": true,
+  "parent_exit_code": 0,
+  "unified_session_id": 10940
+}

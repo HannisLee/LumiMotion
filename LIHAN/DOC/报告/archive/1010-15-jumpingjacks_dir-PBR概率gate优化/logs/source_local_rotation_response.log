@@ -1,0 +1,251 @@
+Loading trained model at iteration 40000
+Found transforms_train.json file, assuming Blender data set!
+Reading Training Transforms
+Read Train Transforms with 135 cameras
+Loading Training Cameras
+Loading Test Cameras
+LOAD PLY
+/home/lihan/reproduce/LumiMotion-stage2-perlight/scene/__init__.py:103: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  unique_fids = [torch.tensor(val, dtype=torch.float32, device="cuda") for val in unique_values]
+################ gaussian_color params: 156934
+{
+  "status": "PASS_READ_ONLY_SOURCE_LOCAL_ROTATION_RESPONSE_PROTOTYPE",
+  "frames": 135,
+  "points": 99827,
+  "groups": {
+    "all": {
+      "points": 99827,
+      "canonical_angle_deg": {
+        "mean": 10.000000762577736,
+        "median": 10.000000718499647,
+        "p90": 10.000004424693891,
+        "p99": 10.000012883726754,
+        "maximum": 10.000028496286463
+      },
+      "mean_time_additive_axis_response_deg": {
+        "mean": 8.061514061205367,
+        "median": 9.465481082919796,
+        "p90": 10.000000032004207,
+        "p99": 10.004614515850907,
+        "maximum": 13.548615763563232
+      },
+      "worst_time_additive_axis_response_deg": {
+        "mean": 8.790450619690214,
+        "median": 10.00000129379432,
+        "p90": 11.143365063688243,
+        "p99": 13.73542802889573,
+        "maximum": 88.05979929867738
+      },
+      "mean_time_local_axis_response_deg": {
+        "mean": 8.478669001139904,
+        "median": 10.000000174159796,
+        "p90": 10.000004358068239,
+        "p99": 10.000012420741529,
+        "maximum": 10.000030731219837
+      },
+      "worst_time_local_axis_response_deg": {
+        "mean": 8.478674251056256,
+        "median": 10.000004195610128,
+        "p90": 10.000012189445155,
+        "p99": 10.000022670113655,
+        "maximum": 10.000041528334753
+      },
+      "local_vs_matrix_transport_max_deg": {
+        "mean": 1.212461304358365e-05,
+        "median": 1.1581149199548762e-05,
+        "p90": 2.1565179853261896e-05,
+        "p99": 2.8567755433551115e-05,
+        "maximum": 4.224238708636954e-05
+      }
+    },
+    "source_projected": {
+      "points": 15187,
+      "canonical_angle_deg": {
+        "mean": 10.00000066947406,
+        "median": 10.000000728930328,
+        "p90": 10.000003416313003,
+        "p99": 10.00000799487376,
+        "maximum": 10.000017978884486
+      },
+      "mean_time_additive_axis_response_deg": {
+        "mean": 2.106128291381361e-06,
+        "median": 1.7039694649832141e-06,
+        "p90": 4.434245462671502e-06,
+        "p99": 6.807692421711211e-06,
+        "maximum": 1.686986406649989e-05
+      },
+      "worst_time_additive_axis_response_deg": {
+        "mean": 6.0864967227152014e-06,
+        "median": 4.9783130603797145e-06,
+        "p90": 1.2919939687890481e-05,
+        "p99": 1.9713482695869344e-05,
+        "maximum": 3.295610511210791e-05
+      },
+      "mean_time_local_axis_response_deg": {
+        "mean": 2.1046710089310055e-06,
+        "median": 1.7174983093552932e-06,
+        "p90": 4.4053934553313126e-06,
+        "p99": 6.733690304590615e-06,
+        "maximum": 1.4812419152493589e-05
+      },
+      "worst_time_local_axis_response_deg": {
+        "mean": 6.092964317529102e-06,
+        "median": 4.90455619685548e-06,
+        "p90": 1.2948118433879161e-05,
+        "p99": 1.954638161766379e-05,
+        "maximum": 2.7506885641908623e-05
+      },
+      "local_vs_matrix_transport_max_deg": null
+    },
+    "source_dynamic_near_plane": {
+      "points": 6836,
+      "canonical_angle_deg": {
+        "mean": 10.000000732778926,
+        "median": 10.000000768573255,
+        "p90": 10.000003340290132,
+        "p99": 10.00000800299613,
+        "maximum": 10.000015599695123
+      },
+      "mean_time_additive_axis_response_deg": {
+        "mean": 9.208070111609693,
+        "median": 9.257065456444879,
+        "p90": 9.559052601256155,
+        "p99": 9.777963204006614,
+        "maximum": 10.170143430176187
+      },
+      "worst_time_additive_axis_response_deg": {
+        "mean": 10.150275127199343,
+        "median": 9.9601266758629,
+        "p90": 10.76125635165504,
+        "p99": 13.59882555639684,
+        "maximum": 18.99830478429514
+      },
+      "mean_time_local_axis_response_deg": {
+        "mean": 10.000000651695675,
+        "median": 10.000000784538942,
+        "p90": 10.000003456041593,
+        "p99": 10.000007763246394,
+        "maximum": 10.000018043673627
+      },
+      "worst_time_local_axis_response_deg": {
+        "mean": 10.000004720703027,
+        "median": 10.000004198886838,
+        "p90": 10.00000878544919,
+        "p99": 10.00001479672487,
+        "maximum": 10.0000262610922
+      },
+      "local_vs_matrix_transport_max_deg": {
+        "mean": 8.03647532316419e-06,
+        "median": 7.3444386094852035e-06,
+        "p90": 1.3226604453452851e-05,
+        "p99": 1.935638736085189e-05,
+        "maximum": 2.9414949330792166e-05
+      }
+    },
+    "source_other_dynamic": {
+      "points": 38747,
+      "canonical_angle_deg": {
+        "mean": 10.000000823171296,
+        "median": 10.000000689698705,
+        "p90": 10.000005550377722,
+        "p99": 10.000015120133092,
+        "maximum": 10.000027137665118
+      },
+      "mean_time_additive_axis_response_deg": {
+        "mean": 9.076789556012953,
+        "median": 9.098784168305084,
+        "p90": 9.726441789616093,
+        "p99": 10.183293810530415,
+        "maximum": 13.548615763563232
+      },
+      "worst_time_additive_axis_response_deg": {
+        "mean": 10.772341995154266,
+        "median": 10.511957417199397,
+        "p90": 11.983267588226608,
+        "p99": 15.116752952640358,
+        "maximum": 88.05979929867738
+      },
+      "mean_time_local_axis_response_deg": {
+        "mean": 10.000000717477462,
+        "median": 10.000000701754791,
+        "p90": 10.000005560355037,
+        "p99": 10.00001434795853,
+        "maximum": 10.000030709017247
+      },
+      "worst_time_local_axis_response_deg": {
+        "mean": 10.000008193443762,
+        "median": 10.000007440156745,
+        "p90": 10.000015123858581,
+        "p99": 10.000025513233131,
+        "maximum": 10.000040747938698
+      },
+      "local_vs_matrix_transport_max_deg": {
+        "mean": 1.631586479634523e-05,
+        "median": 1.666499673782919e-05,
+        "p90": 2.3319120084582497e-05,
+        "p99": 2.978434366079071e-05,
+        "maximum": 4.224238708636954e-05
+      }
+    },
+    "source_static_unprojected": {
+      "points": 39057,
+      "canonical_angle_deg": {
+        "mean": 10.000000743883303,
+        "median": 10.000000724522636,
+        "p90": 10.000004063582782,
+        "p99": 10.000011814238407,
+        "maximum": 10.000028496286463
+      },
+      "mean_time_additive_axis_response_deg": {
+        "mean": 9.988273548720587,
+        "median": 9.99999482836531,
+        "p90": 10.000001930770539,
+        "p99": 10.000017745324962,
+        "maximum": 10.295576742418607
+      },
+      "worst_time_additive_axis_response_deg": {
+        "mean": 10.004378357795327,
+        "median": 10.000001085234587,
+        "p90": 10.000254676600726,
+        "p99": 10.165211962462081,
+        "maximum": 12.483015412301548
+      },
+      "mean_time_local_axis_response_deg": {
+        "mean": 10.000000669740734,
+        "median": 10.000000740267964,
+        "p90": 10.00000438293067,
+        "p99": 10.000011626631327,
+        "maximum": 10.000030731219837
+      },
+      "worst_time_local_axis_response_deg": {
+        "mean": 10.000004408537585,
+        "median": 10.000003499235685,
+        "p90": 10.000010022461918,
+        "p99": 10.000020082999043,
+        "maximum": 10.000041528334753
+      },
+      "local_vs_matrix_transport_max_deg": {
+        "mean": 8.68215913756256e-06,
+        "median": 6.445849674396954e-06,
+        "p90": 1.8568350079179434e-05,
+        "p99": 2.6328917496188493e-05,
+        "maximum": 4.110545510854108e-05
+      }
+    }
+  },
+  "source_iteration": 35000,
+  "camera_NN_container": 40000,
+  "learned_40000_geometry_material_feature_used": false,
+  "source_MLP_32_tensors_frozen": true,
+  "initial_raw_deformation_bit_exact": true,
+  "canonical_probe_degrees": 10,
+  "optimizer_steps": 0,
+  "GT_labels_read": false,
+  "training_prior_saved": false,
+  "scoring_mask_saved": false,
+  "production_pipeline_changed": false,
+  "new_Preset_implemented": false,
+  "source_PLY_sha256": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+  "created_at": "2026-10-10T10:16:06.875766+09:00",
+  "limitations": "全135 source预测姿态的人工10度扰动只读数学原型；source groups不是GT语义。投影支持的法线被既有plane固定，不期望它响应；未删任何点/评分像素。局部四元数运输与旧additive的参数响应比较不是GT normal误差，不是已支持训练或达7度。候选四元数/normal只在RAM，不导出监督/teacher/prior。仅NN/camera容器加载40k，源35k参数用于全部诊断，当前B09训练不变。"
+}

@@ -1,0 +1,41 @@
+{
+  "functional_status": "PASS",
+  "visual_quality": "FAILED_SMOKE_ONLY",
+  "actual_images_viewed": true,
+  "reviewed_at": "2026-10-10T09:07:16.231616+09:00",
+  "iteration": 35020,
+  "frames": [
+    1,
+    75,
+    150
+  ],
+  "images": [
+    "inspection/four_categories.png",
+    "inspection/relight.png"
+  ],
+  "rgb": "黑背景正常、人物/平台存在；前面人物斑驳破碎、背面0075极暗且脚周平台伪起伏，20步仅验证运行。",
+  "alpha": "主体平台大部饱和，但腰手边缘薄雾/腿和脚周残影，覆盖不代表正确几何。",
+  "albedo": "正背色差和来源烘光、平台棋盘及脚周污染仍明显，body破碎。",
+  "normal": "平台整体上向、0075不再旧kernel整个平台倒向，但人物/脚周轴混杂且假起伏。",
+  "relight": "HDR16/替换SUN三帧实际看：光照响应与黑背景正常，但头手/衣服破碎、背面和脚周平台污染保留；无GT重光照精度声明。",
+  "normal_7_goal": "NOT_EVALUATED",
+  "full_MAE": false,
+  "optimizer_steps_diagnostics": 0,
+  "commit_allowed": false,
+  "actual_sessions_exit": {
+    "cpu_first": 1,
+    "cpu_retry": 0,
+    "train": 0,
+    "pbr": 0,
+    "gate_checkpoint": 0,
+    "shared_buffers": 0,
+    "insights": 0
+  },
+  "failed_cpu_reason": "201项中2个旧mock缺少新增FrozenScene字段；仅更新mock兼容并新增gate metadata来源记录用例后202项全部通过。真实Trainer核心源码保持原快照；失败CPU日志/原测试snapshot保留。",
+  "videos_decoded": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-15-dir-PBR来源输出gate/insights/insights/rgb.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-15-dir-PBR来源输出gate/insights/insights/normal.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-15-dir-PBR来源输出gate/insights/insights/albedo.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-15-dir-PBR来源输出gate/insights/insights/alpha.mp4": 150
+  }
+}

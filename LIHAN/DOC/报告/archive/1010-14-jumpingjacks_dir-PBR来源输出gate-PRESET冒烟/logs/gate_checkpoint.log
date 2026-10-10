@@ -1,0 +1,11 @@
+Loading trained model at iteration 35020
+Found transforms_train.json file, assuming Blender data set!
+Reading Training Transforms
+Read Train Transforms with 135 cameras
+Loading Training Cameras
+Loading Test Cameras
+LOAD PLY
+/home/lihan/reproduce/LumiMotion-stage2-perlight/scene/__init__.py:103: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  unique_fids = [torch.tensor(val, dtype=torch.float32, device="cuda") for val in unique_values]
+################ gaussian_color params: 156934
+{"status": "PASS_SAVED_NATIVE_GATE", "iteration": 35020, "points": 99827, "all_finite": true, "opacity_scale_frozen": true, "feature_optimizer_group": true, "source_feature_initialization": true, "feature_changed_points": 68101, "max_source_logit_delta": 1.8596649169921875e-05, "source_MLP_frozen": true, "source_NN_tensors_equal": 32, "source_files_unchanged": true, "core_manifest_sha": true, "post_training_fixture_only_changes": ["tests/test_geometry_eval_source_runtime.py"], "optimizer_steps_diagnostic": 0, "GT_material_normal_geometry_photometry_inputs": false, "full_MAE": false, "normal_7_goal": "NOT_EVALUATED"}

@@ -1,0 +1,35 @@
+{
+  "status": "PENDING_FULL_REVIEW",
+  "iteration": 55000,
+  "actual_images_viewed": true,
+  "reviewed_test_frames": [
+    10,
+    80,
+    150
+  ],
+  "reviewed_insight_frames": [
+    1,
+    75,
+    150
+  ],
+  "images": [
+    "inspection/rgb_final_55000_comparison.png",
+    "inspection/four_categories_final_55000.png",
+    "inspection/relight_final_55000.png",
+    "model_mlp/renders_stage2/ours_55000/directional/0036.png"
+  ],
+  "rgb_background": "实际GT/B09/B10同55k TEST10/80/150对比：黑背景正常，人物和椭圆平台可辨认；人物上衣/手臂/裤腿有明显黑色碎斑，脚周及平台有大块黑灰伪几何/阴影混杂，最新外观与B09近似。背光中帧GT本身较暗，预测仍更暗，不把黑色RGB直接解释为Alpha缺失。RGB质量FAILED。",
+  "alpha": "insights1/75/150均保留人物和完整平台Alpha，手臂/腿/脚轮廓与孤立飞点、平台边缘有模糊碎片。中帧RGB近黑但Alpha人物完整；未删平台/难点。",
+  "albedo_static_dynamic": "人物首中尾均可见，反照率保留照明方向、阴影和碎斑，手臂及裤腿脏乱；平台有颜色斑块和脚周污染。没有干净材质分解或静动态分离的证据。",
+  "reviewed_hdr_frames": [
+    1,
+    76,
+    150
+  ],
+  "reviewed_directional_frames": [
+    0,
+    36,
+    71
+  ],
+  "relighting": "实际查看HDR1/76/150和SUN0/36/71，并单独查看SUN0036原PNG：HDR有橙色人物及平台色彩响应，但人物/腿部明显碎斑、反照率照明污染和平台脚周假起伏仍保留。SUN0/71人物与平台受光，0036几乎全黑（仅小点），对应背/下半球直接照明且关闭间接的情况，不把该单帧黑色当独立渲染错误。重光照功能有响应，未提供重光照GT精度或质量达标证明。"
+}
