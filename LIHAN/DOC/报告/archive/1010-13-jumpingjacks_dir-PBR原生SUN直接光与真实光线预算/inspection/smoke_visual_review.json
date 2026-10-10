@@ -1,0 +1,38 @@
+{
+  "functional_status": "PASS",
+  "visual_quality": "FAILED_SMOKE_ONLY",
+  "reviewed_at": "2026-10-10T08:13:31.388800+09:00",
+  "frames": [
+    1,
+    75,
+    150
+  ],
+  "rgb": "黑背景正常、人物和平台存在；0075背面非常暗，头手和衣服破碎斑驳、脚周平台伪起伏，20步不足最终质量。",
+  "alpha": "主体/平台大部覆盖，腰部边缘和脚周零碎薄雾残影，饱和Alpha不等于正确几何。",
+  "albedo": "来源照明/正背面色差与平台棋盘格烘入，脚周污染仍有；20步仅验证功能。",
+  "normal": "平台整体向上，0075不再全平台反向；人体/脚周混合轴斑驳仍明显。",
+  "hdr_directional": "三帧替换SUN与HDR16实际看，响应/背景正常但伪影及材质烘光仍有；无重光照GT。",
+  "images": [
+    "inspection/four_categories.png",
+    "inspection/relight.png"
+  ],
+  "video_full_decode": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-14-dir-PBR原生SUN预算与DirectPreset/insights/insights/rgb.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-14-dir-PBR原生SUN预算与DirectPreset/insights/insights/normal.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-14-dir-PBR原生SUN预算与DirectPreset/insights/insights/albedo.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-14-dir-PBR原生SUN预算与DirectPreset/insights/insights/alpha.mp4": 150
+  },
+  "optimizer_steps_extra_diagnostics": 0,
+  "full_mae": false,
+  "normal_7_goal": "NOT_EVALUATED",
+  "commit_allowed": false,
+  "actual_sessions_exit": {
+    "cpu": 0,
+    "train": 0,
+    "pbr_first_failed": 1,
+    "pbr_retry": 0,
+    "shared_buffers": 0,
+    "insights": 0
+  },
+  "code_files": 471
+}

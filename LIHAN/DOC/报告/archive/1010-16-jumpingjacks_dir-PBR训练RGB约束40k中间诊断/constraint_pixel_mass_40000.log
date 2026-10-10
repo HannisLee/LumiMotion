@@ -1,0 +1,230 @@
+Loading trained model at iteration 40000
+Found transforms_train.json file, assuming Blender data set!
+Reading Training Transforms
+Read Train Transforms with 135 cameras
+Loading Training Cameras
+Loading Test Cameras
+LOAD PLY
+/home/lihan/reproduce/LumiMotion-stage2-perlight/scene/__init__.py:103: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  unique_fids = [torch.tensor(val, dtype=torch.float32, device="cuda") for val in unique_values]
+################ gaussian_color params: 156934
+{
+  "status": "PASS_READ_ONLY_NATIVE_PIXEL_CONTRIBUTIONS",
+  "iteration": 40000,
+  "source_iteration": 35000,
+  "created_at": "2026-10-10T11:25:16.139861+09:00",
+  "point_stats": {
+    "RGB_confidence": {
+      "points": 29621,
+      "source_static_points": 17389,
+      "source_dynamic_points": 12232,
+      "original_opacity": {
+        "count": 29621,
+        "mean": 0.25395435094833374,
+        "q0_q50_q90_q99_q100": [
+          0.0008066568989306688,
+          0.01223403587937355,
+          0.9995935559272766,
+          0.9999920129776001,
+          1.0
+        ]
+      },
+      "motion_span": {
+        "count": 29621,
+        "mean": 0.33739224076271057,
+        "q0_q50_q90_q99_q100": [
+          1.124900617099911e-09,
+          0.0005103771691210568,
+          1.2070263624191284,
+          1.7834566593170158,
+          2.4414618015289307
+        ]
+      }
+    },
+    "existing_plane": {
+      "points": 15187,
+      "source_static_points": 15187,
+      "source_dynamic_points": 0,
+      "original_opacity": {
+        "count": 15187,
+        "mean": 0.6767557263374329,
+        "q0_q50_q90_q99_q100": [
+          0.05002126097679138,
+          0.9658246040344238,
+          0.9999635696411133,
+          0.9999947547912598,
+          0.9999998807907104
+        ]
+      },
+      "motion_span": {
+        "count": 15187,
+        "mean": 0.0004446722159627825,
+        "q0_q50_q90_q99_q100": [
+          4.020400401483215e-10,
+          9.160867193713784e-06,
+          0.0010914633050560952,
+          0.007534226430580015,
+          0.009974987246096134
+        ]
+      }
+    },
+    "source_position_stable_plane_005": {
+      "points": 12647,
+      "source_static_points": 12647,
+      "source_dynamic_points": 0,
+      "original_opacity": {
+        "count": 12647,
+        "mean": 0.6543972492218018,
+        "q0_q50_q90_q99_q100": [
+          0.05002126097679138,
+          0.9456536769866943,
+          0.9999617338180542,
+          0.9999945163726807,
+          0.9999998807907104
+        ]
+      },
+      "motion_span": {
+        "count": 12647,
+        "mean": 0.0004264882009010762,
+        "q0_q50_q90_q99_q100": [
+          4.020400401483215e-10,
+          8.992119546746835e-06,
+          0.0010220349533483384,
+          0.007419182285666412,
+          0.009955031797289848
+        ]
+      }
+    }
+  },
+  "source_position_stable_band_counts": {
+    "0.01": {
+      "points": 5750,
+      "static_points": 5750,
+      "dynamic_points": 0,
+      "overlapping_RGB_confidence": 14,
+      "overlapping_existing_plane": 5599,
+      "rejected_by_canonical_axis_cosine": 150,
+      "rejected_by_any_source_time_axis_cosine": 151
+    },
+    "0.025": {
+      "points": 10425,
+      "static_points": 10425,
+      "dynamic_points": 0,
+      "overlapping_RGB_confidence": 46,
+      "overlapping_existing_plane": 10014,
+      "rejected_by_canonical_axis_cosine": 410,
+      "rejected_by_any_source_time_axis_cosine": 411
+    },
+    "0.05": {
+      "points": 12647,
+      "static_points": 12647,
+      "dynamic_points": 0,
+      "overlapping_RGB_confidence": 52,
+      "overlapping_existing_plane": 12051,
+      "rejected_by_canonical_axis_cosine": 595,
+      "rejected_by_any_source_time_axis_cosine": 596
+    },
+    "0.1": {
+      "points": 14808,
+      "static_points": 14808,
+      "dynamic_points": 0,
+      "overlapping_RGB_confidence": 62,
+      "overlapping_existing_plane": 13975,
+      "rejected_by_canonical_axis_cosine": 832,
+      "rejected_by_any_source_time_axis_cosine": 833
+    },
+    "0.2": {
+      "points": 16110,
+      "static_points": 16110,
+      "dynamic_points": 0,
+      "overlapping_RGB_confidence": 63,
+      "overlapping_existing_plane": 15187,
+      "rejected_by_canonical_axis_cosine": 922,
+      "rejected_by_any_source_time_axis_cosine": 923
+    }
+  },
+  "rows": [
+    {
+      "frame": "0001",
+      "own_RGBA_foreground_pixels": 19817,
+      "visible_pixels": 17530,
+      "group_mass": {
+        "RGB_confidence": {
+          "alpha_weight_fraction_over_own_foreground": 0.3847498297691345,
+          "mean_pixel_fraction_over_visible": 0.3844740092754364,
+          "visible_pixel_fraction_with_majority_group": 0.3709070086479187
+        },
+        "existing_plane": {
+          "alpha_weight_fraction_over_own_foreground": 0.12066683918237686,
+          "mean_pixel_fraction_over_visible": 0.12116312980651855,
+          "visible_pixel_fraction_with_majority_group": 0.09863092005252838
+        },
+        "source_position_stable_plane_005": {
+          "alpha_weight_fraction_over_own_foreground": 0.08610518276691437,
+          "mean_pixel_fraction_over_visible": 0.08655153959989548,
+          "visible_pixel_fraction_with_majority_group": 0.06229320913553238
+        }
+      }
+    },
+    {
+      "frame": "0075",
+      "own_RGBA_foreground_pixels": 16608,
+      "visible_pixels": 15074,
+      "group_mass": {
+        "RGB_confidence": {
+          "alpha_weight_fraction_over_own_foreground": 0.2852117419242859,
+          "mean_pixel_fraction_over_visible": 0.2851737141609192,
+          "visible_pixel_fraction_with_majority_group": 0.2671487331390381
+        },
+        "existing_plane": {
+          "alpha_weight_fraction_over_own_foreground": 0.1642836183309555,
+          "mean_pixel_fraction_over_visible": 0.16454842686653137,
+          "visible_pixel_fraction_with_majority_group": 0.1418999582529068
+        },
+        "source_position_stable_plane_005": {
+          "alpha_weight_fraction_over_own_foreground": 0.1172601506114006,
+          "mean_pixel_fraction_over_visible": 0.1175154596567154,
+          "visible_pixel_fraction_with_majority_group": 0.0749635174870491
+        }
+      }
+    },
+    {
+      "frame": "0149",
+      "own_RGBA_foreground_pixels": 20085,
+      "visible_pixels": 17630,
+      "group_mass": {
+        "RGB_confidence": {
+          "alpha_weight_fraction_over_own_foreground": 0.3915402591228485,
+          "mean_pixel_fraction_over_visible": 0.391083300113678,
+          "visible_pixel_fraction_with_majority_group": 0.3778786063194275
+        },
+        "existing_plane": {
+          "alpha_weight_fraction_over_own_foreground": 0.11846785247325897,
+          "mean_pixel_fraction_over_visible": 0.11891471594572067,
+          "visible_pixel_fraction_with_majority_group": 0.09256947785615921
+        },
+        "source_position_stable_plane_005": {
+          "alpha_weight_fraction_over_own_foreground": 0.08348973840475082,
+          "mean_pixel_fraction_over_visible": 0.08391571044921875,
+          "visible_pixel_fraction_with_majority_group": 0.05598411709070206
+        }
+      }
+    }
+  ],
+  "actual_checkpoint_files": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/point_cloud/iteration_40000/point_cloud.ply": "afa337601fb93944f5ec6c1f7aa3acba0833ded3941bf38b9c3af585a9c06d5a",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/deform/iteration_40000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/pbr_rgb_normal.npz": "8f2987d0af3f0554ab16891c62ee99cdc04e3a7e1ca0f418046144aabceeada2",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/pbr_rgb_normal.json": "e36b993b4d4cf3f3cb8d1fb1d43be397597a3157af2e85dc338e1e45bc39aaef",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/pbr_rgb_normal_input.npz": "87752217f37e9fe9b96835f892ee2289c3740560d2f4592029652db52d03bc15",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/pbr_rgb_normal_input.json": "40d6b721ae4082522394c446270f1d37484c26832dfb4261aafe6b5e6b6e171e"
+  },
+  "all_points_retained": true,
+  "GT_labels_read": false,
+  "optimizer_steps": 0,
+  "training_prior_generated": false,
+  "production_support_changed": false,
+  "scoring_mask_generated": false,
+  "full_MAE": false,
+  "limitations": "RGB贡献图仅诊断真实前后顺序alpha合成权重；三TRAIN自身Alpha不当GT法线评分。source band集合是位置/全135TRAIN形变稳定候选，未施加新投影，也不是物体GT分类；不能凭候选数量扩大生产支持或声称7度。"
+}

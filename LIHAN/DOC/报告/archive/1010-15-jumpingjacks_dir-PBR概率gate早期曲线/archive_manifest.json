@@ -1,0 +1,10 @@
+{
+  "README.md": "bc5af8d6eeaf762dcad6976591da079dec24e0b87eca98b69a20e44fdb9c9c22",
+  "commands/plot_early_training.py": "13acc5f4df047f43e165cbf6363bfaecbe98e5d1589ce843e4a3ec945fed832a",
+  "logs/plot_early_training.log": "d52e6096fbaa8551a794d3f81428042eeab8d3cf5823e72d4052165cd6e79f1a",
+  "inspection/early_training/metadata.json": "d52e6096fbaa8551a794d3f81428042eeab8d3cf5823e72d4052165cd6e79f1a",
+  "inspection/early_training/training_curves.png": "3a67329759686ef3963e823f338ae460d0105963d02b52b3c00ea8685243088c",
+  "inspection/early_training/B09.tfevents": "7a9ef846b389017b31302e3eaff4c50476b8ab3597020c5b236d278c54dd0f67",
+  "inspection/early_training/B08.tfevents": "4e61824e146882cb887b999d0a5b0372e20aa26d916f28d5a43c9c112b00cea4",
+  "inspection/early_training/training_curves.csv": "bcb4c88d21c3f92767da31d7f4234f62707f409ef0285479ec518e4942e65277"
+}

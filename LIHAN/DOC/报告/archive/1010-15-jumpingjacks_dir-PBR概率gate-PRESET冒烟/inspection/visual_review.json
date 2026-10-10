@@ -1,0 +1,45 @@
+{
+  "actual_images_viewed": true,
+  "functional_status": "PASS",
+  "visual_quality": "FAILED_SMOKE_ONLY",
+  "reviewed_at": "2026-10-10T10:01:14.198751+09:00",
+  "iteration": 35020,
+  "actual_sessions_exit": {
+    "cpu": 0,
+    "train": 0,
+    "pbr": 0,
+    "gate_checkpoint": 0,
+    "shared_buffers": 0,
+    "insights": 0
+  },
+  "actual_sessions": {
+    "cpu": 72164,
+    "train": 84331,
+    "pbr": 62021,
+    "gate_checkpoint": 48619,
+    "shared_buffers": 63985,
+    "insights": 11167
+  },
+  "reviewed_frames": [
+    1,
+    75,
+    150
+  ],
+  "images": [
+    "inspection/four_categories.png",
+    "inspection/relight.png"
+  ],
+  "rgb_background": "黑背景正常，人物/平台存在；20步初始材质人物斑驳/破碎、背面黑，脚周灰黑污染仍明显。",
+  "alpha": "人物与平台主体覆盖完整/大部饱和，手臂/身体轮廓和平台边缘有薄雾及细碎残影。",
+  "albedo_static_dynamic": "正背面的光照色差/身体阴影烘入材质、平台脚周污染，未通过材质质量。",
+  "normal_depth": "Normal平台整体上向但脚周伪凸起、人体混合轴斑驳；GeometryRun仅buffer/time一致审计，不是GT精度，短训不作正式Depth/Mesh/7°评价。",
+  "relighting": "实际view三帧独立替换SUN和HDR16，照明/暖色响应存在，身体斑驳/缺失和平台伪凸起仍明显；仅功能，最终全量HDR2048须重训后验收。",
+  "full_MAE": false,
+  "normal_goal": "NOT_EVALUATED",
+  "videos_decoded": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-16-dir-PBR概率gate/insights/insights/rgb.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-16-dir-PBR概率gate/insights/insights/normal.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-16-dir-PBR概率gate/insights/insights/albedo.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-16-dir-PBR概率gate/insights/insights/alpha.mp4": 150
+  }
+}

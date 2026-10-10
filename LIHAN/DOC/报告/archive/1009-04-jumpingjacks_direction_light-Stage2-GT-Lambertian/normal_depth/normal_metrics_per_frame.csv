@@ -1,0 +1,91 @@
+source_frame,split,region,metric,mae,unit,coverage,valid_pixels,status
+10,test,foreground,GS Render Normal MAE,18.53384762389553,degree,0.9818462346530104,29909,evaluated
+10,test,foreground,Depth Normal MAE,26.083713337361715,degree,0.9320793119296172,28393,evaluated
+10,test,foreground,Mesh Normal MAE,21.120685636975608,degree,0.9825027903617622,29929,evaluated
+10,test,interior,GS Render Normal MAE,17.41539798906571,degree,1.0,26598,evaluated
+10,test,interior,Depth Normal MAE,25.85103192746371,degree,0.9454470260921873,25147,evaluated
+10,test,interior,Mesh Normal MAE,20.064238074178988,degree,0.9999624031882096,26597,evaluated
+20,test,foreground,GS Render Normal MAE,18.08447619417137,degree,0.9362751140145446,30384,evaluated
+20,test,foreground,Depth Normal MAE,25.02213497864373,degree,0.9005608283002589,29225,evaluated
+20,test,foreground,Mesh Normal MAE,20.19085157318881,degree,0.9562738814248737,31033,evaluated
+20,test,interior,GS Render Normal MAE,17.294705480156498,degree,0.9755259037374906,28659,evaluated
+20,test,interior,Depth Normal MAE,25.03053066048016,degree,0.9401933419565661,27621,evaluated
+20,test,interior,Mesh Normal MAE,19.441651357391645,degree,0.9854312751038192,28950,evaluated
+30,test,foreground,GS Render Normal MAE,20.240553220096615,degree,0.915346107370965,26513,evaluated
+30,test,foreground,Depth Normal MAE,25.840902948053785,degree,0.8679095460037977,25139,evaluated
+30,test,foreground,Mesh Normal MAE,22.59809047117528,degree,0.920973588814086,26676,evaluated
+30,test,interior,GS Render Normal MAE,18.872827817742433,degree,0.9612920973002711,24462,evaluated
+30,test,interior,Depth Normal MAE,25.39505523805428,degree,0.9102448225724054,23163,evaluated
+30,test,interior,Mesh Normal MAE,20.920832965491094,degree,0.9592486344166307,24410,evaluated
+40,test,foreground,GS Render Normal MAE,40.17301267283043,degree,0.8155071341665745,14746,evaluated
+40,test,foreground,Depth Normal MAE,29.90227445049694,degree,0.7462117022453268,13493,evaluated
+40,test,foreground,Mesh Normal MAE,27.202370493024784,degree,0.7911182391328393,14305,evaluated
+40,test,interior,GS Render Normal MAE,38.36684218600108,degree,0.8727124847498984,12876,evaluated
+40,test,interior,Depth Normal MAE,28.046600367700144,degree,0.793818625457503,11712,evaluated
+40,test,interior,Mesh Normal MAE,23.551062389951426,degree,0.8491256608377389,12528,evaluated
+50,test,foreground,GS Render Normal MAE,16.50181618676498,degree,0.9717347706192028,31010,evaluated
+50,test,foreground,Depth Normal MAE,23.73767217015675,degree,0.9338806718475808,29802,evaluated
+50,test,foreground,Mesh Normal MAE,18.327739194207773,degree,0.9798821759839559,31270,evaluated
+50,test,interior,GS Render Normal MAE,15.708984584974441,degree,0.9996866731652974,28715,evaluated
+50,test,interior,Depth Normal MAE,23.855477126136833,degree,0.9593371396741401,27556,evaluated
+50,test,interior,Mesh Normal MAE,18.00330026287938,degree,0.9965882189110152,28626,evaluated
+60,test,foreground,GS Render Normal MAE,17.45108824574382,degree,0.9684207235093644,30973,evaluated
+60,test,foreground,Depth Normal MAE,26.2076378299352,degree,0.9380295782134259,30001,evaluated
+60,test,foreground,Mesh Normal MAE,20.262046492943128,degree,0.9856486258324735,31524,evaluated
+60,test,interior,GS Render Normal MAE,17.224722230293448,degree,0.9984015780165963,29357,evaluated
+60,test,interior,Depth Normal MAE,26.621485471026258,degree,0.966433138348524,28417,evaluated
+60,test,interior,Mesh Normal MAE,20.240888504893572,degree,0.9986736498435587,29365,evaluated
+70,test,foreground,GS Render Normal MAE,24.28357077407887,degree,0.996119733924612,23361,evaluated
+70,test,foreground,Depth Normal MAE,30.57055608280908,degree,0.9430325771789186,22116,evaluated
+70,test,foreground,Mesh Normal MAE,24.974987670108835,degree,0.9762493603957019,22895,evaluated
+70,test,interior,GS Render Normal MAE,23.8930445306746,degree,1.0,20185,evaluated
+70,test,interior,Depth Normal MAE,30.685334535291414,degree,0.9385187020064404,18944,evaluated
+70,test,interior,Mesh Normal MAE,24.273110073873166,degree,0.9992568739162745,20170,evaluated
+80,test,foreground,GS Render Normal MAE,33.37252988276015,degree,0.8753347492843291,18958,evaluated
+80,test,foreground,Depth Normal MAE,35.151682623527996,degree,0.8116169544740973,17578,evaluated
+80,test,foreground,Mesh Normal MAE,30.276069599475456,degree,0.8704866562009419,18853,evaluated
+80,test,interior,GS Render Normal MAE,32.09377127201604,degree,0.9269980774512496,16876,evaluated
+80,test,interior,Depth Normal MAE,34.27129845817997,degree,0.861301840153804,15680,evaluated
+80,test,interior,Mesh Normal MAE,28.13315650952627,degree,0.9201867618786048,16752,evaluated
+90,test,foreground,GS Render Normal MAE,19.12480161769398,degree,0.9142169715290416,29638,evaluated
+90,test,foreground,Depth Normal MAE,29.741670056701718,degree,0.883525093309479,28643,evaluated
+90,test,foreground,Mesh Normal MAE,22.850616004433714,degree,0.93537740214072,30324,evaluated
+90,test,interior,GS Render Normal MAE,18.8247028641027,degree,0.9533232374221774,28328,evaluated
+90,test,interior,Depth Normal MAE,29.87544383191478,degree,0.9210499747602221,27369,evaluated
+90,test,interior,Mesh Normal MAE,22.54130699256059,degree,0.9670536765943126,28736,evaluated
+100,test,foreground,GS Render Normal MAE,17.740355149159925,degree,0.9552521334367727,30783,evaluated
+100,test,foreground,Depth Normal MAE,27.345051675817754,degree,0.920899922420481,29676,evaluated
+100,test,foreground,Mesh Normal MAE,20.721292911863042,degree,0.9735608999224205,31373,evaluated
+100,test,interior,GS Render Normal MAE,17.154920091724154,degree,0.9898219695680294,29078,evaluated
+100,test,interior,Depth Normal MAE,27.190736301486904,degree,0.9526840725737822,27987,evaluated
+100,test,interior,Mesh Normal MAE,20.220407023169997,degree,0.9915239813459509,29128,evaluated
+110,test,foreground,GS Render Normal MAE,25.638388545156506,degree,0.9204499391974058,18166,evaluated
+110,test,foreground,Depth Normal MAE,29.916350219416852,degree,0.8550871503850831,16876,evaluated
+110,test,foreground,Mesh Normal MAE,25.84976126622791,degree,0.9087961086339684,17936,evaluated
+110,test,interior,GS Render Normal MAE,21.969667863221517,degree,0.974398330058939,15871,evaluated
+110,test,interior,Depth Normal MAE,28.405128950591052,degree,0.8975933202357563,14620,evaluated
+110,test,interior,Mesh Normal MAE,23.39936661945208,degree,0.9602775049115914,15641,evaluated
+120,test,foreground,GS Render Normal MAE,20.84807632391313,degree,0.9156412210969546,25225,evaluated
+120,test,foreground,Depth Normal MAE,27.68630235390092,degree,0.8699408326981015,23966,evaluated
+120,test,foreground,Mesh Normal MAE,23.317093538907315,degree,0.9243892700279502,25466,evaluated
+120,test,interior,GS Render Normal MAE,19.190774827259435,degree,0.9604958677685951,23244,evaluated
+120,test,interior,Depth Normal MAE,26.770963640993727,degree,0.9101652892561983,22026,evaluated
+120,test,interior,Mesh Normal MAE,21.35649602843336,degree,0.9592148760330579,23213,evaluated
+130,test,foreground,GS Render Normal MAE,17.645323342596047,degree,0.9335469107551487,30597,evaluated
+130,test,foreground,Depth Normal MAE,23.777257130074336,degree,0.89720823798627,29406,evaluated
+130,test,foreground,Mesh Normal MAE,20.028394248270516,degree,0.9579862700228833,31398,evaluated
+130,test,interior,GS Render Normal MAE,16.919599443228147,degree,0.974903474903475,28785,evaluated
+130,test,interior,Depth Normal MAE,23.45638318769712,degree,0.9380545959493328,27697,evaluated
+130,test,interior,Mesh Normal MAE,19.216843898667243,degree,0.9855720382036172,29100,evaluated
+140,test,foreground,GS Render Normal MAE,22.049922456294787,degree,0.894250931054987,28574,evaluated
+140,test,foreground,Depth Normal MAE,29.051643850384984,degree,0.8489030763934529,27125,evaluated
+140,test,foreground,Mesh Normal MAE,25.333844302794894,degree,0.9071448690263825,28986,evaluated
+140,test,interior,GS Render Normal MAE,20.586523435158046,degree,0.9451445251317101,26551,evaluated
+140,test,interior,Depth Normal MAE,28.263229972785524,degree,0.9000071194646163,25283,evaluated
+140,test,interior,Mesh Normal MAE,23.665051153296186,degree,0.9515876406094261,26732,evaluated
+150,test,foreground,GS Render Normal MAE,31.93804179423541,degree,0.8710752145381121,17256,evaluated
+150,test,foreground,Depth Normal MAE,32.118214518112985,degree,0.781675921251893,15485,evaluated
+150,test,foreground,Mesh Normal MAE,31.322397596705617,degree,0.8618879353861686,17074,evaluated
+150,test,interior,GS Render Normal MAE,28.71146327908494,degree,0.9548493876199934,14423,evaluated
+150,test,interior,Depth Normal MAE,28.941982551439544,degree,0.8524991724594505,12877,evaluated
+150,test,interior,Mesh Normal MAE,27.501326581149293,degree,0.9545845746441576,14419,evaluated

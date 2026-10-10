@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "mask_source": "original-image-alpha",
+  "frames": 150,
+  "raw_RGB_RGBA_verified": true,
+  "material_geometry_GT_opened": false,
+  "manifest_sha256": "2c9b3ad5e4f4541e4a65213cfedae256919575a40cddee5b74267bea5c4bfff8",
+  "legacy_converted_RGBA_pixel_identical_frames": 150,
+  "source_stage1_inherited_alpha": "旧Stage1来自albedo-alpha转换；150帧与原RGB自身alpha和新RGBA逐像素相同，不增加原图之外的信息；来源35k权重固定，未重跑Stage1"
+}

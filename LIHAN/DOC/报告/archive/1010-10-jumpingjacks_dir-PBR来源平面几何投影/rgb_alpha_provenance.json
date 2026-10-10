@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "mask_source": "original-image-alpha",
+  "frames": 150,
+  "raw_RGB_RGBA_verified": true,
+  "material_geometry_GT_opened": false,
+  "manifest_sha256": "2c9b3ad5e4f4541e4a65213cfedae256919575a40cddee5b74267bea5c4bfff8"
+}

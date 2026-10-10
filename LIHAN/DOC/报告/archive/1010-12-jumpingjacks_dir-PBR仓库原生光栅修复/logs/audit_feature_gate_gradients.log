@@ -1,0 +1,733 @@
+Loading trained model at iteration 40000
+Found transforms_train.json file, assuming Blender data set!
+Reading Training Transforms
+Read Train Transforms with 135 cameras
+Loading Training Cameras
+Loading Test Cameras
+LOAD PLY
+/home/lihan/reproduce/LumiMotion-stage2-perlight/scene/__init__.py:103: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  unique_fids = [torch.tensor(val, dtype=torch.float32, device="cuda") for val in unique_values]
+################ gaussian_color params: 156934
+{
+  "status": "PASS_READ_ONLY_FEATURE_GATE_GRADIENT_DIAGNOSTIC",
+  "iteration": 40000,
+  "rows": [
+    {
+      "frame": "0001",
+      "losses": {
+        "native_photo": 0.11772049963474274,
+        "PBR_photo": 0.09936647117137909,
+        "SH_photo": 0.018354028463363647,
+        "normal_depth": 0.007061323616653681,
+        "input_alpha": 0.0032301207538694143,
+        "combined_feature_dependent": 0.12801194190979004
+      },
+      "gradient_groups": {
+        "native_photo": {
+          "all": {
+            "points": 99827,
+            "L2": 0.0005630466039292514,
+            "nonzero_points": 34817,
+            "positive_fraction_among_nonzero": 0.5272998809814453,
+            "gradient_sum": 3.45231092069298e-05
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 1.0053882760985289e-05,
+            "nonzero_points": 5167,
+            "positive_fraction_among_nonzero": 0.5095800161361694,
+            "gradient_sum": 9.840676284511574e-06
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 0.0002446251455694437,
+            "nonzero_points": 4672,
+            "positive_fraction_among_nonzero": 0.5413099527359009,
+            "gradient_sum": 0.0002972057554870844
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 7.609796739416197e-05,
+            "nonzero_points": 21037,
+            "positive_fraction_among_nonzero": 0.5271664261817932,
+            "gradient_sum": -2.0618230337277055e-05
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 0.0005012864130549133,
+            "nonzero_points": 3941,
+            "positive_fraction_among_nonzero": 0.5346359014511108,
+            "gradient_sum": -0.00025190520682372153
+          }
+        },
+        "PBR_photo": {
+          "all": {
+            "points": 99827,
+            "L2": 0.0005541249411180615,
+            "nonzero_points": 27885,
+            "positive_fraction_among_nonzero": 0.5105253458023071,
+            "gradient_sum": -0.0001394797582179308
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 9.99966050585499e-06,
+            "nonzero_points": 3258,
+            "positive_fraction_among_nonzero": 0.479742169380188,
+            "gradient_sum": 9.28601912164595e-06
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 0.00024421437410637736,
+            "nonzero_points": 4283,
+            "positive_fraction_among_nonzero": 0.540275514125824,
+            "gradient_sum": 0.0002815840416587889
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 7.628653111169115e-05,
+            "nonzero_points": 17242,
+            "positive_fraction_among_nonzero": 0.5090476870536804,
+            "gradient_sum": -2.3752563720336184e-05
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 0.000491420563776046,
+            "nonzero_points": 3102,
+            "positive_fraction_among_nonzero": 0.5099935531616211,
+            "gradient_sum": -0.0004065973043907434
+          }
+        },
+        "SH_photo": {
+          "all": {
+            "points": 99827,
+            "L2": 5.1424489356577396e-05,
+            "nonzero_points": 26884,
+            "positive_fraction_among_nonzero": 0.5442642569541931,
+            "gradient_sum": 0.0001740028237691149
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 4.507654409735551e-07,
+            "nonzero_points": 4225,
+            "positive_fraction_among_nonzero": 0.5214201211929321,
+            "gradient_sum": 5.546569354919484e-07
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 1.3567336281994358e-05,
+            "nonzero_points": 3768,
+            "positive_fraction_among_nonzero": 0.527600884437561,
+            "gradient_sum": 1.5621726561221294e-05
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 2.3992565729713533e-06,
+            "nonzero_points": 15663,
+            "positive_fraction_among_nonzero": 0.5564706921577454,
+            "gradient_sum": 3.1343208775069797e-06
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 4.954236283083446e-05,
+            "nonzero_points": 3228,
+            "positive_fraction_among_nonzero": 0.5343866348266602,
+            "gradient_sum": 0.00015469211211893708
+          }
+        },
+        "normal_depth": {
+          "all": {
+            "points": 99827,
+            "L2": 0.00018533627735450864,
+            "nonzero_points": 24852,
+            "positive_fraction_among_nonzero": 0.5068404674530029,
+            "gradient_sum": -0.0001485002867411822
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 1.5034865441521106e-07,
+            "nonzero_points": 2794,
+            "positive_fraction_among_nonzero": 0.531853973865509,
+            "gradient_sum": 3.003106598953309e-07
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 1.2593939572980162e-05,
+            "nonzero_points": 3723,
+            "positive_fraction_among_nonzero": 0.5052376985549927,
+            "gradient_sum": 4.520821221376536e-06
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 6.001441306580091e-06,
+            "nonzero_points": 15275,
+            "positive_fraction_among_nonzero": 0.5055973529815674,
+            "gradient_sum": -4.609249117493164e-06
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 0.00018481041479390115,
+            "nonzero_points": 3060,
+            "positive_fraction_among_nonzero": 0.49215686321258545,
+            "gradient_sum": -0.00014871217717882246
+          }
+        },
+        "input_alpha": {
+          "all": {
+            "points": 99827,
+            "L2": 1.1701602034008829e-06,
+            "nonzero_points": 12406,
+            "positive_fraction_among_nonzero": 0.6264710426330566,
+            "gradient_sum": 3.224587317163241e-06
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 1.0885781165370645e-08,
+            "nonzero_points": 1364,
+            "positive_fraction_among_nonzero": 0.49193549156188965,
+            "gradient_sum": 1.4784950153057252e-08
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 9.80962340690894e-07,
+            "nonzero_points": 1774,
+            "positive_fraction_among_nonzero": 0.642615556716919,
+            "gradient_sum": 1.139419623541471e-06
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 1.4354411348449503e-07,
+            "nonzero_points": 7093,
+            "positive_fraction_among_nonzero": 0.6457070112228394,
+            "gradient_sum": 4.912671442980354e-07
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 6.215016128408024e-07,
+            "nonzero_points": 2175,
+            "positive_fraction_among_nonzero": 0.6349425315856934,
+            "gradient_sum": 1.5791160876688082e-06
+          }
+        },
+        "combined_feature_dependent": {
+          "all": {
+            "points": 99827,
+            "L2": 0.0005904163117520511,
+            "nonzero_points": 36288,
+            "positive_fraction_among_nonzero": 0.5322144627571106,
+            "gradient_sum": -0.00011075250222347677
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 1.0168349035666324e-05,
+            "nonzero_points": 5465,
+            "positive_fraction_among_nonzero": 0.511436402797699,
+            "gradient_sum": 1.0155771633435506e-05
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 0.00024862069403752685,
+            "nonzero_points": 4735,
+            "positive_fraction_among_nonzero": 0.5469905138015747,
+            "gradient_sum": 0.0003028659848496318
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 7.963969255797565e-05,
+            "nonzero_points": 21943,
+            "positive_fraction_among_nonzero": 0.534521222114563,
+            "gradient_sum": -2.4736222258070484e-05
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 0.0005294650909490883,
+            "nonzero_points": 4145,
+            "positive_fraction_among_nonzero": 0.5305187106132507,
+            "gradient_sum": -0.0003990381374023855
+          }
+        }
+      }
+    },
+    {
+      "frame": "0075",
+      "losses": {
+        "native_photo": 0.1174294650554657,
+        "PBR_photo": 0.10285316407680511,
+        "SH_photo": 0.014576301909983158,
+        "normal_depth": 0.00969747081398964,
+        "input_alpha": 0.0020955230575054884,
+        "combined_feature_dependent": 0.12922245264053345
+      },
+      "gradient_groups": {
+        "native_photo": {
+          "all": {
+            "points": 99827,
+            "L2": 0.012470509856939316,
+            "nonzero_points": 36220,
+            "positive_fraction_among_nonzero": 0.5041965842247009,
+            "gradient_sum": 0.018054470419883728
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 4.158156571065774e-06,
+            "nonzero_points": 6582,
+            "positive_fraction_among_nonzero": 0.49984806776046753,
+            "gradient_sum": 2.27605005420628e-06
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 0.010364827699959278,
+            "nonzero_points": 5064,
+            "positive_fraction_among_nonzero": 0.4980252683162689,
+            "gradient_sum": 0.012060968205332756
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 0.0002946305030491203,
+            "nonzero_points": 19692,
+            "positive_fraction_among_nonzero": 0.5134064555168152,
+            "gradient_sum": 3.568851388990879e-05
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 0.0069279978051781654,
+            "nonzero_points": 4882,
+            "positive_fraction_among_nonzero": 0.4793117642402649,
+            "gradient_sum": 0.005955534055829048
+          }
+        },
+        "PBR_photo": {
+          "all": {
+            "points": 99827,
+            "L2": 0.012467256747186184,
+            "nonzero_points": 29503,
+            "positive_fraction_among_nonzero": 0.4988645315170288,
+            "gradient_sum": 0.018094951286911964
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 4.070432623848319e-06,
+            "nonzero_points": 4236,
+            "positive_fraction_among_nonzero": 0.49197354912757874,
+            "gradient_sum": 2.1354885575419758e-06
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 0.010364322923123837,
+            "nonzero_points": 4458,
+            "positive_fraction_among_nonzero": 0.5020188689231873,
+            "gradient_sum": 0.012031402438879013
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 0.0002938491525128484,
+            "nonzero_points": 16753,
+            "positive_fraction_among_nonzero": 0.5026562809944153,
+            "gradient_sum": 5.471779149957001e-05
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 0.006922928616404533,
+            "nonzero_points": 4056,
+            "positive_fraction_among_nonzero": 0.4869329333305359,
+            "gradient_sum": 0.006006699521094561
+          }
+        },
+        "SH_photo": {
+          "all": {
+            "points": 99827,
+            "L2": 4.566903953673318e-05,
+            "nonzero_points": 24410,
+            "positive_fraction_among_nonzero": 0.5141335725784302,
+            "gradient_sum": -4.048688424518332e-05
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 2.512091157313989e-07,
+            "nonzero_points": 5369,
+            "positive_fraction_among_nonzero": 0.5040044784545898,
+            "gradient_sum": 1.4056219299618533e-07
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 1.5055366020533256e-05,
+            "nonzero_points": 3741,
+            "positive_fraction_among_nonzero": 0.49585673213005066,
+            "gradient_sum": 2.956681237265002e-05
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 8.81456617207732e-06,
+            "nonzero_points": 11786,
+            "positive_fraction_among_nonzero": 0.5406414270401001,
+            "gradient_sum": -1.9029263057745993e-05
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 4.220470873406157e-05,
+            "nonzero_points": 3514,
+            "positive_fraction_among_nonzero": 0.4601593613624573,
+            "gradient_sum": -5.1165003242203966e-05
+          }
+        },
+        "normal_depth": {
+          "all": {
+            "points": 99827,
+            "L2": 0.00013167432916816324,
+            "nonzero_points": 26192,
+            "positive_fraction_among_nonzero": 0.5264202952384949,
+            "gradient_sum": -6.38543424429372e-05
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 9.277552237563214e-08,
+            "nonzero_points": 4128,
+            "positive_fraction_among_nonzero": 0.5106589198112488,
+            "gradient_sum": -3.252780089724183e-08
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 3.854493115795776e-05,
+            "nonzero_points": 3444,
+            "positive_fraction_among_nonzero": 0.47706153988838196,
+            "gradient_sum": 2.5444718630751595e-05
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 1.946365046023857e-05,
+            "nonzero_points": 14358,
+            "positive_fraction_among_nonzero": 0.5508427619934082,
+            "gradient_sum": 6.113361450843513e-06
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 0.0001243928272742778,
+            "nonzero_points": 4262,
+            "positive_fraction_among_nonzero": 0.499296098947525,
+            "gradient_sum": -9.537991718389094e-05
+          }
+        },
+        "input_alpha": {
+          "all": {
+            "points": 99827,
+            "L2": 1.962365786312148e-06,
+            "nonzero_points": 11771,
+            "positive_fraction_among_nonzero": 0.4984283149242401,
+            "gradient_sum": -4.912917120236671e-06
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 1.5124435037705553e-09,
+            "nonzero_points": 975,
+            "positive_fraction_among_nonzero": 0.3446153700351715,
+            "gradient_sum": -3.222365929644866e-09
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 1.6415246761880553e-07,
+            "nonzero_points": 1889,
+            "positive_fraction_among_nonzero": 0.440444678068161,
+            "gradient_sum": -2.7736973606806714e-07
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 1.2418007599990233e-06,
+            "nonzero_points": 6400,
+            "positive_fraction_among_nonzero": 0.543749988079071,
+            "gradient_sum": 1.3031859680268099e-07
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 1.5105833881534636e-06,
+            "nonzero_points": 2507,
+            "positive_fraction_among_nonzero": 0.4862385392189026,
+            "gradient_sum": -4.762643584399484e-06
+          }
+        },
+        "combined_feature_dependent": {
+          "all": {
+            "points": 99827,
+            "L2": 0.012453286908566952,
+            "nonzero_points": 37687,
+            "positive_fraction_among_nonzero": 0.5125640034675598,
+            "gradient_sum": 0.017985697835683823
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 4.14141049986938e-06,
+            "nonzero_points": 6707,
+            "positive_fraction_among_nonzero": 0.5005218386650085,
+            "gradient_sum": 2.2403000912163407e-06
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 0.010362664237618446,
+            "nonzero_points": 5141,
+            "positive_fraction_among_nonzero": 0.4878428280353546,
+            "gradient_sum": 0.012086138129234314
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 0.0002954447700176388,
+            "nonzero_points": 20796,
+            "positive_fraction_among_nonzero": 0.5296210646629333,
+            "gradient_sum": 4.193228960502893e-05
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 0.0069001647643744946,
+            "nonzero_points": 5043,
+            "positive_fraction_among_nonzero": 0.48344239592552185,
+            "gradient_sum": 0.005855389405041933
+          }
+        }
+      }
+    },
+    {
+      "frame": "0149",
+      "losses": {
+        "native_photo": 0.1149018183350563,
+        "PBR_photo": 0.09545902907848358,
+        "SH_photo": 0.019442789256572723,
+        "normal_depth": 0.006970115937292576,
+        "input_alpha": 0.0034893681295216084,
+        "combined_feature_dependent": 0.12536130845546722
+      },
+      "gradient_groups": {
+        "native_photo": {
+          "all": {
+            "points": 99827,
+            "L2": 0.0022934209555387497,
+            "nonzero_points": 34628,
+            "positive_fraction_among_nonzero": 0.5256728529930115,
+            "gradient_sum": -0.0020855488255620003
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 8.937394341046456e-06,
+            "nonzero_points": 5188,
+            "positive_fraction_among_nonzero": 0.5179259777069092,
+            "gradient_sum": -7.2921084210975096e-06
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 8.512013300787657e-05,
+            "nonzero_points": 4629,
+            "positive_fraction_among_nonzero": 0.5249513983726501,
+            "gradient_sum": 0.00012797446106560528
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 0.00011657492723315954,
+            "nonzero_points": 20923,
+            "positive_fraction_among_nonzero": 0.5268364548683167,
+            "gradient_sum": 0.0001978693762794137
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 0.0022888563107699156,
+            "nonzero_points": 3888,
+            "positive_fraction_among_nonzero": 0.5306069850921631,
+            "gradient_sum": -0.0024041004944592714
+          }
+        },
+        "PBR_photo": {
+          "all": {
+            "points": 99827,
+            "L2": 0.0022938328329473734,
+            "nonzero_points": 27454,
+            "positive_fraction_among_nonzero": 0.5117651224136353,
+            "gradient_sum": -0.002130617154762149
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 8.965706911112648e-06,
+            "nonzero_points": 3153,
+            "positive_fraction_among_nonzero": 0.5099905133247375,
+            "gradient_sum": -7.227290097944206e-06
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 8.369467104785144e-05,
+            "nonzero_points": 4191,
+            "positive_fraction_among_nonzero": 0.5277976393699646,
+            "gradient_sum": 0.00012526330829132348
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 0.00011512895434862003,
+            "nonzero_points": 17006,
+            "positive_fraction_among_nonzero": 0.5072915554046631,
+            "gradient_sum": 0.00019312382210046053
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 0.002289394848048687,
+            "nonzero_points": 3104,
+            "positive_fraction_among_nonzero": 0.5164303779602051,
+            "gradient_sum": -0.0024417773820459843
+          }
+        },
+        "SH_photo": {
+          "all": {
+            "points": 99827,
+            "L2": 2.225993921456393e-05,
+            "nonzero_points": 26965,
+            "positive_fraction_among_nonzero": 0.5468941330909729,
+            "gradient_sum": 4.506790355662815e-05
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 2.0588004190358333e-07,
+            "nonzero_points": 4217,
+            "positive_fraction_among_nonzero": 0.5245435237884521,
+            "gradient_sum": -6.481752024001253e-08
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 5.93739423493389e-06,
+            "nonzero_points": 3807,
+            "positive_fraction_among_nonzero": 0.5185185670852661,
+            "gradient_sum": 2.711144588829484e-06
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 3.234255700590438e-06,
+            "nonzero_points": 15744,
+            "positive_fraction_among_nonzero": 0.5596417188644409,
+            "gradient_sum": 4.745525984617416e-06
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 2.120729914167896e-05,
+            "nonzero_points": 3197,
+            "positive_fraction_among_nonzero": 0.5473881959915161,
+            "gradient_sum": 3.76760472136084e-05
+          }
+        },
+        "normal_depth": {
+          "all": {
+            "points": 99827,
+            "L2": 6.258105713641271e-05,
+            "nonzero_points": 25153,
+            "positive_fraction_among_nonzero": 0.515326201915741,
+            "gradient_sum": -8.721843914827332e-05
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 1.4599091002764908e-07,
+            "nonzero_points": 2944,
+            "positive_fraction_among_nonzero": 0.5567255616188049,
+            "gradient_sum": 2.509116256987909e-07
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 8.48770378070185e-06,
+            "nonzero_points": 3767,
+            "positive_fraction_among_nonzero": 0.5073001980781555,
+            "gradient_sum": 1.9862591216224246e-05
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 9.347253580926917e-06,
+            "nonzero_points": 15296,
+            "positive_fraction_among_nonzero": 0.5094795823097229,
+            "gradient_sum": -1.1109736078651622e-05
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 6.129400571808219e-05,
+            "nonzero_points": 3146,
+            "positive_fraction_among_nonzero": 0.5146217346191406,
+            "gradient_sum": -9.622221841709688e-05
+          }
+        },
+        "input_alpha": {
+          "all": {
+            "points": 99827,
+            "L2": 8.576230925427808e-07,
+            "nonzero_points": 12454,
+            "positive_fraction_among_nonzero": 0.6434880495071411,
+            "gradient_sum": 3.1706404115539044e-06
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 9.514134369226213e-09,
+            "nonzero_points": 1346,
+            "positive_fraction_among_nonzero": 0.47548291087150574,
+            "gradient_sum": -5.308685935290214e-09
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 6.175251314743946e-07,
+            "nonzero_points": 1793,
+            "positive_fraction_among_nonzero": 0.6252091526985168,
+            "gradient_sum": 9.205763262798428e-07
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 1.8714096938765579e-07,
+            "nonzero_points": 7166,
+            "positive_fraction_among_nonzero": 0.6829472184181213,
+            "gradient_sum": 5.689631734639988e-07
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 5.648608407682332e-07,
+            "nonzero_points": 2149,
+            "positive_fraction_among_nonzero": 0.6323871612548828,
+            "gradient_sum": 1.6864096323843114e-06
+          }
+        },
+        "combined_feature_dependent": {
+          "all": {
+            "points": 99827,
+            "L2": 0.0023313830606639385,
+            "nonzero_points": 36135,
+            "positive_fraction_among_nonzero": 0.5353258848190308,
+            "gradient_sum": -0.0021695969626307487
+          },
+          "projected_plane": {
+            "points": 15187,
+            "L2": 8.845178854244296e-06,
+            "nonzero_points": 5411,
+            "positive_fraction_among_nonzero": 0.5204213857650757,
+            "gradient_sum": -7.046505743346643e-06
+          },
+          "dynamic_plane_candidates": {
+            "points": 6836,
+            "L2": 8.622335008112714e-05,
+            "nonzero_points": 4730,
+            "positive_fraction_among_nonzero": 0.5325581431388855,
+            "gradient_sum": 0.00014875763736199588
+          },
+          "other_dynamic": {
+            "points": 38747,
+            "L2": 0.00011897747026523575,
+            "nonzero_points": 21885,
+            "positive_fraction_among_nonzero": 0.5392734408378601,
+            "gradient_sum": 0.00018732858006842434
+          },
+          "static_unprojected": {
+            "points": 39057,
+            "L2": 0.002326731337234378,
+            "nonzero_points": 4109,
+            "positive_fraction_among_nonzero": 0.5371136665344238,
+            "gradient_sum": -0.0024986364878714085
+          }
+        }
+      }
+    }
+  ],
+  "optimizer_steps": 0,
+  "feature_values_changed": false,
+  "mlp_weights_changed": false,
+  "gt_labels_read": false,
+  "new_training_prior_saved": false,
+  "current_training_modified": false,
+  "final_mae": false,
+  "source_files": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复/model_mlp/point_cloud/iteration_40000/point_cloud.ply": "08a31c5dc27f4cc4ec5deb7c2793377626f2494a9511b8037267369c63602392",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复/model_mlp/deform/iteration_40000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+  },
+  "limits": "只证明在同预测状态开放输出乘法gate的RGB/Alpha/ND梯度；candidate由source预测筛选，不是真实物体标注；不据此宣称训练后质量或7°，后续需完整新训练评测。"
+}

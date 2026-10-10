@@ -1,0 +1,13 @@
+{
+  "README.md": "997c3114548ad12c936e76d12ce9d4a8f13282ce37faadf012cc184a4a3ad8cd",
+  "execution_result.json": "16c69b4c604d2d23f5f9447d6f23a7b0320168fc0d442611bcee4bd9b85f7181",
+  "commands/audit_source_jacobian.py": "30931954091f3d74711156e4f9323ada64db27fc446eb765396ff473dbce9ad3",
+  "logs/source_jacobian.log": "871447bbd5f31374ac61f2c226cb80ad68b12f25d0170dfc3892a30a5a7cde5d",
+  "inspection/source_J_0001.npz": "bb3ca8e0a4d513eb5af30d52d8fa2c6643549840c511aac1f0297d1ef679ee61",
+  "inspection/source_J_0091.npz": "5ee8872aab42dc2e0d5e0187e41def3bf33aac2390bed3c886fda31632b2f642",
+  "inspection/source_J_0121.npz": "f120203002bde1415ce5ec7ac318ce242905f0d8485fd4e0b192d0a2386de6fe",
+  "inspection/source_jacobian.json": "e2dd84532367e4fb1f0bdd108fc01b4fcc0559f28c2f660bb5ab7d587fb3bf0a",
+  "inspection/source_J_0031.npz": "26583aecf636c51ec349cc4fcf311d306d98795e865a2a2d200659ce19f783a7",
+  "inspection/source_J_0061.npz": "3e43f714d4fb1830828516923a696cf664f2953e0db2847010d2edfcaae169a1",
+  "inspection/source_J_0149.npz": "556ff9a3dabcdcf2e601b893aecca0d2793bbfcf96114383144753a52902be87"
+}

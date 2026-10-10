@@ -1,0 +1,10 @@
+{
+  "updated_at": "2026-10-10T05:56:26.614944+09:00",
+  "kind": "offline_geometry_evaluator_fix_only",
+  "training_runtime_source_changed": false,
+  "old_eval_sha256": "0e81a53568f7b849607a3d926ce2cd79dd247f7009335d643a7ef15bde1216e8",
+  "new_eval_sha256": "2fe3d523c79a1225a9e3d055499fd4e0b2693bd485cc6b8c05cdfe344c00b50e",
+  "launch_manifest": "code_manifest_train_launch.json",
+  "launch_snapshot": "commands/code_snapshot_train_launch",
+  "reason": "GeometryRun未消费Anchor/Plane，现使用FrozenScene共享实际几何；不改train/renderer/MLP/参数或评分口径。"
+}

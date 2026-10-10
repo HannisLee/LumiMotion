@@ -1,0 +1,25 @@
+{
+  "status": "TRAIN_COMPLETED",
+  "started_at": "2026-10-10T08:14:00.087990+09:00",
+  "training_pid": 271624,
+  "process_start_ticks": "9801108",
+  "source_iteration": 35000,
+  "target_iteration": 55000,
+  "steps_planned": 20000,
+  "preset": "pbr_gt_directional_plane_native_direct",
+  "gt_training_inputs": [
+    "light_direction_only"
+  ],
+  "quality": "PENDING",
+  "normal_goal": "PENDING",
+  "train_session_id": 44255,
+  "postprocess_session_id": 86673,
+  "finished_at": "2026-10-10T08:43:04.510646+09:00",
+  "iteration": 55000,
+  "steps_completed": 20000,
+  "training_exit_code": 0,
+  "verified_training_session_closed": true,
+  "verified_finished_observed_at": "2026-10-10T08:43:45.200906+09:00",
+  "training_complete_log_time": "10/10 08:43:01",
+  "training_loop_elapsed": "28:42"
+}

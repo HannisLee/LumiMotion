@@ -1,0 +1,7 @@
+{
+  "commands/make_final_rgb_comparison.py": "21354a827b5cc03b82517fe38414ef3b841216e4d83d7db2da2e136cd5098b04",
+  "logs/make_final_rgb_comparison.log": "9adb41b1be180780d4ae04fce93bd69fd9288993c00a58f0863349273271594b",
+  "inspection/final_rgb_early_review.json": "821e665df6d162e63c05f13643442e8ba45e8b09236a60b01c0610eea2ab49df",
+  "inspection/rgb_final_55000_comparison.png": "c6e678ded1a685b173b2b850644f3eaa6215eb7962f5fc1a1bfcbdec725de24e",
+  "model_mlp/renders_stage2/ours_55000/eval/metrics.json": "44b4881df95c5326901faf78decd5af5c6a4b9618b6bdab8422e311856ccf470"
+}

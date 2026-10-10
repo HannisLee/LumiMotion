@@ -1,0 +1,20 @@
+{
+  "status": "COMPLETED_CHECKPOINT_AUDITS",
+  "completed": [
+    {
+      "iteration": 40000,
+      "exit_code": 0,
+      "completed_at": "2026-10-10T10:11:02.973680+09:00"
+    },
+    {
+      "iteration": 50000,
+      "exit_code": 0,
+      "completed_at": "2026-10-10T10:25:45.199833+09:00"
+    },
+    {
+      "iteration": 55000,
+      "exit_code": 0,
+      "completed_at": "2026-10-10T10:33:01.908375+09:00"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/point_cloud/iteration_35000/point_cloud.ply",
+  "source_sha256": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+  "gt_geometry_used": false,
+  "method": "500 seeded plane RANSAC on source Stage1 predicted static high-opacity points; .03 distance; SVD refit",
+  "gaussians": 99827,
+  "feature_fields": [
+    "fea_0"
+  ],
+  "static_gaussians": 54244,
+  "selected_static_high_opacity": 12603,
+  "plane_normal": [
+    -0.0025460219476372004,
+    -0.0019261669367551804,
+    0.9999949336051941
+  ],
+  "plane_offset": 0.008620105683803558,
+  "sample_inlier_fraction": 0.5961279060541141,
+  "full_source_plane_proximity_fraction": 0.5173850761817945
+}

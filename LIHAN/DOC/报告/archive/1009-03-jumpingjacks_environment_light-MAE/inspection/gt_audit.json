@@ -1,0 +1,129 @@
+{
+  "status": "PASS",
+  "frames": [
+    {
+      "source_frame": 10,
+      "roughness_alpha_iou": 0.999343853548112,
+      "roughness_foreground_min": 0.6787109375,
+      "roughness_foreground_max": 0.950714647769928,
+      "depth_alpha_iou": 0.9989506132353906,
+      "gt_geometry_shading_normal_gap_deg": 0.6849483275760287
+    },
+    {
+      "source_frame": 20,
+      "roughness_alpha_iou": 0.9995379354957952,
+      "roughness_foreground_min": 0.681640625,
+      "roughness_foreground_max": 0.9502217769622803,
+      "depth_alpha_iou": 0.9988304093567252,
+      "gt_geometry_shading_normal_gap_deg": 0.778780738313071
+    },
+    {
+      "source_frame": 30,
+      "roughness_alpha_iou": 0.9992754123248914,
+      "roughness_foreground_min": 0.673828125,
+      "roughness_foreground_max": 0.9502463340759277,
+      "depth_alpha_iou": 0.9984488107549121,
+      "gt_geometry_shading_normal_gap_deg": 0.7736088294644411
+    },
+    {
+      "source_frame": 40,
+      "roughness_alpha_iou": 0.999392164447146,
+      "roughness_foreground_min": 0.66748046875,
+      "roughness_foreground_max": 0.9502217769622803,
+      "depth_alpha_iou": 0.9980681128222112,
+      "gt_geometry_shading_normal_gap_deg": 1.0388712947611318
+    },
+    {
+      "source_frame": 50,
+      "roughness_alpha_iou": 0.9996867560456083,
+      "roughness_foreground_min": 0.66357421875,
+      "roughness_foreground_max": 0.950714647769928,
+      "depth_alpha_iou": 0.9988106416275431,
+      "gt_geometry_shading_normal_gap_deg": 0.7397948163737877
+    },
+    {
+      "source_frame": 60,
+      "roughness_alpha_iou": 0.9995936611133686,
+      "roughness_foreground_min": 0.66259765625,
+      "roughness_foreground_max": 0.950714647769928,
+      "depth_alpha_iou": 0.999187728451373,
+      "gt_geometry_shading_normal_gap_deg": 0.8589106347161817
+    },
+    {
+      "source_frame": 70,
+      "roughness_alpha_iou": 0.9994884474379743,
+      "roughness_foreground_min": 0.662109375,
+      "roughness_foreground_max": 0.950714647769928,
+      "depth_alpha_iou": 0.9991904903923992,
+      "gt_geometry_shading_normal_gap_deg": 1.012199193292663
+    },
+    {
+      "source_frame": 80,
+      "roughness_alpha_iou": 0.9994001753333641,
+      "roughness_foreground_min": 0.66162109375,
+      "roughness_foreground_max": 0.9502217769622803,
+      "depth_alpha_iou": 0.9987088444157521,
+      "gt_geometry_shading_normal_gap_deg": 1.048069292267692
+    },
+    {
+      "source_frame": 90,
+      "roughness_alpha_iou": 0.9997224363916731,
+      "roughness_foreground_min": 0.66259765625,
+      "roughness_foreground_max": 0.9502463340759277,
+      "depth_alpha_iou": 0.9989831135215087,
+      "gt_geometry_shading_normal_gap_deg": 0.8477276732168627
+    },
+    {
+      "source_frame": 100,
+      "roughness_alpha_iou": 0.9995347538848051,
+      "roughness_foreground_min": 0.66259765625,
+      "roughness_foreground_max": 0.9502217769622803,
+      "depth_alpha_iou": 0.9988531399169301,
+      "gt_geometry_shading_normal_gap_deg": 0.8334456169459541
+    },
+    {
+      "source_frame": 110,
+      "roughness_alpha_iou": 0.9991395454775522,
+      "roughness_foreground_min": 0.66259765625,
+      "roughness_foreground_max": 0.9502217769622803,
+      "depth_alpha_iou": 0.9979268847651313,
+      "gt_geometry_shading_normal_gap_deg": 0.9358536139982692
+    },
+    {
+      "source_frame": 120,
+      "roughness_alpha_iou": 0.9991654874641703,
+      "roughness_foreground_min": 0.67529296875,
+      "roughness_foreground_max": 0.9502217769622803,
+      "depth_alpha_iou": 0.9985863418877773,
+      "gt_geometry_shading_normal_gap_deg": 0.7915170248913429
+    },
+    {
+      "source_frame": 130,
+      "roughness_alpha_iou": 0.9992681141741888,
+      "roughness_foreground_min": 0.67822265625,
+      "roughness_foreground_max": 0.950714647769928,
+      "depth_alpha_iou": 0.9989332520572997,
+      "gt_geometry_shading_normal_gap_deg": 0.7800197703062357
+    },
+    {
+      "source_frame": 140,
+      "roughness_alpha_iou": 0.9993118333385467,
+      "roughness_foreground_min": 0.68896484375,
+      "roughness_foreground_max": 0.950714647769928,
+      "depth_alpha_iou": 0.999062001688397,
+      "gt_geometry_shading_normal_gap_deg": 0.6771666190087352
+    },
+    {
+      "source_frame": 150,
+      "roughness_alpha_iou": 0.99909200968523,
+      "roughness_foreground_min": 0.6533203125,
+      "roughness_foreground_max": 0.9497289061546326,
+      "depth_alpha_iou": 0.9987899566401129,
+      "gt_geometry_shading_normal_gap_deg": 0.8169754183182747
+    }
+  ],
+  "roughness_semantics": "alpha-weighted visible Principled r; not equivalent roughness of a mixed BSDF",
+  "source_snapshot_sha256": "c4d208751ca317547411ea82c341ecee34810304e127bf0440c4a695195add0e",
+  "time_convention": "source frame/150",
+  "note": "GT mesh/EXR法线差只用于来源核验，不是模型Mesh Normal MAE"
+}

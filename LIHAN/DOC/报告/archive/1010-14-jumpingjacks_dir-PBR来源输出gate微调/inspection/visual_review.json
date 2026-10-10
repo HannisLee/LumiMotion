@@ -1,0 +1,48 @@
+{
+  "status": "FAILED",
+  "iteration": 55000,
+  "actual_images_viewed": true,
+  "reviewed_at": "2026-10-10T09:53:11.283333+09:00",
+  "reviewed_test_frames": [
+    10,
+    80,
+    150
+  ],
+  "reviewed_insight_frames": [
+    1,
+    75,
+    150
+  ],
+  "images": [
+    "inspection/rgb_final_55000_comparison.png",
+    "inspection/four_categories_final_55000.png",
+    "inspection/relight_final_55000.png",
+    "normal_depth/comparison_0010.png",
+    "normal_depth/comparison_0080.png",
+    "normal_depth/comparison_0150.png"
+  ],
+  "rgb": {
+    "psnr": 19.24938274959784,
+    "ssim": 0.9107702334721883,
+    "lpips": 0.1102573330203692,
+    "psnr_foreground": 11.887298783047992,
+    "ssim_foreground_bbox": 0.8042977293332417,
+    "lpips_foreground_bbox": 0.21988034347693125
+  },
+  "rgb_background": "黑背景正常，人物与平台存在；头手/衣服/小腿仍稀疏斑驳破碎，脚周大块灰黑污染和伪凸起明显，B08与B07近乎相同。GT0080本身背光暗，失败不是单凭暗。",
+  "alpha": "人物与平台主体大部饱和，身体/手指/平台边缘及脚周有薄雾和细碎残影；高Alpha不保证几何/颜色正确。",
+  "albedo_static_dynamic": "正背面色差和阴影继续烘入材质，平台棋盘格及脚周颜色污染、身体斑驳仍明显；没有GT材质先验。",
+  "normal_depth": "实际单独view TEST0010/0080/0150的Normal/Depth/Mesh图：GS平台整体上向但人体/脚周混合轴斑驳、平台伪凸起；Depth Normal平台强波纹、人体噪声；Expected/Median Z脚周及人物明显错误（原Z米未拟合/裁剪）；Mesh脚周伪凸起、人物头手腿表面零碎，0080腿部不连续。没有缩小评分域。",
+  "relighting": "实际view HDR0001/0076/0150与SUN0000/0036/0071：HDR暖色响应正常，但人物头手/躯干/腿斑驳与脚周平台伪凸起仍有；SUN0/71明显响应且高对比，36灯位于平台下方关闭间接光后黑属直接照明预期，未将该帧黑单独作为错误。所有重光照无GT精度声明。6视频自动全解码PASS，人工只查看列出代表图。",
+  "final_mae": true,
+  "reviewed_hdr_frames": [
+    1,
+    76,
+    150
+  ],
+  "reviewed_directional_frames": [
+    0,
+    36,
+    71
+  ]
+}
