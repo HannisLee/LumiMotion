@@ -63,3 +63,20 @@ RGB／Alpha／Normal／分离四类目检与最终PASS/FAILED必须在实际验�
 ```
 
 日志：`logs/eval55000_verify_all_mae.log`。
+
+
+## 实际执行状态
+
+```json
+{
+  "status": "AWAITING_VISUAL_REVIEW",
+  "stage": "评测结束，等待真实目检",
+  "updated_at": "2026-10-10 18:04:33 UTC",
+  "runner_pid": 1649041,
+  "launched_at": "2026-10-10 15:43:44 UTC",
+  "child_pid": null,
+  "gpu": null,
+  "failures": [],
+  "completed_at": "2026-10-10 18:04:33 UTC"
+}
+```
