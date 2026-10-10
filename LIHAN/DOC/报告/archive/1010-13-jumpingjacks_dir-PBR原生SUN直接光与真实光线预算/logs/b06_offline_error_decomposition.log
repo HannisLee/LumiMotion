@@ -1,0 +1,96 @@
+{
+  "status": "PASS_OFFLINE_DIAGNOSTIC_ONLY",
+  "run": "B06",
+  "iteration": 55000,
+  "frames": 15,
+  "original_mae_deg": 17.29779704758354,
+  "original_gt_pixels": 415433,
+  "original_valid_pixels": 390928,
+  "original_scoring_unchanged": true,
+  "source_sha": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复/normal_depth/prediction_0010.npz": "2fc454528bc2476a3af78ed569e6542d4802f8f46e35ffb221e84c4fc914ef49",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复/normal_depth/prediction_0020.npz": "5eed6530f87ff06ad753133fcf66c608f2d61355374d2e23ac864ff84d36000f",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复/normal_depth/prediction_0030.npz": "2322b8d1f06f2b01d51cb26485636c51a3adab6091c3a553c7c3dee9830b4604",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复/normal_depth/prediction_0040.npz": "f2de20a006d558a3a14042b7c615d5866f9d17f1997f2317ff2738cb0b3af3d2",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复/normal_depth/prediction_0050.npz": "aa3049ba01963bb028c12d388c59e6eb014bc11e862ae695df5f72c6d2fc57fa",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复/normal_depth/prediction_0060.npz": "75697f729a1bebcbcb1ee24a91a4217bae1d31c42547c54814c429c630c7197d",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复/normal_depth/prediction_0070.npz": "3229e9d17fc31b7cda8efb22b806c6d20bf28479d06cbf91cfae858e4a1920d6",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复/normal_depth/prediction_0080.npz": "606adb884faa6284cbbc3efc0145d8e5b81b73e75f4d417eee5b11d3e9fa4c21",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复/normal_depth/prediction_0090.npz": "332f338b3ce4d4ad75cf3b3c31ad4ba230585f3f34f418cbc50015ac6ce3278e",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复/normal_depth/prediction_0100.npz": "fa0644d5040a18327c7733c9c7de3a1df1cf51d69c870f78220b033e241f8292",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复/normal_depth/prediction_0110.npz": "a99e91b47337f9d4bb8db4e23909b5c44ca052a53a0b24d1ccc90b6dadf7afa1",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复/normal_depth/prediction_0120.npz": "81a75396490020a2689c671314e0715cafd9b148f2d5f04bc6408d8304ba9d52",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复/normal_depth/prediction_0130.npz": "1b5d3063052a8eb2241ba077d48c22d674ddb66770844d435110a8045e31471b",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复/normal_depth/prediction_0140.npz": "a92e767a98294288e6da9eb7e40203f133c11e20e5fe94fe8bd2d9fe0c66dc6c",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复/normal_depth/prediction_0150.npz": "a84b3ffc001b49f9cf8e92659865c7d6ba3b8c37028a5e8e650a12379ebd6c27"
+  },
+  "gt_direction_bins": {
+    "GT方向距来源正plane轴0至5度": {
+      "gt_pixels": 301901,
+      "valid_pixels": 295689,
+      "error_sum": 3096953.963446402,
+      "mae_deg": 10.473686756850617,
+      "fraction_of_original_valid_pixels": 0.7563771333851758,
+      "contribution_to_original_mae_deg": 7.922057165120948,
+      "coverage": 0.9794237183712542
+    },
+    "GT方向距来源正plane轴5至30度": {
+      "gt_pixels": 5008,
+      "valid_pixels": 4133,
+      "error_sum": 161383.37896487556,
+      "mae_deg": 39.047514871733746,
+      "fraction_of_original_valid_pixels": 0.010572279294396922,
+      "contribution_to_original_mae_deg": 0.4128212329760865,
+      "coverage": 0.825279552715655
+    },
+    "GT方向距来源正plane轴大于30度": {
+      "gt_pixels": 108524,
+      "valid_pixels": 91106,
+      "error_sum": 3503855.8618064607,
+      "mae_deg": 38.45911204318553,
+      "fraction_of_original_valid_pixels": 0.2330505873204273,
+      "contribution_to_original_mae_deg": 8.962918649486506,
+      "coverage": 0.8395009398842652
+    }
+  },
+  "error_tail_bins": {
+    "0至7度": {
+      "valid_pixels": 190918,
+      "error_sum": 513079.00373215444,
+      "mae_deg": 2.6874312727566516,
+      "fraction_of_original_valid_pixels": 0.4883712601809029,
+      "contribution_to_original_mae_deg": 1.3124641973257338
+    },
+    "7至15度": {
+      "valid_pixels": 59862,
+      "error_sum": 627565.9604246067,
+      "mae_deg": 10.483544826845188,
+      "fraction_of_original_valid_pixels": 0.15312794171816804,
+      "contribution_to_original_mae_deg": 1.6053236412449523
+    },
+    "15至30度": {
+      "valid_pixels": 57954,
+      "error_sum": 1265331.7289584808,
+      "mae_deg": 21.833380421687558,
+      "fraction_of_original_valid_pixels": 0.14824724757500102,
+      "contribution_to_original_mae_deg": 3.2367385527730956
+    },
+    "30至60度": {
+      "valid_pixels": 58103,
+      "error_sum": 2464334.196375869,
+      "mae_deg": 42.41320063294269,
+      "fraction_of_original_valid_pixels": 0.14862839192894856,
+      "contribution_to_original_mae_deg": 6.303805806634135
+    },
+    "60至180度": {
+      "valid_pixels": 24091,
+      "error_sum": 1891882.3147266281,
+      "mae_deg": 78.53066766537827,
+      "fraction_of_original_valid_pixels": 0.06162515859697949,
+      "contribution_to_original_mae_deg": 4.839464849605626
+    }
+  },
+  "optimizer_steps": 0,
+  "training_inputs_generated": false,
+  "limitations": "仅B06完整评测浮点数组的误差分解，不是B07结果；GT方向分箱不是物体分割；不筛帧/点/难像素，不输出任何训练监督或掩码。"
+}

@@ -1,0 +1,7 @@
+{"status": "WAITING", "step": "waiting_for_final_checkpoint_and_gt", "pid": 133378, "updated_at": "2026-10-09T19:09:00.411457+09:00", "iteration": 55000}
+{"status": "RUNNING", "step": "albedo", "pid": 133378, "updated_at": "2026-10-09T19:14:00.700157+09:00", "child_pid": 134512, "iteration": 55000}
+{"status": "RUNNING", "step": "roughness", "pid": 133378, "updated_at": "2026-10-09T19:14:20.222222+09:00", "child_pid": 134614, "iteration": 55000}
+{"status": "RUNNING", "step": "predicted_meshes", "pid": 133378, "updated_at": "2026-10-09T19:14:36.332962+09:00", "child_pid": 134868, "iteration": 55000}
+{"status": "RUNNING", "step": "normal_depth", "pid": 133378, "updated_at": "2026-10-09T19:17:38.494029+09:00", "child_pid": 135728, "iteration": 55000}
+{"status": "RUNNING", "step": "verify_roughness", "pid": 133378, "updated_at": "2026-10-09T19:17:50.687578+09:00", "child_pid": 135791, "iteration": 55000}
+{"status": "EVALUATION_COMPLETED_REVIEW_PENDING", "step": "finished", "pid": 133378, "updated_at": "2026-10-09T19:17:51.310530+09:00", "iteration": 55000}

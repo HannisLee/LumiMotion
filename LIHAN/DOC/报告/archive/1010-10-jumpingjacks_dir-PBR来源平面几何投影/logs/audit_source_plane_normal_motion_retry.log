@@ -1,0 +1,1307 @@
+Loading trained model at iteration 35000
+Found transforms_train.json file, assuming Blender data set!
+Reading Training Transforms
+Read Train Transforms with 135 cameras
+Loading Training Cameras
+Loading Test Cameras
+LOAD PLY
+/home/lihan/reproduce/LumiMotion-stage2-perlight/scene/__init__.py:103: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  unique_fids = [torch.tensor(val, dtype=torch.float32, device="cuda") for val in unique_values]
+################ gaussian_color params: 156934
+{
+  "status": "PASS_SOURCE_DIAGNOSTIC_ONLY",
+  "optimizer_steps": 0,
+  "frames": 135,
+  "GT_labels_read": false,
+  "training_mask_saved": false,
+  "training_configuration_changed": false,
+  "plane_source": "source_prediction_RANSAC_SVD",
+  "source_arrays_comparison": {
+    "motion_span": {
+      "max_abs_error": 1.7881393432617188e-07,
+      "differing_elements": 8097
+    },
+    "max_plane_distance": {
+      "max_abs_error": 1.1920928955078125e-07,
+      "differing_elements": 395
+    },
+    "min_axis_cosine": {
+      "max_abs_error": 1.7916318029165268e-07,
+      "differing_elements": 86
+    }
+  },
+  "comparison_reason": "来源asset使用sigmoid(2×fea)，native get_binary_feature含先加后减log(.5)的float32舍入；只读诊断允许1e-6误差，训练资产严格重算校验未修改。",
+  "groups": {
+    "support": {
+      "points": 15187,
+      "normal_motion_span": {
+        "0": 0.0,
+        "0.5": 2.596527338027954e-06,
+        "0.9": 0.00031119212508201594,
+        "0.99": 0.002509587854146957,
+        "1": 0.008767396211624146
+      },
+      "world_box_motion_span": {
+        "0": 4.020400401483215e-10,
+        "0.5": 9.160867193713784e-06,
+        "0.9": 0.00109146311879158,
+        "0.99": 0.007534226430580015,
+        "1": 0.009974987246096134
+      },
+      "max_plane_distance": {
+        "0": 2.689659595489502e-06,
+        "0.5": 0.014936407096683979,
+        "0.9": 0.09088810086250304,
+        "0.99": 0.16120173931121817,
+        "1": 0.19978506863117218
+      },
+      "min_signed_plane_distance": {
+        "0": -0.19978506863117218,
+        "0.5": -0.003699156455695629,
+        "0.9": 0.05193312987685203,
+        "0.99": 0.13313493818044653,
+        "1": 0.1630803644657135
+      },
+      "max_signed_plane_distance": {
+        "0": -0.1997850239276886,
+        "0.5": -0.003621583804488182,
+        "0.9": 0.05216141268610953,
+        "0.99": 0.13338939040899267,
+        "1": 0.16317026317119598
+      },
+      "max_alltime_nearest_static_plane_distance": {
+        "0": 0.0,
+        "0.5": 6.20174796495121e-06,
+        "0.9": 0.0007413095445372164,
+        "0.99": 0.004530629217624661,
+        "1": 0.009213878773152828
+      }
+    },
+    "static_geometric_candidates_unprojected": {
+      "points": 1542,
+      "normal_motion_span": {
+        "0": 0.000800090841948986,
+        "0.5": 0.015458463691174984,
+        "0.9": 0.06805160567164421,
+        "0.99": 0.14328379273414607,
+        "1": 0.2132197618484497
+      },
+      "world_box_motion_span": {
+        "0": 0.010052726604044437,
+        "0.5": 0.05101066455245018,
+        "0.9": 0.2296973004937172,
+        "0.99": 0.46855914145708083,
+        "1": 0.6823481321334839
+      },
+      "max_plane_distance": {
+        "0": 0.0010162945836782455,
+        "0.5": 0.03300757706165314,
+        "0.9": 0.11913790255784991,
+        "0.99": 0.17190831080079078,
+        "1": 0.19930286705493927
+      },
+      "min_signed_plane_distance": {
+        "0": -0.19930286705493927,
+        "0.5": -0.005829633213579655,
+        "0.9": 0.07625495418906213,
+        "0.99": 0.1304437394440173,
+        "1": 0.15332600474357605
+      },
+      "max_signed_plane_distance": {
+        "0": -0.16170360147953033,
+        "0.5": 0.007902129553258419,
+        "0.9": 0.10820586755871775,
+        "0.99": 0.1666179203987121,
+        "1": 0.18869052827358246
+      },
+      "max_alltime_nearest_static_plane_distance": {
+        "0": 0.0022810695227235556,
+        "0.5": 0.012559294700622559,
+        "0.9": 0.02414623312652111,
+        "0.99": 0.039174810312688324,
+        "1": 0.058798663318157196
+      }
+    },
+    "dynamic_geometric_candidates": {
+      "points": 6836,
+      "normal_motion_span": {
+        "0": 0.012177973054349422,
+        "0.5": 0.12775927782058716,
+        "0.9": 0.2086476907134056,
+        "0.99": 0.3136621877551076,
+        "1": 0.39179277420043945
+      },
+      "world_box_motion_span": {
+        "0": 0.06519520282745361,
+        "0.5": 0.390174999833107,
+        "0.9": 0.8935463726520538,
+        "0.99": 1.3238233864307403,
+        "1": 1.8066930770874023
+      },
+      "max_plane_distance": {
+        "0": 0.007190413773059845,
+        "0.5": 0.11385347694158554,
+        "0.9": 0.1817391961812973,
+        "0.99": 0.19822548776865004,
+        "1": 0.19998975098133087
+      },
+      "min_signed_plane_distance": {
+        "0": -0.19990274310112,
+        "0.5": -0.06831343099474907,
+        "0.9": -0.008702397346496582,
+        "0.99": 0.03660351652652023,
+        "1": 0.08820488303899765
+      },
+      "max_signed_plane_distance": {
+        "0": -0.12203111499547958,
+        "0.5": 0.01801074855029583,
+        "0.9": 0.16792552173137665,
+        "0.99": 0.19659949839115143,
+        "1": 0.19998975098133087
+      },
+      "max_alltime_nearest_static_plane_distance": {
+        "0": 0.00909901037812233,
+        "0.5": 0.028324661776423454,
+        "0.9": 0.09058061614632607,
+        "0.99": 0.12612515389919274,
+        "1": 0.2590533196926117
+      }
+    }
+  },
+  "threshold_diagnostics": {
+    "height0.01_normalspan0.005_nearest0.03": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.01_normalspan0.005_nearest0.05": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.01_normalspan0.005_nearest0.1": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.01_normalspan0.01_nearest0.03": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.01_normalspan0.01_nearest0.05": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.01_normalspan0.01_nearest0.1": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.01_normalspan0.03_nearest0.03": {
+      "points": 14,
+      "normal_motion_span": {
+        "0": 0.012177973054349422,
+        "0.5": 0.014764657709747553,
+        "0.9": 0.017082944884896277,
+        "0.99": 0.01815058561041951,
+        "1": 0.018302902579307556
+      },
+      "world_box_motion_span": {
+        "0": 0.13707667589187622,
+        "0.5": 0.1535460129380226,
+        "0.9": 0.1601237863302231,
+        "0.99": 0.17150554761290548,
+        "1": 0.17308777570724487
+      },
+      "max_plane_distance": {
+        "0": 0.007190413773059845,
+        "0.5": 0.008950957097113132,
+        "0.9": 0.009715995751321316,
+        "0.99": 0.009797336589545012,
+        "1": 0.009804775007069111
+      },
+      "min_signed_plane_distance": {
+        "0": -0.009804775007069111,
+        "0.5": -0.008950957097113132,
+        "0.9": -0.006733063701540231,
+        "0.99": -0.006358844330534339,
+        "1": -0.006332214921712875
+      },
+      "max_signed_plane_distance": {
+        "0": 0.0025839004665613174,
+        "0.5": 0.006903716595843434,
+        "0.9": 0.008384352270513774,
+        "0.99": 0.008639503605663776,
+        "1": 0.00866054929792881
+      },
+      "max_alltime_nearest_static_plane_distance": {
+        "0": 0.017798753455281258,
+        "0.5": 0.023042107000947,
+        "0.9": 0.029070482030510904,
+        "0.99": 0.029513020925223826,
+        "1": 0.029539646580815315
+      }
+    },
+    "height0.01_normalspan0.03_nearest0.05": {
+      "points": 18,
+      "normal_motion_span": {
+        "0": 0.012177973054349422,
+        "0.5": 0.014740786049515009,
+        "0.9": 0.017018559947609903,
+        "0.99": 0.01810371885076165,
+        "1": 0.018302902579307556
+      },
+      "world_box_motion_span": {
+        "0": 0.1119053065776825,
+        "0.5": 0.15391140431165695,
+        "0.9": 0.17269483655691148,
+        "0.99": 0.19666914150118822,
+        "1": 0.2014990597963333
+      },
+      "max_plane_distance": {
+        "0": 0.007190413773059845,
+        "0.5": 0.008581305388361216,
+        "0.9": 0.00967391487210989,
+        "0.99": 0.009795047845691442,
+        "1": 0.009804775007069111
+      },
+      "min_signed_plane_distance": {
+        "0": -0.009804775007069111,
+        "0.5": -0.008427191525697708,
+        "0.9": -0.006994406599551439,
+        "0.99": -0.006367037994787097,
+        "1": -0.006332214921712875
+      },
+      "max_signed_plane_distance": {
+        "0": 0.0025839004665613174,
+        "0.5": 0.006804155418649316,
+        "0.9": 0.00823194282129407,
+        "0.99": 0.008633028008043766,
+        "1": 0.00866054929792881
+      },
+      "max_alltime_nearest_static_plane_distance": {
+        "0": 0.017798753455281258,
+        "0.5": 0.024251055903732777,
+        "0.9": 0.03306485302746296,
+        "0.99": 0.03791515462100505,
+        "1": 0.03873828798532486
+      }
+    },
+    "height0.01_normalspan0.03_nearest0.1": {
+      "points": 18,
+      "normal_motion_span": {
+        "0": 0.012177973054349422,
+        "0.5": 0.014740786049515009,
+        "0.9": 0.017018559947609903,
+        "0.99": 0.01810371885076165,
+        "1": 0.018302902579307556
+      },
+      "world_box_motion_span": {
+        "0": 0.1119053065776825,
+        "0.5": 0.15391140431165695,
+        "0.9": 0.17269483655691148,
+        "0.99": 0.19666914150118822,
+        "1": 0.2014990597963333
+      },
+      "max_plane_distance": {
+        "0": 0.007190413773059845,
+        "0.5": 0.008581305388361216,
+        "0.9": 0.00967391487210989,
+        "0.99": 0.009795047845691442,
+        "1": 0.009804775007069111
+      },
+      "min_signed_plane_distance": {
+        "0": -0.009804775007069111,
+        "0.5": -0.008427191525697708,
+        "0.9": -0.006994406599551439,
+        "0.99": -0.006367037994787097,
+        "1": -0.006332214921712875
+      },
+      "max_signed_plane_distance": {
+        "0": 0.0025839004665613174,
+        "0.5": 0.006804155418649316,
+        "0.9": 0.00823194282129407,
+        "0.99": 0.008633028008043766,
+        "1": 0.00866054929792881
+      },
+      "max_alltime_nearest_static_plane_distance": {
+        "0": 0.017798753455281258,
+        "0.5": 0.024251055903732777,
+        "0.9": 0.03306485302746296,
+        "0.99": 0.03791515462100505,
+        "1": 0.03873828798532486
+      }
+    },
+    "height0.03_normalspan0.005_nearest0.03": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.03_normalspan0.005_nearest0.05": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.03_normalspan0.005_nearest0.1": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.03_normalspan0.01_nearest0.03": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.03_normalspan0.01_nearest0.05": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.03_normalspan0.01_nearest0.1": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.03_normalspan0.03_nearest0.03": {
+      "points": 173,
+      "normal_motion_span": {
+        "0": 0.012177973054349422,
+        "0.5": 0.022201891988515854,
+        "0.9": 0.02806922607123852,
+        "0.99": 0.02949615240097046,
+        "1": 0.029747910797595978
+      },
+      "world_box_motion_span": {
+        "0": 0.10003338009119034,
+        "0.5": 0.15988753736019135,
+        "0.9": 0.2042657732963562,
+        "0.99": 0.3366089653968811,
+        "1": 0.36644247174263
+      },
+      "max_plane_distance": {
+        "0": 0.007190413773059845,
+        "0.5": 0.015262370929121971,
+        "0.9": 0.022542112320661545,
+        "0.99": 0.02825226917862892,
+        "1": 0.029630031436681747
+      },
+      "min_signed_plane_distance": {
+        "0": -0.029630031436681747,
+        "0.5": -0.01202255766838789,
+        "0.9": -0.005305779539048671,
+        "0.99": 0.0010039240680634976,
+        "1": 0.006875539198517799
+      },
+      "max_signed_plane_distance": {
+        "0": -0.011494205333292484,
+        "0.5": 0.008851349353790283,
+        "0.9": 0.016569124162197118,
+        "0.99": 0.022923281341791155,
+        "1": 0.02837562933564186
+      },
+      "max_alltime_nearest_static_plane_distance": {
+        "0": 0.012156147509813309,
+        "0.5": 0.022848062217235565,
+        "0.9": 0.027811081334948543,
+        "0.99": 0.029655608758330346,
+        "1": 0.029878828674554825
+      }
+    },
+    "height0.03_normalspan0.03_nearest0.05": {
+      "points": 227,
+      "normal_motion_span": {
+        "0": 0.012177973054349422,
+        "0.5": 0.02235461212694645,
+        "0.9": 0.028156499937176706,
+        "0.99": 0.02965611405670643,
+        "1": 0.029940202832221985
+      },
+      "world_box_motion_span": {
+        "0": 0.08541747182607651,
+        "0.5": 0.16343635320663452,
+        "0.9": 0.21388421654701237,
+        "0.99": 0.3186940819025044,
+        "1": 0.36644247174263
+      },
+      "max_plane_distance": {
+        "0": 0.007190413773059845,
+        "0.5": 0.015356962569057941,
+        "0.9": 0.022322493046522143,
+        "0.99": 0.028392530754208566,
+        "1": 0.029630031436681747
+      },
+      "min_signed_plane_distance": {
+        "0": -0.029630031436681747,
+        "0.5": -0.01231492217630148,
+        "0.9": -0.00571190435439348,
+        "0.99": 0.0010215764213353398,
+        "1": 0.006875539198517799
+      },
+      "max_signed_plane_distance": {
+        "0": -0.011506958864629269,
+        "0.5": 0.008629623800516129,
+        "0.9": 0.0160349540412426,
+        "0.99": 0.022432642057538036,
+        "1": 0.02837562933564186
+      },
+      "max_alltime_nearest_static_plane_distance": {
+        "0": 0.012156147509813309,
+        "0.5": 0.02451510541141033,
+        "0.9": 0.032137466967105864,
+        "0.99": 0.03856573045253754,
+        "1": 0.043528757989406586
+      }
+    },
+    "height0.03_normalspan0.03_nearest0.1": {
+      "points": 236,
+      "normal_motion_span": {
+        "0": 0.012177973054349422,
+        "0.5": 0.02247774973511696,
+        "0.9": 0.02823502290993929,
+        "0.99": 0.029646952636539936,
+        "1": 0.029940202832221985
+      },
+      "world_box_motion_span": {
+        "0": 0.08541747182607651,
+        "0.5": 0.16357507556676865,
+        "0.9": 0.22708958387374878,
+        "0.99": 0.3450829789042474,
+        "1": 0.36644247174263
+      },
+      "max_plane_distance": {
+        "0": 0.007190413773059845,
+        "0.5": 0.015379343181848526,
+        "0.9": 0.02235237881541252,
+        "0.99": 0.028390475176274778,
+        "1": 0.029630031436681747
+      },
+      "min_signed_plane_distance": {
+        "0": -0.029630031436681747,
+        "0.5": -0.012453162111341953,
+        "0.9": -0.005887492559850216,
+        "0.99": 0.001018122700043023,
+        "1": 0.006875539198517799
+      },
+      "max_signed_plane_distance": {
+        "0": -0.011506958864629269,
+        "0.5": 0.008616528939455748,
+        "0.9": 0.01597429346293211,
+        "0.99": 0.022391260601580146,
+        "1": 0.02837562933564186
+      },
+      "max_alltime_nearest_static_plane_distance": {
+        "0": 0.012156147509813309,
+        "0.5": 0.024677196517586708,
+        "0.9": 0.0342564582824707,
+        "0.99": 0.06450510546565057,
+        "1": 0.0730043426156044
+      }
+    },
+    "height0.05_normalspan0.005_nearest0.03": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.05_normalspan0.005_nearest0.05": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.05_normalspan0.005_nearest0.1": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.05_normalspan0.01_nearest0.03": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.05_normalspan0.01_nearest0.05": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.05_normalspan0.01_nearest0.1": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.05_normalspan0.03_nearest0.03": {
+      "points": 179,
+      "normal_motion_span": {
+        "0": 0.012177973054349422,
+        "0.5": 0.02235461212694645,
+        "0.9": 0.028121357411146165,
+        "0.99": 0.02961655505001545,
+        "1": 0.029747910797595978
+      },
+      "world_box_motion_span": {
+        "0": 0.06519520282745361,
+        "0.5": 0.15963220596313477,
+        "0.9": 0.20453106462955475,
+        "0.99": 0.33543932020664213,
+        "1": 0.36644247174263
+      },
+      "max_plane_distance": {
+        "0": 0.007190413773059845,
+        "0.5": 0.015358821488916874,
+        "0.9": 0.02375690713524819,
+        "0.99": 0.03212421499192714,
+        "1": 0.03842752054333687
+      },
+      "min_signed_plane_distance": {
+        "0": -0.03842752054333687,
+        "0.5": -0.012064916081726551,
+        "0.9": -0.005217358097434037,
+        "0.99": 0.0017480167746543847,
+        "1": 0.006875539198517799
+      },
+      "max_signed_plane_distance": {
+        "0": -0.011494205333292484,
+        "0.5": 0.008792470209300518,
+        "0.9": 0.016679153591394425,
+        "0.99": 0.024867104142904276,
+        "1": 0.030914057046175003
+      },
+      "max_alltime_nearest_static_plane_distance": {
+        "0": 0.012156147509813309,
+        "0.5": 0.022908274084329605,
+        "0.9": 0.02791115008294583,
+        "0.99": 0.02964529912918806,
+        "1": 0.029878828674554825
+      }
+    },
+    "height0.05_normalspan0.03_nearest0.05": {
+      "points": 233,
+      "normal_motion_span": {
+        "0": 0.012177973054349422,
+        "0.5": 0.02258477360010147,
+        "0.9": 0.02818143479526043,
+        "0.99": 0.029723917096853257,
+        "1": 0.029940202832221985
+      },
+      "world_box_motion_span": {
+        "0": 0.06519520282745361,
+        "0.5": 0.16192376613616943,
+        "0.9": 0.21655743718147286,
+        "0.99": 0.31581949591636693,
+        "1": 0.36644247174263
+      },
+      "max_plane_distance": {
+        "0": 0.007190413773059845,
+        "0.5": 0.015459646470844746,
+        "0.9": 0.023360195010900503,
+        "0.99": 0.03135616332292557,
+        "1": 0.03842752054333687
+      },
+      "min_signed_plane_distance": {
+        "0": -0.03842752054333687,
+        "0.5": -0.012436115182936192,
+        "0.9": -0.00555441919714212,
+        "0.99": 0.0031578320264816495,
+        "1": 0.006875539198517799
+      },
+      "max_signed_plane_distance": {
+        "0": -0.011506958864629269,
+        "0.5": 0.00861003715544939,
+        "0.9": 0.016089995950460435,
+        "0.99": 0.023453413993120203,
+        "1": 0.030914057046175003
+      },
+      "max_alltime_nearest_static_plane_distance": {
+        "0": 0.012156147509813309,
+        "0.5": 0.02448858879506588,
+        "0.9": 0.03211297914385796,
+        "0.99": 0.03852590948343278,
+        "1": 0.043528757989406586
+      }
+    },
+    "height0.05_normalspan0.03_nearest0.1": {
+      "points": 242,
+      "normal_motion_span": {
+        "0": 0.012177973054349422,
+        "0.5": 0.022613191977143288,
+        "0.9": 0.02826791945844889,
+        "0.99": 0.02971844606101513,
+        "1": 0.029940202832221985
+      },
+      "world_box_motion_span": {
+        "0": 0.06519520282745361,
+        "0.5": 0.16302458941936493,
+        "0.9": 0.22728312015533447,
+        "0.99": 0.34415132433176043,
+        "1": 0.36644247174263
+      },
+      "max_plane_distance": {
+        "0": 0.007190413773059845,
+        "0.5": 0.015640266705304384,
+        "0.9": 0.023394168540835383,
+        "0.99": 0.03134164586663246,
+        "1": 0.03842752054333687
+      },
+      "min_signed_plane_distance": {
+        "0": -0.03842752054333687,
+        "0.5": -0.01287034247070551,
+        "0.9": -0.005873010121285915,
+        "0.99": 0.002876412854529928,
+        "1": 0.006875539198517799
+      },
+      "max_signed_plane_distance": {
+        "0": -0.011506958864629269,
+        "0.5": 0.008548835758119822,
+        "0.9": 0.015978788398206233,
+        "0.99": 0.023334134146571164,
+        "1": 0.030914057046175003
+      },
+      "max_alltime_nearest_static_plane_distance": {
+        "0": 0.012156147509813309,
+        "0.5": 0.024647820740938187,
+        "0.9": 0.03396818675100803,
+        "0.99": 0.06448491826653481,
+        "1": 0.0730043426156044
+      }
+    },
+    "height0.08_normalspan0.005_nearest0.03": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.08_normalspan0.005_nearest0.05": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.08_normalspan0.005_nearest0.1": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.08_normalspan0.01_nearest0.03": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.08_normalspan0.01_nearest0.05": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.08_normalspan0.01_nearest0.1": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.08_normalspan0.03_nearest0.03": {
+      "points": 179,
+      "normal_motion_span": {
+        "0": 0.012177973054349422,
+        "0.5": 0.02235461212694645,
+        "0.9": 0.028121357411146165,
+        "0.99": 0.02961655505001545,
+        "1": 0.029747910797595978
+      },
+      "world_box_motion_span": {
+        "0": 0.06519520282745361,
+        "0.5": 0.15963220596313477,
+        "0.9": 0.20453106462955475,
+        "0.99": 0.33543932020664213,
+        "1": 0.36644247174263
+      },
+      "max_plane_distance": {
+        "0": 0.007190413773059845,
+        "0.5": 0.015358821488916874,
+        "0.9": 0.02375690713524819,
+        "0.99": 0.03212421499192714,
+        "1": 0.03842752054333687
+      },
+      "min_signed_plane_distance": {
+        "0": -0.03842752054333687,
+        "0.5": -0.012064916081726551,
+        "0.9": -0.005217358097434037,
+        "0.99": 0.0017480167746543847,
+        "1": 0.006875539198517799
+      },
+      "max_signed_plane_distance": {
+        "0": -0.011494205333292484,
+        "0.5": 0.008792470209300518,
+        "0.9": 0.016679153591394425,
+        "0.99": 0.024867104142904276,
+        "1": 0.030914057046175003
+      },
+      "max_alltime_nearest_static_plane_distance": {
+        "0": 0.012156147509813309,
+        "0.5": 0.022908274084329605,
+        "0.9": 0.02791115008294583,
+        "0.99": 0.02964529912918806,
+        "1": 0.029878828674554825
+      }
+    },
+    "height0.08_normalspan0.03_nearest0.05": {
+      "points": 234,
+      "normal_motion_span": {
+        "0": 0.012177973054349422,
+        "0.5": 0.022613191977143288,
+        "0.9": 0.0281752010807395,
+        "0.99": 0.02972330920398235,
+        "1": 0.029940202832221985
+      },
+      "world_box_motion_span": {
+        "0": 0.06519520282745361,
+        "0.5": 0.16226829588413239,
+        "0.9": 0.21887672394514085,
+        "0.99": 0.31534039825200977,
+        "1": 0.36644247174263
+      },
+      "max_plane_distance": {
+        "0": 0.007190413773059845,
+        "0.5": 0.01553263608366251,
+        "0.9": 0.023637170344591146,
+        "0.99": 0.03358964826911684,
+        "1": 0.056234341114759445
+      },
+      "min_signed_plane_distance": {
+        "0": -0.056234341114759445,
+        "0.5": -0.012438364326953888,
+        "0.9": -0.005593790486454957,
+        "0.99": 0.003126563229598066,
+        "1": 0.006875539198517799
+      },
+      "max_signed_plane_distance": {
+        "0": -0.02847921848297119,
+        "0.5": 0.008591173216700554,
+        "0.9": 0.016076235473155977,
+        "0.99": 0.02344016067683695,
+        "1": 0.030914057046175003
+      },
+      "max_alltime_nearest_static_plane_distance": {
+        "0": 0.012156147509813309,
+        "0.5": 0.024501847103238106,
+        "0.9": 0.032137644663453105,
+        "0.99": 0.03851927265524863,
+        "1": 0.043528757989406586
+      }
+    },
+    "height0.08_normalspan0.03_nearest0.1": {
+      "points": 243,
+      "normal_motion_span": {
+        "0": 0.012177973054349422,
+        "0.5": 0.022641610354185104,
+        "0.9": 0.028259695321321488,
+        "0.99": 0.029717838168144224,
+        "1": 0.029940202832221985
+      },
+      "world_box_motion_span": {
+        "0": 0.06519520282745361,
+        "0.5": 0.16343635320663452,
+        "0.9": 0.22742694318294526,
+        "0.99": 0.343996048569679,
+        "1": 0.36644247174263
+      },
+      "max_plane_distance": {
+        "0": 0.007190413773059845,
+        "0.5": 0.015674907714128494,
+        "0.9": 0.023552098870277406,
+        "0.99": 0.03329656161367888,
+        "1": 0.056234341114759445
+      },
+      "min_signed_plane_distance": {
+        "0": -0.056234341114759445,
+        "0.5": -0.012877480126917362,
+        "0.9": -0.00587663073092699,
+        "0.99": 0.0028451440576463443,
+        "1": 0.006875539198517799
+      },
+      "max_signed_plane_distance": {
+        "0": -0.02847921848297119,
+        "0.5": 0.008525362238287926,
+        "0.9": 0.015977664664387704,
+        "0.99": 0.023320880830287914,
+        "1": 0.030914057046175003
+      },
+      "max_alltime_nearest_static_plane_distance": {
+        "0": 0.012156147509813309,
+        "0.5": 0.024650396779179573,
+        "0.9": 0.0344246305525303,
+        "0.99": 0.06448155373334884,
+        "1": 0.0730043426156044
+      }
+    },
+    "height0.1_normalspan0.005_nearest0.03": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.1_normalspan0.005_nearest0.05": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.1_normalspan0.005_nearest0.1": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.1_normalspan0.01_nearest0.03": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.1_normalspan0.01_nearest0.05": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.1_normalspan0.01_nearest0.1": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.1_normalspan0.03_nearest0.03": {
+      "points": 179,
+      "normal_motion_span": {
+        "0": 0.012177973054349422,
+        "0.5": 0.02235461212694645,
+        "0.9": 0.028121357411146165,
+        "0.99": 0.02961655505001545,
+        "1": 0.029747910797595978
+      },
+      "world_box_motion_span": {
+        "0": 0.06519520282745361,
+        "0.5": 0.15963220596313477,
+        "0.9": 0.20453106462955475,
+        "0.99": 0.33543932020664213,
+        "1": 0.36644247174263
+      },
+      "max_plane_distance": {
+        "0": 0.007190413773059845,
+        "0.5": 0.015358821488916874,
+        "0.9": 0.02375690713524819,
+        "0.99": 0.03212421499192714,
+        "1": 0.03842752054333687
+      },
+      "min_signed_plane_distance": {
+        "0": -0.03842752054333687,
+        "0.5": -0.012064916081726551,
+        "0.9": -0.005217358097434037,
+        "0.99": 0.0017480167746543847,
+        "1": 0.006875539198517799
+      },
+      "max_signed_plane_distance": {
+        "0": -0.011494205333292484,
+        "0.5": 0.008792470209300518,
+        "0.9": 0.016679153591394425,
+        "0.99": 0.024867104142904276,
+        "1": 0.030914057046175003
+      },
+      "max_alltime_nearest_static_plane_distance": {
+        "0": 0.012156147509813309,
+        "0.5": 0.022908274084329605,
+        "0.9": 0.02791115008294583,
+        "0.99": 0.02964529912918806,
+        "1": 0.029878828674554825
+      }
+    },
+    "height0.1_normalspan0.03_nearest0.05": {
+      "points": 234,
+      "normal_motion_span": {
+        "0": 0.012177973054349422,
+        "0.5": 0.022613191977143288,
+        "0.9": 0.0281752010807395,
+        "0.99": 0.02972330920398235,
+        "1": 0.029940202832221985
+      },
+      "world_box_motion_span": {
+        "0": 0.06519520282745361,
+        "0.5": 0.16226829588413239,
+        "0.9": 0.21887672394514085,
+        "0.99": 0.31534039825200977,
+        "1": 0.36644247174263
+      },
+      "max_plane_distance": {
+        "0": 0.007190413773059845,
+        "0.5": 0.01553263608366251,
+        "0.9": 0.023637170344591146,
+        "0.99": 0.03358964826911684,
+        "1": 0.056234341114759445
+      },
+      "min_signed_plane_distance": {
+        "0": -0.056234341114759445,
+        "0.5": -0.012438364326953888,
+        "0.9": -0.005593790486454957,
+        "0.99": 0.003126563229598066,
+        "1": 0.006875539198517799
+      },
+      "max_signed_plane_distance": {
+        "0": -0.02847921848297119,
+        "0.5": 0.008591173216700554,
+        "0.9": 0.016076235473155977,
+        "0.99": 0.02344016067683695,
+        "1": 0.030914057046175003
+      },
+      "max_alltime_nearest_static_plane_distance": {
+        "0": 0.012156147509813309,
+        "0.5": 0.024501847103238106,
+        "0.9": 0.032137644663453105,
+        "0.99": 0.03851927265524863,
+        "1": 0.043528757989406586
+      }
+    },
+    "height0.1_normalspan0.03_nearest0.1": {
+      "points": 243,
+      "normal_motion_span": {
+        "0": 0.012177973054349422,
+        "0.5": 0.022641610354185104,
+        "0.9": 0.028259695321321488,
+        "0.99": 0.029717838168144224,
+        "1": 0.029940202832221985
+      },
+      "world_box_motion_span": {
+        "0": 0.06519520282745361,
+        "0.5": 0.16343635320663452,
+        "0.9": 0.22742694318294526,
+        "0.99": 0.343996048569679,
+        "1": 0.36644247174263
+      },
+      "max_plane_distance": {
+        "0": 0.007190413773059845,
+        "0.5": 0.015674907714128494,
+        "0.9": 0.023552098870277406,
+        "0.99": 0.03329656161367888,
+        "1": 0.056234341114759445
+      },
+      "min_signed_plane_distance": {
+        "0": -0.056234341114759445,
+        "0.5": -0.012877480126917362,
+        "0.9": -0.00587663073092699,
+        "0.99": 0.0028451440576463443,
+        "1": 0.006875539198517799
+      },
+      "max_signed_plane_distance": {
+        "0": -0.02847921848297119,
+        "0.5": 0.008525362238287926,
+        "0.9": 0.015977664664387704,
+        "0.99": 0.023320880830287914,
+        "1": 0.030914057046175003
+      },
+      "max_alltime_nearest_static_plane_distance": {
+        "0": 0.012156147509813309,
+        "0.5": 0.024650396779179573,
+        "0.9": 0.0344246305525303,
+        "0.99": 0.06448155373334884,
+        "1": 0.0730043426156044
+      }
+    },
+    "height0.2_normalspan0.005_nearest0.03": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.2_normalspan0.005_nearest0.05": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.2_normalspan0.005_nearest0.1": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.2_normalspan0.01_nearest0.03": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.2_normalspan0.01_nearest0.05": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.2_normalspan0.01_nearest0.1": {
+      "points": 0,
+      "normal_motion_span": null,
+      "world_box_motion_span": null,
+      "max_plane_distance": null,
+      "min_signed_plane_distance": null,
+      "max_signed_plane_distance": null,
+      "max_alltime_nearest_static_plane_distance": null
+    },
+    "height0.2_normalspan0.03_nearest0.03": {
+      "points": 179,
+      "normal_motion_span": {
+        "0": 0.012177973054349422,
+        "0.5": 0.02235461212694645,
+        "0.9": 0.028121357411146165,
+        "0.99": 0.02961655505001545,
+        "1": 0.029747910797595978
+      },
+      "world_box_motion_span": {
+        "0": 0.06519520282745361,
+        "0.5": 0.15963220596313477,
+        "0.9": 0.20453106462955475,
+        "0.99": 0.33543932020664213,
+        "1": 0.36644247174263
+      },
+      "max_plane_distance": {
+        "0": 0.007190413773059845,
+        "0.5": 0.015358821488916874,
+        "0.9": 0.02375690713524819,
+        "0.99": 0.03212421499192714,
+        "1": 0.03842752054333687
+      },
+      "min_signed_plane_distance": {
+        "0": -0.03842752054333687,
+        "0.5": -0.012064916081726551,
+        "0.9": -0.005217358097434037,
+        "0.99": 0.0017480167746543847,
+        "1": 0.006875539198517799
+      },
+      "max_signed_plane_distance": {
+        "0": -0.011494205333292484,
+        "0.5": 0.008792470209300518,
+        "0.9": 0.016679153591394425,
+        "0.99": 0.024867104142904276,
+        "1": 0.030914057046175003
+      },
+      "max_alltime_nearest_static_plane_distance": {
+        "0": 0.012156147509813309,
+        "0.5": 0.022908274084329605,
+        "0.9": 0.02791115008294583,
+        "0.99": 0.02964529912918806,
+        "1": 0.029878828674554825
+      }
+    },
+    "height0.2_normalspan0.03_nearest0.05": {
+      "points": 234,
+      "normal_motion_span": {
+        "0": 0.012177973054349422,
+        "0.5": 0.022613191977143288,
+        "0.9": 0.0281752010807395,
+        "0.99": 0.02972330920398235,
+        "1": 0.029940202832221985
+      },
+      "world_box_motion_span": {
+        "0": 0.06519520282745361,
+        "0.5": 0.16226829588413239,
+        "0.9": 0.21887672394514085,
+        "0.99": 0.31534039825200977,
+        "1": 0.36644247174263
+      },
+      "max_plane_distance": {
+        "0": 0.007190413773059845,
+        "0.5": 0.01553263608366251,
+        "0.9": 0.023637170344591146,
+        "0.99": 0.03358964826911684,
+        "1": 0.056234341114759445
+      },
+      "min_signed_plane_distance": {
+        "0": -0.056234341114759445,
+        "0.5": -0.012438364326953888,
+        "0.9": -0.005593790486454957,
+        "0.99": 0.003126563229598066,
+        "1": 0.006875539198517799
+      },
+      "max_signed_plane_distance": {
+        "0": -0.02847921848297119,
+        "0.5": 0.008591173216700554,
+        "0.9": 0.016076235473155977,
+        "0.99": 0.02344016067683695,
+        "1": 0.030914057046175003
+      },
+      "max_alltime_nearest_static_plane_distance": {
+        "0": 0.012156147509813309,
+        "0.5": 0.024501847103238106,
+        "0.9": 0.032137644663453105,
+        "0.99": 0.03851927265524863,
+        "1": 0.043528757989406586
+      }
+    },
+    "height0.2_normalspan0.03_nearest0.1": {
+      "points": 243,
+      "normal_motion_span": {
+        "0": 0.012177973054349422,
+        "0.5": 0.022641610354185104,
+        "0.9": 0.028259695321321488,
+        "0.99": 0.029717838168144224,
+        "1": 0.029940202832221985
+      },
+      "world_box_motion_span": {
+        "0": 0.06519520282745361,
+        "0.5": 0.16343635320663452,
+        "0.9": 0.22742694318294526,
+        "0.99": 0.343996048569679,
+        "1": 0.36644247174263
+      },
+      "max_plane_distance": {
+        "0": 0.007190413773059845,
+        "0.5": 0.015674907714128494,
+        "0.9": 0.023552098870277406,
+        "0.99": 0.03329656161367888,
+        "1": 0.056234341114759445
+      },
+      "min_signed_plane_distance": {
+        "0": -0.056234341114759445,
+        "0.5": -0.012877480126917362,
+        "0.9": -0.00587663073092699,
+        "0.99": 0.0028451440576463443,
+        "1": 0.006875539198517799
+      },
+      "max_signed_plane_distance": {
+        "0": -0.02847921848297119,
+        "0.5": 0.008525362238287926,
+        "0.9": 0.015977664664387704,
+        "0.99": 0.023320880830287914,
+        "1": 0.030914057046175003
+      },
+      "max_alltime_nearest_static_plane_distance": {
+        "0": 0.012156147509813309,
+        "0.5": 0.024650396779179573,
+        "0.9": 0.0344246305525303,
+        "0.99": 0.06448155373334884,
+        "1": 0.0730043426156044
+      }
+    }
+  }
+}

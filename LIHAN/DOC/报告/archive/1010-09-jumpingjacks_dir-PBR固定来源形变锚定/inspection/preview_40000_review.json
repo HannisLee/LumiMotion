@@ -1,0 +1,25 @@
+{
+  "status": "FAILED_SO_FAR",
+  "iteration": 40000,
+  "scope": "actual_manual_0010_0080_0150_RGB_comparison_GT_B03_same40000",
+  "frames": [
+    "0010",
+    "0080",
+    "0150"
+  ],
+  "background": "正常黑背景；人物与平台存在",
+  "foreground": "人物/头手/衣服斑驳且边缘稀疏；平台脚周伪结构和残影，棋盘纹理与阴影不符合GT",
+  "comparison": "与B03同40k接近，RGB指标略提升，不能称视觉通过",
+  "metrics": {
+    "psnr": 18.517455841244086,
+    "ssim": 0.8864702026049296,
+    "lpips": 0.10901500582695008,
+    "psnr_foreground": 11.48589137773118,
+    "ssim_foreground_bbox": 0.7530547539393108,
+    "lpips_foreground_bbox": 0.22960177361965178
+  },
+  "full_seven_mae_available": false,
+  "final_quality": false,
+  "commit_allowed": false,
+  "image": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/inspection/preview_40000_rgb_comparison.png"
+}

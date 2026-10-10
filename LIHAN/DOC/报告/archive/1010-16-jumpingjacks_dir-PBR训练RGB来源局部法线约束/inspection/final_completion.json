@@ -1,0 +1,18 @@
+{
+  "status": "CURRENT_RUN_COMPLETED_ITERATIONS_STOPPED",
+  "verified_at": "2026-10-10T11:56:08.741938+09:00",
+  "training_steps": 20000,
+  "iteration": 55000,
+  "training_exit_code": 0,
+  "postprocess_steps": 9,
+  "postprocess_exit_code": 0,
+  "finish_manual_review_exit_code": 0,
+  "summary_generator_exit_code": 0,
+  "quality": "FAILED",
+  "normal_goal": "FAILED",
+  "iterations_stopped": true,
+  "continued_training": false,
+  "commit": false,
+  "push": false,
+  "new_branch": false
+}

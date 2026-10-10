@@ -1,0 +1,35 @@
+{
+  "status": "FAILED_AUDIT_EXPECTATION_ONLY",
+  "exception": "AssertionError",
+  "reason": "首次允许changed字段只列5项，未包含B04中不存在的新增pbr_plane_motion_span与pbr_plane_support_band。训练参数及进程未修改；修正审计期望为7项后actual exit0。",
+  "actual_changed_fields": {
+    "loss_preset": {
+      "B04": "pbr_gt_directional_anchor",
+      "B05": "pbr_gt_directional_plane"
+    },
+    "model_path": {
+      "B04": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp",
+      "B05": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp"
+    },
+    "pbr_gt_lights_path": {
+      "B04": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/pbr_gt_lights.json",
+      "B05": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/pbr_gt_lights.json"
+    },
+    "pbr_plane_motion_span": {
+      "B04": null,
+      "B05": 0.01
+    },
+    "pbr_plane_projection": {
+      "B04": null,
+      "B05": true
+    },
+    "pbr_plane_support_band": {
+      "B04": null,
+      "B05": 0.2
+    },
+    "source_path": {
+      "B04": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/data_view",
+      "B05": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/data_view"
+    }
+  }
+}

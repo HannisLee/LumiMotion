@@ -1,0 +1,121 @@
+{
+  "status": "PASS_LAUNCH_ONLY",
+  "changed_config": {
+    "loss_preset": {
+      "B04": "pbr_gt_directional_anchor",
+      "B05": "pbr_gt_directional_plane"
+    },
+    "model_path": {
+      "B04": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp",
+      "B05": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp"
+    },
+    "pbr_gt_lights_path": {
+      "B04": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/pbr_gt_lights.json",
+      "B05": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/pbr_gt_lights.json"
+    },
+    "pbr_plane_motion_span": {
+      "B04": null,
+      "B05": 0.01
+    },
+    "pbr_plane_projection": {
+      "B04": null,
+      "B05": true
+    },
+    "pbr_plane_support_band": {
+      "B04": null,
+      "B05": 0.2
+    },
+    "source_path": {
+      "B04": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/data_view",
+      "B05": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/data_view"
+    }
+  },
+  "source_provenance": {
+    "status": "PASS",
+    "mask_source": "original-image-alpha",
+    "frames": 150,
+    "raw_RGB_RGBA_verified": true,
+    "material_geometry_GT_opened": false,
+    "manifest_sha256": "2c9b3ad5e4f4541e4a65213cfedae256919575a40cddee5b74267bea5c4bfff8"
+  },
+  "plane": {
+    "format_version": 1,
+    "method": "source_prediction_temporal_plane_geometry_projection",
+    "source_iteration": 35000,
+    "points": 99827,
+    "fit_band": 0.08,
+    "support_band": 0.2,
+    "max_motion_span": 0.01,
+    "asset_sha256": "eb650a3c2c9c584b0617c4ac2e62673979179c8fbcbb60991a98b6f66b9a40f7",
+    "gt_geometry_inputs": false,
+    "gt_normal_inputs": false,
+    "gt_material_inputs": false,
+    "source_files": {
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/point_cloud/iteration_35000/point_cloud.ply": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/deform/iteration_35000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+    },
+    "source_snapshots": {
+      "point_cloud/iteration_35000/point_cloud.ply": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+      "deform/iteration_35000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+    },
+    "training_camera_sha256": "3b46f17217f27a5bffb458909f289970440d3adfd3ab91cde9c4a297953d564d",
+    "training_cameras": 135,
+    "source_plane_fit": {
+      "method": "source_prediction_static_RANSAC_SVD",
+      "seed": 1010,
+      "source_points": 99827,
+      "eligible_points": 12603,
+      "ransac_inlier_fraction": 0.5946203284932159,
+      "plane_normal": [
+        -0.0029613651534769734,
+        -0.002400413027768733,
+        0.9999927341404656
+      ],
+      "plane_offset": 0.008403862980894893,
+      "band": 0.08,
+      "support_points": 14556,
+      "gt_normal_inputs": false,
+      "gt_geometry_inputs": false,
+      "gt_material_inputs": false
+    },
+    "support_points": 15187
+  },
+  "plane_supported_stats": {
+    "motion_span": {
+      "min": 4.020400401483215e-10,
+      "max": 0.009974987246096134,
+      "median": 9.160867193713784e-06
+    },
+    "max_plane_distance": {
+      "min": 2.689659595489502e-06,
+      "max": 0.19978506863117218,
+      "median": 0.014936407096683979
+    },
+    "min_axis_cosine": {
+      "min": 0.5002549886703491,
+      "max": 0.9999974370002747,
+      "median": 0.9622767567634583
+    }
+  },
+  "anchor": {
+    "format_version": 1,
+    "method": "stage1_prediction_XYZ_deformation_input_anchor",
+    "source_iteration": 35000,
+    "points": 99827,
+    "source_files": {
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/point_cloud/iteration_35000/point_cloud.ply": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/deform/iteration_35000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+    },
+    "source_snapshots": {
+      "point_cloud/iteration_35000/point_cloud.ply": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+      "deform/iteration_35000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+    },
+    "asset_sha256": "f6ecb19b7d4ea670b890527eba7e9875da2fa927bd0f402c5fa31e82c8a3beaa",
+    "gt_geometry_inputs": false,
+    "gt_material_inputs": false,
+    "gt_normal_inputs": false
+  },
+  "lighting_table_identical_to_B04": true,
+  "code_manifest_matches": true,
+  "final_mae": false
+}

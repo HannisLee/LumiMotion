@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "kind": "actual_GeometryRun_PBR_buffers_and_mesh_time_consistency",
+  "optimizer_steps": 0,
+  "GT_labels_read": false,
+  "models": [
+    {
+      "model": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-16-dir-PBR概率gate/model_mlp",
+      "iteration": 35020,
+      "frames": [
+        {
+          "frame": 10,
+          "normal_max_abs_error": 0.0,
+          "alpha_max_abs_error": 0.0,
+          "expected_Z_max_abs_error": 0.0,
+          "supported_world_plane_max_distance": 2.7008354663848877e-08,
+          "supported_world_axis_cosine_min": 0.9999996423721313,
+          "mesh_target_time_override_consistent": true
+        },
+        {
+          "frame": 80,
+          "normal_max_abs_error": 0.0,
+          "alpha_max_abs_error": 0.0,
+          "expected_Z_max_abs_error": 0.0,
+          "supported_world_plane_max_distance": 2.514570951461792e-08,
+          "supported_world_axis_cosine_min": 0.9999996423721313,
+          "mesh_target_time_override_consistent": true
+        },
+        {
+          "frame": 150,
+          "normal_max_abs_error": 0.0,
+          "alpha_max_abs_error": 0.0,
+          "expected_Z_max_abs_error": 0.0,
+          "supported_world_plane_max_distance": 2.7008354663848877e-08,
+          "supported_world_axis_cosine_min": 0.9999996423721313,
+          "mesh_target_time_override_consistent": true
+        }
+      ],
+      "source_sha_unchanged": true,
+      "hashed_sources": 454
+    }
+  ]
+}

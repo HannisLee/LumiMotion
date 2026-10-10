@@ -1,0 +1,3 @@
+{"status": "WAITING_LIVE_TRAIN_50000", "pid": 273217, "start_ticks": "9849745", "training_pid": 271624, "training_start_ticks": "9801108", "updated_at": "2026-10-10T08:22:05.286228+09:00", "final_mae": false}
+{"status": "AUDITING_50000", "pid": 273217, "start_ticks": "9849745", "training_pid": 271624, "training_start_ticks": "9801108", "updated_at": "2026-10-10T08:35:56.124898+09:00", "final_mae": false}
+{"status": "PASS_50000_CHECKPOINT_ONLY", "pid": 273217, "start_ticks": "9849745", "training_pid": 271624, "training_start_ticks": "9801108", "updated_at": "2026-10-10T08:35:57.402642+09:00", "final_mae": false, "audit_subprocess_exit_code": 0, "iteration": 50000}

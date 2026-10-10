@@ -1,0 +1,19 @@
+{
+  "status": "COMPLETED_READ_ONLY_DIAGNOSTIC_VISUAL_FAILED",
+  "reviewed_at": "2026-10-10T10:26:03.958797+09:00",
+  "actually_viewed": [
+    "inspection/shadow_visibility/comparison.png"
+  ],
+  "original_tool_session_id": "not_recovered_after_compaction",
+  "original_process_exit_code": null,
+  "completed_json_and_final_log_present": true,
+  "production_core_SHA_verified": 474,
+  "observations": [
+    "实际查看TRAIN0001/0075/0149五列拼图，原生/关闭阴影/更小偏移/混合深度均未修复人物斑驳与脚周伪几何。",
+    "原native light_t_min=.1，沿光方向偏移；.02/.05使亮部暗斑和自身原RGB误差增大。",
+    "关闭阴影有局部改善但抹去真实地面阴影，不据此接入新训练或Preset。",
+    "half深度混合响应很小，不能解释全部伪几何。"
+  ],
+  "normal_GT_accuracy_claimed": false,
+  "training_changed": false
+}

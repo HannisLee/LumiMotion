@@ -1,0 +1,40 @@
+{
+  "status": "FAILED_SO_FAR_RGB_AND_FOUR_ONLY",
+  "iteration": 55000,
+  "reviewed_at": "2026-10-10T08:48:01.127092+09:00",
+  "actual_images_viewed": true,
+  "rgb": {
+    "psnr": 19.235614174536575,
+    "ssim": 0.9104916214942932,
+    "lpips": 0.11079909801483154,
+    "psnr_foreground": 11.882659584201594,
+    "ssim_foreground_bbox": 0.803943928082784,
+    "lpips_foreground_bbox": 0.22023212313652038
+  },
+  "previous_B06_rgb": {
+    "psnr": 19.682202597909917,
+    "ssim": 0.8977724393208821,
+    "lpips": 0.11070925494035085,
+    "psnr_foreground": 12.488568200962481,
+    "ssim_foreground_bbox": 0.7782925049463908,
+    "lpips_foreground_bbox": 0.221701983610789
+  },
+  "reviewed_test_frames": [
+    10,
+    80,
+    150
+  ],
+  "reviewed_insight_frames": [
+    1,
+    75,
+    150
+  ],
+  "rgb_background": "黑背景正常/人物平台存在，但头手/衣服和小腿稀疏斑驳、脚周伪凸起/灰黑及阴影污染仍明显，Direct更高对比；GT0080自身背光暗，不仅凭暗失败。",
+  "alpha": "主体平台大部饱和覆盖，腰手边缘与平台/脚周薄雾、细碎残影仍有；Alpha饱和不能推断真实表面正确。",
+  "albedo_static_dynamic": "正背面光照/色差仍烘入材质，平台棋盘和脚周污染、身体破碎；source feature保持，未修正来源静动态误分。",
+  "normal": "平台整体上向、0075无旧kernel整个反向，但人体/脚周混合轴斑驳、伪起伏仍明显；Depth/Mesh与最终15七MAE待完成。",
+  "hdr_directional": "尚未实际审核最终HDR首中尾，仍渲染；不提前声明已审阅。",
+  "full_seven_MAE": false,
+  "normal_goal": "PENDING",
+  "commit_allowed": false
+}

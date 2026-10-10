@@ -1,0 +1,11 @@
+{
+  "path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/example_envmaps/golden_bay_4k_32x16_rot330.hdr",
+  "sha256": "0a71e1570e6cca9d732e4785b72aadba1fbfb6de1f85991fc38ce58a668f5bc4",
+  "samples": 2048,
+  "yaw_degrees": 0.0,
+  "exposure": 1.0,
+  "world_up": "Z",
+  "longitude": "atan2(-y,x)",
+  "axis_reference": "原始HDR脚本轴变换 [[0,-1,0],[0,0,1],[-1,0,0]]",
+  "integrator": "native PBR GGX + BVH visibility + native relight indirect"
+}

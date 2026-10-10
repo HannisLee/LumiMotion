@@ -1,0 +1,1 @@
+{"status": "PASS_READ_ONLY_ARCHIVE_SYNC", "updated_at": "2026-10-10T07:19:17.158800+09:00", "steps": 8684, "archive_files": 28, "checkouts_verified": 3, "final_mae": false, "commit_allowed": false}

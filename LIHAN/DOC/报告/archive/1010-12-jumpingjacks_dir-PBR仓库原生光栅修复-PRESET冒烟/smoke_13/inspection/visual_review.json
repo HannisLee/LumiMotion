@@ -1,0 +1,16 @@
+{
+  "status": "PASS_FUNCTIONAL_ONLY",
+  "quality": "FAILED_SO_FAR_NOT_FINAL_TRAIN",
+  "reviewed_frames": [
+    1,
+    75,
+    150
+  ],
+  "rgb_background": "黑背景正常，人物平台存在；人物偏暗/斑驳，脚周伪结构仍有。20步源初始化不能作完整训练结果。",
+  "alpha": "主体及平台基本覆盖，边缘仍少量残影。",
+  "albedo": "光照仍烘入，脚周污染。",
+  "normal": "0075平台不再整体反向；人体与脚周局部轴仍斑驳。",
+  "hdr_directional": "两种灯替换均响应且背景正常；HDR16噪声和斑驳不作质量准确性。",
+  "full_mae": false,
+  "commit_allowed": false
+}

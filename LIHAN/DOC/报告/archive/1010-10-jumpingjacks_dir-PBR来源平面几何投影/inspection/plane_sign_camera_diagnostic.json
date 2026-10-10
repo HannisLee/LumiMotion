@@ -1,0 +1,25 @@
+{
+  "incorrect_legacy_normal_z_facing_frames": [
+    {
+      "frame": "frame_0038",
+      "split": "train",
+      "plane_view_normal_z": 0.0025092323616511284,
+      "camera_plane_side": 1.0215206248086173
+    },
+    {
+      "frame": "frame_0075",
+      "split": "train",
+      "plane_view_normal_z": 0.0007563598909168497,
+      "camera_plane_side": 0.8750215589879297
+    },
+    {
+      "frame": "frame_0076",
+      "split": "train",
+      "plane_view_normal_z": 0.000631491440793999,
+      "camera_plane_side": 0.8740150093549462
+    }
+  ],
+  "train_steps": 0,
+  "gt_labels_used": false,
+  "source": "converted camera and source-derived plane only"
+}

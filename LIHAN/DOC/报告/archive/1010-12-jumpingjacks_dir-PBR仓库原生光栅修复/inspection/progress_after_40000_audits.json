@@ -1,0 +1,30 @@
+{
+  "status": "TRAINING_VERIFIED_LIVE",
+  "updated_at": "2026-10-10T07:19:36.873354+09:00",
+  "steps": 8833,
+  "total_steps": 20000,
+  "iteration": 43833,
+  "process_handles": {
+    "train": {
+      "pid": 258688,
+      "session_id": 30746,
+      "start_ticks": "9357639"
+    },
+    "postprocess": {
+      "pid": 258864,
+      "session_id": 47576,
+      "start_ticks": "9362140"
+    },
+    "preview_40000": {
+      "pid": 258868,
+      "session_id": 25842,
+      "start_ticks": "9362256"
+    }
+  },
+  "postprocess": "WAITING_LIVE_TRAIN",
+  "preview_40000": "EXIT_0_REVIEW_FAILED_SO_FAR",
+  "gate_diagnostic": "EXIT_0_READ_ONLY",
+  "native_joint_geometry": "EXIT_0_READ_ONLY",
+  "final_mae": false,
+  "commit_allowed": false
+}

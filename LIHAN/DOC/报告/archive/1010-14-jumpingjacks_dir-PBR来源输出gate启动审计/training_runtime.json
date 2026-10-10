@@ -1,0 +1,18 @@
+{
+  "status": "TRAIN_RUNNING",
+  "started_at": "2026-10-10T09:10:32.082100+09:00",
+  "training_pid": 282299,
+  "process_start_ticks": "10140426",
+  "source_iteration": 35000,
+  "target_iteration": 55000,
+  "steps_planned": 20000,
+  "preset": "pbr_gt_directional_plane_native_direct_gate",
+  "gt_training_inputs": [
+    "light_direction_only"
+  ],
+  "quality": "PENDING",
+  "normal_goal": "PENDING",
+  "train_session_id": 76498,
+  "postprocess_session_id": 89846,
+  "preview_session_id": 88932
+}

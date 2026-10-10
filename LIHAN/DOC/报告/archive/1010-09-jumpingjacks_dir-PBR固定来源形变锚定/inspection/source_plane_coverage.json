@@ -1,0 +1,568 @@
+{
+  "status": "PASS_READ_ONLY_DIAGNOSTIC",
+  "source_iteration": 35000,
+  "source_files": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/point_cloud/iteration_35000/point_cloud.ply": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/deform/iteration_35000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+  },
+  "points": 99827,
+  "source_plane": {
+    "method": "source_prediction_static_RANSAC_SVD",
+    "seed": 1010,
+    "source_points": 99827,
+    "eligible_points": 12603,
+    "ransac_inlier_fraction": 0.5946203284932159,
+    "plane_normal": [
+      -0.0029613651534769734,
+      -0.002400413027768733,
+      0.9999927341404656
+    ],
+    "plane_offset": 0.008403862980894893,
+    "band": 0.08,
+    "support_points": 14556,
+    "gt_normal_inputs": false,
+    "gt_geometry_inputs": false,
+    "gt_material_inputs": false,
+    "source_iteration": 35000,
+    "source_model": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp",
+    "optimizer_groups": [
+      "albedo_dc",
+      "albedo_dc_stage1",
+      "albedo_rest",
+      "rotation",
+      "roughness",
+      "xyz"
+    ],
+    "source_files": {
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/point_cloud/iteration_35000/point_cloud.ply": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/deform/iteration_35000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+    }
+  },
+  "training_time_count": 135,
+  "rows": {
+    "static_canonical_band_0.08": {
+      "points": 42785,
+      "opacity_sum": 10447.1923828125,
+      "unprojected_area_opacity_proxy": 4.790628910064697,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        3.8044443044782383e-06,
+        0.0014978997642174363,
+        0.17922285199165344,
+        0.8474589586257935
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.012279230169951916,
+        0.03456179052591324,
+        0.07701027393341064,
+        0.3273075520992279
+      ]
+    },
+    "static_canonical_band_0.08_alpha_gt_005": {
+      "points": 15385,
+      "opacity_sum": 10234.51953125,
+      "unprojected_area_opacity_proxy": 4.757917404174805,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        1.4516936971631367e-05,
+        0.007007202133536339,
+        0.22954359650611877,
+        0.6823481321334839
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.013724512420594692,
+        0.053215015679597855,
+        0.07986558228731155,
+        0.23887041211128235
+      ]
+    },
+    "static_canonical_band_0.08_alpha_le_005": {
+      "points": 27400,
+      "opacity_sum": 212.67190551757812,
+      "unprojected_area_opacity_proxy": 0.032711416482925415,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        2.269992137371446e-06,
+        0.0004211533232592046,
+        0.12877774238586426,
+        0.8474589586257935
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.011844477616250515,
+        0.026923518627882004,
+        0.07041854411363602,
+        0.3273075520992279
+      ]
+    },
+    "static_canonical_band_0.08_all_train_span_le_003": {
+      "points": 41283,
+      "opacity_sum": 9864.9970703125,
+      "unprojected_area_opacity_proxy": 4.567657947540283,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        3.2442037536384305e-06,
+        0.000613498326856643,
+        0.016900684684515,
+        0.029978586360812187
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.012002439238131046,
+        0.03193704038858414,
+        0.0727396309375763,
+        0.08415551483631134
+      ]
+    },
+    "static_canonical_band_0.08_all_train_plane_le_band": {
+      "points": 42522,
+      "opacity_sum": 10346.845703125,
+      "unprojected_area_opacity_proxy": 4.746567726135254,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        3.7026152313046623e-06,
+        0.0012597024906426668,
+        0.12874610722064972,
+        0.6513612270355225
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.01220984198153019,
+        0.033262867480516434,
+        0.0732051357626915,
+        0.07997681945562363
+      ]
+    },
+    "dynamic_canonical_band_0.08": {
+      "points": 15697,
+      "opacity_sum": 7791.37744140625,
+      "unprojected_area_opacity_proxy": 3.7216718196868896,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        1.075313925743103,
+        1.6979247331619263,
+        2.01859974861145,
+        2.4414618015289307
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.22142474353313446,
+        0.530610978603363,
+        0.7581208348274231,
+        0.8783603310585022
+      ]
+    },
+    "dynamic_canonical_band_0.08_alpha_gt_005": {
+      "points": 11865,
+      "opacity_sum": 7720.470703125,
+      "unprojected_area_opacity_proxy": 3.7120203971862793,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        0.9123896360397339,
+        1.6643764972686768,
+        2.004202127456665,
+        2.268742561340332
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.1905243992805481,
+        0.5022067427635193,
+        0.7365210652351379,
+        0.8783603310585022
+      ]
+    },
+    "dynamic_canonical_band_0.08_alpha_le_005": {
+      "points": 3832,
+      "opacity_sum": 70.90681457519531,
+      "unprojected_area_opacity_proxy": 0.009651537984609604,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        1.32503080368042,
+        1.7631521224975586,
+        2.0542094707489014,
+        2.4414618015289307
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.2995147705078125,
+        0.6042059659957886,
+        0.7920505404472351,
+        0.868156909942627
+      ]
+    },
+    "dynamic_canonical_band_0.08_all_train_span_le_003": {
+      "points": 0
+    },
+    "dynamic_canonical_band_0.08_all_train_plane_le_band": {
+      "points": 2589,
+      "opacity_sum": 1856.5367431640625,
+      "unprojected_area_opacity_proxy": 1.1928176879882812,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        0.26507431268692017,
+        0.6124088764190674,
+        0.8369240164756775,
+        1.0210671424865723
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.05365223437547684,
+        0.07487256824970245,
+        0.0794035792350769,
+        0.07996279746294022
+      ]
+    },
+    "static_canonical_band_0.12": {
+      "points": 45359,
+      "opacity_sum": 11644.583984375,
+      "unprojected_area_opacity_proxy": 5.61375617980957,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        4.003984940936789e-06,
+        0.0016510182758793235,
+        0.176927849650383,
+        0.8474589586257935
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.012907934375107288,
+        0.05677339807152748,
+        0.11186030507087708,
+        0.3273075520992279
+      ]
+    },
+    "static_canonical_band_0.12_alpha_gt_005": {
+      "points": 16881,
+      "opacity_sum": 11422.212890625,
+      "unprojected_area_opacity_proxy": 5.575196266174316,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        1.5662551959394477e-05,
+        0.007591687608510256,
+        0.2260696291923523,
+        0.6823481321334839
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.015264318324625492,
+        0.07910649478435516,
+        0.11494003981351852,
+        0.23887041211128235
+      ]
+    },
+    "static_canonical_band_0.12_alpha_le_005": {
+      "points": 28478,
+      "opacity_sum": 222.37020874023438,
+      "unprojected_area_opacity_proxy": 0.03855999559164047,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        2.2928434191271663e-06,
+        0.00045203077024780214,
+        0.1303376406431198,
+        0.8474589586257935
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.012198759242892265,
+        0.03176809102296829,
+        0.11095789819955826,
+        0.3273075520992279
+      ]
+    },
+    "static_canonical_band_0.12_all_train_span_le_003": {
+      "points": 43709,
+      "opacity_sum": 10988.5751953125,
+      "unprojected_area_opacity_proxy": 5.367815971374512,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        3.4073814276780467e-06,
+        0.0006613251753151417,
+        0.017306072637438774,
+        0.029978586360812187
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.01261203084141016,
+        0.0504966601729393,
+        0.11087517440319061,
+        0.12283653020858765
+      ]
+    },
+    "static_canonical_band_0.12_all_train_plane_le_band": {
+      "points": 45223,
+      "opacity_sum": 11597.494140625,
+      "unprojected_area_opacity_proxy": 5.594747066497803,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        3.958384695579298e-06,
+        0.0015347072621807456,
+        0.150633305311203,
+        0.6823481321334839
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.012876947410404682,
+        0.054941315203905106,
+        0.11089033633470535,
+        0.11993232369422913
+      ]
+    },
+    "dynamic_canonical_band_0.12": {
+      "points": 17437,
+      "opacity_sum": 8929.1943359375,
+      "unprojected_area_opacity_proxy": 4.161778450012207,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        0.9608870148658752,
+        1.6779903173446655,
+        2.005051612854004,
+        2.4414618015289307
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.20126613974571228,
+        0.514133095741272,
+        0.7484258413314819,
+        0.8783603310585022
+      ]
+    },
+    "dynamic_canonical_band_0.12_alpha_gt_005": {
+      "points": 13377,
+      "opacity_sum": 8853.6162109375,
+      "unprojected_area_opacity_proxy": 4.15128231048584,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        0.7866145968437195,
+        1.6376125812530518,
+        1.9938783645629883,
+        2.268742561340332
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.17576949298381805,
+        0.48629239201545715,
+        0.7324262261390686,
+        0.8783603310585022
+      ]
+    },
+    "dynamic_canonical_band_0.12_alpha_le_005": {
+      "points": 4060,
+      "opacity_sum": 75.57806396484375,
+      "unprojected_area_opacity_proxy": 0.010496426373720169,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        1.2942862510681152,
+        1.753141164779663,
+        2.0435733795166016,
+        2.4414618015289307
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.28557857871055603,
+        0.5953547954559326,
+        0.7893563508987427,
+        0.868156909942627
+      ]
+    },
+    "dynamic_canonical_band_0.12_all_train_span_le_003": {
+      "points": 0
+    },
+    "dynamic_canonical_band_0.12_all_train_plane_le_band": {
+      "points": 4671,
+      "opacity_sum": 3217.689208984375,
+      "unprojected_area_opacity_proxy": 2.0111515522003174,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        0.3152570128440857,
+        0.7234482765197754,
+        1.0705231428146362,
+        1.3828518390655518
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.07494897395372391,
+        0.11161533743143082,
+        0.1191767081618309,
+        0.11998643726110458
+      ]
+    },
+    "static_canonical_band_0.2": {
+      "points": 47356,
+      "opacity_sum": 12294.548828125,
+      "unprojected_area_opacity_proxy": 6.271538734436035,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        4.209055987303145e-06,
+        0.0018742841202765703,
+        0.1842697262763977,
+        0.8474589586257935
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.01342575903981924,
+        0.08168616890907288,
+        0.16343805193901062,
+        0.3273075520992279
+      ]
+    },
+    "static_canonical_band_0.2_alpha_gt_005": {
+      "points": 17768,
+      "opacity_sum": 12063.095703125,
+      "unprojected_area_opacity_proxy": 6.2238311767578125,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        1.571330903971102e-05,
+        0.00815175473690033,
+        0.2291451394557953,
+        0.6823481321334839
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.01624879613518715,
+        0.09567184001207352,
+        0.16508975625038147,
+        0.23992100358009338
+      ]
+    },
+    "static_canonical_band_0.2_alpha_le_005": {
+      "points": 29588,
+      "opacity_sum": 231.4521484375,
+      "unprojected_area_opacity_proxy": 0.047707200050354004,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        2.4287746782647446e-06,
+        0.000519748660735786,
+        0.14177991449832916,
+        0.8474589586257935
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.012525144964456558,
+        0.050310831516981125,
+        0.162971630692482,
+        0.3273075520992279
+      ]
+    },
+    "static_canonical_band_0.2_all_train_span_le_003": {
+      "points": 45547,
+      "opacity_sum": 11581.369140625,
+      "unprojected_area_opacity_proxy": 6.007737636566162,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        3.5298278362461133e-06,
+        0.0006990451365709305,
+        0.017375992611050606,
+        0.029978586360812187
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.013073140755295753,
+        0.0746307298541069,
+        0.1588180661201477,
+        0.19996954500675201
+      ]
+    },
+    "static_canonical_band_0.2_all_train_plane_le_band": {
+      "points": 47337,
+      "opacity_sum": 12288.6171875,
+      "unprojected_area_opacity_proxy": 6.268625259399414,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        4.199050636088941e-06,
+        0.0018535074777901173,
+        0.17754733562469482,
+        0.8474589586257935
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.01342241745442152,
+        0.08148946613073349,
+        0.1626138687133789,
+        0.19996954500675201
+      ]
+    },
+    "dynamic_canonical_band_0.2": {
+      "points": 21040,
+      "opacity_sum": 11110.388671875,
+      "unprojected_area_opacity_proxy": 4.839487552642822,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        0.8003013134002686,
+        1.6341904401779175,
+        1.9889670610427856,
+        2.4414618015289307
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.21031087636947632,
+        0.48830854892730713,
+        0.7369770407676697,
+        0.8783603310585022
+      ]
+    },
+    "dynamic_canonical_band_0.2_alpha_gt_005": {
+      "points": 16421,
+      "opacity_sum": 11024.05078125,
+      "unprojected_area_opacity_proxy": 4.827267646789551,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        0.6641770601272583,
+        1.588979959487915,
+        1.9703102111816406,
+        2.268742561340332
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.19831472635269165,
+        0.4469086229801178,
+        0.7237874865531921,
+        0.8783603310585022
+      ]
+    },
+    "dynamic_canonical_band_0.2_alpha_le_005": {
+      "points": 4619,
+      "opacity_sum": 86.33821105957031,
+      "unprojected_area_opacity_proxy": 0.012219925411045551,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        1.223325490951538,
+        1.7313950061798096,
+        2.0362548828125,
+        2.4414618015289307
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.25951606035232544,
+        0.5706709027290344,
+        0.7826830744743347,
+        0.868156909942627
+      ]
+    },
+    "dynamic_canonical_band_0.2_all_train_span_le_003": {
+      "points": 0
+    },
+    "dynamic_canonical_band_0.2_all_train_plane_le_band": {
+      "points": 9678,
+      "opacity_sum": 6217.14208984375,
+      "unprojected_area_opacity_proxy": 3.2907681465148926,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        0.4195351302623749,
+        1.0236459970474243,
+        1.4349561929702759,
+        1.8066930770874023
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.12324227392673492,
+        0.18719378113746643,
+        0.19881045818328857,
+        0.19998975098133087
+      ]
+    },
+    "current_support": {
+      "points": 14556,
+      "opacity_sum": 9651.38671875,
+      "unprojected_area_opacity_proxy": 4.591814041137695,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        1.4416302292374894e-05,
+        0.006999771110713482,
+        0.22801236808300018,
+        0.6823481321334839
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.013281993567943573,
+        0.05161605775356293,
+        0.07980214804410934,
+        0.23887041211128235
+      ]
+    },
+    "static_near_02_excluded_current_support": {
+      "points": 32800,
+      "opacity_sum": 2643.16162109375,
+      "unprojected_area_opacity_proxy": 1.6797244548797607,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        2.8024942366755567e-06,
+        0.0007822439656592906,
+        0.15962478518486023,
+        0.8474589586257935
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.013480545952916145,
+        0.10012353956699371,
+        0.1710231453180313,
+        0.3273075520992279
+      ]
+    },
+    "static_near_008_excluded_normal_cosine": {
+      "points": 829,
+      "opacity_sum": 583.1334838867188,
+      "unprojected_area_opacity_proxy": 0.1661032736301422,
+      "motion_axis_box_span_norm_p50_p90_p99_max": [
+        1.6637155567877926e-05,
+        0.007860720157623291,
+        0.3486477732658386,
+        0.6714262366294861
+      ],
+      "all_train_max_plane_distance_p50_p90_p99_max": [
+        0.024429701268672943,
+        0.06738893687725067,
+        0.08641698211431503,
+        0.1248876079916954
+      ]
+    }
+  },
+  "gt_inputs": false,
+  "optimizer_steps": 0,
+  "current_training_modified": false,
+  "final_mae": false,
+  "caveat": "opacity×scale0×scale1仅未投影面积代理，不等同光栅覆盖/遮挡贡献；box-span是坐标范围范数，不是精确最大两时刻距离。没有生成训练先验。"
+}

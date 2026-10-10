@@ -1,0 +1,25 @@
+{
+  "status": "FAILED",
+  "scope": "55k首中尾人工图像质量；不等同所有150帧逐帧人工查看",
+  "rgb": {
+    "background": "黑背景正常",
+    "foreground": "人物强斑驳，头手边界欠完整、脚周平台伪几何/阴影误差"
+  },
+  "alpha": "主体/平台大致覆盖，边界毛糙/局部漏检残影",
+  "normal": "人体/平台斑驳，脚周强异常；冻结几何无法修复",
+  "albedo": "保留强照明与暗背面结构、平台偏白/缺棋盘格",
+  "evidence": [
+    "inspection/rgb_final_55000.png",
+    "inspection/four_categories_final_55000.png"
+  ],
+  "normal_target_pass": false,
+  "commit_allowed": false,
+  "depth": "0010对照：平台脚周大凸起/波纹，身体Z偏差；GS/Depth/Mesh均有平台伪几何，Mesh平滑但未修复",
+  "relight": "转灯亮度随方向变化且Alpha固定；HDR首中尾有真实光照响应，仍保留橙色偏色/材质和伪几何残留，无对应GT",
+  "final_status": "FAILED_IMAGE_QUALITY",
+  "training_execution": "PASS",
+  "full_mae": "PASS",
+  "normal_mae_deg": 21.228755899062943,
+  "strict_input_source_gate": "FAILED_LEGACY_ALBEDO_ALPHA_SOURCE",
+  "original_RGB_alpha_equivalent_frames": 150
+}

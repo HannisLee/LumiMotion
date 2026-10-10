@@ -1,0 +1,4 @@
+  File "output/smoke_test/1010-18-dir-PBR训练RGB来源局部法线/commands/prepare_full_run.py", line 54
+    needle='for folder in ['commands','logs','inspection']:'
+                            ^
+SyntaxError: invalid syntax

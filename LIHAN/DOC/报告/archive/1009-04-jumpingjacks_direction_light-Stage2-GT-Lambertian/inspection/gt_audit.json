@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "frames": 15,
+  "meters_per_world_unit": 1,
+  "gt_depth": "pixel center ray intersections of per-frame dir Blender evaluated PLY triangles; positive camera Z",
+  "normal_reference": "Blender signed world-space shading Normal EXR may include material normal maps",
+  "source_blend": "/home/lihan/data/LH-data/danamic/jumpingjacks_direction_light/scene_snapshot.blend",
+  "source_blend_sha256": "a9f1491e17e84179ecabbb7d98bb0cbe48264778521df5da707cc92269fa682c",
+  "alpha_hit_iou_min": 0.9979268847651313,
+  "geometry_shading_normal_gap_deg": [
+    0.6849483275760287,
+    0.778780738313071,
+    0.7736088294644411,
+    1.0388712947611318,
+    0.7397948163737877,
+    0.8589106347161817,
+    1.012199193292663,
+    1.048069292267692,
+    0.8477276732168627,
+    0.8334456169459541,
+    0.9358536139982692,
+    0.7915170248913429,
+    0.7800197703062357,
+    0.6771666190087352,
+    0.8169754183182747
+  ],
+  "same_gt_reference_for_all_three_normals": true
+}

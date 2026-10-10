@@ -1,0 +1,29 @@
+diff --git a/LIHAN/README.md b/LIHAN/README.md
+index c72244e..a7201e8 100644
+--- a/LIHAN/README.md
++++ b/LIHAN/README.md
+@@ -1,11 +1,23 @@
+ # LumiMotion 文档库与 Agent 工作索引
+ 
+-更新日期：2026-10-07
++更新日期：2026-10-09
+ 适用范围：本仓库中的 LumiMotion 复现实验、数据准备、Stage 1/2 训练、离线评估与后续代码维护。
+ 
+ 本文件是进入项目后的**第一阅读入口**。它不重复各实验的原始命令或指标；需要执行、判断或修改时，请沿下方链接回到对应的一手文档、脚本和实验产物。当前文档库的唯一入口目录为 `LIHAN/DOC/`。
+ 
+ 
++## 1009 env最终55k全前景MAE：完成并归档
++
++[各项MAE与三类Normal报告](DOC/报告/1009-03-jumpingjacks_environment_light-各项MAE与三类Normal评测报告.md)：完整15测试帧，Albedo 0.19101779、Roughness 0.19992533；GS/Depth/Mesh Normal 13.8899°/18.9226°/14.9573°，联报92.94%/88.37%/93.94%覆盖率；Expected/Median Z Depth 5.8996/5.9127厘米。新增15份逐时刻预测Mesh，各融合135个训练相机固定目标time，无GT几何参与重建。真值、来源、独立CPU复算及首中尾真实目检PASS；材质偏暗、人体法线斑驳与局部漏覆盖是主要限制。指标、逐帧表、命令、日志、源码快照及代表图已归档并保存SHA256清单。原训练六步流水线已结束，NVS PSNR 33.8618、SSIM 0.979730、LPIPS 0.0292933；完整视频最终目检待完成。
++
++## 1009 direction_light 原版Stage1与env阶段结果初查
++
++[方向光Stage1训练](DOC/训练/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1训练报告.md)：用户授权，仅原版SH 35k与150时刻insights，GPU0与env Stage2并行；默认10万随机方块初始化核验PASS，正式训练运行中。env Stage1 35k完整，7视频各150帧解码通过，测试子集PSNR41.2724；同相机RGB较接近GT，人体法线斑驳、基色明暗残留、固定视角局部拖影。完整结论与代表图见1009-01训练报告，env最终55k MAE已完成并归档，见上方1009-03报告。
++
++## 1009 JumpingJacks 双光照数据转换与 env 原版训练准备
++
++[训练报告与完整命令](DOC/训练/1009-01-jumpingjacks_environment_light-原版LumiMotion两阶段训练报告.md)：environment_light、direction_light 两套150帧数据已转换，各135/15划分；全部300帧、原版reader与首中尾目检PASS。仅env准备原版SH 35k→IR累计55k，默认随机方块初始化，用户已确认报告名字并于2026-10-09 18:04启动GPU0正式后台训练，Stage1 35k、Stage2 55k及六步流水线已结束；完整视频最终目检待完成。[转换适配器说明](DOC/修改/1009-01-jumpingjacks新版多光源数据转换与原版训练准备.md)。
++
+ ## 1008 通用前景 MAE 使用指导
+ 
+ [简明指导](DOC/指导/1008-01-通用前景MAE评测使用指导.md)：Albedo、Normal、Roughness 均使用全前景，不按材质或物体类别拆分。更换数据集只需替换模型/GT路径；roughness直接读取逐帧浮点真值，不绑定场景、帧数或分辨率。[修改与核验](DOC/修改/1008-42-通用前景MAE与逐帧粗糙度真值评测.md)，33项测试、三项各15帧实际评测、通用纹理场景核验通过。
