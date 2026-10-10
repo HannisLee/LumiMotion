@@ -79,3 +79,20 @@ RGB／Alpha／Normal／分离四类目检与最终PASS/FAILED必须在实际验�
 ```
 
 日志：`logs/eval55000_verify_all_mae.log`。
+
+
+## 实际执行状态
+
+```json
+{
+  "status": "FAILED",
+  "stage": "失败",
+  "updated_at": "2026-10-10 19:28:58 UTC",
+  "runner_pid": 1649040,
+  "launched_at": "2026-10-10 15:43:44 UTC",
+  "child_pid": 1715368,
+  "gpu": 1,
+  "error": "render退出码1；日志/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-05-LH-static-jumpingjacks_DL_V2-PBR与GT方向光源/logs/render.log",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/batch_1011.py\", line 392, in run\n    else:\n  File \"/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/batch_1011.py\", line 350, in gpu_step\n    execute(exp, step, command, gpu)\n  File \"/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/batch_1011.py\", line 295, in execute\n    raise RuntimeError(f'{step}退出码{code}；日志{log_path}')\nRuntimeError: render退出码1；日志/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-05-LH-static-jumpingjacks_DL_V2-PBR与GT方向光源/logs/render.log\n"
+}
+```
