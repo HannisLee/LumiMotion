@@ -1,0 +1,63 @@
+{
+  "status": "PASS_READ_ONLY_TRAIN_RGB_AXIS_LIFECYCLE",
+  "created_at": "2026-10-10T11:18:05.104592+09:00",
+  "event_source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/events.out.tfevents.1791598293.venus.306459.0",
+  "event_snapshot": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/inspection/rgb_axis_lifecycle/B10.tfevents",
+  "event_snapshot_sha256": "e48f4b69365011c0822acdff2e5250d193aa5d202967477d5ea2f2d40bdb4727",
+  "source_asset_sha256": "8f2987d0af3f0554ab16891c62ee99cdc04e3a7e1ca0f418046144aabceeada2",
+  "points": 99827,
+  "confidence_points": 29621,
+  "candidate_initial_angle_deg_nonGT": {
+    "count": 29621,
+    "mean": 20.419897079467773,
+    "q0_q50_q90_q99_q100": [
+      0.06255725026130676,
+      14.764004707336426,
+      45.157798767089844,
+      83.10694427490232,
+      89.91942596435547
+    ]
+  },
+  "candidate_source_raw_q_norm": {
+    "count": 29621,
+    "mean": 1.0632973909378052,
+    "q0_q50_q90_q99_q100": [
+      0.16960260272026062,
+      1.0291810035705566,
+      1.34344482421875,
+      1.80468533039093,
+      3.592599391937256
+    ]
+  },
+  "all_source_raw_q_norm": {
+    "count": 99827,
+    "mean": 0.9962993860244751,
+    "q0_q50_q90_q99_q100": [
+      0.10601092129945755,
+      0.9732771515846252,
+      1.287411403656006,
+      1.674602291584015,
+      3.6866559982299805
+    ]
+  },
+  "candidate_angle_gt60_count": 1600,
+  "canonical_60cap_ideal_axis_loss_lower_bound": 0.0020880308002233505,
+  "first": {
+    "iteration": 37100,
+    "Stage2_steps": 2100,
+    "loss": 0.09924675524234772,
+    "weighted_ramped_loss": 0.019849351048469546
+  },
+  "last": {
+    "iteration": 39400,
+    "Stage2_steps": 4400,
+    "loss": 0.0038797222077846527,
+    "weighted_ramped_loss": 0.007759444415569305
+  },
+  "optimizer_steps_diagnostic": 0,
+  "GT_labels_read": false,
+  "full_MAE": false,
+  "normal_7_goal": "NOT_EVALUATED",
+  "loss_denominator": "sum(confidence)=29621; all99827 arrays/normal scoring/photo unchanged",
+  "limitations": "RGB候选角是对source预测axis，不是对GT normal；已实际优化loss下降不证明GT法线7度或外观通过。canonical60度下限是独立轴理想旋转条件，未考虑photo/BVH/Alpha冲突，不能当可达GT误差。norm统计没有充分理由改Adam坐标，本轮保持原raw q。"
+}

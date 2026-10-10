@@ -1,0 +1,11 @@
+{
+  "format_version": 1,
+  "iteration": 50000,
+  "lights_sha256": "15fa8ab35b9aa4438bfbcacc1e7d5399579096000e43d4c3e1c5f6483973c1a8",
+  "intensity_scale": 3.141592653589793,
+  "effective_intensity_scale": 6.247264862060547,
+  "intensity_fitted_from_train_rgb": true,
+  "deformation_anchor_sha256": "f6ecb19b7d4ea670b890527eba7e9875da2fa927bd0f402c5fa31e82c8a3beaa",
+  "plane_projection_sha256": "eb650a3c2c9c584b0617c4ac2e62673979179c8fbcbb60991a98b6f66b9a40f7",
+  "rasterizer_source_sha256": "82b1840f4039649e548239445e8c83a6e2018d57c4fc0f7819c835f31aa098d0"
+}

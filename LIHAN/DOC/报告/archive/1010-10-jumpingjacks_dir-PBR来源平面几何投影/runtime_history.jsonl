@@ -1,0 +1,9 @@
+{"step": "render", "exit_code": 0, "elapsed_seconds": 648.3544840812683, "finished_at": "2026-10-10T06:44:39.692289+09:00"}
+{"step": "albedo", "exit_code": 0, "elapsed_seconds": 16.84745216369629, "finished_at": "2026-10-10T06:44:56.540119+09:00"}
+{"step": "predicted_meshes", "exit_code": 0, "elapsed_seconds": 124.94829988479614, "finished_at": "2026-10-10T06:47:01.488834+09:00"}
+{"step": "normal_depth", "exit_code": 0, "elapsed_seconds": 23.01119613647461, "finished_at": "2026-10-10T06:47:24.500342+09:00"}
+{"step": "roughness", "exit_code": 0, "elapsed_seconds": 16.705941438674927, "finished_at": "2026-10-10T06:47:41.206640+09:00"}
+{"step": "verify_roughness", "exit_code": 0, "elapsed_seconds": 0.6409521102905273, "finished_at": "2026-10-10T06:47:41.848054+09:00"}
+{"step": "verify_all_mae", "exit_code": 0, "elapsed_seconds": 1.7913613319396973, "finished_at": "2026-10-10T06:47:43.639719+09:00"}
+{"step": "audit_artifacts", "exit_code": 0, "elapsed_seconds": 5.331775665283203, "finished_at": "2026-10-10T06:47:48.971871+09:00"}
+{"step": "write_results", "exit_code": 0, "elapsed_seconds": 0.10271000862121582, "finished_at": "2026-10-10T06:47:49.074872+09:00"}

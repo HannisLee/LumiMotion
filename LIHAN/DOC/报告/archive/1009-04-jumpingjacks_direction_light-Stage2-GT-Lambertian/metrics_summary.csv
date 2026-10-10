@@ -1,0 +1,9 @@
+metric,mae,unit,coverage_pct,status,reason
+Albedo MAE,0.2399667469938792,linear RGB,96.15998862380906,,
+GS Render Normal MAE,21.525043464883158,degree,92.93748931837385,,
+Depth Normal MAE,27.60512757914095,degree,88.32326753050431,,
+Mesh Normal MAE,22.88577861576241,degree,93.64735107706899,,
+Expected Z Depth MAE,0.08970386075333393,m,92.93748931837385,,
+Median Z Depth MAE,0.09224996114676697,m,92.93748931837385,,
+GS Normal XYZ component MAE (supplementary),0.17537826838210147,unit normal XYZ,92.93748931837385,,
+Roughness MAE,,r,,NOT_APPLICABLE,Lambertian has no roughness output

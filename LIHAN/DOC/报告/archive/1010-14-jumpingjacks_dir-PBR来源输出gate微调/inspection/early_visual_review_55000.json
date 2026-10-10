@@ -1,0 +1,34 @@
+{
+  "status": "FAILED_SO_FAR_RGB_AND_FOUR_ONLY",
+  "iteration": 55000,
+  "actual_images_viewed": true,
+  "reviewed_at": "2026-10-10T09:47:18.265752+09:00",
+  "reviewed_test_frames": [
+    10,
+    80,
+    150
+  ],
+  "reviewed_insight_frames": [
+    1,
+    75,
+    150
+  ],
+  "images": [
+    "inspection/rgb_final_55000_comparison.png",
+    "inspection/four_categories_final_55000.png"
+  ],
+  "rgb": {
+    "psnr": 19.24938274959784,
+    "ssim": 0.9107702334721883,
+    "lpips": 0.1102573330203692,
+    "psnr_foreground": 11.887298783047992,
+    "ssim_foreground_bbox": 0.8042977293332417,
+    "lpips_foreground_bbox": 0.21988034347693125
+  },
+  "rgb_background": "黑背景正常，人物与平台存在；头手/衣服/小腿仍稀疏斑驳破碎，脚周大块灰黑污染和伪凸起明显，B08与B07近乎相同。GT0080本身背光暗，失败不是单凭暗。",
+  "alpha": "人物与平台主体大部饱和，身体/手指/平台边缘及脚周有薄雾和细碎残影；高Alpha不保证几何/颜色正确。",
+  "albedo_static_dynamic": "正背面色差和阴影继续烘入材质，平台棋盘格及脚周颜色污染、身体斑驳仍明显；没有GT材质先验。",
+  "normal_depth": "平台整体上向，0075无旧kernel整面反转，但脚周/人体混合轴和伪起伏明显；最终Depth/Mesh未实际查看，七MAE待完成。",
+  "relighting": "HDR仍运行，尚未审阅最终HDR/SUN，不替代最终验收。",
+  "final_mae": false
+}

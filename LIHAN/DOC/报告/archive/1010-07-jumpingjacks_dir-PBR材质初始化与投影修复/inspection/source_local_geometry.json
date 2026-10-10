@@ -1,0 +1,114 @@
+{
+  "status": "PASS_READ_ONLY_DIAGNOSTIC",
+  "method": "source_local_32_neighbours_PCA_by_source_soft_feature_group",
+  "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/point_cloud/iteration_35000/point_cloud.ply",
+  "source_sha256": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+  "rows": [
+    {
+      "group": "static_feature_lt_half",
+      "points": 54244,
+      "valid_local_plane_points": 1740,
+      "valid_fraction": 0.03207728043654598,
+      "source_axis_to_local_PCA_deg": {
+        "count": 1740,
+        "mean": 15.148869940943682,
+        "quantiles": {
+          "min": 0.24591211469074195,
+          "p50": 9.670167814150176,
+          "p90": 32.74959360536963,
+          "p99": 83.14291638553854,
+          "max": 89.80556107056479
+        }
+      },
+      "local_eigenvalue_ratio": {
+        "count": 1740,
+        "mean": 0.13235208716450686,
+        "quantiles": {
+          "min": 0.006529019905554494,
+          "p50": 0.14192794149730525,
+          "p90": 0.18981943790385955,
+          "p99": 0.19933804528988322,
+          "max": 0.19993932220401225
+        }
+      },
+      "radius_over_scale": {
+        "count": 1740,
+        "mean": 1.3369366250703238,
+        "quantiles": {
+          "min": 0.16101166161550998,
+          "p50": 1.2501951177188624,
+          "p90": 2.2060777564940928,
+          "p99": 2.850316238438571,
+          "max": 2.9926112829304183
+        }
+      },
+      "B02_axis_to_same_source_local_PCA_deg": {
+        "count": 1740,
+        "mean": 15.612421668491423,
+        "quantiles": {
+          "min": 0.08244153931534023,
+          "p50": 9.974838528268034,
+          "p90": 33.87070094988669,
+          "p99": 88.02113021965835,
+          "max": 89.76933806735698
+        }
+      }
+    },
+    {
+      "group": "dynamic_feature_ge_half",
+      "points": 45583,
+      "valid_local_plane_points": 3265,
+      "valid_fraction": 0.07162758045762675,
+      "source_axis_to_local_PCA_deg": {
+        "count": 3265,
+        "mean": 16.429842272077497,
+        "quantiles": {
+          "min": 0.2473968272322611,
+          "p50": 10.66032544504836,
+          "p90": 37.740299918031816,
+          "p99": 84.15422328030147,
+          "max": 89.7046473875179
+        }
+      },
+      "local_eigenvalue_ratio": {
+        "count": 3265,
+        "mean": 0.11302105563168093,
+        "quantiles": {
+          "min": 0.0014802724561851204,
+          "p50": 0.11939224727151951,
+          "p90": 0.1865448918465346,
+          "p99": 0.1988115031161024,
+          "max": 0.19999568370688223
+        }
+      },
+      "radius_over_scale": {
+        "count": 3265,
+        "mean": 1.4359721246985058,
+        "quantiles": {
+          "min": 0.1257132900517734,
+          "p50": 1.3876984426221712,
+          "p90": 2.2484408852843827,
+          "p99": 2.8430106802224646,
+          "max": 2.992354777551241
+        }
+      },
+      "B02_axis_to_same_source_local_PCA_deg": {
+        "count": 3265,
+        "mean": 20.48652402359454,
+        "quantiles": {
+          "min": 0.17884411554922372,
+          "p50": 14.171679373474989,
+          "p90": 48.04553840802926,
+          "p99": 84.12950108547288,
+          "max": 89.57931971691191
+        }
+      }
+    }
+  ],
+  "gt_inputs": false,
+  "optimizer_steps": 0,
+  "generated_training_target": false,
+  "current_training_modified": false,
+  "final_mae": false,
+  "limitations": "PCA一致性仅为来源点云局部诊断，不能当真实法线正确性或7°指标；可能受体积点/边界/混合表面影响。"
+}

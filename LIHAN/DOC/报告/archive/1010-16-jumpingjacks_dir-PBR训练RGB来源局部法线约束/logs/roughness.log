@@ -1,0 +1,26 @@
+Loading trained model at iteration 55000
+Found transforms_train.json file, assuming Blender data set!
+Reading Training Transforms
+Read Train Transforms with 135 cameras
+Loading Training Cameras
+Loading Test Cameras
+LOAD PLY
+/home/lihan/reproduce/LumiMotion-stage2-perlight/scene/__init__.py:103: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  unique_fids = [torch.tensor(val, dtype=torch.float32, device="cuda") for val in unique_values]
+################ gaussian_color params: 156934
+frame 0010 {'gt_pixels': 26313, 'valid_pixels': 26301, 'absolute_error_sum': 4441.567053054502, 'mae': 0.16887445546003962, 'coverage_pct': 99.95439516588759}
+frame 0020 {'gt_pixels': 29165, 'valid_pixels': 28830, 'absolute_error_sum': 4866.653216795781, 'mae': 0.16880517574733891, 'coverage_pct': 98.85136293502485}
+frame 0030 {'gt_pixels': 25193, 'valid_pixels': 24344, 'absolute_error_sum': 4419.983597287832, 'mae': 0.1815635720213536, 'coverage_pct': 96.63001627436192}
+frame 0040 {'gt_pixels': 14502, 'valid_pixels': 12683, 'absolute_error_sum': 2617.699464450593, 'mae': 0.20639434396046621, 'coverage_pct': 87.45690249620742}
+frame 0050 {'gt_pixels': 28524, 'valid_pixels': 28441, 'absolute_error_sum': 5606.834501895481, 'mae': 0.197139147775939, 'coverage_pct': 99.70901696816716}
+frame 0060 {'gt_pixels': 29221, 'valid_pixels': 29186, 'absolute_error_sum': 5856.617220079004, 'mae': 0.2006652922661209, 'coverage_pct': 99.88022312720304}
+frame 0070 {'gt_pixels': 19913, 'valid_pixels': 19901, 'absolute_error_sum': 3935.5503171412656, 'mae': 0.1977564100869939, 'coverage_pct': 99.93973785968964}
+frame 0080 {'gt_pixels': 17934, 'valid_pixels': 16748, 'absolute_error_sum': 3335.5068726824124, 'mae': 0.1991585187892532, 'coverage_pct': 93.38686294189807}
+frame 0090 {'gt_pixels': 29503, 'valid_pixels': 28860, 'absolute_error_sum': 5483.853815434213, 'mae': 0.1900157247205202, 'coverage_pct': 97.8205606209538}
+frame 0100 {'gt_pixels': 29123, 'valid_pixels': 28946, 'absolute_error_sum': 5175.817969438839, 'mae': 0.17880943720855522, 'coverage_pct': 99.39223294303471}
+frame 0110 {'gt_pixels': 16033, 'valid_pixels': 15708, 'absolute_error_sum': 2620.4486829093357, 'mae': 0.16682255429776774, 'coverage_pct': 97.9729308301628}
+frame 0120 {'gt_pixels': 23951, 'valid_pixels': 23136, 'absolute_error_sum': 3650.306919933691, 'mae': 0.1577760598173276, 'coverage_pct': 96.59721932278401}
+frame 0130 {'gt_pixels': 29300, 'valid_pixels': 28979, 'absolute_error_sum': 4753.399646426498, 'mae': 0.16402911233743395, 'coverage_pct': 98.90443686006826}
+frame 0140 {'gt_pixels': 27800, 'valid_pixels': 26845, 'absolute_error_sum': 4763.475135216524, 'mae': 0.1774436630738135, 'coverage_pct': 96.56474820143885}
+frame 0150 {'gt_pixels': 14784, 'valid_pixels': 14290, 'absolute_error_sum': 2344.396273652538, 'mae': 0.16405852159919793, 'coverage_pct': 96.65854978354979}
+summary {"foreground": {"gt_pixels": 361259, "valid_pixels": 353198, "absolute_error_sum": 63872.11068639851, "mae": 0.18083938948238243, "coverage_pct": 97.76863690593176}}

@@ -1,0 +1,1375 @@
+diff --git a/LIHAN/README.md b/LIHAN/README.md
+index c72244e..134743c 100644
+--- a/LIHAN/README.md
++++ b/LIHAN/README.md
+@@ -1,11 +1,53 @@
+ # LumiMotion 文档库与 Agent 工作索引
+ 
+-更新日期：2026-10-07
++更新日期：2026-10-10
+ 适用范围：本仓库中的 LumiMotion 复现实验、数据准备、Stage 1/2 训练、离线评估与后续代码维护。
+ 
+ 本文件是进入项目后的**第一阅读入口**。它不重复各实验的原始命令或指标；需要执行、判断或修改时，请沿下方链接回到对应的一手文档、脚本和实验产物。当前文档库的唯一入口目录为 `LIHAN/DOC/`。
+ 
+ 
++## 1010 Stage2 PBR方向光优化目标
++
++- [GOAL：完整训练验收、提交及法线<7°迭代记录](DOC/GOAL/1010-goal-opt-pbr-jacks.md)
++- [1010-02 原生PBR方向光完整基线训练报告](DOC/训练/1010-02-jumpingjacks_dir-PBR方向光完整基线训练报告.md)
++- [1010-02 运行验证与透明Roughness评测导出](DOC/修改/1010-02-原生PBR方向光运行验证与透明Roughness评测导出.md)
++
++B00完整20k训练与15帧七项MAE完成；GS Normal 21.2288°/覆盖93.0788%，人工图像质量FAILED。B01因旧转换albedo-alpha来源声明错误已中止；B02/B03完整20k及七项MAE完成、质量FAILED；B03 GS18.8955°，B04完整20k及七项MAE完成，GS18.9123°/质量FAILED，163项CPU与GPU来源一致性通过；目标仍进行中，未提交/push或建立优化分支。
++
++- [1010-02 全量MAE与失败结论](DOC/报告/1010-02-jumpingjacks_dir-PBR方向光各项MAE评测报告.md)
++- [1010-03 预测几何与RGB光强Preset](DOC/修改/1010-03-原生PBR预测几何微调与来源平面约束Preset.md)
++- [1010-04 修复版完整Stage2训练](DOC/训练/1010-04-jumpingjacks_dir-PBR预测几何与RGB光强训练报告.md)
++
++- [1010-04 原始RGBA来源护栏与中止审计](DOC/修改/1010-04-Stage2原始RGBA严格输入与来源护栏.md)
++- [1010-05 原始RGBA完整重训与全量MAE（质量FAILED）](DOC/训练/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入训练报告.md)
++
++- [1010-05 预测材质初始化与Refine候选Preset](DOC/修改/1010-05-原生PBR预测材质初始化与RefinePreset.md)
++
++- [1010-07 材质初始化与投影完整训练（全量MAE已完成，质量FAILED）](DOC/训练/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复训练报告.md)
++
++- [1010-06 固定来源形变Anchor Preset](DOC/修改/1010-06-原生PBR固定来源形变与AnchorPreset.md)
++- [1010-09 固定来源形变完整训练与MAE（质量FAILED）](DOC/训练/1010-09-jumpingjacks_dir-PBR固定来源形变锚定训练报告.md)
++
++## 1010 原生PBR GT方向光与preset接入
++
++[实现与使用命令](DOC/修改/1010-01-原生PBR支持GT方向光与Preset接入.md)：新增pbr_gt_directional preset，使用原生original_ir材质/roughness/GGX及BVH，直接读取新版逐帧多SUN方向、颜色、强度。已接入训练、配置快照、离线评测、转灯/HDR与Roughness MAE权重识别。方向光功能已通过实际完整训练、渲染与评测；B00图像质量未通过，B01输入来源审计中止，B02/B03完整训练质量FAILED，B04固定来源形变Anchor完整训练/评测完成，质量FAILED。当前代码位于1001-stage2-perlight工作区，未提交。
++
++## 1009 dir GT Lambertian Stage2：完成并归档
++
++[训练文档](DOC/训练/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian训练报告.md)；[全15帧MAE报告](DOC/报告/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian-各项MAE与三类Normal评测报告.md)：Stage1/35k只读来源，99,827 Gaussian，冻结几何及形变，仅材质训练至55k；真实GT SUN方向，135训练RGB标定固定光强3.09641359。Albedo 0.23996675，GS/Depth/Mesh Normal 21.5250°/27.6051°/22.8858°；覆盖率、共同像素与深度完整联报。Roughness无输出，标为不适用。训练、GT审核、MAE独立复算、六视频解码及首中尾实际目检PASS，质量限制和证据SHA256清单已归档。[多灯适配记录](DOC/修改/1009-04-dir多SUN兼容表与GT-Lambertian执行记录.md)。
++
++## 1009 env最终55k全前景MAE：完成并归档
++
++[各项MAE与三类Normal报告](DOC/报告/1009-03-jumpingjacks_environment_light-各项MAE与三类Normal评测报告.md)：完整15测试帧，Albedo 0.19101779、Roughness 0.19992533；GS/Depth/Mesh Normal 13.8899°/18.9226°/14.9573°，联报92.94%/88.37%/93.94%覆盖率；Expected/Median Z Depth 5.8996/5.9127厘米。新增15份逐时刻预测Mesh，各融合135个训练相机固定目标time，无GT几何参与重建。真值、来源、独立CPU复算及首中尾真实目检PASS；材质偏暗、人体法线斑驳与局部漏覆盖是主要限制。指标、逐帧表、命令、日志、源码快照及代表图已归档并保存SHA256清单。原训练六步流水线已结束，NVS PSNR 33.8618、SSIM 0.979730、LPIPS 0.0292933；完整视频最终目检待完成。
++
++## 1009 direction_light 原版Stage1与env阶段结果初查
++
++[方向光Stage1训练](DOC/训练/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1训练报告.md)：用户授权，仅原版SH 35k与150时刻insights，GPU0与env Stage2并行；默认10万随机方块初始化核验PASS，35k训练、7视频完整解码及首中尾目检完成，流程PASS；中间时刻有局部拖影，人体法线斑驳。env Stage1 35k完整，7视频各150帧解码通过，测试子集PSNR41.2724；同相机RGB较接近GT，人体法线斑驳、基色明暗残留、固定视角局部拖影。完整结论与代表图见1009-01训练报告，env最终55k MAE已完成并归档，见上方1009-03报告。
++
++## 1009 JumpingJacks 双光照数据转换与 env 原版训练准备
++
++[训练报告与完整命令](DOC/训练/1009-01-jumpingjacks_environment_light-原版LumiMotion两阶段训练报告.md)：environment_light、direction_light 两套150帧数据已转换，各135/15划分；全部300帧、原版reader与首中尾目检PASS。仅env准备原版SH 35k→IR累计55k，默认随机方块初始化，用户已确认报告名字并于2026-10-09 18:04启动GPU0正式后台训练，Stage1 35k、Stage2 55k及六步流水线已结束；完整视频最终目检待完成。[转换适配器说明](DOC/修改/1009-01-jumpingjacks新版多光源数据转换与原版训练准备.md)。
++
+ ## 1008 通用前景 MAE 使用指导
+ 
+ [简明指导](DOC/指导/1008-01-通用前景MAE评测使用指导.md)：Albedo、Normal、Roughness 均使用全前景，不按材质或物体类别拆分。更换数据集只需替换模型/GT路径；roughness直接读取逐帧浮点真值，不绑定场景、帧数或分辨率。[修改与核验](DOC/修改/1008-42-通用前景MAE与逐帧粗糙度真值评测.md)，33项测试、三项各15帧实际评测、通用纹理场景核验通过。
+@@ -198,3 +240,31 @@ output/ ────────────────── 训练、渲染
+ 当文档、代码和产物存在冲突时，优先级为：**当前代码与可复现实验产物 > 最新修改/训练记录 > 审计报告 > 历史归档**。发现不一致时，不要静默修正文档；先定位差异，再在相应目录新增中文记录。
+ 
+ 四组Stage1/Stage2的SSIM、albedo、depth及normal MAE评测已完成：[双阶段真值评测报告](DOC/报告/1006-01-四组Stage1与Stage2真值评测报告.md)。训练仍只有01～04，全部结果、质量限制和最终状态已回填。
++
++- B05来源平面实际几何投影：[修改与Plane Preset](DOC/修改/1010-07-原生PBR来源平面几何投影与PlanePreset.md)；[完整Stage2训练计划](DOC/训练/1010-10-jumpingjacks_dir-PBR来源平面几何投影训练报告.md)。179 CPU及真实GPU零步PASS；完整20k及全15七MAE/独立复算完成，GS17.73082°，前后景/四类/HDR实际质量FAILED、7°FAILED。
++
++- 几何评测共享入口更正：[Anchor/Plane GeometryRun修复](DOC/修改/1010-08-原生PBR几何评测共享Anchor与Plane运行时.md)。B04旧几何MAE SUPERSEDED，完整15帧重评已更正；179 CPU及真实GPU缓冲逐像素一致PASS；B05同入口全量评测已完成，未改变评分。
++
++- [B04完整七项MAE几何更正报告](DOC/报告/1010-11-jumpingjacks_dir-PBR固定来源形变锚定几何更正与七项MAE报告.md)：全15重评/独立复算PASS，真实GS18.77743°，旧GeometryRun分数SUPERSEDED；图像质量与7°FAILED。
++
++- [B05完整七项MAE与失败验收报告](DOC/报告/1010-10-jumpingjacks_dir-PBR来源平面几何投影各项MAE评测报告.md)：GS17.73082°，较B04更正18.77743°下降1.04661°；质量及7°FAILED。另发现旧installed CUDA法线Z符号缺陷，独立原生核验继续，未提交。
++
++- [仓库原生CUDA与Native Preset修复](DOC/修改/1010-09-原生PBR显式仓库CUDA光栅与NativePreset.md)：旧installed normal.Z定向与仓库ray-dot不同，真实六视角/梯度及187 CPU/20步训练/缓冲一致PASS；[B06完整Stage2训练](DOC/训练/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复训练报告.md)：完整20k/55k train和9步后处理exit0，GS17.29780°/覆盖94.10134%，RGB PSNR19.68220dB；全部15帧七MAE/独立复算完成，前后景/四类/HDR与7°FAILED，未commit/push。
++
++- [B06完整七项MAE与失败验收报告](DOC/报告/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复各项MAE评测报告.md)：仓库原生kernel真实修复、GS下降.43302°，材质MAE上升，仍需源预测/RGB范围的优化。
++
++- [Direct Native SUN预算与Preset](DOC/修改/1010-10-原生PBR直接SUN像素预算与DirectPreset.md)：194 CPU PASS，实际20步/GPU与完整B07待完成，不是质量或7°PASS。
++
++- [B07直接SUN与真实预算完整Stage2](DOC/训练/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算训练报告.md)：194 CPU及20步/真实GPU预算/共享buffer PASS，smoke图像仍FAILED；独立35k→55k全20k已真实开训，完整MAE/质量待完成。
++
++- [B07直接SUN实际预算完整七项MAE与验收](DOC/报告/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算各项MAE评测报告.md)：完整20k/全15七MAE/独立复算exit0，GS16.81871°/覆盖95.00329%，实际质量FAILED、7°FAILED；未自动提交。
++
++- [原生PBR来源输出gate与Preset](DOC/修改/1010-11-原生PBR来源输出gate微调与Preset.md)：202 CPU/真实20步/五参数梯度/共享buffer/4视频PASS，实际smoke质量FAILED，完整B08未开训。
++
++- [B08来源gate完整Stage2](DOC/训练/1010-14-jumpingjacks_dir-PBR来源输出gate微调训练报告.md)：202 CPU/20步/五参数GPU/共享buffer PASS，独立20k PREPARED，最终全15七MAE/质量待完成。
++
++- [B08来源输出gate完整七项MAE与验收](DOC/报告/1010-14-jumpingjacks_dir-PBR来源输出gate微调各项MAE评测报告.md)：完整20k/全15七MAE/独立复算exit0，GS16.84134°/覆盖95.01267%，实际质量FAILED、7°FAILED；未自动提交。
++
++- [原生PBR概率gate与Preset](DOC/修改/1010-12-原生PBR概率gate优化与Preset.md)：211 CPU/真实20步/五参数GPU/共享buffer/4视频PASS，smoke质量FAILED，完整B09尚未启动。
++
++- [B09概率gate完整Stage2](DOC/训练/1010-15-jumpingjacks_dir-PBR概率gate优化训练报告.md)：211 CPU/20步/五参数GPU/共享buffer/4视频功能PASS，独立20k PREPARED，全15七MAE/质量待完成。
+diff --git a/arguments/stage2.py b/arguments/stage2.py
+index 6e32ecd..6cad976 100644
+--- a/arguments/stage2.py
++++ b/arguments/stage2.py
+@@ -5,12 +5,47 @@ from arguments import PipelineParams, OptimizationParams
+ class Stage2PipelineParams(PipelineParams):
+     def __init__(self, parser):
+         self.render_mode = "original_ir"
++        self.pbr_light_mode = "envmap"
++        self.pbr_gt_lights_path = ""
++        self.pbr_light_intensity_scale = 1.0
++        self.pbr_learn_light_intensity = False
++        self.pbr_rasterizer_backend = "installed"
++        self.pbr_directional_actual_ray_budget = False
+         super().__init__(parser)
+ 
+ 
+ class Stage2OptimizationParams(OptimizationParams):
+     def __init__(self, parser):
+         self.loss_preset = "auto"
++        self.pbr_optimize_geometry = False
++        self.pbr_freeze_opacity = False
++        self.pbr_albedo_interior_init = False
++        self.pbr_albedo_project_after_step = False
++        self.pbr_albedo_init_margin = 0.001
++        self.pbr_deformation_anchor = False
++        self.pbr_plane_projection = False
++        self.pbr_optimize_feature_gate = False
++        self.pbr_feature_gate_parameterization = "raw_logit"
++        self.pbr_feature_gate_max_probability_delta = 1.0
++        self.pbr_feature_gate_lr = 0.001
++        self.pbr_feature_gate_max_logit_delta = 4.0
++        self.lambda_pbr_feature_gate_anchor = 0.001
++        self.pbr_plane_support_band = 0.2
++        self.pbr_plane_motion_span = 0.01
++        self.pbr_light_intensity_lr = 0.001
++        self.lambda_pbr_light_intensity_anchor = 0.001
++        self.pbr_geometry_warmup = 2000
++        self.pbr_geometry_xyz_lr = 0.00002
++        self.pbr_geometry_rotation_lr = 0.001
++        self.pbr_geometry_max_displacement = 0.08
++        self.pbr_geometry_max_angle = 60.0
++        self.pbr_plane_band = 0.08
++        self.lambda_pbr_normal_depth = 0.05
++        self.lambda_pbr_plane_normal = 0.5
++        self.lambda_pbr_plane_position = 0.1
++        self.lambda_pbr_xyz_anchor = 0.001
++        self.lambda_pbr_rotation_anchor = 0.001
++        self.lambda_pbr_silhouette = 0.1
+         self.photometric_light_mode = "learned_directional"
+         self.photometric_gt_lights_path = ""
+         self.photometric_light_intensity = -1.0
+diff --git a/gaussian_renderer/render_albedo.py b/gaussian_renderer/render_albedo.py
+index e39fecb..8c01ab5 100644
+--- a/gaussian_renderer/render_albedo.py
++++ b/gaussian_renderer/render_albedo.py
+@@ -1,14 +1,17 @@
+ """从训练材质直接光栅化线性 albedo；不执行光照或 SH 外观计算。"""
+ import math
++from types import SimpleNamespace
+ 
+ import torch
+-from diff_surfel_rasterization import GaussianRasterizationSettings, GaussianRasterizer
++from scene.pbr_rasterizer import rasterizer_classes
+ 
+ from scene.stage2_photometric import srgb_to_linear
+ 
+ 
+ @torch.no_grad()
+-def render_albedo(camera, pc, albedo_srgb, deformation, compute_cov3D_python=False):
++def render_albedo(camera, pc, albedo_srgb, deformation, compute_cov3D_python=False, rasterizer_backend='installed'):
++    GaussianRasterizationSettings,GaussianRasterizer=rasterizer_classes(SimpleNamespace(
++        pbr_rasterizer_backend=rasterizer_backend,compute_cov3D_python=compute_cov3D_python))
+     means = pc.get_xyz + deformation['d_xyz']
+     opacity = pc.get_opacity
+     if deformation['d_opacity'] is not None:
+diff --git a/gaussian_renderer/render_ir.py b/gaussian_renderer/render_ir.py
+index 7a6baec..c80a265 100755
+--- a/gaussian_renderer/render_ir.py
++++ b/gaussian_renderer/render_ir.py
+@@ -11,7 +11,7 @@
+ 
+ import torch
+ import math
+-from diff_surfel_rasterization import GaussianRasterizationSettings, GaussianRasterizer
++from scene.pbr_rasterizer import rasterizer_classes
+ from scene.gaussian_model import GaussianModel
+ from utils.sh_utils import SH2RGB, RGB2SH
+ from utils.point_utils import depth_to_normal
+@@ -29,7 +29,7 @@ def render_ir(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
+               detach_scale=False, detach_rot=False, detach_opacity=False, scale_const=None,
+               d_rotation_bias=None, depth_filtering=False, raster_settings_override=None, opt=None,
+               training=False, relight=False, env_light=None, base_color_scale=None, material_only=False, rot_env_x=None,
+-              colmap_transform=False, override_dirs=None, skip_tracer=False):
++              colmap_transform=False, override_dirs=None, skip_tracer=False, directional_lights=None):
+     """
+     Render the scene. 
+ 
+@@ -43,6 +43,8 @@ def render_ir(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
+     except:
+         pass
+ 
++    GaussianRasterizationSettings, GaussianRasterizer = rasterizer_classes(pipe)
++
+     # Set up rasterization configuration
+     tanfovx = math.tan(viewpoint_camera.FoVx * 0.5)
+     tanfovy = math.tan(viewpoint_camera.FoVy * 0.5)
+@@ -254,12 +256,26 @@ def render_ir(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
+         }
+         return results
+ 
++    # 显式HDR替换优先；无HDR时按当前相机帧读取已知SUN。
++    if directional_lights is None and env_light is None and getattr(pipe, 'pbr_light_mode', 'envmap') == 'gt_directional':
++        from scene.pbr_directional import directional_lights_for_camera
++        directional_lights = directional_lights_for_camera(pipe, viewpoint_camera)
++    if directional_lights is None and env_light is None:
++        raise ValueError('PBR着色需要环境光或显式方向光。')
++    if directional_lights is not None and scales is None:
++        # Python covariance仅供光栅化；BVH trace仍需要实际动态scale/rotation。
++        scales = pc.get_scaling + d_scaling
++        rotations = pc.get_rotation_bias(d_rotation)
++
++    photo_ray_cost = photo_pixel_cap = None
+     if training:
+         if opt.train_ray:
+             mask_alpha = render_alpha[0] > 0.9  # 0.0 originally
+             mask_sum = mask_alpha.sum()
+ 
+-            num_pixels = opt.trace_num_rays // (pipe.diffuse_sample_num + pipe.light_sample_num)
++            from scene.pbr_ray_budget import photo_pixel_budget
++            num_pixels, photo_ray_cost = photo_pixel_budget(pipe, opt, directional_lights, relight)
++            photo_pixel_cap = num_pixels
+             if num_pixels > mask_sum:
+                 ray_ids = torch.arange(mask_sum, device='cuda')
+             else:
+@@ -285,7 +301,8 @@ def render_ir(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
+                                             camera_center=viewpoint_camera.camera_center,
+                                             envlight=env_light, xyz=means3D, scales=scales, sh_features=sh_features, rotation=rotations,
+                                             opacity=opacity, colmap_transform=colmap_transform,
+-                                            override_dirs=None, rot_env_x=None, skip_tracer=False)
++                                            override_dirs=None, rot_env_x=None, skip_tracer=False,
++                                            directional_lights=directional_lights)
+     else:
+         render_results = rendering_equation_chunk(rendered_base_color.permute(1, 2, 0)[mask],
+                                                   rendered_roughness.permute(1, 2, 0)[mask],
+@@ -294,7 +311,8 @@ def render_ir(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
+                                                   camera_center=viewpoint_camera.camera_center,
+                                                   envlight=env_light, xyz=means3D, scales=scales, sh_features=sh_features, rotation=rotations,
+                                                   opacity=opacity, rot_env_x=rot_env_x, colmap_transform=colmap_transform,
+-                                                  override_dirs=override_dirs, skip_tracer=skip_tracer)
++                                                  override_dirs=override_dirs, skip_tracer=skip_tracer,
++                                                  directional_lights=directional_lights)
+ 
+     diffuse = render_results['diffuse']
+     specular = render_results['specular']
+@@ -313,7 +331,8 @@ def render_ir(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
+     final_image_sh = rendered_image_sh + bg_color[:, None, None] * (1 - render_alpha)
+ 
+     # direct_lights = rgb_to_srgb(pc.get_envmap(rays_d, mode='pure_env').permute(2,0,1))
+-    direct_lights = rgb_to_srgb(env_light(rays_d, mode='pure_env').permute(2, 0, 1))
++    direct_lights = (torch.zeros_like(rendered_image) if directional_lights is not None else
++                     rgb_to_srgb(env_light(rays_d, mode='pure_env').permute(2, 0, 1)))
+     env_only = direct_lights
+ 
+     results = {
+@@ -323,6 +342,8 @@ def render_ir(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
+         "diffuse": rgb_to_srgb(rendered_diffuse),
+         "specular": rgb_to_srgb(rendered_specular),
+         "mask": mask,
++        "photo_rays_per_pixel": photo_ray_cost,
++        "photo_pixel_budget": photo_pixel_cap,
+         "roughness": rendered_roughness * render_alpha,
+         "base_color": rgb_to_srgb(rendered_base_color) * render_alpha + bg_color[:, None, None] * (1 - render_alpha),
+         "base_color_linear": rendered_base_color * render_alpha + bg_color[:, None, None] * (1 - render_alpha),
+@@ -435,6 +456,11 @@ def rendering_equation_chunk(base_color, roughness, normal,
+ def rendering_equation(base_color, roughness, normals, position, viewdirs, pc, pipe, training=False, f0=0.04,
+                        relight=False, camera_center=None, envlight=None, xyz=None, scales=None, sh_features=None,
+                        rotation=None, opacity=None, **kwargs):
++    if kwargs.get('directional_lights') is not None:
++        return rendering_equation_directional(base_color, roughness, normals, position, viewdirs, pc, pipe,
++            kwargs['directional_lights'], training=training, relight=relight, camera_center=camera_center,
++            xyz=xyz, scales=scales, sh_features=sh_features, rotation=rotation, opacity=opacity,
++            skip_tracer=kwargs.get('skip_tracer', False))
+     # print(pipe.diffuse_sample_num)
+     B = base_color.shape[0]
+ 
+@@ -555,6 +581,61 @@ def rendering_equation(base_color, roughness, normals, position, viewdirs, pc, p
+     return results
+ 
+ 
++def rendering_equation_directional(base_color, roughness, normals, position, viewdirs, pc, pipe,
++                                  lights, training=False, relight=False, camera_center=None,
++                                  xyz=None, scales=None, sh_features=None, rotation=None, opacity=None,
++                                  skip_tracer=False):
++    """SUN是离散delta光源：直接求和BRDF×辐照度×cos×透射率，不做半球面积加权。"""
++    directions, irradiances = lights
++    directions = directions.to(device=normals.device, dtype=normals.dtype)
++    irradiances = irradiances.to(device=normals.device, dtype=normals.dtype)
++    if (directions.ndim != 2 or directions.shape[-1] != 3 or not len(directions) or
++            irradiances.shape != directions.shape or not torch.isfinite(directions).all() or
++            not torch.isfinite(irradiances).all() or (irradiances < 0).any() or
++            (directions.norm(dim=-1) < 1e-8).any()):
++        raise ValueError('PBR方向光须为非空L×3方向与非负RGB辐照度。')
++    incident = F.normalize(directions, dim=-1).unsqueeze(0).expand(len(normals), -1, -1)
++    if len(normals) == 0:
++        rgb = base_color.new_zeros((0, 3))
++        return dict(diffuse=rgb, specular=rgb, light_direct=rgb, light_indirect=rgb,
++                    visibility=base_color.new_zeros((0, 1)), light=rgb, light_blocked=rgb)
++    if skip_tracer:
++        visibility = base_color.new_ones((len(normals), len(directions), 1))
++    else:
++        traced = pc.trace(position.unsqueeze(1) + incident * pipe.light_t_min, incident,
++                          camera_center=camera_center, xyz=xyz, scales=scales, rotation=rotation,
++                          opacity=opacity, use_zeros=True)
++        visibility = (1 - traced['alpha'][..., None]).clamp(0, 1)
++        if pipe.detach_indirect:
++            visibility = visibility.detach()
++    cosine = (normals[:, None] * incident).sum(-1, keepdim=True).clamp_min(0)
++    transport = irradiances[None] * visibility * cosine
++    diffuse = (base_color[:, None] / math.pi * transport).sum(1)
++    specular = (GGX_specular(normals, viewdirs, incident, roughness, fresnel=.04) * transport).sum(1)
++    local_mean = torch.zeros_like(base_color)
++    # 保留原生Stage1 SH间接光近似；转灯时仍是来源照明的近似，可用wo_indirect_relight关闭。
++    indirect_disabled = pipe.wo_indirect or (relight and pipe.wo_indirect_relight)
++    if not indirect_disabled and not skip_tracer:
++        incoming, areas = sample_incident_rays(normals, training, pipe.diffuse_sample_num)
++        traced = pc.trace(position.unsqueeze(1) + incoming * pipe.light_t_min, incoming,
++                          camera_center=camera_center, xyz=xyz, scales=scales, rotation=rotation,
++                          opacity=opacity, shs=sh_features)
++        local = srgb_to_rgb(traced['color'])
++        if pipe.detach_indirect:
++            local = local.detach()
++        local_mean = local.mean(1)
++        indirect_transport = local * areas * (normals[:, None] * incoming).sum(-1, keepdim=True).clamp_min(0)
++        diffuse = diffuse + (base_color[:, None] / math.pi * indirect_transport).mean(1)
++        specular = specular + (GGX_specular(normals, viewdirs, incoming, roughness, fresnel=.04) *
++                               indirect_transport).mean(1)
++    if pipe.wo_specular:
++        specular = specular * 0
++    direct = irradiances.sum(0).expand_as(base_color)
++    return dict(diffuse=diffuse, specular=specular, light_direct=direct, light_indirect=local_mean,
++                visibility=visibility.mean(1), light=transport.sum(1) / math.pi,
++                light_blocked=(irradiances[None] * (1-visibility)).sum(1))
++
++
+ def GGX_specular(
+         normal,
+         pts2c,
+diff --git a/gaussian_renderer/render_roughness.py b/gaussian_renderer/render_roughness.py
+index 2f09998..82ca4d6 100644
+--- a/gaussian_renderer/render_roughness.py
++++ b/gaussian_renderer/render_roughness.py
+@@ -1,12 +1,15 @@
+ """只读光栅化原版 PBR 的 roughness 参数；零背景、单通道、无颜色变换。"""
+ import math
++from types import SimpleNamespace
+ 
+ import torch
+-from diff_surfel_rasterization import GaussianRasterizationSettings, GaussianRasterizer
++from scene.pbr_rasterizer import rasterizer_classes
+ 
+ 
+ @torch.no_grad()
+-def render_roughness(camera, pc, deformation, compute_cov3D_python=False):
++def render_roughness(camera, pc, deformation, compute_cov3D_python=False, rasterizer_backend='installed'):
++    GaussianRasterizationSettings,GaussianRasterizer=rasterizer_classes(SimpleNamespace(
++        pbr_rasterizer_backend=rasterizer_backend,compute_cov3D_python=compute_cov3D_python))
+     if hasattr(pc, 'stage2_geometry'):
+         raise ValueError('roughness 评测只支持原版 PBR 几何。')
+     means = pc.get_xyz + deformation['d_xyz']
+diff --git a/scripts/eval_albedo_gt.py b/scripts/eval_albedo_gt.py
+index 3c34bb2..b7728da 100644
+--- a/scripts/eval_albedo_gt.py
++++ b/scripts/eval_albedo_gt.py
+@@ -74,6 +74,14 @@ class AlbedoRun:
+         self.config = config
+         self.checkpoint_hashes = {str(p.resolve()): file_sha256(p) for p in self.checkpoint_files}
+         self.checkpoint_hashes.update(self.context.source_files)
++        if self.context.pbr_feature_gate_provenance is not None:
++            asset = self.context.source/'pbr_feature_gate.json'
++            self.checkpoint_hashes[str(asset)] = file_sha256(asset)
++        if self.context.pbr_rasterizer_provenance is not None:
++            from scene.pbr_rasterizer import ASSET,ROOT
++            native=self.context.pbr_rasterizer_provenance
++            self.checkpoint_hashes[str(self.context.source/ASSET)]=file_sha256(self.context.source/ASSET)
++            self.checkpoint_hashes.update({str(ROOT/relative):digest for relative,digest in native['source_files'].items()})
+ 
+     @torch.no_grad()
+     def render(self, camera):
+@@ -81,7 +89,8 @@ class AlbedoRun:
+         deformation = self.context.deformation(camera)
+         albedo = self.context.pc.get_albedo if self.material is None else self.material.albedo
+         pkg = render_albedo(camera, self.context.pc, albedo, deformation,
+-                            self.mode == 'original_ir' and self.config.compute_cov3D_python)
++                            self.mode == 'original_ir' and self.config.compute_cov3D_python,
++                            getattr(self.config,'pbr_rasterizer_backend','installed'))
+         self.context.unload_camera(camera)
+         return {key: value.cpu().numpy() for key, value in pkg.items()}
+ 
+@@ -92,7 +101,8 @@ class AlbedoRun:
+         deformation = self.context.deformation(camera)
+         albedo = self.context.pc.get_albedo if self.material is None else self.material.albedo
+         pkg = render_albedo(camera, self.context.pc, albedo, deformation,
+-                            self.mode == 'original_ir' and self.config.compute_cov3D_python)
++                            self.mode == 'original_ir' and self.config.compute_cov3D_python,
++                            getattr(self.config,'pbr_rasterizer_backend','installed'))
+         if self.mode == 'original_ir':
+             from gaussian_renderer.render_ir import render_ir
+             legacy = render_ir(camera, self.context.pc, self.config, self.context.background,
+diff --git a/scripts/eval_geometry_gt.py b/scripts/eval_geometry_gt.py
+index 93df10d..ac53d3b 100644
+--- a/scripts/eval_geometry_gt.py
++++ b/scripts/eval_geometry_gt.py
+@@ -75,6 +75,44 @@ class GeometryRun:
+         ply = geometry_model/'point_cloud'/f'iteration_{geometry_iteration}'/'point_cloud.ply'
+         pth = geometry_model/'deform'/f'iteration_{geometry_iteration}'/'deform.pth'
+         self.files.update({str(p): file_sha256(p) for p in (ply, pth)})
++        if config.get('pbr_rasterizer_backend','installed')=='lumimotion':
++            from argparse import Namespace
++            from scene.pbr_rasterizer import validate_backend_model,ASSET,ROOT
++            native=validate_backend_model(geometry_model,Namespace(**config))
++            asset=geometry_model/ASSET
++            self.files[str(asset)]=file_sha256(asset)
++            self.files.update({str(ROOT/relative):digest for relative,digest in native['source_files'].items()})
++            if config.get('pbr_light_mode')=='gt_directional' and iteration>config.get('load_iter',-1):
++                from scene.pbr_directional import validate_directional_checkpoint
++                for path in validate_directional_checkpoint(geometry_model,iteration,config):
++                    self.files[str(path)]=file_sha256(path)
++        self.context = None
++        if config.get('pbr_deformation_anchor', False) or config.get('pbr_plane_projection', False):
++            if self.mode != 'original_ir' or photo.is_file():
++                raise ValueError('PBR来源形变与平面模型只能用于原生PBR几何评测。')
++            from argparse import Namespace
++            from scripts.stage2_runtime import FrozenScene
++            runtime_config = dict(config, source_path=str(self.source))
++            self.context = FrozenScene(Namespace(**runtime_config), geometry_model, geometry_iteration)
++            self.pc, self.deform = self.context.pc, self.context.deform
++            self.files.update(self.context.source_files)
++            if self.context.pbr_feature_gate_provenance is not None:
++                metadata = geometry_model/'pbr_feature_gate.json'
++                self.files[str(metadata)] = file_sha256(metadata)
++            for enabled, prefix in [(config.get('pbr_deformation_anchor', False), 'pbr_deformation_anchor'),
++                                    (config.get('pbr_plane_projection', False), 'pbr_plane_projection')]:
++                if enabled:
++                    metadata = geometry_model/(prefix+'.json')
++                    asset = geometry_model/(prefix+'.npz')
++                    self.files.update({str(p): file_sha256(p) for p in (metadata, asset)})
++                    record = json.loads(metadata.read_text())
++                    self.files.update(record['source_files'])
++                    for relative, digest in record['source_snapshots'].items():
++                        self.files[str(geometry_model/relative)] = digest
++            marker = geometry_model/'pbr_directional'/f'iteration_{geometry_iteration}'/'lighting.json'
++            if marker.is_file():
++                self.files[str(marker)] = file_sha256(marker)
++            return
+         self.pc = GaussianModel(config.get('sh_degree', 3), config.get('no_binary_separation', False),
+                                 fea_dim=config.get('hyper_dim', 1))
+         self.pc.load_ply(str(ply))
+@@ -90,6 +128,15 @@ class GeometryRun:
+             raise FileNotFoundError(pth)
+         self.deform.deform.eval().requires_grad_(False)
+ 
++    def deformation(self, camera):
++        """几何评测/逐time Mesh与训练共享来源查询及真实几何模型。"""
++        if self.context is not None:
++            return self.context.deformation(camera)
++        count = len(self.pc.get_xyz)
++        return self.deform.step(self.pc.get_xyz.detach(), camera.fid.unsqueeze(0).expand(count, -1),
++            iteration=self.iteration, feature=self.pc.get_binary_feature(), camera_center=camera.camera_center,
++            is_training=False)
++
+     def camera(self, metadata, record, divisor):
+         import torch
+         from scene.cameras import Camera
+@@ -119,12 +166,11 @@ class GeometryRun:
+ 
+     def render(self, camera, c2w, intrinsics):
+         import torch
+-        from diff_surfel_rasterization import GaussianRasterizationSettings, GaussianRasterizer
++        from argparse import Namespace
++        from scene.pbr_rasterizer import rasterizer_classes
++        GaussianRasterizationSettings,GaussianRasterizer=rasterizer_classes(Namespace(**self.config))
+         with torch.no_grad():
+-            count = len(self.pc.get_xyz)
+-            deformation = self.deform.step(self.pc.get_xyz.detach(), camera.fid.unsqueeze(0).expand(count, -1),
+-                iteration=self.iteration, feature=self.pc.get_binary_feature(), camera_center=camera.camera_center,
+-                is_training=False)
++            deformation = self.deformation(camera)
+             means = self.pc.get_xyz + deformation['d_xyz']
+             rotations = self.pc.get_rotation_bias(deformation['d_rotation'])
+             scales = self.pc.get_scaling+deformation['d_scaling']
+diff --git a/scripts/eval_nvs_dynamic.py b/scripts/eval_nvs_dynamic.py
+index 7f28dc3..04267bc 100644
+--- a/scripts/eval_nvs_dynamic.py
++++ b/scripts/eval_nvs_dynamic.py
+@@ -148,6 +148,9 @@ def render_set(dataset: ModelParams, pipeline: PipelineParams, opt: Optimization
+ 
+             
+ if __name__ == "__main__":
++    from scripts.stage2_compat import dispatch
++    if dispatch('eval'):
++        raise SystemExit(0)
+     # Set up command line argument parser
+     parser = ArgumentParser(description="Testing script parameters")
+     model = ModelParams(parser)
+@@ -165,4 +168,4 @@ if __name__ == "__main__":
+ 
+     # Initialize system state (RNG)
+     safe_state(args.quiet)
+-    render_set(model.extract(args), pipeline.extract(args), opt.extract(args), args.load_iter)
+\ No newline at end of file
++    render_set(model.extract(args), pipeline.extract(args), opt.extract(args), args.load_iter)
+diff --git a/scripts/eval_roughness_gt.py b/scripts/eval_roughness_gt.py
+index 907e7c7..d16fd04 100644
+--- a/scripts/eval_roughness_gt.py
++++ b/scripts/eval_roughness_gt.py
+@@ -30,15 +30,20 @@ def validate_model(model, iteration):
+     if config.get('geometry_source_deformation_mode', 'dynamic') != 'dynamic':
+         raise ValueError('评测必须使用每帧真实 time 的原版形变。')
+     ply = model / 'point_cloud' / f'iteration_{iteration}' / 'point_cloud.ply'
+-    env = model / 'envmap' / f'iteration_{iteration}'
+-    if not env.is_dir() or not any(env.iterdir()):
+-        raise ValueError('缺少同 iteration 的 PBR envmap，不能将 Stage1 当作已训练材质。')
++    if config.get('pbr_light_mode', 'envmap') == 'gt_directional':
++        from scene.pbr_directional import validate_directional_checkpoint
++        light_files = validate_directional_checkpoint(model, iteration, config)
++    else:
++        env = model / 'envmap' / f'iteration_{iteration}'
++        if not env.is_dir() or not any(env.iterdir()):
++            raise ValueError('缺少同 iteration 的 PBR envmap，不能将 Stage1 当作已训练材质。')
++        light_files = list(env.rglob('*'))
+     data = PlyData.read(ply)
+     if 'roughness' not in data['vertex'].data.dtype.names:
+         raise ValueError('checkpoint 没有 roughness，禁止使用加载器的初始化默认值。')
+     if not np.isfinite(data['vertex']['roughness']).all():
+         raise ValueError('checkpoint roughness 包含 NaN/Inf。')
+-    return config, config_path, list(env.rglob('*'))
++    return config, config_path, light_files
+ 
+ 
+ class RoughnessRun:
+@@ -57,6 +62,13 @@ class RoughnessRun:
+         self.files = {str(config_path.resolve()): file_sha256(config_path)}
+         self.files.update(self.context.source_files)
+         self.files.update({str(p.resolve()): file_sha256(p) for p in env_files if p.is_file()})
++        if self.context.pbr_feature_gate_provenance is not None:
++            asset = self.context.source/'pbr_feature_gate.json'
++            self.files[str(asset)] = file_sha256(asset)
++        if self.context.pbr_rasterizer_provenance is not None:
++            from scene.pbr_rasterizer import ROOT
++            self.files.update({str(ROOT/relative):digest for relative,digest in
++                               self.context.pbr_rasterizer_provenance['source_files'].items()})
+         self.torch = torch
+ 
+     def render(self, camera, verify=False):
+@@ -67,7 +79,8 @@ class RoughnessRun:
+         try:
+             with torch.no_grad():
+                 deformation = ctx.deformation(camera)
+-                pkg = render_roughness(camera, ctx.pc, deformation, self.config.compute_cov3D_python)
++                pkg = render_roughness(camera, ctx.pc, deformation, self.config.compute_cov3D_python,
++                                       getattr(self.config,'pbr_rasterizer_backend','installed'))
+                 if verify:
+                     from gaussian_renderer.render_ir import render_ir
+                     # 同时核验黑、白背景；原版输出=(S+bg*(1-A))*A。
+@@ -230,7 +243,9 @@ def evaluate(args, destination):
+     for path, digest in provenance['source_hashes'].items():
+         if file_sha256(ROOT / path) != digest:
+             raise AssertionError('评测期间依赖代码变化：' + path)
+-    report = {'schema_version': 2, 'mode': 'original_ir', 'source_path': str(source),
++    report = {'schema_version': 2, 'mode': 'original_ir',
++              'pbr_light_mode': run.config.pbr_light_mode if hasattr(run.config, 'pbr_light_mode') else 'envmap',
++              'source_path': str(source),
+               'model_path': str(args.model_path), 'iteration': args.iteration,
+               'protocol': {'split': args.split, 'frames': keys, 'region': 'GT foreground interior; no material/object subsets',
+                   'parameter': 'r (not r_squared)', 'gt_alpha_threshold': args.gt_alpha_threshold,
+diff --git a/scripts/export_roughness_gt.py b/scripts/export_roughness_gt.py
+index 0b62f1d..5b88a45 100644
+--- a/scripts/export_roughness_gt.py
++++ b/scripts/export_roughness_gt.py
+@@ -21,6 +21,10 @@ def main():
+     parser.add_argument('--transforms', type=Path, required=True,
+                         help='对应 split 的 transforms JSON，提供 source_frame、time 和相机。')
+     parser.add_argument('--resolution', type=int, default=2, help='原始分辨率除数。')
++    parser.add_argument('--alpha_composite', action='store_true',
++                        help='允许单一Principled透明度；保持原Alpha，导出透射层alpha加权的有效roughness。')
++    parser.add_argument('--engine', choices=['cycles', 'eevee', 'source'], default='cycles',
++                        help='默认原有Cycles；透明数据推荐source以保留源引擎Alpha语义。')
+     args = parser.parse_args(sys.argv[sys.argv.index('--') + 1:])
+     if args.resolution < 1:
+         parser.error('resolution 必须为正整数。')
+@@ -35,7 +39,8 @@ def main():
+     if len({f['source_frame'] for f in frames}) != len(frames):
+         raise ValueError('source_frame 重复。')
+     scene = bpy.context.scene
+-    scene.render.engine = 'CYCLES'
++    if args.engine != 'source':
++        scene.render.engine = 'CYCLES' if args.engine == 'cycles' else 'BLENDER_EEVEE'
+     scene.cycles.device = 'CPU'
+     scene.cycles.samples = 16
+     scene.cycles.use_denoising = False
+@@ -67,7 +72,9 @@ def main():
+         node = link.from_node
+         if node.type != 'BSDF_PRINCIPLED' or node.mute:
+             raise ValueError('首版仅支持直接连接的 Principled BSDF：' + material.name)
+-        if node.inputs['Alpha'].is_linked or node.inputs['Alpha'].default_value != 1:
++        alpha = node.inputs['Alpha']
++        transparent = alpha.is_linked or alpha.default_value != 1
++        if transparent and not args.alpha_composite:
+             raise ValueError('首版不支持透明材质：' + material.name)
+         emission = tree.nodes.new('ShaderNodeEmission')
+         emission.inputs['Strength'].default_value = 1
+@@ -82,21 +89,43 @@ def main():
+             tree.links.new(scalar.outputs[0], emission.inputs['Color'])
+         else:
+             emission.inputs['Color'].default_value = [roughness.default_value] * 3 + [1]
+-            replacements.append((roughness, emission))
++            replacements.append((roughness, emission.inputs['Color'], True))
++        shader = emission.outputs[0]
++        if transparent:
++            # 透明层的材质参数没有唯一第一命中值；保留原alpha，定义为
++            # 各可见层按透射率×alpha加权的r，不将半透明头发强制变为不透明。
++            mix = tree.nodes.new('ShaderNodeMixShader')
++            clear = tree.nodes.new('ShaderNodeBsdfTransparent')
++            tree.links.new(clear.outputs[0], mix.inputs[1])
++            tree.links.new(shader, mix.inputs[2])
++            if alpha.is_linked:
++                scalar = tree.nodes.new('ShaderNodeMath')
++                scalar.operation = 'MULTIPLY'
++                scalar.inputs[1].default_value = 1
++                scalar.use_clamp = True
++                tree.links.new(alpha.links[0].from_socket, scalar.inputs[0])
++                tree.links.new(scalar.outputs[0], mix.inputs[0])
++            else:
++                mix.inputs[0].default_value = alpha.default_value
++                replacements.append((alpha, mix.inputs[0], False))
++            shader = mix.outputs[0]
+         tree.links.remove(link)
+-        tree.links.new(emission.outputs[0], output.inputs['Surface'])
++        tree.links.new(shader, output.inputs['Surface'])
+     report = {'schema_version': 1, 'parameter': 'roughness_r', 'source_blend': str(blend),
+               'source_blend_sha256': source_hash, 'transforms': str(args.transforms.resolve()),
+               'transforms_sha256': digest(args.transforms), 'frames': {},
+               'width': scene.render.resolution_x, 'height': scene.render.resolution_y,
+               'method': 'Principled Roughness input -> emission -> raw float RGBA EXR',
+               'alpha_association': 'premultiplied_RGB',
++              'render_engine': scene.render.engine,
++              'transparent_parameter_definition': ('transmittance-alpha weighted effective r'
++                                                    if args.alpha_composite else 'opaque only'),
+               'blender_version': bpy.app.version_string}
+     for record in frames:
+         frame = int(record['source_frame'])
+         scene.frame_set(frame)
+-        for roughness, emission in replacements:
+-            emission.inputs['Color'].default_value = [roughness.default_value] * 3 + [1]
++        for source, target, color in replacements:
++            target.default_value = [source.default_value] * 3 + [1] if color else source.default_value
+         matrix = scene.camera.matrix_world
+         if max(abs(matrix[y][x] - record['transform_matrix'][y][x]) for y in range(4) for x in range(4)) > 1e-5:
+             raise ValueError('Blender 相机与评测 transforms 不匹配：' + str(frame))
+diff --git a/scripts/loss_stage2.py b/scripts/loss_stage2.py
+index cb9e0c3..460c254 100644
+--- a/scripts/loss_stage2.py
++++ b/scripts/loss_stage2.py
+@@ -235,7 +235,80 @@ class IRGSBaselineLossPreset:
+         return Stage2LossResult(total, terms, rgb_l1)
+ 
+ 
++class PBRGTDirectionalLossPreset(IRGSBaselineLossPreset):
++    """原生PBR材质/SH损失；已知SUN不优化环境光或加入环境光正则。"""
++    overrides = {"pbr_light_mode": "gt_directional", "d_lower_hemisphere_weight": 0.,
++                 "lambda_light": 0., "lambda_light_smooth": 0.}
++
++
++class PBRGTDirectionalGeometryLossPreset(PBRGTDirectionalLossPreset):
++    """真实原生PLY几何微调；附加项由Trainer从来源预测和当前训练图像计算。"""
++    overrides = dict(PBRGTDirectionalLossPreset.overrides, pbr_optimize_geometry=True,
++                     pbr_freeze_opacity=True, pbr_learn_light_intensity=True)
++
++
++class PBRGTDirectionalRefineLossPreset(PBRGTDirectionalGeometryLossPreset):
++    """预测DC初始化解除硬clamp梯度死区；保留原生材质公式和预测几何约束。"""
++    overrides = dict(PBRGTDirectionalGeometryLossPreset.overrides,
++                     pbr_albedo_interior_init=True, pbr_albedo_project_after_step=True)
++
++
++class PBRGTDirectionalAnchorLossPreset(PBRGTDirectionalRefineLossPreset):
++    """固定来源XYZ作为MLP输入；真实PBR渲染几何仍参与优化。"""
++    overrides = dict(PBRGTDirectionalRefineLossPreset.overrides, pbr_deformation_anchor=True)
++
++
++class PBRGTDirectionalPlaneLossPreset(PBRGTDirectionalAnchorLossPreset):
++    """来源时间稳定平面几何投影，保持原生PBR/GGX与全部评测口径。"""
++    overrides = dict(PBRGTDirectionalAnchorLossPreset.overrides, pbr_plane_projection=True)
++
++
++class PBRGTDirectionalNativeLossPreset(PBRGTDirectionalLossPreset):
++    """方向光原生PBR显式构建仓库CUDA，实现逐Gaussian观察射线法线定向。"""
++    overrides = dict(PBRGTDirectionalLossPreset.overrides, pbr_rasterizer_backend='lumimotion')
++
++
++class PBRGTDirectionalPlaneNativeLossPreset(PBRGTDirectionalPlaneLossPreset):
++    """来源plane实际几何与仓库原生CUDA；训练/评测共享，损失参数不改。"""
++    overrides = dict(PBRGTDirectionalPlaneLossPreset.overrides, pbr_rasterizer_backend='lumimotion')
++
++
++class PBRGTDirectionalNativeDirectLossPreset(PBRGTDirectionalNativeLossPreset):
++    """原生SUN直接光，关闭来源SH间接近似并按实际光线预算训练。"""
++    overrides = dict(PBRGTDirectionalNativeLossPreset.overrides, wo_indirect=True,
++                     wo_indirect_relight=True, pbr_directional_actual_ray_budget=True)
++
++
++class PBRGTDirectionalPlaneNativeDirectLossPreset(PBRGTDirectionalPlaneNativeLossPreset):
++    """保留来源plane几何与原生CUDA的直接SUN训练。"""
++    overrides = dict(PBRGTDirectionalPlaneNativeLossPreset.overrides, wo_indirect=True,
++                     wo_indirect_relight=True, pbr_directional_actual_ray_budget=True)
++
++
++class PBRGTDirectionalPlaneNativeDirectGateLossPreset(PBRGTDirectionalPlaneNativeDirectLossPreset):
++    """仅新增原生feature输出gate优化，来源MLP全部冻结。"""
++    overrides = dict(PBRGTDirectionalPlaneNativeDirectLossPreset.overrides,
++                     pbr_optimize_feature_gate=True)
++
++
++class PBRGTDirectionalPlaneNativeDirectProbabilityGateLossPreset(PBRGTDirectionalPlaneNativeDirectGateLossPreset):
++    """优化原生输出gate的概率坐标，保存仍用PLY feature。"""
++    overrides = dict(PBRGTDirectionalPlaneNativeDirectGateLossPreset.overrides,
++                     pbr_feature_gate_parameterization='probability')
++
++
+ LOSS_PRESETS = {"irgs_baseline": IRGSBaselineLossPreset,
++                "pbr_gt_directional": PBRGTDirectionalLossPreset,
++                "pbr_gt_directional_geometry": PBRGTDirectionalGeometryLossPreset,
++                "pbr_gt_directional_refine": PBRGTDirectionalRefineLossPreset,
++                "pbr_gt_directional_anchor": PBRGTDirectionalAnchorLossPreset,
++                "pbr_gt_directional_plane": PBRGTDirectionalPlaneLossPreset,
++                "pbr_gt_directional_native": PBRGTDirectionalNativeLossPreset,
++                "pbr_gt_directional_plane_native": PBRGTDirectionalPlaneNativeLossPreset,
++                "pbr_gt_directional_native_direct": PBRGTDirectionalNativeDirectLossPreset,
++                "pbr_gt_directional_plane_native_direct": PBRGTDirectionalPlaneNativeDirectLossPreset,
++                "pbr_gt_directional_plane_native_direct_gate": PBRGTDirectionalPlaneNativeDirectGateLossPreset,
++                "pbr_gt_directional_plane_native_direct_probability_gate": PBRGTDirectionalPlaneNativeDirectProbabilityGateLossPreset,
+                 "lambertian_default": LambertianLossPreset,
+                 "lambertian_gt": LambertianGTLossPreset,
+                 "lambertian_geometry": LambertianGeometryLossPreset,
+@@ -273,15 +346,54 @@ def resolve_preset(opt, mode):
+     mode = normalize_render_mode(mode)
+     name = opt.loss_preset
+     if name == "auto":
+-        name = "irgs_baseline" if mode == "original_ir" else (
++        native = getattr(opt, 'pbr_rasterizer_backend', 'installed') == 'lumimotion'
++        direct = (native and getattr(opt, 'pbr_directional_actual_ray_budget', False) and
++                  getattr(opt, 'wo_indirect', False))
++        name = (("pbr_gt_directional_plane_native_direct_probability_gate" if direct and getattr(opt, 'pbr_plane_projection', False) and
++                 getattr(opt, 'pbr_optimize_feature_gate', False) and
++                 getattr(opt, 'pbr_feature_gate_parameterization', 'raw_logit') == 'probability' else
++                 "pbr_gt_directional_plane_native_direct_gate" if direct and getattr(opt, 'pbr_plane_projection', False) and
++                 getattr(opt, 'pbr_optimize_feature_gate', False) else
++                 "pbr_gt_directional_plane_native_direct" if direct and getattr(opt, 'pbr_plane_projection', False) else
++                 "pbr_gt_directional_native_direct" if direct else
++                 "pbr_gt_directional_plane_native" if native and getattr(opt, 'pbr_plane_projection', False) else
++                 "pbr_gt_directional_native" if native and not (getattr(opt, 'pbr_optimize_geometry', False) or
++                  getattr(opt, 'pbr_deformation_anchor', False) or getattr(opt, 'pbr_albedo_interior_init', False) or
++                  getattr(opt, 'pbr_albedo_project_after_step', False)) else
++                 "pbr_gt_directional_plane" if getattr(opt, 'pbr_plane_projection', False) else
++                 "pbr_gt_directional_anchor" if getattr(opt, 'pbr_deformation_anchor', False) else
++                 "pbr_gt_directional_refine" if (getattr(opt, 'pbr_albedo_interior_init', False) or
++                 getattr(opt, 'pbr_albedo_project_after_step', False)) else
++                 "pbr_gt_directional_geometry" if getattr(opt, 'pbr_optimize_geometry', False) else
++                 "pbr_gt_directional") if getattr(opt, 'pbr_light_mode', 'envmap') == 'gt_directional'
++                else "irgs_baseline") if mode == "original_ir" else (
+             "lambertian_gt" if opt.photometric_light_mode == "gt_directional" else "lambertian_default")
+     if name not in LOSS_PRESETS:
+         raise ValueError("未知 Stage2 loss preset：" + name)
+     if mode not in {"original_ir", "photometric_lambertian"}:
+         raise ValueError("未知 Stage2 render mode：" + mode)
+-    if (name == "irgs_baseline") != (mode == "original_ir"):
++    if getattr(opt, 'pbr_optimize_geometry', False) and mode != 'original_ir':
++        raise ValueError('PBR几何参数仅适用于original_ir。')
++    if getattr(opt, 'pbr_learn_light_intensity', False) and mode != 'original_ir':
++        raise ValueError('PBR光强拟合仅适用于original_ir。')
++    if getattr(opt, 'pbr_deformation_anchor', False) and mode != 'original_ir':
++        raise ValueError('PBR形变输入锚定仅适用于original_ir。')
++    if getattr(opt, 'pbr_plane_projection', False) and mode != 'original_ir':
++        raise ValueError('PBR平面几何投影仅适用于original_ir。')
++    if getattr(opt, 'pbr_optimize_feature_gate', False) and mode != 'original_ir':
++        raise ValueError('PBR输出gate仅适用于original_ir。')
++    if getattr(opt, 'pbr_rasterizer_backend', 'installed') == 'lumimotion' and mode != 'original_ir':
++        raise ValueError('仓库原生PBR光栅仅适用于original_ir。')
++    if getattr(opt, 'pbr_directional_actual_ray_budget', False) and mode != 'original_ir':
++        raise ValueError('实际SUN光线预算仅适用于original_ir。')
++    if (getattr(opt, 'pbr_albedo_interior_init', False) or
++            getattr(opt, 'pbr_albedo_project_after_step', False)) and mode != 'original_ir':
++        raise ValueError('PBR材质初始化仅适用于original_ir。')
++    if issubclass(LOSS_PRESETS[name], IRGSBaselineLossPreset) != (mode == "original_ir"):
+         raise ValueError("loss preset 与 render mode 不匹配。")
+     if mode == "photometric_lambertian":
++        if getattr(opt, 'pbr_light_mode', 'envmap') != 'envmap':
++            raise ValueError('PBR光照参数仅适用于original_ir。')
+         if opt.photometric_light_mode not in {"learned_directional", "gt_directional"}:
+             raise ValueError("未知光照模式。")
+         if issubclass(LOSS_PRESETS[name],LambertianGTLossPreset) != (opt.photometric_light_mode == "gt_directional"):
+@@ -291,12 +403,18 @@ def resolve_preset(opt, mode):
+ 
+ def apply_loss_preset(args, argv=None):
+     name = resolve_preset(args, args.render_mode)
+-    if args.loss_preset == "auto":
++    if args.loss_preset == "auto" and not name.startswith('pbr_gt_directional'):
+         return
+     explicit = {t[2:].split('=')[0].replace('-','_') for t in (sys.argv[1:] if argv is None else argv) if t.startswith('--')}
+     for key, value in LOSS_PRESETS[name].overrides.items():
+         if key not in explicit:
+             setattr(args, key, value)
++    if name.startswith('pbr_gt_directional'):
++        args.loss_preset = name
++        if args.pbr_light_mode != 'gt_directional':
++            raise ValueError('pbr_gt_directional preset要求pbr_light_mode=gt_directional。')
++    elif getattr(args, 'pbr_light_mode', 'envmap') != 'envmap':
++        raise ValueError('GT方向光PBR请使用pbr_gt_directional或auto preset。')
+ 
+ 
+ def build_loss_preset(opt, mode):
+diff --git a/scripts/render_stage2.py b/scripts/render_stage2.py
+index e3c8d22..e254d68 100644
+--- a/scripts/render_stage2.py
++++ b/scripts/render_stage2.py
+@@ -39,12 +39,25 @@ class Stage2RenderRun:
+             if not config.exists():raise ValueError('缺少 Stage2 配置：'+str(config))
+             self.args=Namespace(**json.loads(config.read_text()))
+             self.context=FrozenScene(self.args,output,iteration)
+-            from scene.light import EnvLight
+-            self.env=EnvLight(path=None,device='cuda',resolution=[self.args.envmap_resolution//2,self.args.envmap_resolution],
+-                              max_res=self.args.envmap_resolution,activation=self.args.envmap_activation)
+-            self.env.load_weights(str(output),iteration)
++            self.env=None
++            if getattr(self.args, 'pbr_light_mode', 'envmap') == 'gt_directional':
++                from scene.pbr_directional import load_gt_directional_lights, validate_directional_checkpoint
++                validate_directional_checkpoint(output, iteration, vars(self.args))
++                if getattr(self.args, 'pbr_learn_light_intensity', False):
++                    lighting=json.loads((output/'pbr_directional'/f'iteration_{iteration}'/'lighting.json').read_text())
++                    self.args.pbr_light_intensity_scale=lighting['effective_intensity_scale']
++                self.pbr_lights=load_gt_directional_lights(self.args.pbr_gt_lights_path)
++            else:
++                from scene.light import EnvLight
++                self.env=EnvLight(path=None,device='cuda',resolution=[self.args.envmap_resolution//2,self.args.envmap_resolution],
++                                  max_res=self.args.envmap_resolution,activation=self.args.envmap_activation)
++                self.env.load_weights(str(output),iteration)
+             self.mode='original_ir';self.bvh=False
+ 
++    @property
++    def is_pbr_directional(self):
++        return self.mode=='original_ir' and getattr(self.args,'pbr_light_mode','envmap')=='gt_directional'
++
+     @torch.no_grad()
+     def render(self,camera,direction=None,intensity=None,hdr=None,time_override=None):
+         ctx=self.context;ctx.load_camera(camera)
+@@ -62,15 +75,32 @@ class Stage2RenderRun:
+             return render_stage2_lambertian(camera,ctx.pc,self.material,deformation,ctx.background,
+                 direction=direction,intensity=self.args.photometric_light_intensity if intensity is None else intensity,
+                 hdr=hdr,depth_ratio=self.args.depth_ratio,**kwargs)
+-        if direction is not None or hdr is not None:
++        if (direction is not None or hdr is not None) and not self.is_pbr_directional:
+             raise ValueError('原始 IR 对照使用原始 HDR 工具；此重光照入口针对 Lambertian。')
++        if self.is_pbr_directional and time_override is not None and direction is None and hdr is None:
++            raise ValueError('替换time时请同时显式指定方向光或HDR，避免使用另一帧的GT光照。')
+         from gaussian_renderer.render_ir import render_ir
+         if not self.bvh:
+             ctx.pc.build_bvh(d_rotation=deformation['d_rotation'],d_xyz=deformation['d_xyz'],d_scaling=deformation['d_scaling'])
+             self.bvh=True
+         else:ctx.pc.update_bvh(d_rotation=deformation['d_rotation'],d_xyz=deformation['d_xyz'],d_scaling=deformation['d_scaling'])
+-        return render_ir(camera,ctx.pc,self.args,ctx.background,**{k:deformation[k] for k in ['d_xyz','d_rotation','d_scaling','d_opacity','d_color']},
+-                         relight=False,training=False,env_light=self.env,opt=self.args)
++        lights=None;pipe=self.args
++        if direction is not None:
++            value=(self.pbr_lights.for_camera(camera,self.args.pbr_light_intensity_scale)[1].sum(0)
++                   if intensity is None else torch.full((3,),float(intensity),device='cuda'))
++            if not torch.isfinite(value).all() or (value<0).any():
++                raise ValueError('替换PBR方向光强度必须有限且非负。')
++            lights=(unit_vector(direction).reshape(1,3),value.reshape(1,3))
++        if hdr is not None:
++            import copy
++            pipe=copy.copy(self.args);pipe.diffuse_sample_num=hdr.pbr_samples
++        package=render_ir(camera,ctx.pc,pipe,ctx.background,**{k:deformation[k] for k in ['d_xyz','d_rotation','d_scaling','d_opacity','d_color']},
++                         relight=direction is not None or hdr is not None,training=False,
++                         env_light=hdr if hdr is not None else self.env,opt=self.args,directional_lights=lights)
++        if self.is_pbr_directional:
++            from scene.stage2_photometric import srgb_to_linear
++            package['render_linear']=srgb_to_linear(package['render'])
++        return package
+ 
+ 
+ def ensure_directory(path):
+@@ -144,7 +174,8 @@ def insights(run,output):
+ 
+ @torch.no_grad()
+ def directional_relight(run,output,key='0001',frames=72,intensity=None):
+-    if run.mode!='photometric_lambertian':raise ValueError('方向光替换仅适用于 Lambertian。')
++    if run.mode!='photometric_lambertian' and not run.is_pbr_directional:
++        raise ValueError('方向光替换适用于Lambertian或GT方向光PBR。')
+     if frames<4:raise ValueError('转灯视频至少4帧。')
+     output=ensure_directory(output);camera=run.context.camera_by_key[key]
+     # 在固定相机右/前方向形成闭合转灯轨迹，位置、时间和材质均保持不变。
+@@ -164,16 +195,30 @@ def directional_relight(run,output,key='0001',frames=72,intensity=None):
+             writer.append_data(to_image(pkg['render']));means.append(float(pkg['render'].mean()))
+     finally:writer.close();run.context.unload_camera(camera)
+     record={'frame_key':key,'frames':frames,'mean_brightness':means,'alpha_unchanged':True,
+-            'intensity':run.args.photometric_light_intensity if intensity is None else intensity}
++            'intensity':(run.args.photometric_light_intensity if run.mode=='photometric_lambertian' else
++                         'frame light-table irradiance sum × saved scale') if intensity is None else intensity}
+     if max(means)-min(means)<1e-5:raise AssertionError('转灯没有产生光照响应。')
+     (output/'relight.json').write_text(json.dumps(record,indent=2)+'\n')
+ 
+ 
+ @torch.no_grad()
+ def hdr_relight(run,output,path,samples=2048,yaw=0.0,exposure=1.0):
+-    if run.mode!='photometric_lambertian':raise ValueError('此 HDR 入口针对 Lambertian。')
++    if run.mode!='photometric_lambertian' and not run.is_pbr_directional:
++        raise ValueError('此HDR入口支持Lambertian或GT方向光PBR。')
+     output=ensure_directory(output)
+-    hdr=HDRIrradiance.from_file(path,samples=samples,yaw_degrees=yaw,exposure=exposure)
++    if run.is_pbr_directional:
++        from scene.light import EnvLight
++        if samples<=0 or not math.isfinite(exposure) or exposure<=0 or not math.isfinite(yaw):
++            raise ValueError('PBR HDR采样数、曝光须正，参数须有限。')
++        hdr=EnvLight(path=path,device='cuda',activation='none')
++        hdr.base.mul_(exposure);hdr.requires_grad_(False)
++        transform=torch.tensor([[0.,-1.,0.],[0.,0.,1.],[-1.,0.,0.]],device='cuda')
++        angle=math.radians(yaw)
++        rotation=torch.tensor([[math.cos(angle),-math.sin(angle),0.],
++                               [math.sin(angle),math.cos(angle),0.],[0.,0.,1.]],device='cuda')
++        hdr.set_transform(transform@rotation);hdr.build_mips();hdr.update_pdf();hdr.pbr_samples=samples
++    else:
++        hdr=HDRIrradiance.from_file(path,samples=samples,yaw_degrees=yaw,exposure=exposure)
+     writer=video_writer(output/'hdr.mp4')
+     cameras=sorted(run.context.train_cameras+run.context.test_cameras,key=lambda c:float(c.fid.item()))
+     try:
+@@ -187,7 +232,8 @@ def hdr_relight(run,output,path,samples=2048,yaw=0.0,exposure=1.0):
+     (output/'hdr.json').write_text(json.dumps({'path':str(Path(path).resolve()),'sha256':file_sha256(path),
+         'samples':samples,'yaw_degrees':yaw,'exposure':exposure,'world_up':'Z',
+         'longitude':'atan2(-y,x)','axis_reference':'原始HDR脚本轴变换 [[0,-1,0],[0,0,1],[-1,0,0]]',
+-        'integrator':'确定性均匀球面积分；直接漫反射，无遮挡/镜面/间接光'},ensure_ascii=False,indent=2)+'\n')
++        'integrator':('native PBR GGX + BVH visibility + native relight indirect' if run.is_pbr_directional else
++                      '确定性均匀球面积分；直接漫反射，无遮挡/镜面/间接光')},ensure_ascii=False,indent=2)+'\n')
+ 
+ 
+ def run_cli(argv=None):
+@@ -209,6 +255,10 @@ def run_cli(argv=None):
+     (output/'code_diff.patch').write_bytes(subprocess.check_output(['git','diff'],cwd=repository))
+     (output/'provenance.json').write_text(json.dumps(provenance,ensure_ascii=False,indent=2)+'\n')
+     run=Stage2RenderRun(model,args.load_iter)
++    if getattr(run.args,'pbr_rasterizer_backend','installed')=='lumimotion':
++        from scene.pbr_rasterizer import native_module
++        provenance['pbr_rasterizer']=native_module().provenance
++        (output/'provenance.json').write_text(json.dumps(provenance,ensure_ascii=False,indent=2)+'\n')
+     if args.task in {'eval','all'}:evaluate(run,output/'eval')
+     if args.task in {'insights','materials','all'}:insights(run,output/'insights')
+     if args.task in {'directional','all'}:directional_relight(run,output/'directional',args.frame_key,args.relight_frames,args.light_intensity)
+diff --git a/scripts/stage2_compat.py b/scripts/stage2_compat.py
+index f8e4724..4ede1c4 100644
+--- a/scripts/stage2_compat.py
++++ b/scripts/stage2_compat.py
+@@ -35,8 +35,12 @@ def dispatch(task):
+     config=find_stage2_config(model)
+     if config is None:
+         model=Path(str(model)+'_'+known.deform_type);config=find_stage2_config(model)
+-    if config is None or json.loads(config.read_text()).get('render_mode')!='photometric_lambertian':return False
+-    parser=argparse.ArgumentParser(description='Stage2 Lambertian '+task)
++    if config is None:return False
++    saved=json.loads(config.read_text())
++    if (saved.get('render_mode')!='photometric_lambertian' and not
++            (saved.get('render_mode','original_ir')=='original_ir' and saved.get('pbr_light_mode')=='gt_directional')):
++        return False
++    parser=argparse.ArgumentParser(description='Stage2 '+task)
+     parser.add_argument('--model_path',required=True);parser.add_argument('--load_iter',type=int,required=True)
+     parser.add_argument('--deform-type',dest='deform_type',default='mlp')
+     parser.add_argument('--hdr_filepath','--hdr',default='example_envmaps/golden_bay_4k_32x16_rot330.hdr')
+diff --git a/scripts/stage2_runtime.py b/scripts/stage2_runtime.py
+index 7949ca3..b8d2635 100644
+--- a/scripts/stage2_runtime.py
++++ b/scripts/stage2_runtime.py
+@@ -110,6 +110,8 @@ class FrozenScene:
+             if isinstance(value,torch.nn.Parameter):value.requires_grad_(False)
+         self.deform.deform.requires_grad_(False);self.deform.deform.eval()
+         self.iteration=source_iteration
++        from scene.pbr_rasterizer import validate_backend_model
++        self.pbr_rasterizer_provenance=validate_backend_model(self.source,args)
+         self.background=torch.tensor([1.,1.,1.] if args.white_background else [0.,0.,0.],device='cuda')
+         self.center=self.pc.get_xyz.detach().mean(0)
+         self.fingerprint=tensor_fingerprint(self.pc,self.deform)
+@@ -123,6 +125,19 @@ class FrozenScene:
+         from scene.stage2_source_deformation import find_static_anchor_camera
+         self.static_anchor_camera = find_static_anchor_camera(args, self.train_cameras, frame_key)
+         self.static_deformation_cache = None
++        self.pbr_deformation_xyz = None
++        if getattr(args, 'pbr_deformation_anchor', False):
++            from scene.pbr_deformation import validate_deformation_anchor, load_deformation_anchor
++            validate_deformation_anchor(args)
++            self.pbr_deformation_xyz = load_deformation_anchor(self.source, self.pc.get_xyz, source_iteration)
++        self.pbr_plane_projection = None
++        if getattr(args, 'pbr_plane_projection', False):
++            from scene.pbr_plane_projection import load_plane_projection
++            self.pbr_plane_projection = load_plane_projection(
++                self.source, self.pc, self.deform, self.train_cameras, args, source_iteration)
++        from scene.pbr_feature_gate import validate_feature_gate_model
++        self.pbr_feature_gate_provenance = validate_feature_gate_model(
++            self.source, self.pc, self.deform, args, source_iteration)
+ 
+     def load_camera(self,camera):
+         if self.args.load2gpu_on_the_fly:camera.load2device()
+@@ -139,9 +154,15 @@ class FrozenScene:
+             time_override = None
+         fid=camera.fid if time_override is None else torch.as_tensor([time_override],device='cuda')
+         time_input=fid.to('cuda').unsqueeze(0).expand(len(self.pc.get_xyz),-1)
+-        prediction = self.deform.step(self.pc.get_xyz.detach(),time_input,iteration=self.iteration,
++        xyz = self.pc.get_xyz.detach()
++        if getattr(self, 'pbr_deformation_xyz', None) is not None:
++            from scene.pbr_deformation import deformation_input
++            xyz = deformation_input(self.pc.get_xyz, self.pbr_deformation_xyz)
++        prediction = self.deform.step(xyz,time_input,iteration=self.iteration,
+                                      feature=self.pc.get_binary_feature(),camera_center=camera.camera_center,
+                                      is_training=False)
++        if getattr(self, 'pbr_plane_projection', None) is not None:
++            prediction = self.pbr_plane_projection.apply(self.pc, prediction)
+         if getattr(self, 'static_anchor_camera', None) is not None:
+             self.static_deformation_cache = prediction
+         return prediction
+diff --git a/scripts/train_stage2.py b/scripts/train_stage2.py
+index 5015052..db9877c 100755
+--- a/scripts/train_stage2.py
++++ b/scripts/train_stage2.py
+@@ -62,6 +62,23 @@ class Trainer:
+                                        fea_dim=gs_fea_dim)
+ 
+         self.scene = Scene(dataset, self.gaussians, load_iteration=load_iter)
++        self.pbr_deformation_xyz = None
++        self.pbr_deformation_anchor_sha = None
++        if getattr(opt, 'pbr_deformation_anchor', False):
++            from scene.pbr_deformation import create_deformation_anchor
++            self.pbr_deformation_xyz, anchor_record = create_deformation_anchor(
++                args.model_path, self.gaussians.get_xyz, load_iter)
++            self.pbr_deformation_anchor_sha = anchor_record['asset_sha256']
++
++        if getattr(opt, 'pbr_albedo_interior_init', False):
++            from scene.pbr_material import initialize_native_albedo
++            from pathlib import Path
++            import json
++            initialization = initialize_native_albedo(self.gaussians, opt.pbr_albedo_init_margin)
++            initialization.update(source_iteration=load_iter, source_model=args.stage1_model_path,
++                source_files=json.loads((Path(args.model_path)/'stage1_source.json').read_text()))
++            (Path(args.model_path)/'pbr_albedo_initialization.json').write_text(
++                json.dumps(initialization, indent=2)+'\n')
+ 
+         # lower lr for most of gaussian params
+         lr_scale = 0.1
+@@ -75,18 +92,51 @@ class Trainer:
+ 
+         self.gaussians.training_setup(opt)
+ 
+-        # optimizer - only train colors and roughness and opacity
+-        remaining_params = [group for group in self.gaussians.optimizer.param_groups if
+-                            group["name"] in ["albedo_dc", "albedo_dc_stage1", "albedo_rest", "roughness", "opacity"]]
++        # 默认原生材质范围；独立几何preset才开放真实PLY的xyz/rotation。
++        allowed = {"albedo_dc", "albedo_dc_stage1", "albedo_rest", "roughness", "opacity"}
++        self.pbr_feature_gate = None
++        if getattr(opt, "pbr_optimize_feature_gate", False):
++            from scene.pbr_feature_gate import NativePBRFeatureGate
++            self.pbr_feature_gate = NativePBRFeatureGate(args.model_path, self.gaussians, self.deform, args, load_iter)
++            allowed.add("feature")
++            for group in self.gaussians.optimizer.param_groups:
++                if group['name'] == 'feature':
++                    group['params'] = self.pbr_feature_gate.optimizer_parameters(self.gaussians)
++        self.pbr_geometry = None
++        if getattr(opt, 'pbr_optimize_geometry', False):
++            from scene.pbr_geometry import NativePBRGeometry
++            self.pbr_geometry = NativePBRGeometry(self.gaussians, opt)
++            allowed.update({'xyz', 'rotation'})
++            if opt.pbr_freeze_opacity:
++                allowed.remove('opacity')
++            import json
++            from pathlib import Path
++            record = dict(self.pbr_geometry.record, source_iteration=load_iter,
++                          source_model=args.stage1_model_path, optimizer_groups=sorted(allowed),
++                          source_files=json.loads((Path(args.model_path)/'stage1_source.json').read_text()))
++            (Path(args.model_path)/'pbr_geometry_source.json').write_text(json.dumps(record, indent=2)+'\n')
++        self.pbr_plane_projection = None
++        self.pbr_plane_projection_sha = None
++        if getattr(opt, 'pbr_plane_projection', False):
++            from scene.pbr_plane_projection import create_plane_projection
++            self.pbr_plane_projection, plane_record = create_plane_projection(
++                args.model_path, self.gaussians, self.deform, self.scene.getTrainCameras(), args, load_iter)
++            self.pbr_plane_projection_sha = plane_record['asset_sha256']
++        remaining_params = [group for group in self.gaussians.optimizer.param_groups if group['name'] in allowed]
+         self.gaussians.optimizer.param_groups.clear()
+         self.gaussians.optimizer.param_groups.extend(remaining_params)
+         self.gaussians.optimizer.state.clear()
+-
++        if self.pbr_geometry is not None:
++            retained = {id(p) for g in remaining_params for p in g['params']}
++            for value in vars(self.gaussians).values():
++                if isinstance(value, torch.nn.Parameter):
++                    value.requires_grad_(id(value) in retained)
+ 
+         # optimize also mlp deform, but keep only color-related head
+         before = sum(p.numel() for g in self.deform.optimizer.param_groups for p in g["params"])
+ 
+-        remaining_params = [group for group in self.deform.optimizer.param_groups if group["name"] in ["mlp_color"]]
++        remaining_params = ([] if self.pbr_feature_gate is not None else
++                            [group for group in self.deform.optimizer.param_groups if group["name"] in ["mlp_color"]])
+         self.deform.optimizer.param_groups.clear()
+         self.deform.optimizer.param_groups.extend(remaining_params)
+         self.deform.optimizer.state.clear()
+@@ -100,11 +150,28 @@ class Trainer:
+ 
+         self.N = self.gaussians.get_xyz.shape[0]
+ 
+-        self.env_light = EnvLight(path=None, device='cuda',
+-                                  resolution=[opt.envmap_resolution // 2, opt.envmap_resolution],
+-                                  max_res=opt.envmap_resolution, init_value=opt.envmap_init_value,
+-                                  activation=opt.envmap_activation)
+-        self.env_light.training_setup(opt)
++        self.pbr_lights = None
++        self.env_light = None
++        self.log_pbr_intensity = None
++        self.pbr_intensity_optimizer = None
++        if getattr(args, 'pbr_learn_light_intensity', False):
++            import math
++            self.log_pbr_intensity = torch.nn.Parameter(torch.tensor(
++                math.log(args.pbr_light_intensity_scale), device='cuda'))
++            self.pbr_intensity_optimizer = torch.optim.Adam([self.log_pbr_intensity],
++                lr=opt.pbr_light_intensity_lr)
++            self.initial_log_pbr_intensity = self.log_pbr_intensity.detach().clone()
++        if getattr(pipe, 'pbr_light_mode', 'envmap') == 'gt_directional':
++            from scene.pbr_directional import load_gt_directional_lights
++            self.pbr_lights = load_gt_directional_lights(pipe.pbr_gt_lights_path)
++            for camera in self.original_train_cameras + self.scene.getTestCameras():
++                self.pbr_lights.for_camera(camera, pipe.pbr_light_intensity_scale, device='cpu')
++        else:
++            self.env_light = EnvLight(path=None, device='cuda',
++                                      resolution=[opt.envmap_resolution // 2, opt.envmap_resolution],
++                                      max_res=opt.envmap_resolution, init_value=opt.envmap_init_value,
++                                      activation=opt.envmap_activation)
++            self.env_light.training_setup(opt)
+ 
+         bg_color = [1, 1, 1] if dataset.white_background else [0, 0, 0]
+         self.background = torch.tensor(bg_color, dtype=torch.float32, device="cuda")
+@@ -132,6 +199,23 @@ class Trainer:
+ 
+     def train_step(self):
+         self.iter_start.record()
++        geometry_active = (self.pbr_geometry is not None and
++                           self.iteration > self.load_iter + self.opt.pbr_geometry_warmup)
++        if self.pbr_geometry is not None:
++            steps = self.iteration-self.load_iter-self.opt.pbr_geometry_warmup
++            duration = self.opt.iterations-self.load_iter-self.opt.pbr_geometry_warmup
++            ramp = max(0., min(steps/1000., 1.))
++            decay = max(.1, 1-.9*max(steps, 0)/duration)
++            for group in self.gaussians.optimizer.param_groups:
++                if group['name'] == 'xyz':
++                    group['lr'] = self.opt.pbr_geometry_xyz_lr*ramp*decay
++                elif group['name'] == 'rotation':
++                    group['lr'] = self.opt.pbr_geometry_rotation_lr*ramp*decay
++                elif group['name'] == 'feature' and self.pbr_feature_gate is not None:
++                    group['lr'] = self.opt.pbr_feature_gate_lr*ramp*decay
++
++        if self.log_pbr_intensity is not None:
++            self.pipe.pbr_light_intensity_scale = self.log_pbr_intensity.exp()
+ 
+         # Pick a random Camera
+         if not self.viewpoint_stack:
+@@ -146,11 +230,18 @@ class Trainer:
+ 
+         time_input = fid.unsqueeze(0).expand(self.N, -1)
+ 
+-        # careful with no grad
+-        with torch.no_grad():
+-            d_values = self.deform.step(self.gaussians.get_xyz.detach(), time_input, iteration=self.iteration,
+-                                        feature=self.gaussians.get_binary_feature(),
++        # gate候选只对输出feature乘法可导；NN全部冻结，输入仍detach。
++        with torch.set_grad_enabled(self.pbr_feature_gate is not None):
++            deformation_xyz = self.gaussians.get_xyz.detach()
++            if self.pbr_deformation_xyz is not None:
++                from scene.pbr_deformation import deformation_input
++                deformation_xyz = deformation_input(self.gaussians.get_xyz, self.pbr_deformation_xyz)
++            d_values = self.deform.step(deformation_xyz, time_input, iteration=self.iteration,
++                                        feature=(self.pbr_feature_gate.output(self.gaussians) if self.pbr_feature_gate is not None
++                                                 else self.gaussians.get_binary_feature()),
+                                         camera_center=viewpoint_cam.camera_center)
++        if self.pbr_plane_projection is not None:
++            d_values = self.pbr_plane_projection.apply(self.gaussians, d_values)
+         d_xyz, d_rotation, d_scaling, d_opacity, d_color = d_values['d_xyz'], d_values['d_rotation'], \
+                                                            d_values['d_scaling'], d_values['d_opacity'], d_values[
+                                                                'd_color']
+@@ -180,6 +271,21 @@ class Trainer:
+         gt_image = viewpoint_cam.original_image_train_light.cuda()
+         loss_result = self.stage2_loss.compute(self, render_pkg_re, gt_image, image_non_masked)
+         Ll1, loss = loss_result.l1, loss_result.total
++        if self.log_pbr_intensity is not None:
++            intensity_anchor = (self.log_pbr_intensity-self.initial_log_pbr_intensity).square()
++            loss = loss + self.opt.lambda_pbr_light_intensity_anchor*intensity_anchor
++            if self.tb_writer and self.iteration % 100 == 0:
++                self.tb_writer.add_scalar('pbr_light/intensity_scale', self.log_pbr_intensity.exp().item(), self.iteration)
++        if geometry_active:
++            extra, geometry_terms = self.pbr_geometry.losses(self.gaussians, render_pkg_re, viewpoint_cam)
++            loss = loss + extra*ramp
++            if self.pbr_feature_gate is not None:
++                gate_anchor = self.pbr_feature_gate.loss(self.gaussians)
++                loss = loss + self.opt.lambda_pbr_feature_gate_anchor*gate_anchor*ramp
++                geometry_terms['pbr_feature_gate_anchor'] = gate_anchor
++            if self.tb_writer and self.iteration % 100 == 0:
++                for name, value in geometry_terms.items():
++                    self.tb_writer.add_scalar('pbr_geometry/'+name, value.item(), self.iteration)
+         loss.backward()
+         self.iter_end.record()
+ 
+@@ -201,22 +307,61 @@ class Trainer:
+                                                  self.testing_iterations, self.scene,
+                                                  (self.pipe, self.background), self.deform,
+                                                  self.dataset.load2gpu_on_the_fly,
+-                                                 env_light=self.env_light)
++                                                 env_light=self.env_light,
++                                                 source_deformation_xyz=self.pbr_deformation_xyz,
++                                                 plane_projection=self.pbr_plane_projection)
+ 
+             if self.iteration in self.saving_iterations or self.iteration == self.opt.warm_up - 1:
+                 print("\n[ITER {}] Saving Gaussians".format(self.iteration))
+                 self.scene.save(self.iteration)
+                 self.deform.save_weights(self.args.model_path, self.iteration)
+-                self.env_light.save_weights(self.args.model_path, self.iteration)
++                if self.env_light is not None:
++                    self.env_light.save_weights(self.args.model_path, self.iteration)
++                else:
++                    import json
++                    from pathlib import Path
++                    destination = Path(self.args.model_path)/'pbr_directional'/f'iteration_{self.iteration}'
++                    destination.mkdir(parents=True, exist_ok=True)
++                    lighting_record = dict(format_version=1, iteration=self.iteration,
++                        lights_sha256=self.pbr_lights.sha256, intensity_scale=self.args.pbr_light_intensity_scale)
++                    if self.log_pbr_intensity is not None:
++                        lighting_record.update(effective_intensity_scale=float(self.log_pbr_intensity.exp()),
++                            intensity_fitted_from_train_rgb=True)
++                    if self.pbr_deformation_anchor_sha is not None:
++                        lighting_record['deformation_anchor_sha256'] = self.pbr_deformation_anchor_sha
++                    if self.pbr_plane_projection_sha is not None:
++                        lighting_record['plane_projection_sha256'] = self.pbr_plane_projection_sha
++                    if self.pbr_feature_gate is not None:
++                        lighting_record['feature_gate_metadata_sha256'] = self.pbr_feature_gate.metadata_sha
++                    if getattr(self.args, 'pbr_rasterizer_backend', 'installed') == 'lumimotion':
++                        from scene.pbr_rasterizer import validate_backend_model
++                        native = validate_backend_model(self.args.model_path, self.args)
++                        lighting_record['rasterizer_source_sha256'] = native['source_sha256']
++                    (destination/'lighting.json').write_text(json.dumps(lighting_record, indent=2)+'\n')
+ 
+             # Optimizer step
+             if self.iteration < self.opt.iterations and self.iteration % 4 == 0:
++                if geometry_active:
++                    torch.nn.utils.clip_grad_norm_([self.gaussians._xyz, self.gaussians._rotation], 10.)
+                 self.gaussians.optimizer.step()
+-                self.gaussians.update_learning_rate(self.iteration)
++                if getattr(self.opt, 'pbr_albedo_project_after_step', False):
++                    from scene.pbr_material import project_native_albedo
++                    project_native_albedo(self.gaussians, self.opt.pbr_albedo_init_margin)
++                if self.pbr_geometry is None:
++                    self.gaussians.update_learning_rate(self.iteration)
++                elif geometry_active:
++                    self.pbr_geometry.project(self.gaussians)
++                    if self.pbr_feature_gate is not None:
++                        self.pbr_feature_gate.project(self.gaussians)
+                 self.gaussians.optimizer.zero_grad(set_to_none=True)
++                if self.pbr_intensity_optimizer is not None:
++                    self.pbr_intensity_optimizer.step()
++                    self.log_pbr_intensity.clamp_(min=-4.605170186, max=4.605170186)
++                    self.pbr_intensity_optimizer.zero_grad(set_to_none=True)
+ 
+-                self.env_light.optimizer.step()
+-                self.env_light.optimizer.zero_grad(set_to_none=True)
++                if self.env_light is not None:
++                    self.env_light.optimizer.step()
++                    self.env_light.optimizer.zero_grad(set_to_none=True)
+ 
+                 self.deform.optimizer.step()
+                 self.deform.optimizer.zero_grad(set_to_none=True)
+@@ -290,6 +435,47 @@ if __name__ == "__main__":
+         sys.exit(0)
+     if args.resume_iteration is not None:
+         parser.error("完整状态恢复仅适用于 photometric_lambertian。")
++    if args.pbr_light_mode not in {'envmap', 'gt_directional'}:
++        parser.error('未知PBR光照模式。')
++    if args.pbr_learn_light_intensity:
++        import math
++        if (args.pbr_light_mode != 'gt_directional' or not .01 <= args.pbr_light_intensity_scale <= 100 or
++                not math.isfinite(args.pbr_light_intensity_lr) or args.pbr_light_intensity_lr <= 0 or
++                not math.isfinite(args.lambda_pbr_light_intensity_anchor) or args.lambda_pbr_light_intensity_anchor < 0):
++            parser.error('学习光强仅适用于GT方向光，初值在[.01,100]，学习率正且锚定权重非负。')
++    if args.pbr_light_mode == 'gt_directional':
++        from pathlib import Path
++        import json, shutil, math
++        from scene.pbr_directional import GTDirectionalLights
++        if not args.stage1_model_path or args.load_iter <= 0:
++            parser.error('GT方向光PBR首次训练需要独立 --stage1_model_path 和正的 --load_iter。')
++        if not args.pbr_gt_lights_path:
++            parser.error('GT方向光PBR需要 --pbr_gt_lights_path。')
++        if not math.isfinite(args.pbr_light_intensity_scale) or args.pbr_light_intensity_scale <= 0:
++            parser.error('PBR方向光强度倍率必须有限且为正。')
++        if any(getattr(args, k) != 0 for k in ('d_lower_hemisphere_weight', 'lambda_light', 'lambda_light_smooth')):
++            parser.error('已知方向光没有环境光可优化，请将环境光正则权重设为0。')
++        if args.diffuse_sample_num <= 0 or args.light_sample_num != 0:
++            parser.error('当前PBR方向光的原生SH间接光需要正的diffuse_sample_num和light_sample_num=0。')
++        if args.iterations <= args.load_iter:
++            parser.error('GT方向光PBR目标iteration必须大于Stage1来源iteration。')
++        gt_lights = GTDirectionalLights(args.pbr_gt_lights_path)
++        from scene.pbr_directional import validate_directional_training_inputs
++        rgb_alpha_audit = validate_directional_training_inputs(args.source_path)
++    from scene.pbr_ray_budget import validate_actual_ray_budget
++    validate_actual_ray_budget(args)
++    from scene.pbr_rasterizer import validate_backend, prepare_backend
++    validate_backend(args)
++    from scene.pbr_geometry import validate_pbr_geometry
++    validate_pbr_geometry(args)
++    from scene.pbr_material import validate_albedo_initialization
++    validate_albedo_initialization(args)
++    from scene.pbr_deformation import validate_deformation_anchor
++    validate_deformation_anchor(args)
++    from scene.pbr_plane_projection import validate_plane_projection
++    validate_plane_projection(args)
++    from scene.pbr_feature_gate import validate_feature_gate
++    validate_feature_gate(args)
+     if args.stage1_model_path:
+         from scripts.stage2_runtime import model_dir, file_sha256
+         from pathlib import Path
+@@ -311,6 +497,14 @@ if __name__ == "__main__":
+             hashes[str(original)] = file_sha256(original)
+         (output / "stage1_source.json").write_text(json.dumps(hashes, indent=2)+"\n")
+         (output / "stage2_config.json").write_text(json.dumps(vars(args), indent=2)+"\n")
++    if args.pbr_light_mode == 'gt_directional':
++        (Path(args.model_path)/'rgb_alpha_provenance.json').write_text(json.dumps(rgb_alpha_audit, indent=2)+'\n')
++        snapshot = Path(args.model_path)/'pbr_gt_lights.json'
++        if gt_lights.path != snapshot.resolve():
++            shutil.copy2(gt_lights.path, snapshot)
++        args.pbr_gt_lights_path = str(snapshot.resolve())
++        (Path(args.model_path)/'stage2_config.json').write_text(json.dumps(vars(args), indent=2)+'\n')
++    prepare_backend(args.model_path, args)
+     trainer = Trainer(args=args, dataset=lp.extract(args), opt=op.extract(args), pipe=pp.extract(args),
+               testing_iterations=args.test_iterations, saving_iterations=args.save_iterations,
+               load_iter=args.load_iter)
+diff --git a/utils/train_report_utils.py b/utils/train_report_utils.py
+index 16b5d46..76b27e2 100644
+--- a/utils/train_report_utils.py
++++ b/utils/train_report_utils.py
+@@ -236,14 +236,15 @@ def training_report(tb_writer, iteration, Ll1, loss, l1_loss, elapsed, testing_i
+ 
+ def training_report_relight_screen_space(tb_writer, iteration, Ll1, loss, elapsed, testing_iterations,
+                                          scene: Scene,
+-                                         renderArgs, deform, load2gpu_on_the_fly, env_light):
++                                         renderArgs, deform, load2gpu_on_the_fly, env_light,
++                                         source_deformation_xyz=None, plane_projection=None):
+     if tb_writer:
+         tb_writer.add_scalar('train_loss_patches/l1_loss', Ll1.item(), iteration)
+         tb_writer.add_scalar('train_loss_patches/total_loss', loss.item(), iteration)
+         tb_writer.add_scalar('iter_time', elapsed, iteration)
+ 
+     if iteration in testing_iterations:
+-        if tb_writer:
++        if tb_writer and env_light is not None:
+             env_dict = env_light.render_env_map()
+             env2_map = env_dict["env2"].permute(2, 0, 1)
+             env2_map_unscaled = env2_map.clone()
+@@ -283,10 +284,16 @@ def training_report_relight_screen_space(tb_writer, iteration, Ll1, loss, elapse
+                     else:
+                         time_input = 0
+ 
+-                    d_values = deform.step(xyz.detach(), time_input,
++                    deformation_xyz = xyz.detach()
++                    if source_deformation_xyz is not None:
++                        from scene.pbr_deformation import deformation_input
++                        deformation_xyz = deformation_input(xyz, source_deformation_xyz)
++                    d_values = deform.step(deformation_xyz, time_input,
+                                            feature=scene.gaussians.get_binary_feature(),
+                                            is_training=False,
+                                            camera_center=viewpoint.camera_center)
++                    if plane_projection is not None:
++                        d_values = plane_projection.apply(scene.gaussians, d_values)
+ 
+                     d_xyz, d_rotation, d_scaling, d_opacity, d_color = d_values['d_xyz'], \
+                                                                        d_values['d_rotation'], d_values['d_scaling'], \

@@ -1,0 +1,317 @@
+{
+  "automatic_status": "PASS",
+  "scope": "实际权重有限性、几何信赖域和opacity/scale冻结与feature gate信赖域、roughness已变化、全量图片与6视频解码、15帧背景数值；人工实际审阅FAILED；自动数值PASS不等于质量PASS",
+  "manual_review": "FAILED",
+  "checkpoint": {
+    "40000": {
+      "rgb_normal": {
+        "status": "PASS_SHARED_RGB_MODEL_LOAD",
+        "points": 99827,
+        "confidence_points": 29621,
+        "constraint_weight": 2.0,
+        "canonical_RGB_axis_loss": 0.0038387239910662174,
+        "source_MLP_frozen": true,
+        "source_RGB_derived": true,
+        "GT_labels_read": false,
+        "optimizer_steps": 0,
+        "source_files": {
+          "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/point_cloud/iteration_40000/point_cloud.ply": "afa337601fb93944f5ec6c1f7aa3acba0833ded3941bf38b9c3af585a9c06d5a",
+          "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/deform/iteration_40000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5",
+          "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/pbr_rgb_normal.npz": "8f2987d0af3f0554ab16891c62ee99cdc04e3a7e1ca0f418046144aabceeada2",
+          "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/pbr_rgb_normal.json": "e36b993b4d4cf3f3cb8d1fb1d43be397597a3157af2e85dc338e1e45bc39aaef",
+          "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/pbr_rgb_normal_input.npz": "87752217f37e9fe9b96835f892ee2289c3740560d2f4592029652db52d03bc15",
+          "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/pbr_rgb_normal_input.json": "40d6b721ae4082522394c446270f1d37484c26832dfb4261aafe6b5e6b6e171e"
+        }
+      },
+      "gaussians": 99827,
+      "finite": true,
+      "geometry_unchanged": false,
+      "max_displacement": 0.0354757234454155,
+      "max_rotation_deg": 60.000064849853516,
+      "opacity_scale_unchanged": true,
+      "feature_optimized": true,
+      "max_feature_probability_delta": 0.6157300472259521,
+      "max_feature_logit_delta": 79.57797241210938,
+      "feature_changed_points": 72133,
+      "roughness_range": [
+        0.33435219526290894,
+        0.9287196397781372
+      ],
+      "ply_sha256": "afa337601fb93944f5ec6c1f7aa3acba0833ded3941bf38b9c3af585a9c06d5a",
+      "deform_sha256": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5",
+      "deform_finite_tensors": 32
+    },
+    "50000": {
+      "rgb_normal": {
+        "status": "PASS_SHARED_RGB_MODEL_LOAD",
+        "points": 99827,
+        "confidence_points": 29621,
+        "constraint_weight": 2.0,
+        "canonical_RGB_axis_loss": 0.0037192506715655327,
+        "source_MLP_frozen": true,
+        "source_RGB_derived": true,
+        "GT_labels_read": false,
+        "optimizer_steps": 0,
+        "source_files": {
+          "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/point_cloud/iteration_50000/point_cloud.ply": "705985a9845831f7c5cdc8441b3a41a9ec6cd5a20ee077c9114a2914b2d3c976",
+          "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/deform/iteration_50000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5",
+          "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/pbr_rgb_normal.npz": "8f2987d0af3f0554ab16891c62ee99cdc04e3a7e1ca0f418046144aabceeada2",
+          "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/pbr_rgb_normal.json": "e36b993b4d4cf3f3cb8d1fb1d43be397597a3157af2e85dc338e1e45bc39aaef",
+          "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/pbr_rgb_normal_input.npz": "87752217f37e9fe9b96835f892ee2289c3740560d2f4592029652db52d03bc15",
+          "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/pbr_rgb_normal_input.json": "40d6b721ae4082522394c446270f1d37484c26832dfb4261aafe6b5e6b6e171e"
+        }
+      },
+      "gaussians": 99827,
+      "finite": true,
+      "geometry_unchanged": false,
+      "max_displacement": 0.07999999076128006,
+      "max_rotation_deg": 60.000064849853516,
+      "opacity_scale_unchanged": true,
+      "feature_optimized": true,
+      "max_feature_probability_delta": 1.0,
+      "max_feature_logit_delta": 88.77782440185547,
+      "feature_changed_points": 72074,
+      "roughness_range": [
+        0.02985154092311859,
+        0.9929409027099609
+      ],
+      "ply_sha256": "705985a9845831f7c5cdc8441b3a41a9ec6cd5a20ee077c9114a2914b2d3c976",
+      "deform_sha256": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5",
+      "deform_finite_tensors": 32
+    },
+    "55000": {
+      "rgb_normal": {
+        "status": "PASS_SHARED_RGB_MODEL_LOAD",
+        "points": 99827,
+        "confidence_points": 29621,
+        "constraint_weight": 2.0,
+        "canonical_RGB_axis_loss": 0.003710283199325204,
+        "source_MLP_frozen": true,
+        "source_RGB_derived": true,
+        "GT_labels_read": false,
+        "optimizer_steps": 0,
+        "source_files": {
+          "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/point_cloud/iteration_55000/point_cloud.ply": "af58022cd20c3ae2b1aa400a765d4ef4a22474944a6af808c96e3104150984a5",
+          "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/deform/iteration_55000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5",
+          "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/pbr_rgb_normal.npz": "8f2987d0af3f0554ab16891c62ee99cdc04e3a7e1ca0f418046144aabceeada2",
+          "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/pbr_rgb_normal.json": "e36b993b4d4cf3f3cb8d1fb1d43be397597a3157af2e85dc338e1e45bc39aaef",
+          "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/pbr_rgb_normal_input.npz": "87752217f37e9fe9b96835f892ee2289c3740560d2f4592029652db52d03bc15",
+          "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/pbr_rgb_normal_input.json": "40d6b721ae4082522394c446270f1d37484c26832dfb4261aafe6b5e6b6e171e"
+        }
+      },
+      "gaussians": 99827,
+      "finite": true,
+      "geometry_unchanged": false,
+      "max_displacement": 0.08000001311302185,
+      "max_rotation_deg": 60.00005340576172,
+      "opacity_scale_unchanged": true,
+      "feature_optimized": true,
+      "max_feature_probability_delta": 1.0,
+      "max_feature_logit_delta": 88.77782440185547,
+      "feature_changed_points": 72026,
+      "roughness_range": [
+        0.016186675056815147,
+        0.9966493248939514
+      ],
+      "ply_sha256": "af58022cd20c3ae2b1aa400a765d4ef4a22474944a6af808c96e3104150984a5",
+      "deform_sha256": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5",
+      "deform_finite_tensors": 32
+    }
+  },
+  "rgb": {
+    "psnr": 19.754226714113255,
+    "ssim": 0.9193544467290242,
+    "lpips": 0.10111725976069769,
+    "psnr_foreground": 12.278676023812173,
+    "ssim_foreground_bbox": 0.8186597545941671,
+    "lpips_foreground_bbox": 0.2067933867375056
+  },
+  "images": {
+    "rgb": 150,
+    "alpha": 150,
+    "normal": 150,
+    "albedo": 150,
+    "directional": 72,
+    "hdr": 150
+  },
+  "videos": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/directional/rotating_directional.mp4": 72,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/hdr/hdr.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/insights/albedo.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/insights/alpha.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/insights/normal.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/insights/rgb.mp4": 150
+  },
+  "representatives": {
+    "rgb": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/insights/rgb/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/insights/rgb/0075.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/insights/rgb/0150.png"
+    ],
+    "alpha": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/insights/alpha/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/insights/alpha/0075.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/insights/alpha/0150.png"
+    ],
+    "normal": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/insights/normal/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/insights/normal/0075.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/insights/normal/0150.png"
+    ],
+    "albedo": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/insights/albedo/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/insights/albedo/0075.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/insights/albedo/0150.png"
+    ],
+    "directional": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/directional/0000.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/directional/0036.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/directional/0071.png"
+    ],
+    "hdr": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/hdr/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/hdr/0076.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp/renders_stage2/ours_55000/hdr/0150.png"
+    ]
+  },
+  "background": [
+    {
+      "frame": "0010",
+      "mean_rgb_background_all": 0.0013764696799742056,
+      "mean_rgb_background_core": 2.7278915015769136e-05,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0020",
+      "mean_rgb_background_all": 0.002925800633737625,
+      "mean_rgb_background_core": 0.00016544951082999603,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0030",
+      "mean_rgb_background_all": 0.0018738697970258713,
+      "mean_rgb_background_core": 0.00028896906683945355,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0040",
+      "mean_rgb_background_all": 0.0007585378456690612,
+      "mean_rgb_background_core": 0.00023290463241327266,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0050",
+      "mean_rgb_background_all": 0.0011821286398448077,
+      "mean_rgb_background_core": 2.0865379431629183e-06,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0060",
+      "mean_rgb_background_all": 0.001963791565491026,
+      "mean_rgb_background_core": 7.154628109227252e-06,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0070",
+      "mean_rgb_background_all": 0.0002685967878477879,
+      "mean_rgb_background_core": 8.932415557409527e-08,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0080",
+      "mean_rgb_background_all": 0.0005584813412359077,
+      "mean_rgb_background_core": 7.162011359283133e-05,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0090",
+      "mean_rgb_background_all": 0.0023594639065866356,
+      "mean_rgb_background_core": 0.000559043693664242,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0100",
+      "mean_rgb_background_all": 0.0021618160265434094,
+      "mean_rgb_background_core": 5.77297335166927e-05,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0110",
+      "mean_rgb_background_all": 0.00294813396908,
+      "mean_rgb_background_core": 0.00010395020451440889,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0120",
+      "mean_rgb_background_all": 0.004037861290773553,
+      "mean_rgb_background_core": 0.0005892021077769381,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0130",
+      "mean_rgb_background_all": 0.002687363783046691,
+      "mean_rgb_background_core": 0.00017793174320455073,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0140",
+      "mean_rgb_background_all": 0.0038899608578201674,
+      "mean_rgb_background_core": 0.0009822775726819775,
+      "p99_background_core": 0.00392156862745098
+    },
+    {
+      "frame": "0150",
+      "mean_rgb_background_all": 0.001413754262110885,
+      "mean_rgb_background_core": 0.00015324002892983026,
+      "p99_background_core": 0.0
+    }
+  ],
+  "source_files": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/point_cloud/iteration_35000/point_cloud.ply": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/deform/iteration_35000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+  },
+  "visual_review": {
+    "status": "FAILED",
+    "iteration": 55000,
+    "actual_images_viewed": true,
+    "reviewed_test_frames": [
+      10,
+      80,
+      150
+    ],
+    "reviewed_insight_frames": [
+      1,
+      75,
+      150
+    ],
+    "images": [
+      "inspection/rgb_final_55000_comparison.png",
+      "inspection/four_categories_final_55000.png",
+      "inspection/relight_final_55000.png",
+      "model_mlp/renders_stage2/ours_55000/directional/0036.png",
+      "normal_depth/comparison_0010.png",
+      "normal_depth/comparison_0080.png",
+      "normal_depth/comparison_0150.png"
+    ],
+    "rgb_background": "实际GT/B09/B10同55k TEST10/80/150对比：黑背景正常，人物和椭圆平台可辨认；人物上衣/手臂/裤腿有明显黑色碎斑，脚周及平台有大块黑灰伪几何/阴影混杂，最新外观与B09近似。背光中帧GT本身较暗，预测仍更暗，不把黑色RGB直接解释为Alpha缺失。RGB质量FAILED。",
+    "alpha": "insights1/75/150均保留人物和完整平台Alpha，手臂/腿/脚轮廓与孤立飞点、平台边缘有模糊碎片。中帧RGB近黑但Alpha人物完整；未删平台/难点。",
+    "albedo_static_dynamic": "人物首中尾均可见，反照率保留照明方向、阴影和碎斑，手臂及裤腿脏乱；平台有颜色斑块和脚周污染。没有干净材质分解或静动态分离的证据。",
+    "reviewed_hdr_frames": [
+      1,
+      76,
+      150
+    ],
+    "reviewed_directional_frames": [
+      0,
+      36,
+      71
+    ],
+    "relighting": "实际查看HDR1/76/150和SUN0/36/71，并单独查看SUN0036原PNG：HDR有橙色人物及平台色彩响应，但人物/腿部明显碎斑、反照率照明污染和平台脚周假起伏仍保留。SUN0/71人物与平台受光，0036几乎全黑（仅小点），对应背/下半球直接照明且关闭间接的情况，不把该单帧黑色当独立渲染错误。重光照功能有响应，未提供重光照GT精度或质量达标证明。",
+    "reviewed_geometry_frames": [
+      10,
+      80,
+      150
+    ],
+    "normal_depth": "实际查看normal_depth/comparison_0010/0080/0150完整三行GT/GS/Depth/Z/Mesh对照：GS平台主体紫蓝，但脚周和人物表面有杂色、伪起伏；Depth Normal高频波纹更严重。Expected/Median Z在脚周平台有明显假起伏，与GT平面相比偏差集中在人物下方；Mesh也保留平台凸起，中帧身体和腿部有孔洞/缺片，末帧脚部不完整，三种法线人物误差明显。未删难像素或使用共同像素替代目标；整体几何质量FAILED。"
+  }
+}

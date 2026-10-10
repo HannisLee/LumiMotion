@@ -1,0 +1,85 @@
+{
+  "status": "FAILED_SO_FAR_PREVIEW_ONLY",
+  "updated_at": "2026-10-10T07:15:26.674133+09:00",
+  "iteration": 40000,
+  "checkpoint": {
+    "status": "PASS_CHECKPOINT_ONLY",
+    "iteration": 40000,
+    "gaussians": 99827,
+    "all_finite": true,
+    "opacity_scale_feature_frozen": true,
+    "albedo_rgb_range": [
+      0.030999988317489624,
+      0.968999981880188
+    ],
+    "clamped_albedo_channel_fraction": 0.0,
+    "channels_at_projected_bound_fraction": 0.3448933321312537,
+    "max_displacement": 0.03539922460913658,
+    "max_rotation_deg": 60.00002670288086,
+    "actual_light_scale": 5.280002593994141,
+    "deformation_state_tensors_unchanged": true,
+    "deformation_tensor_count": 32,
+    "deformation_input_exactly_source_xyz": true,
+    "anchor_marker_bound": true,
+    "source_files_unchanged": true,
+    "final_mae": false
+  },
+  "RGB": {
+    "psnr": 18.514171736955014,
+    "ssim": 0.8879236896832784,
+    "lpips": 0.10788123557964961,
+    "psnr_foreground": 11.461610424097136,
+    "ssim_foreground_bbox": 0.7571394244829813,
+    "lpips_foreground_bbox": 0.22566056847572327
+  },
+  "previous_RGB": {
+    "psnr": 18.393261800805856,
+    "ssim": 0.8858578602472941,
+    "lpips": 0.10931317210197448,
+    "psnr_foreground": 11.360213718905596,
+    "ssim_foreground_bbox": 0.7518338481585185,
+    "lpips_foreground_bbox": 0.2303248941898346
+  },
+  "preview_exit_code": 0,
+  "checkpoint_audit_exit_code": 0,
+  "feature_diagnostic_exit_code": 0,
+  "actual_reviewed_frames": [
+    "0010",
+    "0080",
+    "0150"
+  ],
+  "comparison": "inspection/preview_40000_comparison.png",
+  "visual_review": {
+    "background": "黑背景正常，无全屏异常",
+    "foreground": "人物/平台存在，头手细节欠完整、衣服斑驳，脚周平台伪凸起/灰黑残影仍明显；B05与B06同40k差异有限。0080的GT本来背光暗，不用暗单独判失败。",
+    "final_four_categories": "尚待55k完整四类与HDR/方向光，不用RGB预览代替完整审核"
+  },
+  "final_mae": false,
+  "final_quality": "PENDING",
+  "training_modified": false,
+  "current_training": {
+    "status": "TRAINING_VERIFIED_LIVE",
+    "steps": 6962,
+    "total_steps": 20000,
+    "iteration": 41962,
+    "process_handles": {
+      "train": {
+        "pid": 258688,
+        "session_id": 30746,
+        "start_ticks": "9357639"
+      },
+      "postprocess": {
+        "pid": 258864,
+        "session_id": 47576,
+        "start_ticks": "9362140"
+      },
+      "preview_40000": {
+        "pid": 258868,
+        "session_id": 25842,
+        "start_ticks": "9362256"
+      }
+    }
+  },
+  "code_manifest_verified_files": 469,
+  "commit_allowed": false
+}

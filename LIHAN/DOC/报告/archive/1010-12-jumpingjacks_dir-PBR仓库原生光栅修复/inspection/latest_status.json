@@ -1,0 +1,27 @@
+{
+  "status": "TRAINING_VERIFIED_LIVE",
+  "updated_at": "2026-10-10T07:04:56.276364+09:00",
+  "steps": 2261,
+  "total_steps": 20000,
+  "iteration": 37261,
+  "process_handles": {
+    "train": {
+      "pid": 258688,
+      "session_id": 30746,
+      "start_ticks": "9357639"
+    },
+    "postprocess": {
+      "pid": 258864,
+      "session_id": 47576,
+      "start_ticks": "9362140"
+    },
+    "preview_40000": {
+      "pid": 258868,
+      "session_id": 25842,
+      "start_ticks": "9362256"
+    }
+  },
+  "postprocess": "WAITING_LIVE_TRAIN",
+  "final_mae": false,
+  "commit_allowed": false
+}

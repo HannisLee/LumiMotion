@@ -1,0 +1,150 @@
+{
+  "status": "COMPLETE_MAE_MANUAL_REVIEW_PENDING",
+  "model_path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp",
+  "iteration": 55000,
+  "frames": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150
+  ],
+  "metrics": [
+    {
+      "metric": "Albedo MAE",
+      "mae": 0.1910740278945565,
+      "unit": "linear RGB",
+      "coverage_pct": 97.56697185486605
+    },
+    {
+      "metric": "Roughness MAE",
+      "mae": 0.18083938948238243,
+      "unit": "r",
+      "coverage_pct": 97.76863690593176
+    },
+    {
+      "metric": "GS Render Normal MAE",
+      "mae": 15.540066466250822,
+      "unit": "degree",
+      "coverage_pct": 95.48687754704129
+    },
+    {
+      "metric": "Depth Normal MAE",
+      "mae": 25.163986432714978,
+      "unit": "degree",
+      "coverage_pct": 90.80116408662768
+    },
+    {
+      "metric": "Mesh Normal MAE",
+      "mae": 19.75904152309024,
+      "unit": "degree",
+      "coverage_pct": 95.38313037240663
+    },
+    {
+      "metric": "Expected Z Depth MAE",
+      "mae": 0.07666492137662657,
+      "unit": "m",
+      "coverage_pct": 95.48687754704129
+    },
+    {
+      "metric": "Median Z Depth MAE",
+      "mae": 0.080658179376893,
+      "unit": "m",
+      "coverage_pct": 95.48687754704129
+    }
+  ],
+  "rgb": {
+    "psnr": 19.754226714113255,
+    "ssim": 0.9193544467290242,
+    "lpips": 0.10111725976069769,
+    "psnr_foreground": 12.278676023812173,
+    "ssim_foreground_bbox": 0.8186597545941671,
+    "lpips_foreground_bbox": 0.2067933867375056
+  },
+  "normal_common_pixels": {
+    "methods": [
+      "gs_render",
+      "depth_normal",
+      "mesh"
+    ],
+    "gt_pixels": 415433,
+    "valid_pixels": 376203,
+    "coverage": 0.9055684069392658,
+    "angular_deg": {
+      "gs_render": {
+        "mae_frame_mean_deg": 15.022065097304688,
+        "mae_pixel_mean_deg": 14.511730163119179
+      },
+      "depth_normal": {
+        "mae_frame_mean_deg": 25.525053911453174,
+        "mae_pixel_mean_deg": 25.10148879064218
+      },
+      "mesh": {
+        "mae_frame_mean_deg": 19.241815281472707,
+        "mae_pixel_mean_deg": 18.719770603686484
+      }
+    }
+  },
+  "gs_normal_missing_180_penalty_deg": 22.96234465268344,
+  "independent_audit": {
+    "status": "PASS",
+    "iteration": 55000,
+    "frames": 15,
+    "independently_recomputed_normal": {
+      "gs_render": {
+        "mae_deg": 15.540066466250822,
+        "coverage": 0.9548687754704128,
+        "common_mae_deg": 14.511730163119179
+      },
+      "depth_normal": {
+        "mae_deg": 25.163986432714978,
+        "coverage": 0.9080116408662768,
+        "common_mae_deg": 25.10148879064218
+      },
+      "mesh": {
+        "mae_deg": 19.75904152309024,
+        "coverage": 0.9538313037240662,
+        "common_mae_deg": 18.719770603686484
+      }
+    },
+    "independently_recomputed_depth": {
+      "expected": {
+        "mae": 0.07666492263097406,
+        "coverage": 0.9548687754704128
+      },
+      "median": {
+        "mae": 0.08065817747042908,
+        "coverage": 0.9548687754704128
+      }
+    },
+    "independently_recomputed_albedo": {
+      "mae_linear": 0.1910740279092826,
+      "coverage_pct": 97.56697185486605
+    },
+    "source_hashes_verified": 538,
+    "dynamic_meshes": 15,
+    "train_poses_per_time": 135,
+    "common_normal_pixels": 376203,
+    "roughness_mae": 0.18083938948238243
+  },
+  "training_gt_inputs": [
+    "light_direction_only"
+  ],
+  "material_geometry_gt_used_for_training": false,
+  "light_GT_photometry_used": false,
+  "light_intensity": 7.731767177581787,
+  "source_plane_diagnostic_only": false,
+  "source_RGB_derived_normal_constraint": true,
+  "RGB_constraint_weight": 2.0,
+  "source_local_world_rotation": true
+}

@@ -1,0 +1,26 @@
+Loading trained model at iteration 55000
+Found transforms_train.json file, assuming Blender data set!
+Reading Training Transforms
+Read Train Transforms with 135 cameras
+Loading Training Cameras
+Loading Test Cameras
+LOAD PLY
+/home/lihan/reproduce/LumiMotion-stage2-perlight/scene/__init__.py:103: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  unique_fids = [torch.tensor(val, dtype=torch.float32, device="cuda") for val in unique_values]
+################ gaussian_color params: 156934
+evaluation 55000 0010 MAE 0.18287162451961264
+evaluation 55000 0020 MAE 0.1834557677784738
+evaluation 55000 0030 MAE 0.18523571716401166
+evaluation 55000 0040 MAE 0.19518234873636614
+evaluation 55000 0050 MAE 0.18945904331989089
+evaluation 55000 0060 MAE 0.18832976217204653
+evaluation 55000 0070 MAE 0.19446052720463258
+evaluation 55000 0080 MAE 0.21966060313757022
+evaluation 55000 0090 MAE 0.20957851194396743
+evaluation 55000 0100 MAE 0.18027378839625352
+evaluation 55000 0110 MAE 0.15344528412348227
+evaluation 55000 0120 MAE 0.17230472885716225
+evaluation 55000 0130 MAE 0.16846671264746757
+evaluation 55000 0140 MAE 0.18585706103892105
+evaluation 55000 0150 MAE 0.18289615529522613
+summary 55000 {'raw': {'foreground_mae_linear': 0.1860324518964416, 'coverage_pct': 96.51740885373937}}

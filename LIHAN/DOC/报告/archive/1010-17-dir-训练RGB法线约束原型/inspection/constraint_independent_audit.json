@@ -1,0 +1,17 @@
+{
+  "status": "PASS_SOURCE_TRAIN_RGB_ARRAYS_AND_PROVENANCE_CPU",
+  "points": 99827,
+  "confidence_points": 29621,
+  "confidence_disagreement_points": 0,
+  "source_axis_max_abs_error": 5.938389184834136e-07,
+  "CPU_vs_GPU_candidate_axis_max_abs_error": 2.473382376633193e-06,
+  "CPU_vs_GPU_angle_max_deg": 0.02952370440741058,
+  "source_files_SHA_verified": 6,
+  "TRAIN_RGBA_SHA_verified": 135,
+  "TEST_frames_used": 0,
+  "GT_labels_read": false,
+  "optimizer_steps": 0,
+  "production_pipeline_changed": false,
+  "created_at": "2026-10-10T10:41:07.634988+09:00",
+  "limitations": "只复算训练RGB派生候选和来源，不证明GGX/阴影模型合适、GT方向准确率或7度。全部点保留。"
+}

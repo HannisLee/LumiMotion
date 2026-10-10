@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "output/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复/commands/audit_native_joint_geometry.py", line 10, in <module>
+    from scene.pbr_rasterizer import get_rasterizer_types
+ImportError: cannot import name 'get_rasterizer_types' from 'scene.pbr_rasterizer' (/home/lihan/reproduce/LumiMotion-stage2-perlight/scene/pbr_rasterizer.py)

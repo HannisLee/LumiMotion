@@ -1,0 +1,29 @@
+Loading trained model at iteration 35000
+Found transforms_train.json file, assuming Blender data set!
+Reading Training Transforms
+Read Train Transforms with 135 cameras
+Loading Training Cameras
+Loading Test Cameras
+LOAD PLY
+/home/lihan/reproduce/LumiMotion-stage2-perlight/scene/__init__.py:103: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  unique_fids = [torch.tensor(val, dtype=torch.float32, device="cuda") for val in unique_values]
+################ gaussian_color params: 156934
+Traceback (most recent call last):
+  File "output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/commands/audit_source_plane_normal_motion.py", line 38, in <module>
+    np.testing.assert_array_equal(span,expected_span);np.testing.assert_array_equal(maxdist,expected_max);np.testing.assert_array_equal(mincos,expected_cos)
+  File "/home/lihan/miniconda3/envs/lumimotion/lib/python3.8/site-packages/numpy/testing/_private/utils.py", line 985, in assert_array_equal
+    assert_array_compare(operator.__eq__, x, y, err_msg=err_msg,
+  File "/home/lihan/miniconda3/envs/lumimotion/lib/python3.8/contextlib.py", line 75, in inner
+    return func(*args, **kwds)
+  File "/home/lihan/miniconda3/envs/lumimotion/lib/python3.8/site-packages/numpy/testing/_private/utils.py", line 862, in assert_array_compare
+    raise AssertionError(msg)
+AssertionError: 
+Arrays are not equal
+
+Mismatched elements: 8097 / 99827 (8.11%)
+Max absolute difference: 1.7881393e-07
+Max relative difference: 2.2328252e-06
+ x: array([2.768680e-08, 3.859620e-05, 5.694513e-08, ..., 1.076878e+00,
+       3.189354e-01, 6.662075e-07], dtype=float32)
+ y: array([2.768680e-08, 3.859620e-05, 5.694518e-08, ..., 1.076878e+00,
+       3.189354e-01, 6.662075e-07], dtype=float32)

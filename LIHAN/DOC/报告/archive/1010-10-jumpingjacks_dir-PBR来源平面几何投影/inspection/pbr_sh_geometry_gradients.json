@@ -1,0 +1,453 @@
+{
+  "status": "PASS_READ_ONLY_GRADIENT_DIAGNOSTIC",
+  "iteration": 40000,
+  "frames": [
+    1,
+    75,
+    149
+  ],
+  "rows": [
+    {
+      "frame": "0001",
+      "valid_pixels": 18128,
+      "losses": {
+        "native_rgb_and_SH": 0.1106582060456276,
+        "physical_PBR_rgb": 0.09218861907720566,
+        "SH_rgb": 0.018469586968421936,
+        "normal_depth_full": 0.00781827513128519,
+        "normal_depth_GS_side": 0.00781827513128519,
+        "normal_depth_depth_side": 0.00781827513128519
+      },
+      "parameters": {
+        "xyz": {
+          "gradient_L2": {
+            "native_rgb_and_SH": 0.9169989228248596,
+            "physical_PBR_rgb": 0.9170213341712952,
+            "SH_rgb": 0.030414773151278496,
+            "normal_depth_full": 0.04356435686349869,
+            "normal_depth_GS_side": 0.03571402281522751,
+            "normal_depth_depth_side": 0.026589596644043922
+          },
+          "full_branch_sum_max_difference": 4.6566128730773926e-09,
+          "groups": {
+            "all": {
+              "points": 99827,
+              "gradient_L2": {
+                "native_rgb_and_SH": 0.9169989228248596,
+                "physical_PBR_rgb": 0.9170213341712952,
+                "SH_rgb": 0.030414773151278496,
+                "normal_depth_full": 0.04356435686349869,
+                "normal_depth_GS_side": 0.03571402281522751,
+                "normal_depth_depth_side": 0.026589596644043922
+              },
+              "PBR_SH_gradient_cosine": -0.017318973317742348,
+              "PBR_ND_gradient_cosine": -0.03144845739006996
+            },
+            "projected_plane": {
+              "points": 15187,
+              "gradient_L2": {
+                "native_rgb_and_SH": 0.013969303108751774,
+                "physical_PBR_rgb": 0.01320273894816637,
+                "SH_rgb": 0.003496793331578374,
+                "normal_depth_full": 0.0017720703035593033,
+                "normal_depth_GS_side": 0.0008900690008886158,
+                "normal_depth_depth_side": 0.0014503459678962827
+              },
+              "PBR_SH_gradient_cosine": 0.09315642714500427,
+              "PBR_ND_gradient_cosine": 0.013825993984937668
+            },
+            "dynamic": {
+              "points": 45583,
+              "gradient_L2": {
+                "native_rgb_and_SH": 0.8947770595550537,
+                "physical_PBR_rgb": 0.8948805928230286,
+                "SH_rgb": 0.028819210827350616,
+                "normal_depth_full": 0.0409562848508358,
+                "normal_depth_GS_side": 0.03428158909082413,
+                "normal_depth_depth_side": 0.023571301251649857
+              },
+              "PBR_SH_gradient_cosine": -0.019693899899721146,
+              "PBR_ND_gradient_cosine": -0.029064100235700607
+            },
+            "static_unprojected": {
+              "points": 39057,
+              "gradient_L2": {
+                "native_rgb_and_SH": 0.20016475021839142,
+                "physical_PBR_rgb": 0.19985626637935638,
+                "SH_rgb": 0.009071043692529202,
+                "normal_depth_full": 0.014740965329110622,
+                "normal_depth_GS_side": 0.009973556734621525,
+                "normal_depth_depth_side": 0.012218710966408253
+              },
+              "PBR_SH_gradient_cosine": 0.011339006945490837,
+              "PBR_ND_gradient_cosine": -0.06498274207115173
+            }
+          }
+        },
+        "rotation": {
+          "gradient_L2": {
+            "native_rgb_and_SH": 0.05956218019127846,
+            "physical_PBR_rgb": 0.059489164501428604,
+            "SH_rgb": 0.0018322122050449252,
+            "normal_depth_full": 0.0037349220365285873,
+            "normal_depth_GS_side": 0.003203359432518482,
+            "normal_depth_depth_side": 0.002099626464769244
+          },
+          "full_branch_sum_max_difference": 9.313225746154785e-10,
+          "groups": {
+            "all": {
+              "points": 99827,
+              "gradient_L2": {
+                "native_rgb_and_SH": 0.05956218019127846,
+                "physical_PBR_rgb": 0.059489164501428604,
+                "SH_rgb": 0.0018322122050449252,
+                "normal_depth_full": 0.0037349220365285873,
+                "normal_depth_GS_side": 0.003203359432518482,
+                "normal_depth_depth_side": 0.002099626464769244
+              },
+              "PBR_SH_gradient_cosine": 0.02447405457496643,
+              "PBR_ND_gradient_cosine": -0.012491544708609581
+            },
+            "projected_plane": {
+              "points": 15187,
+              "gradient_L2": {
+                "native_rgb_and_SH": 0.0020429629366844893,
+                "physical_PBR_rgb": 0.002014684723690152,
+                "SH_rgb": 0.00031053408747538924,
+                "normal_depth_full": 0.0003622832882683724,
+                "normal_depth_GS_side": 0.0001189234753837809,
+                "normal_depth_depth_side": 0.0003547726955730468
+              },
+              "PBR_SH_gradient_cosine": 0.014635719358921051,
+              "PBR_ND_gradient_cosine": 0.08777543157339096
+            },
+            "dynamic": {
+              "points": 45583,
+              "gradient_L2": {
+                "native_rgb_and_SH": 0.058653272688388824,
+                "physical_PBR_rgb": 0.05857484042644501,
+                "SH_rgb": 0.0017083750572055578,
+                "normal_depth_full": 0.0036422102712094784,
+                "normal_depth_GS_side": 0.003147826762869954,
+                "normal_depth_depth_side": 0.0020026504062116146
+              },
+              "PBR_SH_gradient_cosine": 0.0313558354973793,
+              "PBR_ND_gradient_cosine": -0.012190129607915878
+            },
+            "static_unprojected": {
+              "points": 39057,
+              "gradient_L2": {
+                "native_rgb_and_SH": 0.010162358172237873,
+                "physical_PBR_rgb": 0.010192646645009518,
+                "SH_rgb": 0.0005848287837579846,
+                "normal_depth_full": 0.0007434357539750636,
+                "normal_depth_GS_side": 0.0005818554782308638,
+                "normal_depth_depth_side": 0.000521496229339391
+              },
+              "PBR_SH_gradient_cosine": -0.08040213584899902,
+              "PBR_ND_gradient_cosine": -0.03152249753475189
+            }
+          }
+        }
+      }
+    },
+    {
+      "frame": "0075",
+      "valid_pixels": 15501,
+      "losses": {
+        "native_rgb_and_SH": 0.22068415582180023,
+        "physical_PBR_rgb": 0.2059040069580078,
+        "SH_rgb": 0.01478014700114727,
+        "normal_depth_full": 0.033943500369787216,
+        "normal_depth_GS_side": 0.033943500369787216,
+        "normal_depth_depth_side": 0.033943500369787216
+      },
+      "parameters": {
+        "xyz": {
+          "gradient_L2": {
+            "native_rgb_and_SH": 2.904552936553955,
+            "physical_PBR_rgb": 2.9048736095428467,
+            "SH_rgb": 0.033315885812044144,
+            "normal_depth_full": 0.10886874794960022,
+            "normal_depth_GS_side": 0.10129372030496597,
+            "normal_depth_depth_side": 0.056524988263845444
+          },
+          "full_branch_sum_max_difference": 1.4901161193847656e-08,
+          "groups": {
+            "all": {
+              "points": 99827,
+              "gradient_L2": {
+                "native_rgb_and_SH": 2.904552936553955,
+                "physical_PBR_rgb": 2.9048736095428467,
+                "SH_rgb": 0.033315885812044144,
+                "normal_depth_full": 0.10886874794960022,
+                "normal_depth_GS_side": 0.10129372030496597,
+                "normal_depth_depth_side": 0.056524988263845444
+              },
+              "PBR_SH_gradient_cosine": -0.015369061380624771,
+              "PBR_ND_gradient_cosine": 0.02350948564708233
+            },
+            "projected_plane": {
+              "points": 15187,
+              "gradient_L2": {
+                "native_rgb_and_SH": 0.20239029824733734,
+                "physical_PBR_rgb": 0.2023303359746933,
+                "SH_rgb": 0.004690975416451693,
+                "normal_depth_full": 0.00875075999647379,
+                "normal_depth_GS_side": 0.007938627153635025,
+                "normal_depth_depth_side": 0.0023028962314128876
+              },
+              "PBR_SH_gradient_cosine": 0.0011927345767617226,
+              "PBR_ND_gradient_cosine": 0.03869536519050598
+            },
+            "dynamic": {
+              "points": 45583,
+              "gradient_L2": {
+                "native_rgb_and_SH": 2.7722346782684326,
+                "physical_PBR_rgb": 2.7723655700683594,
+                "SH_rgb": 0.03216444328427315,
+                "normal_depth_full": 0.1039651557803154,
+                "normal_depth_GS_side": 0.09673717617988586,
+                "normal_depth_depth_side": 0.05443120002746582
+              },
+              "PBR_SH_gradient_cosine": -0.009878809563815594,
+              "PBR_ND_gradient_cosine": 0.03444061055779457
+            },
+            "static_unprojected": {
+              "points": 39057,
+              "gradient_L2": {
+                "native_rgb_and_SH": 0.8427215814590454,
+                "physical_PBR_rgb": 0.8434106111526489,
+                "SH_rgb": 0.007306950632482767,
+                "normal_depth_full": 0.03109782002866268,
+                "normal_depth_GS_side": 0.028970927000045776,
+                "normal_depth_depth_side": 0.015067021362483501
+              },
+              "PBR_SH_gradient_cosine": -0.09859490394592285,
+              "PBR_ND_gradient_cosine": -0.09762146323919296
+            }
+          }
+        },
+        "rotation": {
+          "gradient_L2": {
+            "native_rgb_and_SH": 0.22587023675441742,
+            "physical_PBR_rgb": 0.22594285011291504,
+            "SH_rgb": 0.002784752519801259,
+            "normal_depth_full": 0.01656828634440899,
+            "normal_depth_GS_side": 0.007792542688548565,
+            "normal_depth_depth_side": 0.015262934379279613
+          },
+          "full_branch_sum_max_difference": 1.862645149230957e-09,
+          "groups": {
+            "all": {
+              "points": 99827,
+              "gradient_L2": {
+                "native_rgb_and_SH": 0.22587023675441742,
+                "physical_PBR_rgb": 0.22594285011291504,
+                "SH_rgb": 0.002784752519801259,
+                "normal_depth_full": 0.01656828634440899,
+                "normal_depth_GS_side": 0.007792542688548565,
+                "normal_depth_depth_side": 0.015262934379279613
+              },
+              "PBR_SH_gradient_cosine": -0.032236792147159576,
+              "PBR_ND_gradient_cosine": -0.019436009228229523
+            },
+            "projected_plane": {
+              "points": 15187,
+              "gradient_L2": {
+                "native_rgb_and_SH": 0.020620454102754593,
+                "physical_PBR_rgb": 0.020632505416870117,
+                "SH_rgb": 0.0004033994337078184,
+                "normal_depth_full": 0.0012819623807445168,
+                "normal_depth_GS_side": 0.001085220486856997,
+                "normal_depth_depth_side": 0.0004899207851849496
+              },
+              "PBR_SH_gradient_cosine": -0.039641886949539185,
+              "PBR_ND_gradient_cosine": 0.17257076501846313
+            },
+            "dynamic": {
+              "points": 45583,
+              "gradient_L2": {
+                "native_rgb_and_SH": 0.21994085609912872,
+                "physical_PBR_rgb": 0.21999649703502655,
+                "SH_rgb": 0.002680953359231353,
+                "normal_depth_full": 0.016369841992855072,
+                "normal_depth_GS_side": 0.007449752185493708,
+                "normal_depth_depth_side": 0.015234588645398617
+              },
+              "PBR_SH_gradient_cosine": -0.02684323489665985,
+              "PBR_ND_gradient_cosine": -0.021225841715931892
+            },
+            "static_unprojected": {
+              "points": 39057,
+              "gradient_L2": {
+                "native_rgb_and_SH": 0.047097522765398026,
+                "physical_PBR_rgb": 0.0471806563436985,
+                "SH_rgb": 0.0006360849947668612,
+                "normal_depth_full": 0.002212004503235221,
+                "normal_depth_GS_side": 0.0020117678213864565,
+                "normal_depth_depth_side": 0.0007902108482085168
+              },
+              "PBR_SH_gradient_cosine": -0.13732115924358368,
+              "PBR_ND_gradient_cosine": -0.008452757261693478
+            }
+          }
+        }
+      }
+    },
+    {
+      "frame": "0149",
+      "valid_pixels": 18407,
+      "losses": {
+        "native_rgb_and_SH": 0.10803183168172836,
+        "physical_PBR_rgb": 0.08847916126251221,
+        "SH_rgb": 0.019552670419216156,
+        "normal_depth_full": 0.00733900535851717,
+        "normal_depth_GS_side": 0.00733900535851717,
+        "normal_depth_depth_side": 0.00733900535851717
+      },
+      "parameters": {
+        "xyz": {
+          "gradient_L2": {
+            "native_rgb_and_SH": 1.076598048210144,
+            "physical_PBR_rgb": 1.0755014419555664,
+            "SH_rgb": 0.026683978736400604,
+            "normal_depth_full": 0.0356634221971035,
+            "normal_depth_GS_side": 0.02814484015107155,
+            "normal_depth_depth_side": 0.02367757260799408
+          },
+          "full_branch_sum_max_difference": 2.7939677238464355e-09,
+          "groups": {
+            "all": {
+              "points": 99827,
+              "gradient_L2": {
+                "native_rgb_and_SH": 1.076598048210144,
+                "physical_PBR_rgb": 1.0755014419555664,
+                "SH_rgb": 0.026683978736400604,
+                "normal_depth_full": 0.0356634221971035,
+                "normal_depth_GS_side": 0.02814484015107155,
+                "normal_depth_depth_side": 0.02367757260799408
+              },
+              "PBR_SH_gradient_cosine": 0.02871500328183174,
+              "PBR_ND_gradient_cosine": 0.0032793611753731966
+            },
+            "projected_plane": {
+              "points": 15187,
+              "gradient_L2": {
+                "native_rgb_and_SH": 0.030816340819001198,
+                "physical_PBR_rgb": 0.03037494793534279,
+                "SH_rgb": 0.002834941027686,
+                "normal_depth_full": 0.0015669467393308878,
+                "normal_depth_GS_side": 0.000564346497412771,
+                "normal_depth_depth_side": 0.0014104339061304927
+              },
+              "PBR_SH_gradient_cosine": 0.1101619303226471,
+              "PBR_ND_gradient_cosine": -0.012567801401019096
+            },
+            "dynamic": {
+              "points": 45583,
+              "gradient_L2": {
+                "native_rgb_and_SH": 0.7995818853378296,
+                "physical_PBR_rgb": 0.7979874610900879,
+                "SH_rgb": 0.026058988645672798,
+                "normal_depth_full": 0.03298225998878479,
+                "normal_depth_GS_side": 0.026881743222475052,
+                "normal_depth_depth_side": 0.020978907123208046
+              },
+              "PBR_SH_gradient_cosine": 0.04491950199007988,
+              "PBR_ND_gradient_cosine": 0.007182342000305653
+            },
+            "static_unprojected": {
+              "points": 39057,
+              "gradient_L2": {
+                "native_rgb_and_SH": 0.7202655673027039,
+                "physical_PBR_rgb": 0.7204141616821289,
+                "SH_rgb": 0.00499268714338541,
+                "normal_depth_full": 0.013475717045366764,
+                "normal_depth_GS_side": 0.008317778818309307,
+                "normal_depth_depth_side": 0.010886854492127895
+              },
+              "PBR_SH_gradient_cosine": -0.033222176134586334,
+              "PBR_ND_gradient_cosine": -0.006453745067119598
+            }
+          }
+        },
+        "rotation": {
+          "gradient_L2": {
+            "native_rgb_and_SH": 0.06340540200471878,
+            "physical_PBR_rgb": 0.06328817456960678,
+            "SH_rgb": 0.0016043175710365176,
+            "normal_depth_full": 0.002768724923953414,
+            "normal_depth_GS_side": 0.0018854044610634446,
+            "normal_depth_depth_side": 0.0022357446141541004
+          },
+          "full_branch_sum_max_difference": 6.402842700481415e-10,
+          "groups": {
+            "all": {
+              "points": 99827,
+              "gradient_L2": {
+                "native_rgb_and_SH": 0.06340540200471878,
+                "physical_PBR_rgb": 0.06328817456960678,
+                "SH_rgb": 0.0016043175710365176,
+                "normal_depth_full": 0.002768724923953414,
+                "normal_depth_GS_side": 0.0018854044610634446,
+                "normal_depth_depth_side": 0.0022357446141541004
+              },
+              "PBR_SH_gradient_cosine": 0.060462791472673416,
+              "PBR_ND_gradient_cosine": 0.007853961549699306
+            },
+            "projected_plane": {
+              "points": 15187,
+              "gradient_L2": {
+                "native_rgb_and_SH": 0.004672574810683727,
+                "physical_PBR_rgb": 0.004618034232407808,
+                "SH_rgb": 0.0002942011342383921,
+                "normal_depth_full": 0.0003385519376024604,
+                "normal_depth_GS_side": 0.00010636543447617441,
+                "normal_depth_depth_side": 0.00035496472264640033
+              },
+              "PBR_SH_gradient_cosine": 0.1546264886856079,
+              "PBR_ND_gradient_cosine": 0.10609561204910278
+            },
+            "dynamic": {
+              "points": 45583,
+              "gradient_L2": {
+                "native_rgb_and_SH": 0.06233987212181091,
+                "physical_PBR_rgb": 0.06223640218377113,
+                "SH_rgb": 0.0015429219929501414,
+                "normal_depth_full": 0.0026837943587452173,
+                "normal_depth_GS_side": 0.0018208154942840338,
+                "normal_depth_depth_side": 0.0021712947636842728
+              },
+              "PBR_SH_gradient_cosine": 0.0547245517373085,
+              "PBR_ND_gradient_cosine": 0.008091099560260773
+            },
+            "static_unprojected": {
+              "points": 39057,
+              "gradient_L2": {
+                "native_rgb_and_SH": 0.010590173304080963,
+                "physical_PBR_rgb": 0.010521269403398037,
+                "SH_rgb": 0.0003266075800638646,
+                "normal_depth_full": 0.0005903119454160333,
+                "normal_depth_GS_side": 0.0004775637644343078,
+                "normal_depth_depth_side": 0.00039753271266818047
+              },
+              "PBR_SH_gradient_cosine": 0.19613778591156006,
+              "PBR_ND_gradient_cosine": -0.022718068212270737
+            }
+          }
+        }
+      }
+    }
+  ],
+  "model_files": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/point_cloud/iteration_40000/point_cloud.ply": "3a7071836c6be5413488b20b5b4bd3f14f57528a2bc6f4a0beb1f7288255a594",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/deform/iteration_40000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+  },
+  "gt_material_normal_geometry_inputs": false,
+  "original_test_RGB_used": false,
+  "optimizer_steps": 0,
+  "current_training_modified": false,
+  "final_mae": false,
+  "limitations": "三训练帧PBR/SH梯度量级与冲突仅证明优化机制，不证明GT准确性；不替代全15帧MAE或完整训练。"
+}

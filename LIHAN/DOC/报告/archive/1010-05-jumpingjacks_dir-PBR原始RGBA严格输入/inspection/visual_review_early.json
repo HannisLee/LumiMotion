@@ -1,0 +1,21 @@
+{
+  "status": "FAILED_FINAL_IMAGES_PENDING_ALL_MAE",
+  "iteration": 55000,
+  "reviewed_image": "inspection/four_categories_final_55000.png",
+  "sample_frames": [
+    1,
+    75,
+    150
+  ],
+  "scope": "实际查看首中尾四类图；不声称逐帧人工审核",
+  "RGB": "黑背景正常，人物斑驳、头手边界稀疏/缺失，平台偏白、棋盘纹理未恢复、脚周残色",
+  "Alpha": "人物平台轮廓基本完整，头手边毛糙、平台边缘残影；RGB暗部不是全部Alpha缺失",
+  "Normal": "台面较基线集中/平滑，脚周仍大片异常，人体表面及头手复杂斑驳",
+  "Albedo": "正面明/背面暗的照明结构严重残留，平台多为白色、棋盘格未恢复",
+  "quality_gate": "FAILED",
+  "commit_allowed": false,
+  "all_mae": "PENDING",
+  "HDR_review": "实际看首中尾：无全黑/全白，黑背景正常；人物及平台随HDR呈橙粉色，但严重斑驳、脚周伪结构、材质污染明显；无HDR GT，不判定颜色正确",
+  "directional_review": "实际看0000/0036/0071：随光方向变化、场景存在、黑背景正常；背向光较暗不单独判功能故障，人物及平台斑驳/伪结构明显",
+  "reviewed_relight_image": "inspection/relight_final_55000.png"
+}

@@ -1,0 +1,25 @@
+Loading trained model at iteration 55000
+Found transforms_train.json file, assuming Blender data set!
+Reading Training Transforms
+Read Train Transforms with 135 cameras
+Loading Training Cameras
+Loading Test Cameras
+LOAD PLY
+/home/lihan/reproduce/LumiMotion-stage2-perlight/scene/__init__.py:103: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  unique_fids = [torch.tensor(val, dtype=torch.float32, device="cuda") for val in unique_values]
+################ gaussian_color params: 156934
+Mesh frame 0010 time 0.06666667: 23856 vertices / 46456 triangles; 135 train poses
+Mesh frame 0020 time 0.13333333: 38348 vertices / 70959 triangles; 135 train poses
+Mesh frame 0030 time 0.20000000: 26061 vertices / 49212 triangles; 135 train poses
+Mesh frame 0040 time 0.26666667: 20363 vertices / 39718 triangles; 135 train poses
+Mesh frame 0050 time 0.33333333: 21429 vertices / 41916 triangles; 135 train poses
+Mesh frame 0060 time 0.40000000: 33888 vertices / 60752 triangles; 135 train poses
+Mesh frame 0070 time 0.46666667: 21078 vertices / 40707 triangles; 135 train poses
+Mesh frame 0080 time 0.53333333: 21041 vertices / 41000 triangles; 135 train poses
+Mesh frame 0090 time 0.60000000: 30597 vertices / 57650 triangles; 135 train poses
+Mesh frame 0100 time 0.66666667: 22176 vertices / 43561 triangles; 135 train poses
+Mesh frame 0110 time 0.73333333: 20741 vertices / 40537 triangles; 135 train poses
+Mesh frame 0120 time 0.80000000: 22468 vertices / 44073 triangles; 135 train poses
+Mesh frame 0130 time 0.86666667: 23753 vertices / 46515 triangles; 135 train poses
+Mesh frame 0140 time 0.93333333: 24119 vertices / 46311 triangles; 135 train poses
+Mesh frame 0150 time 1.00000000: 23949 vertices / 45349 triangles; 135 train poses

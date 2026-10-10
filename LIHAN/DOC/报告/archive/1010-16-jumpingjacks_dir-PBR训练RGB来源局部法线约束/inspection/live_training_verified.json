@@ -1,0 +1,21 @@
+{
+  "status": "PASS_LIVE_TRAIN",
+  "verified_at": "2026-10-10T11:13:35.904698+09:00",
+  "training_pid": 306459,
+  "start_ticks": "10865815",
+  "actual_stage2_steps": 1395,
+  "target_steps": 20000,
+  "source_iteration": 35000,
+  "current_iteration": 36395,
+  "unified_exec_sessions": {
+    "training": 4419,
+    "checkpoint_waiter": 10940,
+    "postprocess": 65390
+  },
+  "actual_sessions_still_running": true,
+  "GT_labels_training": false,
+  "source_RGB_derived_constraint": true,
+  "formal_MAE": false,
+  "normal_goal": "PENDING",
+  "quality": "PENDING"
+}

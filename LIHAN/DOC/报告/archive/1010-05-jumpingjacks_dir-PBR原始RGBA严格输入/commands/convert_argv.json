@@ -1,0 +1,10 @@
+[
+  "/home/lihan/miniconda3/envs/lumimotion/bin/python",
+  "LIHAN/scripts/prepare_jump_rgb_only_stage2.py",
+  "--source",
+  "/home/lihan/data/LH-data/danamic/jumpingjacks_direction_light",
+  "--reference_view",
+  "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/data_view",
+  "--output",
+  "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/data_view"
+]

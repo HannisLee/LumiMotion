@@ -1,0 +1,57 @@
+{
+  "scope": "只读35k预测DC，native get_albedo clamp [.03,.97] 的来源饱和诊断，无GT材质/法线",
+  "rows": [
+    {
+      "scope": "all",
+      "points": 99827,
+      "native_clamp_channel_fraction": 0.4350292672990941,
+      "all_channels_clamped_fraction": 0.2894307151371873,
+      "any_channel_clamped_fraction": 0.5862942891201779,
+      "min_rgb": [
+        -1.3930785655975342,
+        -1.2793344259262085,
+        -1.1419614553451538
+      ],
+      "max_rgb": [
+        3.535569429397583,
+        3.9626200199127197,
+        3.700413227081299
+      ]
+    },
+    {
+      "scope": "high_opacity",
+      "points": 32010,
+      "native_clamp_channel_fraction": 0.5459335624284077,
+      "all_channels_clamped_fraction": 0.373320837238363,
+      "any_channel_clamped_fraction": 0.7111215245235863,
+      "min_rgb": [
+        -0.8338215351104736,
+        -0.8439936637878418,
+        -0.8311200141906738
+      ],
+      "max_rgb": [
+        3.535569429397583,
+        3.9626200199127197,
+        3.700413227081299
+      ]
+    },
+    {
+      "scope": "static_high_opacity",
+      "points": 12603,
+      "native_clamp_channel_fraction": 0.5882197360416832,
+      "all_channels_clamped_fraction": 0.4046655558200428,
+      "any_channel_clamped_fraction": 0.7685471713084187,
+      "min_rgb": [
+        -0.540753960609436,
+        -0.5429930686950684,
+        -0.6253757476806641
+      ],
+      "max_rgb": [
+        3.535569429397583,
+        3.9626200199127197,
+        3.700413227081299
+      ]
+    }
+  ],
+  "training_changed": false
+}
