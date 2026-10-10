@@ -1,0 +1,390 @@
+Loading trained model at iteration 40000
+Found transforms_train.json file, assuming Blender data set!
+Reading Training Transforms
+Read Train Transforms with 135 cameras
+Loading Training Cameras
+Loading Test Cameras
+LOAD PLY
+/home/lihan/reproduce/LumiMotion-stage2-perlight/scene/__init__.py:103: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  unique_fids = [torch.tensor(val, dtype=torch.float32, device="cuda") for val in unique_values]
+################ gaussian_color params: 156934
+{
+  "status": "PASS_READ_ONLY_GATE_WORLD_RESPONSE",
+  "iteration": 40000,
+  "source_iteration": 35000,
+  "parameter_groups": {
+    "all": {
+      "points": 99827,
+      "raw_logit_delta": {
+        "mean": 0.03271610078342426,
+        "median": 0.0022658109664916992,
+        "p90": 0.10370407104492188,
+        "p99": 0.34058094978332537,
+        "maximum": 0.9284038543701172
+      },
+      "probability_delta": {
+        "mean": 0.0010290489932955804,
+        "median": 4.336470738053322e-08,
+        "p90": 0.00028699308168143037,
+        "p99": 0.029145016670227057,
+        "maximum": 0.2598613202571869
+      },
+      "source_gate_mean": 0.456786572933197,
+      "saved_gate_mean": 0.45644915103912354,
+      "raw_threshold_crossings": 91,
+      "changed_raw_points": 71553
+    },
+    "source_projected": {
+      "points": 15187,
+      "raw_logit_delta": {
+        "mean": 0.037975394962067394,
+        "median": 0.0034971237182617188,
+        "p90": 0.1336373329162597,
+        "p99": 0.2935183906555173,
+        "maximum": 0.5130321979522705
+      },
+      "probability_delta": {
+        "mean": 0.00017094364489866185,
+        "median": 1.659018380451016e-07,
+        "p90": 0.0002792461775243282,
+        "p99": 0.003632029332220547,
+        "maximum": 0.019490674138069153
+      },
+      "source_gate_mean": 0.0009300188976339996,
+      "saved_gate_mean": 0.0008515465306118131,
+      "raw_threshold_crossings": 0,
+      "changed_raw_points": 15138
+    },
+    "source_dynamic_near_plane": {
+      "points": 6836,
+      "raw_logit_delta": {
+        "mean": 0.08340452151507087,
+        "median": 0.04580259323120117,
+        "p90": 0.20734643936157227,
+        "p99": 0.5667262732982634,
+        "maximum": 0.9284038543701172
+      },
+      "probability_delta": {
+        "mean": 0.004566820489865008,
+        "median": 2.4557113647460938e-05,
+        "p90": 0.00982898473739624,
+        "p99": 0.08227498829364771,
+        "maximum": 0.2598613202571869
+      },
+      "source_gate_mean": 0.9717977046966553,
+      "saved_gate_mean": 0.9694521427154541,
+      "raw_threshold_crossings": 34,
+      "changed_raw_points": 6836
+    },
+    "source_other_dynamic": {
+      "points": 38747,
+      "raw_logit_delta": {
+        "mean": 0.045430100907078615,
+        "median": 0.01450490951538086,
+        "p90": 0.12337799072265625,
+        "p99": 0.4187337255477907,
+        "maximum": 0.8849232196807861
+      },
+      "probability_delta": {
+        "mean": 0.0007497143204862522,
+        "median": 7.152557373046875e-07,
+        "p90": 0.00022497177124023446,
+        "p99": 0.0201865816116333,
+        "maximum": 0.20835453271865845
+      },
+      "source_gate_mean": 0.991985023021698,
+      "saved_gate_mean": 0.99170982837677,
+      "raw_threshold_crossings": 14,
+      "changed_raw_points": 36441
+    },
+    "source_static_unprojected": {
+      "points": 39057,
+      "raw_logit_delta": {
+        "mean": 0.009186175095229454,
+        "median": 0.0,
+        "p90": 0.016853761672973647,
+        "p99": 0.18446646690368698,
+        "maximum": 0.5321438312530518
+      },
+      "probability_delta": {
+        "mean": 0.00102063105394792,
+        "median": 0.0,
+        "p90": 2.660274622030566e-05,
+        "p99": 0.029685950279235932,
+        "maximum": 0.19227609038352966
+      },
+      "source_gate_mean": 0.012951789423823357,
+      "saved_gate_mean": 0.012803408317267895,
+      "raw_threshold_crossings": 43,
+      "changed_raw_points": 13138
+    }
+  },
+  "rows": [
+    {
+      "frame": "0001",
+      "groups": {
+        "all": {
+          "position_change_m": {
+            "mean": 7.615579307184248e-05,
+            "median": 3.0048527555059934e-10,
+            "p90": 1.3143535761628356e-05,
+            "p99": 0.0016891379235312383,
+            "maximum": 0.05241285264492035
+          },
+          "unoriented_axis_change_deg": {
+            "mean": 0.005757052431650724,
+            "median": 8.537736462515939e-07,
+            "p90": 0.0008736209692556226,
+            "p99": 0.13932712019298404,
+            "maximum": 5.079439758689446
+          }
+        },
+        "source_projected": {
+          "position_change_m": {
+            "mean": 8.03181922211499e-06,
+            "median": 4.656612873077393e-10,
+            "p90": 9.282445535063743e-06,
+            "p99": 0.00017452677711844416,
+            "maximum": 0.0014594084350392222
+          },
+          "unoriented_axis_change_deg": {
+            "mean": 4.323054736202669e-07,
+            "median": 0.0,
+            "p90": 8.537736462515939e-07,
+            "p99": 4.365018614946014e-06,
+            "maximum": 1.5533050064947646e-05
+          }
+        },
+        "source_dynamic_near_plane": {
+          "position_change_m": {
+            "mean": 0.0003925127027111797,
+            "median": 9.999564554163953e-07,
+            "p90": 0.00047214167716447264,
+            "p99": 0.007929218932986247,
+            "maximum": 0.05241285264492035
+          },
+          "unoriented_axis_change_deg": {
+            "mean": 0.019927968267873176,
+            "median": 8.110849639390819e-05,
+            "p90": 0.031760515216220135,
+            "p99": 0.39499719556642565,
+            "maximum": 2.2169545156060715
+          }
+        },
+        "source_other_dynamic": {
+          "position_change_m": {
+            "mean": 6.103575789834989e-05,
+            "median": 5.115549583933898e-08,
+            "p90": 1.2929221338708888e-05,
+            "p99": 0.0012938759243115788,
+            "maximum": 0.03918468579649925
+          },
+          "unoriented_axis_change_deg": {
+            "mean": 0.005525978393729401,
+            "median": 7.143182815269534e-06,
+            "p90": 0.0015138953337942454,
+            "p99": 0.1268826323967998,
+            "maximum": 5.079439758689446
+          }
+        },
+        "source_static_unprojected": {
+          "position_change_m": {
+            "mean": 6.22745159493963e-05,
+            "median": 0.0,
+            "p90": 1.0607602916934417e-06,
+            "p99": 0.0015291616972535995,
+            "maximum": 0.03336169198155403
+          },
+          "unoriented_axis_change_deg": {
+            "mean": 0.005744425628444449,
+            "median": 0.0,
+            "p90": 0.00016523509044522237,
+            "p99": 0.1390139239197004,
+            "maximum": 3.502018933194168
+          }
+        }
+      }
+    },
+    {
+      "frame": "0075",
+      "groups": {
+        "all": {
+          "position_change_m": {
+            "mean": 6.067511019091783e-05,
+            "median": 2.0598986405495623e-10,
+            "p90": 1.572460496390707e-05,
+            "p99": 0.001549428233411166,
+            "maximum": 0.03362541273236275
+          },
+          "unoriented_axis_change_deg": {
+            "mean": 0.006220195093695805,
+            "median": 8.537736462515939e-07,
+            "p90": 0.001067815351259059,
+            "p99": 0.167277451622392,
+            "maximum": 3.9483391365774887
+          }
+        },
+        "source_projected": {
+          "position_change_m": {
+            "mean": 6.541772354103171e-06,
+            "median": 0.0,
+            "p90": 8.978985351859576e-06,
+            "p99": 0.000136270590010099,
+            "maximum": 0.0012224753154441714
+          },
+          "unoriented_axis_change_deg": {
+            "mean": 4.2752378035854355e-07,
+            "median": 0.0,
+            "p90": 8.537736462515939e-07,
+            "p99": 4.280703866421745e-06,
+            "maximum": 1.8802414151681903e-05
+          }
+        },
+        "source_dynamic_near_plane": {
+          "position_change_m": {
+            "mean": 0.00022519067801152957,
+            "median": 1.2995711813346134e-06,
+            "p90": 0.0004229407350067049,
+            "p99": 0.00451554285828024,
+            "maximum": 0.01763320341706276
+          },
+          "unoriented_axis_change_deg": {
+            "mean": 0.020531207637394126,
+            "median": 0.0001102261125587678,
+            "p90": 0.03735498041988325,
+            "p99": 0.41688162239957344,
+            "maximum": 1.33746468885321
+          }
+        },
+        "source_other_dynamic": {
+          "position_change_m": {
+            "mean": 5.457813169299539e-05,
+            "median": 9.534578282455186e-08,
+            "p90": 1.716742044663992e-05,
+            "p99": 0.0012914792378433074,
+            "maximum": 0.03362541273236275
+          },
+          "unoriented_axis_change_deg": {
+            "mean": 0.005979366155687607,
+            "median": 9.50722096304615e-06,
+            "p90": 0.0018632922275535271,
+            "p99": 0.1432430159868294,
+            "maximum": 3.9483391365774887
+          }
+        },
+        "source_static_unprojected": {
+          "position_change_m": {
+            "mean": 5.897846697625729e-05,
+            "median": 0.0,
+            "p90": 1.3050460438535084e-06,
+            "p99": 0.0015920573705807347,
+            "maximum": 0.02365218847990036
+          },
+          "unoriented_axis_change_deg": {
+            "mean": 0.006372816318996977,
+            "median": 0.0,
+            "p90": 0.00017566089162460827,
+            "p99": 0.17757839246814347,
+            "maximum": 2.484403070987835
+          }
+        }
+      }
+    },
+    {
+      "frame": "0149",
+      "groups": {
+        "all": {
+          "position_change_m": {
+            "mean": 7.39703260248609e-05,
+            "median": 2.8444704924801556e-10,
+            "p90": 1.3283066618896592e-05,
+            "p99": 0.0016099374322220826,
+            "maximum": 0.05302637442946434
+          },
+          "unoriented_axis_change_deg": {
+            "mean": 0.0054176493771009825,
+            "median": 8.537736462515939e-07,
+            "p90": 0.0008548566492234537,
+            "p99": 0.12982375614790856,
+            "maximum": 4.9127817709702315
+          }
+        },
+        "source_projected": {
+          "position_change_m": {
+            "mean": 8.246166088298093e-06,
+            "median": 4.656612873077393e-10,
+            "p90": 9.438484266865993e-06,
+            "p99": 0.00017683843936538274,
+            "maximum": 0.0013248545583337545
+          },
+          "unoriented_axis_change_deg": {
+            "mean": 4.1920280653709476e-07,
+            "median": 0.0,
+            "p90": 8.537736462515939e-07,
+            "p99": 4.353408482428141e-06,
+            "maximum": 1.319902026398418e-05
+          }
+        },
+        "source_dynamic_near_plane": {
+          "position_change_m": {
+            "mean": 0.0003731877536485434,
+            "median": 9.469787869420543e-07,
+            "p90": 0.0004379705496830866,
+            "p99": 0.006976928864605719,
+            "maximum": 0.05302637442946434
+          },
+          "unoriented_axis_change_deg": {
+            "mean": 0.017631731237092146,
+            "median": 7.705277594565119e-05,
+            "p90": 0.02780659785281452,
+            "p99": 0.36503259866061694,
+            "maximum": 1.9853779022599618
+          }
+        },
+        "source_other_dynamic": {
+          "position_change_m": {
+            "mean": 6.0573343998318096e-05,
+            "median": 5.21540641784668e-08,
+            "p90": 1.325880111835433e-05,
+            "p99": 0.0013221165747381817,
+            "maximum": 0.03784506767988205
+          },
+          "unoriented_axis_change_deg": {
+            "mean": 0.005395715811138228,
+            "median": 7.2445096183544035e-06,
+            "p90": 0.001516648843605471,
+            "p99": 0.11901323477166804,
+            "maximum": 4.9127817709702315
+          }
+        },
+        "source_static_unprojected": {
+          "position_change_m": {
+            "mean": 6.0446382667806856e-05,
+            "median": 0.0,
+            "p90": 1.0541879646552894e-06,
+            "p99": 0.001497511309571597,
+            "maximum": 0.03413927182555199
+          },
+          "unoriented_axis_change_deg": {
+            "mean": 0.0054080703244975825,
+            "median": 0.0,
+            "p90": 0.00016021808037262067,
+            "p99": 0.13064337618526345,
+            "maximum": 3.508417797796718
+          }
+        }
+      }
+    }
+  ],
+  "source_PLY_sha": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+  "frozen_checkpoint_SHA": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-14-jumpingjacks_dir-PBR来源输出gate微调/model_mlp/point_cloud/iteration_40000/point_cloud.ply": "352e600f8a889bfb3327b8ecfc48fc2ebf4a1c2dbbca4dcabbafdf112f495a51",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-14-jumpingjacks_dir-PBR来源输出gate微调/model_mlp/deform/iteration_40000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+  },
+  "source_NN_frozen": true,
+  "optimizer_steps": 0,
+  "GT_labels_read": false,
+  "training_prior_generated": false,
+  "scoring_mask_generated": false,
+  "limitations": "同一40k canonical几何比较saved gate与source35k gate的只读输出响应，不是B07另训权重，也不是GT法线误差。source near-plane/静动态组不是GT物体分类，全部点完整分区；未强制静态/删点/调整评分。仅TRAIN三帧，不当全15正式MAE。"
+}

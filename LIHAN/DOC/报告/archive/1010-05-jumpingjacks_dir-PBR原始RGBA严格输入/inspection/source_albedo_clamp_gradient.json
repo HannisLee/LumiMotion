@@ -1,0 +1,12 @@
+{
+  "scope": "CPU只读来源硬裁剪梯度诊断，不是初始化或训练修改",
+  "original_zero_gradient_channel_fraction": 0.4350292682647705,
+  "proposed_source_only_interior_interval": [
+    0.031,
+    0.969
+  ],
+  "proposed_initial_appearance_max_abs_srgb_difference": 0.001000046730041504,
+  "proposed_zero_gradient_fraction": 0.0,
+  "source_ply_unchanged": true,
+  "training_changed": false
+}

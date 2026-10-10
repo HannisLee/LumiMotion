@@ -1,0 +1,7 @@
+{
+  "status": "FAILED_INPUT_PROVENANCE",
+  "steps": 4177,
+  "exit_code": 143,
+  "training_pid": 206152,
+  "final_mae_available": false
+}

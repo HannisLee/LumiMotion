@@ -1,0 +1,64 @@
+[
+  {
+    "name": "predicted_meshes",
+    "argv": [
+      "/home/lihan/miniconda3/envs/lumimotion/bin/python",
+      "-u",
+      "-m",
+      "scripts.extract_geometry_mesh_dynamic",
+      "--model_path",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp",
+      "--load_iter",
+      "55000",
+      "--split",
+      "test",
+      "--resolution",
+      "2",
+      "--voxel_size",
+      "0.02",
+      "--sdf_trunc",
+      "0.08",
+      "--alpha_threshold",
+      "0.5",
+      "--output_dir",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-11-jumpingjacks_dir-PBR固定来源形变锚定-几何重评/predicted_meshes"
+    ],
+    "log": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-11-jumpingjacks_dir-PBR固定来源形变锚定-几何重评/logs/predicted_meshes.log"
+  },
+  {
+    "name": "normal_depth",
+    "argv": [
+      "/home/lihan/miniconda3/envs/lumimotion/bin/python",
+      "-u",
+      "-m",
+      "scripts.eval_geometry_gt",
+      "--model_path",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp",
+      "--load_iter",
+      "55000",
+      "--gt_root",
+      "/home/lihan/data/LH-data/danamic/jumpingjacks_direction_light",
+      "--gt_depth_dir",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/gt_depth",
+      "--split",
+      "test",
+      "--resolution",
+      "2",
+      "--output_dir",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-11-jumpingjacks_dir-PBR固定来源形变锚定-几何重评/normal_depth",
+      "--pred_mesh_manifest",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-11-jumpingjacks_dir-PBR固定来源形变锚定-几何重评/predicted_meshes/manifest.json",
+      "--save_arrays"
+    ],
+    "log": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-11-jumpingjacks_dir-PBR固定来源形变锚定-几何重评/logs/normal_depth.log"
+  },
+  {
+    "name": "verify_all_mae",
+    "argv": [
+      "/home/lihan/miniconda3/envs/lumimotion/bin/python",
+      "-u",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-11-jumpingjacks_dir-PBR固定来源形变锚定-几何重评/commands/verify_all_mae.py"
+    ],
+    "log": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-11-jumpingjacks_dir-PBR固定来源形变锚定-几何重评/logs/verify_all_mae.log"
+  }
+]

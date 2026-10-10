@@ -1,0 +1,9 @@
+# 1010-04 Stage2原始RGBA严格输入与来源护栏
+
+旧转换器读取albedo alpha，先前来源声明不准确。B01已4177/20000主动中止exit143，所有失败产物保留。150帧原RGB与albedo的16-bit alpha实际一致，旧与新转换RGBA亦全部像素一致；固定Stage1来源继承旧转换但没有原RGB之外的轮廮信息，披露继承限制，禁止重跑Stage1。
+
+新增LIHAN/scripts/prepare_jump_rgb_only_stage2.py：只读取原image RGBA与camera.json；保留135/15划分、相机/time/内参，参考原transforms逐项校验；复制原随机points3d仅供Scene点数元数据，实际几何加载指定35k预测PLY。输出最小data_view，不链接任何albedo/normal/depth/mesh/blend。逐图记录源/输出SHA与自带Alpha。
+
+新增scene/pbr_directional.validate_directional_training_inputs：原生方向光Stage2在输出变更前拒绝albedo-alpha；对original-image-alpha逐图核验源/输出SHA、RGBA来源及像素相等，写rgb_alpha_provenance.json。通用无转换manifest的原版数据不声称自动完成来源验证。未改变渲染公式、几何损失、优化参数或MAE定义。
+
+147项全量CPU tests实际OK；4项新增验证原始RGBA通过、旧GT alpha拒绝、源哈希变化拒绝、即便更新输出SHA仍拒绝替换Alpha。实际新data_view全150帧PASS，inspection/input_provenance.json。B02输出1010-05重新从35k完整Stage2至55k，全部MAE/渲染/人工审核待完成，未提交。

@@ -1,0 +1,155 @@
+{
+  "status": "COMPLETED_QUALITY_FAILED",
+  "model_path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-02-jumpingjacks_dir-PBR方向光基线/model_mlp",
+  "iteration": 55000,
+  "frames": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150
+  ],
+  "metrics": [
+    {
+      "metric": "Albedo MAE",
+      "mae": 0.19659954015133715,
+      "unit": "linear RGB",
+      "coverage_pct": 96.27566479615834
+    },
+    {
+      "metric": "Roughness MAE",
+      "mae": 0.2915418125615343,
+      "unit": "r",
+      "coverage_pct": 96.56091612942515
+    },
+    {
+      "metric": "GS Render Normal MAE",
+      "mae": 21.228755899062943,
+      "unit": "degree",
+      "coverage_pct": 93.0787876745468
+    },
+    {
+      "metric": "Depth Normal MAE",
+      "mae": 27.80211481125512,
+      "unit": "degree",
+      "coverage_pct": 88.449882411845
+    },
+    {
+      "metric": "Mesh Normal MAE",
+      "mae": 22.792035668886935,
+      "unit": "degree",
+      "coverage_pct": 93.77805807434653
+    },
+    {
+      "metric": "Expected Z Depth MAE",
+      "mae": 0.08852290402058548,
+      "unit": "m",
+      "coverage_pct": 93.0787876745468
+    },
+    {
+      "metric": "Median Z Depth MAE",
+      "mae": 0.09119154700414588,
+      "unit": "m",
+      "coverage_pct": 93.0787876745468
+    }
+  ],
+  "rgb": {
+    "psnr": 18.384561590747985,
+    "ssim": 0.8770897030830384,
+    "lpips": 0.12493863701820374,
+    "psnr_foreground": 11.308006909041387,
+    "ssim_foreground_bbox": 0.7279389182726542,
+    "lpips_foreground_bbox": 0.26818381746610004
+  },
+  "normal_common_pixels": {
+    "methods": [
+      "gs_render",
+      "depth_normal",
+      "mesh"
+    ],
+    "gt_pixels": 415433,
+    "valid_pixels": 366712,
+    "coverage": 0.8827223643764458,
+    "angular_deg": {
+      "gs_render": {
+        "mae_frame_mean_deg": 21.673617683711083,
+        "mae_pixel_mean_deg": 20.265508590246732
+      },
+      "depth_normal": {
+        "mae_frame_mean_deg": 28.306615525225304,
+        "mae_pixel_mean_deg": 27.74667539565902
+      },
+      "mesh": {
+        "mae_frame_mean_deg": 22.46569212164943,
+        "mae_pixel_mean_deg": 21.78272610886515
+      }
+    }
+  },
+  "gs_normal_missing_180_penalty_deg": 32.21765081505239,
+  "independent_audit": {
+    "status": "PASS",
+    "iteration": 55000,
+    "frames": 15,
+    "independently_recomputed_normal": {
+      "gs_render": {
+        "mae_deg": 21.228755899062943,
+        "coverage": 0.930787876745468,
+        "common_mae_deg": 20.265508590246732
+      },
+      "depth_normal": {
+        "mae_deg": 27.80211481125512,
+        "coverage": 0.8844988241184499,
+        "common_mae_deg": 27.74667539565902
+      },
+      "mesh": {
+        "mae_deg": 22.792035668886935,
+        "coverage": 0.9377805807434653,
+        "common_mae_deg": 21.78272610886515
+      }
+    },
+    "independently_recomputed_depth": {
+      "expected": {
+        "mae": 0.08852290489612696,
+        "coverage": 0.930787876745468
+      },
+      "median": {
+        "mae": 0.09119154856223977,
+        "coverage": 0.930787876745468
+      }
+    },
+    "independently_recomputed_albedo": {
+      "mae_linear": 0.1965995401586571,
+      "coverage_pct": 96.27566479615835
+    },
+    "source_hashes_verified": 83,
+    "dynamic_meshes": 15,
+    "train_poses_per_time": 135,
+    "common_normal_pixels": 366712,
+    "roughness_mae": 0.2915418125615343
+  },
+  "training_gt_inputs": [
+    "light_direction",
+    "albedo_alpha_file_in_legacy_conversion"
+  ],
+  "material_geometry_gt_used_for_training": true,
+  "light_GT_photometry_used": false,
+  "light_intensity": "fixed pi, white unique directions; not GT energy",
+  "source_plane_diagnostic_only": true,
+  "manual_review": "FAILED",
+  "normal_target_pass": false,
+  "commit_allowed": false,
+  "strict_input_source_gate": "FAILED_LEGACY_ALBEDO_ALPHA_SOURCE",
+  "albedo_RGB_normal_roughness_depth_mesh_GT_used_for_training": false,
+  "gt_material_file_component": "albedo alpha only; identical to original RGB alpha on all 150 frames",
+  "original_RGBA_pixel_equivalent": true
+}

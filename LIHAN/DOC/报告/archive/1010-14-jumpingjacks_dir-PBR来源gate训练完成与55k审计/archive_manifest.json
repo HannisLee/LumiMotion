@@ -1,0 +1,11 @@
+{
+  "README.md": "b2a3a10266a3611a60cabdbfa5aa01a9278321ce39db183eda9408db898a14fa",
+  "process_handles.json": "bdeb6376f0c590de350154a48bfdcbb64f176a74bb0b38f53c05946a50d7cfa1",
+  "training_runtime.json": "52f09d1a7e2b52ac543f4b9fa88ec5ec1cf2ec3a21896565d266a68d2e57dd53",
+  "logs/checkpoint_55000_audit.log": "7dcb18e37b92344f404bdba6ec9b82a3f3579faf76d16995506e8fbb2ef75d15",
+  "logs/train.log": "cfc6d15004ad160e2f143032aa8b7c513eb78da8c9a2efb7c60f7e37aef2d2c2",
+  "model_mlp/pbr_feature_gate.json": "d7d8b565c505ed5d4d578706626466601d9490e6349718d0098c6d9c07055254",
+  "inspection/checkpoint_wait_state.json": "8b4e8156d8d5c983ca44c05869c74def55d41344ca3a542908d5b216a2f136be",
+  "inspection/checkpoint_55000_audit.json": "680b486e52ebc51b65a31b5915d6e3891a80b9c44c0f14cf75cc53d73750de1d",
+  "model_mlp/pbr_directional/iteration_55000/lighting.json": "f140c75f29902b882af8fd170c76424f4e5c5c6087bc1b4ef48f4e249002e8b6"
+}

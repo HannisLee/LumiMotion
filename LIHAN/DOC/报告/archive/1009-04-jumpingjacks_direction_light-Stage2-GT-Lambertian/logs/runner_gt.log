@@ -1,0 +1,5 @@
+{'status': 'RUNNING', 'step': 'export_gt_meshes', 'updated_at': '2026-10-09T19:56:27.644251+09:00', 'pid': 144877}
+{'status': 'RUNNING', 'step': 'export_gt_meshes', 'updated_at': '2026-10-09T19:56:27.645148+09:00', 'pid': 144877, 'child_pid': 144880}
+{'status': 'RUNNING', 'step': 'prepare_depth_gt', 'updated_at': '2026-10-09T19:56:35.599572+09:00', 'pid': 144877}
+{'status': 'RUNNING', 'step': 'prepare_depth_gt', 'updated_at': '2026-10-09T19:56:35.601015+09:00', 'pid': 144877, 'child_pid': 144941}
+{'status': 'COMPLETED', 'step': 'finished', 'updated_at': '2026-10-09T19:56:48.036294+09:00', 'pid': 144877}

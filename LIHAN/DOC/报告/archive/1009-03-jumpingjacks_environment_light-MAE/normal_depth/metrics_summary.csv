@@ -1,0 +1,11 @@
+source_frame,split,region,metric,mae,unit,coverage,valid_pixels,status
+,,foreground,GS Render Normal MAE,14.438466394185806,degree,0.9293556361675649,386085,evaluated
+,,foreground,Depth Normal MAE,19.10947925393528,degree,0.883709286455337,367122,evaluated
+,,foreground,Mesh Normal MAE,15.361214803065552,degree,0.9394222413722549,390267,evaluated
+,,foreground,Expected Depth MAE,0.05875840173633591,meter,0.9293556361675649,386085,evaluated
+,,foreground,Median Depth MAE,0.05903383735314616,meter,0.9293556361675649,386085,evaluated
+,,interior,GS Render Normal MAE,12.522446757426739,degree,0.9701450418906405,354101,evaluated
+,,interior,Depth Normal MAE,17.86154424854792,degree,0.9212762809659231,336264,evaluated
+,,interior,Mesh Normal MAE,13.11338530390012,degree,0.9730683455799758,355168,evaluated
+,,interior,Expected Depth MAE,0.05691052358370293,meter,0.9701450418906405,354101,evaluated
+,,interior,Median Depth MAE,0.05708444531225143,meter,0.9701450418906405,354101,evaluated

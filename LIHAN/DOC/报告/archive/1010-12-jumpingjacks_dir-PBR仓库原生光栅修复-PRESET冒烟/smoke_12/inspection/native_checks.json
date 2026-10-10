@@ -1,0 +1,160 @@
+{
+  "status": "PASS_NATIVE_FACING_AND_GRADIENT_DIAGNOSTIC",
+  "rows": [
+    {
+      "frame": "0001",
+      "camera_center": [
+        0.023895861580967903,
+        -4.640604496002197,
+        1.035266399383545
+      ],
+      "camera_plane_side_min": 1.0547312498092651,
+      "modes": {
+        "legacy": {
+          "valid_pixels": 10074,
+          "plane_dot_min": 0.9999998807907104,
+          "negative_fraction": 0.0
+        },
+        "native": {
+          "valid_pixels": 10074,
+          "plane_dot_min": 0.9999999403953552,
+          "negative_fraction": 0.0
+        }
+      }
+    },
+    {
+      "frame": "0038",
+      "camera_center": [
+        4.607349872589111,
+        -0.09756223112344742,
+        1.026534080505371
+      ],
+      "camera_plane_side_min": 1.0215206146240234,
+      "modes": {
+        "legacy": {
+          "valid_pixels": 9880,
+          "plane_dot_min": -1.0,
+          "negative_fraction": 1.0
+        },
+        "native": {
+          "valid_pixels": 9880,
+          "plane_dot_min": 0.9999999403953552,
+          "negative_fraction": 0.0
+        }
+      }
+    },
+    {
+      "frame": "0075",
+      "camera_center": [
+        0.12037335336208344,
+        4.65539026260376,
+        0.8781554698944092
+      ],
+      "camera_plane_side_min": 0.8750215768814087,
+      "modes": {
+        "legacy": {
+          "valid_pixels": 8439,
+          "plane_dot_min": -1.0000001192092896,
+          "negative_fraction": 1.0
+        },
+        "native": {
+          "valid_pixels": 8439,
+          "plane_dot_min": 0.9999999403953552,
+          "negative_fraction": 0.0
+        }
+      }
+    },
+    {
+      "frame": "0076",
+      "camera_center": [
+        -0.07268127799034119,
+        4.65585994720459,
+        0.8765783309936523
+      ],
+      "camera_plane_side_min": 0.8740150332450867,
+      "modes": {
+        "legacy": {
+          "valid_pixels": 8427,
+          "plane_dot_min": -1.0000001192092896,
+          "negative_fraction": 1.0
+        },
+        "native": {
+          "valid_pixels": 8427,
+          "plane_dot_min": 0.9999998807907104,
+          "negative_fraction": 0.0
+        }
+      }
+    },
+    {
+      "frame": "0080",
+      "camera_center": [
+        -0.8328909873962402,
+        4.538178443908691,
+        1.4753118753433228
+      ],
+      "camera_plane_side_min": 1.4752779006958008,
+      "modes": {
+        "legacy": {
+          "valid_pixels": 12935,
+          "plane_dot_min": 0.9999999403953552,
+          "negative_fraction": 0.0
+        },
+        "native": {
+          "valid_pixels": 12935,
+          "plane_dot_min": 0.9999999403953552,
+          "negative_fraction": 0.0
+        }
+      }
+    },
+    {
+      "frame": "0150",
+      "camera_center": [
+        0.023895861580967903,
+        -4.640604496002197,
+        1.035266399383545
+      ],
+      "camera_plane_side_min": 1.0547312498092651,
+      "modes": {
+        "legacy": {
+          "valid_pixels": 10074,
+          "plane_dot_min": 0.9999999403953552,
+          "negative_fraction": 0.0
+        },
+        "native": {
+          "valid_pixels": 10074,
+          "plane_dot_min": 0.9999999403953552,
+          "negative_fraction": 0.0
+        }
+      }
+    }
+  ],
+  "optimizer_steps": 0,
+  "gt_labels_used": false,
+  "synthetic_gradient": [
+    [
+      -0.1496533900499344,
+      1.332554578781128,
+      0.39200109243392944,
+      -0.1330360621213913
+    ]
+  ],
+  "finite_difference": [
+    [
+      -0.14975666999816895,
+      1.3329088687896729,
+      0.39204955101013184,
+      -0.13336539268493652
+    ]
+  ],
+  "gradient_max_error": 0.0003542900085449219,
+  "source_files": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/point_cloud/iteration_55000/point_cloud.ply": "004214808c1e713e7a46c07e77a30f3b7a308dcbff53b8a981d1ec170e73cb61",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/deform/iteration_55000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+  },
+  "native_extension": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-12-dir-PBR原生光栅方向核验/build/lumimotion_pbr_raster_audit_cuda.so",
+  "native_extension_sha256": "10787723eb6779c4fb6f4e498997bb3d93677441e21743a31026553fb3b5d426",
+  "environment_package_changed": false,
+  "B05_pipeline_changed": false,
+  "final_mae": false,
+  "limitations": "同B05旧训练权重仅验证新CUDA实际法线定向/梯度/PBR功能；不据此声明新训练后画质或7°。"
+}

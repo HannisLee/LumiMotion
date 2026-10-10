@@ -1,10 +1,60 @@
 # LumiMotion 文档库与 Agent 工作索引
 
-更新日期：2026-10-07
+更新日期：2026-10-10
 适用范围：本仓库中的 LumiMotion 复现实验、数据准备、Stage 1/2 训练、离线评估与后续代码维护。
 
 本文件是进入项目后的**第一阅读入口**。它不重复各实验的原始命令或指标；需要执行、判断或修改时，请沿下方链接回到对应的一手文档、脚本和实验产物。当前文档库的唯一入口目录为 `LIHAN/DOC/`。
 
+
+## 1010 新增静态JumpingJacks原版两阶段
+
+- [17号静态env训练报告](DOC/训练/1010-17-static_jumpingjacks_environment_light-原版LumiMotion两阶段训练报告.md)
+- [18号静态dir训练报告](DOC/训练/1010-18-static_jumpingjacks_direction_light-原版LumiMotion两阶段训练报告.md)
+- [转换与执行记录](DOC/修改/1010-16-静态JumpingJacks转换与原版两阶段执行.md)
+
+两套静态人物均冻结原动作第100帧，150帧运动相机与光照，135/15划分。原版main SH35k→IR累计55k，默认随机方块初始化，GPU0最多两组并行。910源文件SHA256/300真实reader相机核验通过；两组独立冒烟及正式六步、完整视频解码和代表图实际目检完成，2/2流程验收PASS。质量限制、指标与产物见两份训练报告及[执行汇总](../output/1010-19-static_jumpingjacks-原版两阶段执行汇总/README.md)。
+
+## 1010 Stage2 PBR方向光优化目标
+
+- [GOAL：完整训练验收、提交及法线<7°迭代记录](DOC/GOAL/1010-goal-opt-pbr-jacks.md)
+- [1010-02 原生PBR方向光完整基线训练报告](DOC/训练/1010-02-jumpingjacks_dir-PBR方向光完整基线训练报告.md)
+- [1010-02 运行验证与透明Roughness评测导出](DOC/修改/1010-02-原生PBR方向光运行验证与透明Roughness评测导出.md)
+
+B00完整20k训练与15帧七项MAE完成；GS Normal 21.2288°/覆盖93.0788%，人工图像质量FAILED。B01因旧转换albedo-alpha来源声明错误已中止；B02/B03完整20k及七项MAE完成、质量FAILED；B03 GS18.8955°，B04完整20k及七项MAE完成，GS18.9123°/质量FAILED，163项CPU与GPU来源一致性通过；目标仍进行中，未提交/push或建立优化分支。
+
+- [1010-02 全量MAE与失败结论](DOC/报告/1010-02-jumpingjacks_dir-PBR方向光各项MAE评测报告.md)
+- [1010-03 预测几何与RGB光强Preset](DOC/修改/1010-03-原生PBR预测几何微调与来源平面约束Preset.md)
+- [1010-04 修复版完整Stage2训练](DOC/训练/1010-04-jumpingjacks_dir-PBR预测几何与RGB光强训练报告.md)
+
+- [1010-04 原始RGBA来源护栏与中止审计](DOC/修改/1010-04-Stage2原始RGBA严格输入与来源护栏.md)
+- [1010-05 原始RGBA完整重训与全量MAE（质量FAILED）](DOC/训练/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入训练报告.md)
+
+- [1010-05 预测材质初始化与Refine候选Preset](DOC/修改/1010-05-原生PBR预测材质初始化与RefinePreset.md)
+
+- [1010-07 材质初始化与投影完整训练（全量MAE已完成，质量FAILED）](DOC/训练/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复训练报告.md)
+
+- [1010-06 固定来源形变Anchor Preset](DOC/修改/1010-06-原生PBR固定来源形变与AnchorPreset.md)
+- [1010-09 固定来源形变完整训练与MAE（质量FAILED）](DOC/训练/1010-09-jumpingjacks_dir-PBR固定来源形变锚定训练报告.md)
+
+## 1010 原生PBR GT方向光与preset接入
+
+[实现与使用命令](DOC/修改/1010-01-原生PBR支持GT方向光与Preset接入.md)：新增pbr_gt_directional preset，使用原生original_ir材质/roughness/GGX及BVH，直接读取新版逐帧多SUN方向、颜色、强度。已接入训练、配置快照、离线评测、转灯/HDR与Roughness MAE权重识别。方向光功能已通过实际完整训练、渲染与评测；B00图像质量未通过，B01输入来源审计中止，B02/B03完整训练质量FAILED，B04固定来源形变Anchor完整训练/评测完成，质量FAILED。当前代码位于1001-stage2-perlight工作区，未提交。
+
+## 1009 dir GT Lambertian Stage2：完成并归档
+
+[训练文档](DOC/训练/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian训练报告.md)；[全15帧MAE报告](DOC/报告/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian-各项MAE与三类Normal评测报告.md)：Stage1/35k只读来源，99,827 Gaussian，冻结几何及形变，仅材质训练至55k；真实GT SUN方向，135训练RGB标定固定光强3.09641359。Albedo 0.23996675，GS/Depth/Mesh Normal 21.5250°/27.6051°/22.8858°；覆盖率、共同像素与深度完整联报。Roughness无输出，标为不适用。训练、GT审核、MAE独立复算、六视频解码及首中尾实际目检PASS，质量限制和证据SHA256清单已归档。[多灯适配记录](DOC/修改/1009-04-dir多SUN兼容表与GT-Lambertian执行记录.md)。
+
+## 1009 env最终55k全前景MAE：完成并归档
+
+[各项MAE与三类Normal报告](DOC/报告/1009-03-jumpingjacks_environment_light-各项MAE与三类Normal评测报告.md)：完整15测试帧，Albedo 0.19101779、Roughness 0.19992533；GS/Depth/Mesh Normal 13.8899°/18.9226°/14.9573°，联报92.94%/88.37%/93.94%覆盖率；Expected/Median Z Depth 5.8996/5.9127厘米。新增15份逐时刻预测Mesh，各融合135个训练相机固定目标time，无GT几何参与重建。真值、来源、独立CPU复算及首中尾真实目检PASS；材质偏暗、人体法线斑驳与局部漏覆盖是主要限制。指标、逐帧表、命令、日志、源码快照及代表图已归档并保存SHA256清单。原训练六步流水线已结束，NVS PSNR 33.8618、SSIM 0.979730、LPIPS 0.0292933；完整视频最终目检待完成。
+
+## 1009 direction_light 原版Stage1与env阶段结果初查
+
+[方向光Stage1训练](DOC/训练/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1训练报告.md)：用户授权，仅原版SH 35k与150时刻insights，GPU0与env Stage2并行；默认10万随机方块初始化核验PASS，35k训练、7视频完整解码及首中尾目检完成，流程PASS；中间时刻有局部拖影，人体法线斑驳。env Stage1 35k完整，7视频各150帧解码通过，测试子集PSNR41.2724；同相机RGB较接近GT，人体法线斑驳、基色明暗残留、固定视角局部拖影。完整结论与代表图见1009-01训练报告，env最终55k MAE已完成并归档，见上方1009-03报告。
+
+## 1009 JumpingJacks 双光照数据转换与 env 原版训练准备
+
+[训练报告与完整命令](DOC/训练/1009-01-jumpingjacks_environment_light-原版LumiMotion两阶段训练报告.md)：environment_light、direction_light 两套150帧数据已转换，各135/15划分；全部300帧、原版reader与首中尾目检PASS。仅env准备原版SH 35k→IR累计55k，默认随机方块初始化，用户已确认报告名字并于2026-10-09 18:04启动GPU0正式后台训练，Stage1 35k、Stage2 55k及六步流水线已结束；完整视频最终目检待完成。[转换适配器说明](DOC/修改/1009-01-jumpingjacks新版多光源数据转换与原版训练准备.md)。
 
 ## 1008 通用前景 MAE 使用指导
 
@@ -51,6 +101,8 @@
 [四组执行记录（辅助文档）](DOC/训练/1006-05-V4四版本原版随机方块初始化重训核对.md)、[初始化审计](DOC/修改/1006-06-随机方块重训准备与初始化审计.md)、[调度及最终回填](DOC/修改/1006-07-四版本随机方块正式调度与结果回填.md)。默认随机方块100000点，原版35k/55k；冒烟按用户要求跳过。四组正式流程和双阶段评测、代表图目检均完成；质量限制见报告，PASS仅表示流程与产物验收。
 
 ## 全分支共享文档与历史归档
+
+- [1010当前项目提交与全分支同步](DOC/修改/1010-20-当前项目提交与全分支共享资料同步.md)：包含新增静态两阶段结果、PBR实验归档和规则兼容入口。
 
 `LIHAN/` 和根目录 `LIHAN.md` 为全分支共享资料。训练、参数与实验记录仍以文中标注的来源分支和提交为准；当前分支未必具备其他分支的模型功能。服务器环境应先运行 `hostname`，再按根目录规则选择，文中的历史环境和本地 `output/` 链接仅供追溯。
 
@@ -198,3 +250,51 @@ output/ ────────────────── 训练、渲染�
 当文档、代码和产物存在冲突时，优先级为：**当前代码与可复现实验产物 > 最新修改/训练记录 > 审计报告 > 历史归档**。发现不一致时，不要静默修正文档；先定位差异，再在相应目录新增中文记录。
 
 四组Stage1/Stage2的SSIM、albedo、depth及normal MAE评测已完成：[双阶段真值评测报告](DOC/报告/1006-01-四组Stage1与Stage2真值评测报告.md)。训练仍只有01～04，全部结果、质量限制和最终状态已回填。
+
+- B05来源平面实际几何投影：[修改与Plane Preset](DOC/修改/1010-07-原生PBR来源平面几何投影与PlanePreset.md)；[完整Stage2训练计划](DOC/训练/1010-10-jumpingjacks_dir-PBR来源平面几何投影训练报告.md)。179 CPU及真实GPU零步PASS；完整20k及全15七MAE/独立复算完成，GS17.73082°，前后景/四类/HDR实际质量FAILED、7°FAILED。
+
+- 几何评测共享入口更正：[Anchor/Plane GeometryRun修复](DOC/修改/1010-08-原生PBR几何评测共享Anchor与Plane运行时.md)。B04旧几何MAE SUPERSEDED，完整15帧重评已更正；179 CPU及真实GPU缓冲逐像素一致PASS；B05同入口全量评测已完成，未改变评分。
+
+- [B04完整七项MAE几何更正报告](DOC/报告/1010-11-jumpingjacks_dir-PBR固定来源形变锚定几何更正与七项MAE报告.md)：全15重评/独立复算PASS，真实GS18.77743°，旧GeometryRun分数SUPERSEDED；图像质量与7°FAILED。
+
+- [B05完整七项MAE与失败验收报告](DOC/报告/1010-10-jumpingjacks_dir-PBR来源平面几何投影各项MAE评测报告.md)：GS17.73082°，较B04更正18.77743°下降1.04661°；质量及7°FAILED。另发现旧installed CUDA法线Z符号缺陷，独立原生核验继续，未提交。
+
+- [仓库原生CUDA与Native Preset修复](DOC/修改/1010-09-原生PBR显式仓库CUDA光栅与NativePreset.md)：旧installed normal.Z定向与仓库ray-dot不同，真实六视角/梯度及187 CPU/20步训练/缓冲一致PASS；[B06完整Stage2训练](DOC/训练/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复训练报告.md)：完整20k/55k train和9步后处理exit0，GS17.29780°/覆盖94.10134%，RGB PSNR19.68220dB；全部15帧七MAE/独立复算完成，前后景/四类/HDR与7°FAILED，未commit/push。
+
+- [B06完整七项MAE与失败验收报告](DOC/报告/1010-12-jumpingjacks_dir-PBR仓库原生光栅修复各项MAE评测报告.md)：仓库原生kernel真实修复、GS下降.43302°，材质MAE上升，仍需源预测/RGB范围的优化。
+
+- [Direct Native SUN预算与Preset](DOC/修改/1010-10-原生PBR直接SUN像素预算与DirectPreset.md)：194 CPU PASS，实际20步/GPU与完整B07待完成，不是质量或7°PASS。
+
+- [B07直接SUN与真实预算完整Stage2](DOC/训练/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算训练报告.md)：194 CPU及20步/真实GPU预算/共享buffer PASS，smoke图像仍FAILED；独立35k→55k全20k已真实开训，完整MAE/质量待完成。
+
+- [B07直接SUN实际预算完整七项MAE与验收](DOC/报告/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算各项MAE评测报告.md)：完整20k/全15七MAE/独立复算exit0，GS16.81871°/覆盖95.00329%，实际质量FAILED、7°FAILED；未自动提交。
+
+- [原生PBR来源输出gate与Preset](DOC/修改/1010-11-原生PBR来源输出gate微调与Preset.md)：202 CPU/真实20步/五参数梯度/共享buffer/4视频PASS，实际smoke质量FAILED，完整B08未开训。
+
+- [B08来源gate完整Stage2](DOC/训练/1010-14-jumpingjacks_dir-PBR来源输出gate微调训练报告.md)：202 CPU/20步/五参数GPU/共享buffer PASS，独立20k PREPARED，最终全15七MAE/质量待完成。
+
+- [B08来源输出gate完整七项MAE与验收](DOC/报告/1010-14-jumpingjacks_dir-PBR来源输出gate微调各项MAE评测报告.md)：完整20k/全15七MAE/独立复算exit0，GS16.84134°/覆盖95.01267%，实际质量FAILED、7°FAILED；未自动提交。
+
+- [原生PBR概率gate与Preset](DOC/修改/1010-12-原生PBR概率gate优化与Preset.md)：211 CPU/真实20步/五参数GPU/共享buffer/4视频PASS，smoke质量FAILED，完整B09尚未启动。
+
+- [B09概率gate完整Stage2](DOC/训练/1010-15-jumpingjacks_dir-PBR概率gate优化训练报告.md)：211 CPU/20步/五参数GPU/共享buffer/4视频功能PASS，独立20k PREPARED，全15七MAE/质量待完成。
+
+- B09训练期间只读阴影起点/原RGB损失梯度检查：26/4文件归档SHA三checkout一致，50k checkpoint实际PASS（7文件）。详见[GOAL](DOC/GOAL/1010-goal-opt-pbr-jacks.md)，最终MAE/质量待完成。
+
+- B09完整20k真实exit0/55k来源检查通过；最终15 RGB PSNR19.81035dB，实际RGB/四类早期画质FAILED，HDR/七MAE继续。[训练文档](DOC/训练/1010-15-jumpingjacks_dir-PBR概率gate优化训练报告.md)。
+
+- [训练RGB方向约束独立原型](DOC/修改/1010-13-原生PBR训练RGB法线约束独立原型.md)：仅135 TRAIN RGB/自身Alpha/来源35k/单位方向，29621来源候选，独立CPU/SHA PASS；未接入生产或作7度结论。
+
+- [B09概率gate完整七项MAE与验收](DOC/报告/1010-15-jumpingjacks_dir-PBR概率gate优化各项MAE评测报告.md)：完整20k/全15七MAE/独立复算exit0，GS15.94231°/覆盖95.47845%，实际质量FAILED、7°FAILED；未自动提交。
+
+- [B10来源RGB局部法线Preset实际冒烟](DOC/训练/1010-18-dir-PBR训练RGB来源局部法线冒烟训练文档.md)：226 CPU/20步/GPU/保存/共享buffer/4视频功能PASS，实际画质FAILED_SMOKE_ONLY，完整训练待执行。
+
+- [B10训练RGB来源局部法线完整Stage2](DOC/训练/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束训练报告.md)：226 CPU/20步/共享功能PASS，独立原35k→55k PREPARED，全15七MAE和质量待执行。
+
+- B10完整Stage2已启动：原35k→55k、lambda2训练RGB派生轴、启动7项配置差异/来源SHA审计PASS；当前1395/20000步，正式MAE/质量未完成。
+
+- [来源形变Jacobian只读诊断](DOC/修改/1010-15-来源形变Jacobian法线运输独立诊断.md)：已执行诊断归档，直接替换候选未接受；完成B10后停止迭代。
+
+- [B10训练RGB轴约束完整七项MAE与验收](DOC/报告/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束各项MAE评测报告.md)：完整20k/全15七MAE/独立复算exit0，GS15.54007°/覆盖95.48688%，实际质量FAILED、7°FAILED；未自动提交。
+
+- [当前训练结束与完整迭代总结](DOC/报告/1010-17-jumpingjacks_dir-原生PBR方向光迭代总结报告.md)：B00–B10/前置env与GT Lambertian、七MAE/真实画质、审计和产物路径；按用户要求停止迭代。

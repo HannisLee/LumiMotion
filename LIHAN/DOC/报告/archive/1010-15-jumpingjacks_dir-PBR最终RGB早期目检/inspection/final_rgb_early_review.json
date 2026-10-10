@@ -1,0 +1,30 @@
+{
+  "status": "FAILED_EARLY_RGB_ONLY",
+  "iteration": 55000,
+  "actual_images_viewed": true,
+  "images": [
+    "inspection/rgb_final_55000_comparison.png"
+  ],
+  "test_frames": [
+    10,
+    80,
+    150
+  ],
+  "rgb_metrics": {
+    "psnr": 19.810345333543953,
+    "ssim": 0.9202187975247701,
+    "lpips": 0.10036607980728149,
+    "psnr_foreground": 12.319447497693583,
+    "ssim_foreground_bbox": 0.8192175626754761,
+    "lpips_foreground_bbox": 0.2063336710135142
+  },
+  "reviewed_at": "2026-10-10T10:34:31.179322+09:00",
+  "conclusions": [
+    "黑背景正常，人物和平台均存在；B09相较B08人物/衣服/部分腿部略更完整。",
+    "人物手臂、衣服和双腿仍斑驳/稀疏，轮廓与脚周有碎片；平台脚周黑灰伪凸起仍明显。",
+    "0080原RGB自身背光较暗，不以暗单独判失败；预测肩颈轮廓/脚周与原RGB明显不符。",
+    "全15 RGB指标改善不能代替全15七MAE/四类/HDR及人工质量，暂不提交。"
+  ],
+  "normal_MAE_evaluated": false,
+  "full_manual_review_completed": false
+}

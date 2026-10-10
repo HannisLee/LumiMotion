@@ -1,0 +1,19 @@
+{
+  "status": "PASS_CHECKPOINT_ONLY",
+  "iteration": 50000,
+  "gaussians": 99827,
+  "all_finite": true,
+  "opacity_scale_feature_frozen": true,
+  "albedo_rgb_range": [
+    0.030999988317489624,
+    0.968999981880188
+  ],
+  "clamped_albedo_channel_fraction": 0.0,
+  "channels_at_projected_bound_fraction": 0.3296035474704572,
+  "max_displacement": 0.06572393327951431,
+  "max_rotation_deg": 60.000038146972656,
+  "actual_light_scale": 6.202476978302002,
+  "final_mae": false,
+  "deformation_state_tensors_unchanged": true,
+  "deformation_tensor_count": 32
+}

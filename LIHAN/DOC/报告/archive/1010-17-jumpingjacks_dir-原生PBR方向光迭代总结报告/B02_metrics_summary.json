@@ -1,0 +1,179 @@
+{
+  "status": "COMPLETED_QUALITY_FAILED",
+  "model_path": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/model_mlp",
+  "iteration": 55000,
+  "frames": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150
+  ],
+  "metrics": [
+    {
+      "metric": "Albedo MAE",
+      "mae": 0.1860324518964416,
+      "unit": "linear RGB",
+      "coverage_pct": 96.51740885373937
+    },
+    {
+      "metric": "Roughness MAE",
+      "mae": 0.24401020600830156,
+      "unit": "r",
+      "coverage_pct": 96.79343628809248
+    },
+    {
+      "metric": "GS Render Normal MAE",
+      "mae": 19.407437046633817,
+      "unit": "degree",
+      "coverage_pct": 93.69404934128968
+    },
+    {
+      "metric": "Depth Normal MAE",
+      "mae": 27.60153970792207,
+      "unit": "degree",
+      "coverage_pct": 89.06899548182258
+    },
+    {
+      "metric": "Mesh Normal MAE",
+      "mae": 22.243800704120574,
+      "unit": "degree",
+      "coverage_pct": 94.07220899639654
+    },
+    {
+      "metric": "Expected Z Depth MAE",
+      "mae": 0.08647351095270658,
+      "unit": "m",
+      "coverage_pct": 93.69404934128968
+    },
+    {
+      "metric": "Median Z Depth MAE",
+      "mae": 0.09010209308468205,
+      "unit": "m",
+      "coverage_pct": 93.69404934128968
+    }
+  ],
+  "rgb": {
+    "psnr": 18.912289595136517,
+    "ssim": 0.8901072422663371,
+    "lpips": 0.11933969706296921,
+    "psnr_foreground": 11.9928638250002,
+    "ssim_foreground_bbox": 0.7621153076489766,
+    "lpips_foreground_bbox": 0.24486602246761321
+  },
+  "normal_common_pixels": {
+    "methods": [
+      "gs_render",
+      "depth_normal",
+      "mesh"
+    ],
+    "gt_pixels": 415433,
+    "valid_pixels": 369136,
+    "coverage": 0.8885572402770122,
+    "angular_deg": {
+      "gs_render": {
+        "mae_frame_mean_deg": 19.795716884774638,
+        "mae_pixel_mean_deg": 18.519645207688434
+      },
+      "depth_normal": {
+        "mae_frame_mean_deg": 28.0095231850546,
+        "mae_pixel_mean_deg": 27.546641879291943
+      },
+      "mesh": {
+        "mae_frame_mean_deg": 21.892754277923874,
+        "mae_pixel_mean_deg": 21.26382697791657
+      }
+    }
+  },
+  "gs_normal_missing_180_penalty_deg": 29.53432482803139,
+  "independent_audit": {
+    "status": "PASS",
+    "iteration": 55000,
+    "frames": 15,
+    "independently_recomputed_normal": {
+      "gs_render": {
+        "mae_deg": 19.407437046633817,
+        "coverage": 0.9369404934128969,
+        "common_mae_deg": 18.519645207688434
+      },
+      "depth_normal": {
+        "mae_deg": 27.60153970792207,
+        "coverage": 0.8906899548182258,
+        "common_mae_deg": 27.546641879291943
+      },
+      "mesh": {
+        "mae_deg": 22.243800704120574,
+        "coverage": 0.9407220899639653,
+        "common_mae_deg": 21.26382697791657
+      }
+    },
+    "independently_recomputed_depth": {
+      "expected": {
+        "mae": 0.08647351128286004,
+        "coverage": 0.9369404934128969
+      },
+      "median": {
+        "mae": 0.09010209394222352,
+        "coverage": 0.9369404934128969
+      }
+    },
+    "independently_recomputed_albedo": {
+      "mae_linear": 0.18603245190190493,
+      "coverage_pct": 96.51740885373938
+    },
+    "source_hashes_verified": 83,
+    "dynamic_meshes": 15,
+    "train_poses_per_time": 135,
+    "common_normal_pixels": 369136,
+    "roughness_mae": 0.24401020600830156
+  },
+  "training_gt_inputs": [
+    "light_direction_only"
+  ],
+  "material_geometry_gt_used_for_training": false,
+  "light_GT_photometry_used": false,
+  "light_intensity": 4.6837568283081055,
+  "source_plane_diagnostic_only": false,
+  "manual_quality_gate": "FAILED",
+  "strict_input_source_gate": "PASS_ORIGINAL_RGBA",
+  "commit_allowed": false,
+  "normal_goal_pass": false,
+  "visual_review": {
+    "status": "COMPLETED_QUALITY_FAILED",
+    "iteration": 55000,
+    "reviewed_image": "inspection/four_categories_final_55000.png",
+    "sample_frames": [
+      1,
+      75,
+      150
+    ],
+    "scope": "实际查看首中尾四类图；不声称逐帧人工审核",
+    "RGB": "黑背景正常，人物斑驳、头手边界稀疏/缺失，平台偏白、棋盘纹理未恢复、脚周残色",
+    "Alpha": "人物平台轮廓基本完整，头手边毛糙、平台边缘残影；RGB暗部不是全部Alpha缺失",
+    "Normal": "台面较基线集中/平滑，脚周仍大片异常，人体表面及头手复杂斑驳",
+    "Albedo": "正面明/背面暗的照明结构严重残留，平台多为白色、棋盘格未恢复",
+    "quality_gate": "FAILED",
+    "commit_allowed": false,
+    "all_mae": "COMPLETE_FULL_15_FRAMES_INDEPENDENT_PASS",
+    "HDR_review": "实际看首中尾：无全黑/全白，黑背景正常；人物及平台随HDR呈橙粉色，但严重斑驳、脚周伪结构、材质污染明显；无HDR GT，不判定颜色正确",
+    "directional_review": "实际看0000/0036/0071：随光方向变化、场景存在、黑背景正常；背向光较暗不单独判功能故障，人物及平台斑驳/伪结构明显",
+    "reviewed_relight_image": "inspection/relight_final_55000.png",
+    "pipeline_completed_at": "2026-10-10T03:08:19.594588+09:00",
+    "normal_depth_review": "实际查看0010/0080/0150三法线与Depth对照：台面法线较基线集中但脚周仍明显伪起伏；人体/头手法线斑驳、Depth Normal更噪；Mesh人体头手/腿有缺面、平台不平；Depth脚周误差突出。未达7°。",
+    "reviewed_geometry_images": [
+      "normal_depth/comparison_0010.png",
+      "normal_depth/comparison_0080.png",
+      "normal_depth/comparison_0150.png"
+    ]
+  }
+}

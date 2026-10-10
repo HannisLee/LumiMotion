@@ -1,0 +1,53 @@
+Loading trained model at iteration 35020
+Found transforms_train.json file, assuming Blender data set!
+Reading Training Transforms
+Read Train Transforms with 135 cameras
+Loading Training Cameras
+Loading Test Cameras
+LOAD PLY
+/home/lihan/reproduce/LumiMotion-stage2-perlight/scene/__init__.py:103: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  unique_fids = [torch.tensor(val, dtype=torch.float32, device="cuda") for val in unique_values]
+################ gaussian_color params: 156934
+{
+  "status": "PASS",
+  "kind": "actual_GeometryRun_PBR_buffers_and_mesh_time_consistency",
+  "optimizer_steps": 0,
+  "GT_labels_read": false,
+  "models": [
+    {
+      "model": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-16-dir-PBR概率gate/model_mlp",
+      "iteration": 35020,
+      "frames": [
+        {
+          "frame": 10,
+          "normal_max_abs_error": 0.0,
+          "alpha_max_abs_error": 0.0,
+          "expected_Z_max_abs_error": 0.0,
+          "supported_world_plane_max_distance": 2.7008354663848877e-08,
+          "supported_world_axis_cosine_min": 0.9999996423721313,
+          "mesh_target_time_override_consistent": true
+        },
+        {
+          "frame": 80,
+          "normal_max_abs_error": 0.0,
+          "alpha_max_abs_error": 0.0,
+          "expected_Z_max_abs_error": 0.0,
+          "supported_world_plane_max_distance": 2.514570951461792e-08,
+          "supported_world_axis_cosine_min": 0.9999996423721313,
+          "mesh_target_time_override_consistent": true
+        },
+        {
+          "frame": 150,
+          "normal_max_abs_error": 0.0,
+          "alpha_max_abs_error": 0.0,
+          "expected_Z_max_abs_error": 0.0,
+          "supported_world_plane_max_distance": 2.7008354663848877e-08,
+          "supported_world_axis_cosine_min": 0.9999996423721313,
+          "mesh_target_time_override_consistent": true
+        }
+      ],
+      "source_sha_unchanged": true,
+      "hashed_sources": 454
+    }
+  ]
+}

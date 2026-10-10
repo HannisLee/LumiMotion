@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "frames": 150,
+  "coincident_suns": 2,
+  "source_sha256": "135e441a451832c5c10799bf240b61f3e37b8a528380f21415686c3d933b3833",
+  "output_sha256": "1d0032182b6a18b7c2760bfb7907a7567e6cef6930ddfa923b7cbd65ea530942"
+}

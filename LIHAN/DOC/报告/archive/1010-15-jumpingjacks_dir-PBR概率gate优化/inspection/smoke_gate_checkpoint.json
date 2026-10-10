@@ -1,0 +1,23 @@
+{
+  "status": "PASS_SAVED_NATIVE_PROBABILITY_GATE",
+  "iteration": 35020,
+  "points": 99827,
+  "all_finite": true,
+  "opacity_scale_frozen": true,
+  "source_MLP_frozen": true,
+  "source_NN_tensors_equal": 32,
+  "feature_optimizer_probability_group": true,
+  "source_native_probability_initialization": true,
+  "raw_feature_changed_points": 70033,
+  "native_probability_changed_points": 69971,
+  "max_source_probability_delta": 1.8596649169921875e-05,
+  "max_source_raw_logit_delta": 74.53421020507812,
+  "core_manifest_sha": true,
+  "GT_material_normal_geometry_photometry_inputs": false,
+  "full_MAE": false,
+  "normal_7_goal": "NOT_EVALUATED",
+  "source_files": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-16-dir-PBR概率gate/model_mlp/point_cloud/iteration_35020/point_cloud.ply": "cd3920bdeb015ca22808e51a3cb995d459400d76588355ba75a7327297a6f264",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-16-dir-PBR概率gate/model_mlp/deform/iteration_35020/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+  }
+}

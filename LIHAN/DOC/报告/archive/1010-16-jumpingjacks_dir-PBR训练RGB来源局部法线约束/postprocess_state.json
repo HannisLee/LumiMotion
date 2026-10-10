@@ -1,0 +1,17 @@
+{
+  "status": "FINISHED_QUALITY_FAILED",
+  "step": "finished",
+  "pid": 306612,
+  "training_pid": 306459,
+  "updated_at": "2026-10-10T11:54:26.580728+09:00",
+  "iteration": 55000,
+  "frames": 15,
+  "pipeline_exit_code": 0,
+  "verified_session_closed": true,
+  "unified_session_id": 65390,
+  "session_exit_verified_at": "2026-10-10T11:54:42.607818+09:00",
+  "iterations_stopped_by_user": true,
+  "reviewed_at": "2026-10-10T11:54:42.629402+09:00",
+  "final_gs_normal_mae_deg": 15.540066466250822,
+  "commit_allowed": false
+}

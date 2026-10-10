@@ -1,0 +1,54 @@
+{
+  "status": "PASS_LAUNCH_ONLY",
+  "configuration": {
+    "loss_preset": "pbr_gt_directional_anchor",
+    "pbr_deformation_anchor": true,
+    "pbr_optimize_geometry": true,
+    "pbr_light_mode": "gt_directional",
+    "pbr_albedo_interior_init": true,
+    "pbr_albedo_project_after_step": true,
+    "iterations": 55000
+  },
+  "source_files": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/point_cloud/iteration_35000/point_cloud.ply": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/deform/iteration_35000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+  },
+  "anchor": {
+    "format_version": 1,
+    "method": "stage1_prediction_XYZ_deformation_input_anchor",
+    "source_iteration": 35000,
+    "points": 99827,
+    "source_files": {
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/point_cloud/iteration_35000/point_cloud.ply": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/deform/iteration_35000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+    },
+    "source_snapshots": {
+      "point_cloud/iteration_35000/point_cloud.ply": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+      "deform/iteration_35000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+    },
+    "asset_sha256": "f6ecb19b7d4ea670b890527eba7e9875da2fa927bd0f402c5fa31e82c8a3beaa",
+    "gt_geometry_inputs": false,
+    "gt_material_inputs": false,
+    "gt_normal_inputs": false
+  },
+  "input_audit": {
+    "status": "PASS",
+    "mask_source": "original-image-alpha",
+    "frames": 150,
+    "raw_RGB_RGBA_verified": true,
+    "material_geometry_GT_opened": false,
+    "manifest_sha256": "2c9b3ad5e4f4541e4a65213cfedae256919575a40cddee5b74267bea5c4bfff8"
+  },
+  "runtime": {
+    "status": "TRAINING",
+    "started_at": "2026-10-10T04:30:08.950000+09:00",
+    "training_pid": 232645,
+    "process_start_ticks": "8458195",
+    "steps_planned": 20000,
+    "source_iteration": 35000,
+    "target_iteration": 55000,
+    "loss_preset": "pbr_gt_directional_anchor",
+    "session_id": 16086
+  },
+  "final_mae": false
+}

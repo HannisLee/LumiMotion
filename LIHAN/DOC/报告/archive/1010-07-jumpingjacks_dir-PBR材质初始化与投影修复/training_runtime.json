@@ -1,0 +1,17 @@
+{
+  "status": "TRAIN_COMPLETED",
+  "started_at": "2026-10-10T03:10:06.570000+09:00",
+  "training_pid": 219507,
+  "process_start_ticks": "7977957",
+  "steps_planned": 20000,
+  "source_iteration": 35000,
+  "target_iteration": 55000,
+  "loss_preset": "pbr_gt_directional_refine",
+  "session_id": 26125,
+  "finished_at": "2026-10-10T03:54:36.677826+09:00",
+  "iteration": 55000,
+  "steps_completed": 20000,
+  "exit_code": 0,
+  "training_log_completed_at": "2026-10-10T03:54:31+09:00",
+  "training_loop_elapsed": "44:07"
+}

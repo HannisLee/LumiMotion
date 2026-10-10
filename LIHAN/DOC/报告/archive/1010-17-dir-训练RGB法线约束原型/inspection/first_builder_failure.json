@@ -1,0 +1,12 @@
+{
+  "attempt": "build_training_rgb_constraint.py",
+  "session_id": 23962,
+  "exit_code": 1,
+  "verified_session_closed": true,
+  "failed_at": "2026-10-10T10:40:11.284353+09:00",
+  "reason": "source PLY path inherited prototype ROOT rather than fixed BASE container",
+  "candidate_assets_created": false,
+  "production_changed": false,
+  "retry_file": "commands/build_training_rgb_constraint_retry.py",
+  "retry_uses_exact_native_feature_probability": true
+}

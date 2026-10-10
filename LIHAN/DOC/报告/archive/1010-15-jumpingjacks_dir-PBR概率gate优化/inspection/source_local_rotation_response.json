@@ -1,0 +1,1188 @@
+{
+  "status": "PASS_READ_ONLY_SOURCE_LOCAL_ROTATION_RESPONSE_PROTOTYPE",
+  "frames": 135,
+  "points": 99827,
+  "groups": {
+    "all": {
+      "points": 99827,
+      "canonical_angle_deg": {
+        "mean": 10.000000762577736,
+        "median": 10.000000718499647,
+        "p90": 10.000004424693891,
+        "p99": 10.000012883726754,
+        "maximum": 10.000028496286463
+      },
+      "mean_time_additive_axis_response_deg": {
+        "mean": 8.061514061205367,
+        "median": 9.465481082919796,
+        "p90": 10.000000032004207,
+        "p99": 10.004614515850907,
+        "maximum": 13.548615763563232
+      },
+      "worst_time_additive_axis_response_deg": {
+        "mean": 8.790450619690214,
+        "median": 10.00000129379432,
+        "p90": 11.143365063688243,
+        "p99": 13.73542802889573,
+        "maximum": 88.05979929867738
+      },
+      "mean_time_local_axis_response_deg": {
+        "mean": 8.478669001139904,
+        "median": 10.000000174159796,
+        "p90": 10.000004358068239,
+        "p99": 10.000012420741529,
+        "maximum": 10.000030731219837
+      },
+      "worst_time_local_axis_response_deg": {
+        "mean": 8.478674251056256,
+        "median": 10.000004195610128,
+        "p90": 10.000012189445155,
+        "p99": 10.000022670113655,
+        "maximum": 10.000041528334753
+      },
+      "local_vs_matrix_transport_max_deg": {
+        "mean": 1.212461304358365e-05,
+        "median": 1.1581149199548762e-05,
+        "p90": 2.1565179853261896e-05,
+        "p99": 2.8567755433551115e-05,
+        "maximum": 4.224238708636954e-05
+      }
+    },
+    "source_projected": {
+      "points": 15187,
+      "canonical_angle_deg": {
+        "mean": 10.00000066947406,
+        "median": 10.000000728930328,
+        "p90": 10.000003416313003,
+        "p99": 10.00000799487376,
+        "maximum": 10.000017978884486
+      },
+      "mean_time_additive_axis_response_deg": {
+        "mean": 2.106128291381361e-06,
+        "median": 1.7039694649832141e-06,
+        "p90": 4.434245462671502e-06,
+        "p99": 6.807692421711211e-06,
+        "maximum": 1.686986406649989e-05
+      },
+      "worst_time_additive_axis_response_deg": {
+        "mean": 6.0864967227152014e-06,
+        "median": 4.9783130603797145e-06,
+        "p90": 1.2919939687890481e-05,
+        "p99": 1.9713482695869344e-05,
+        "maximum": 3.295610511210791e-05
+      },
+      "mean_time_local_axis_response_deg": {
+        "mean": 2.1046710089310055e-06,
+        "median": 1.7174983093552932e-06,
+        "p90": 4.4053934553313126e-06,
+        "p99": 6.733690304590615e-06,
+        "maximum": 1.4812419152493589e-05
+      },
+      "worst_time_local_axis_response_deg": {
+        "mean": 6.092964317529102e-06,
+        "median": 4.90455619685548e-06,
+        "p90": 1.2948118433879161e-05,
+        "p99": 1.954638161766379e-05,
+        "maximum": 2.7506885641908623e-05
+      },
+      "local_vs_matrix_transport_max_deg": null
+    },
+    "source_dynamic_near_plane": {
+      "points": 6836,
+      "canonical_angle_deg": {
+        "mean": 10.000000732778926,
+        "median": 10.000000768573255,
+        "p90": 10.000003340290132,
+        "p99": 10.00000800299613,
+        "maximum": 10.000015599695123
+      },
+      "mean_time_additive_axis_response_deg": {
+        "mean": 9.208070111609693,
+        "median": 9.257065456444879,
+        "p90": 9.559052601256155,
+        "p99": 9.777963204006614,
+        "maximum": 10.170143430176187
+      },
+      "worst_time_additive_axis_response_deg": {
+        "mean": 10.150275127199343,
+        "median": 9.9601266758629,
+        "p90": 10.76125635165504,
+        "p99": 13.59882555639684,
+        "maximum": 18.99830478429514
+      },
+      "mean_time_local_axis_response_deg": {
+        "mean": 10.000000651695675,
+        "median": 10.000000784538942,
+        "p90": 10.000003456041593,
+        "p99": 10.000007763246394,
+        "maximum": 10.000018043673627
+      },
+      "worst_time_local_axis_response_deg": {
+        "mean": 10.000004720703027,
+        "median": 10.000004198886838,
+        "p90": 10.00000878544919,
+        "p99": 10.00001479672487,
+        "maximum": 10.0000262610922
+      },
+      "local_vs_matrix_transport_max_deg": {
+        "mean": 8.03647532316419e-06,
+        "median": 7.3444386094852035e-06,
+        "p90": 1.3226604453452851e-05,
+        "p99": 1.935638736085189e-05,
+        "maximum": 2.9414949330792166e-05
+      }
+    },
+    "source_other_dynamic": {
+      "points": 38747,
+      "canonical_angle_deg": {
+        "mean": 10.000000823171296,
+        "median": 10.000000689698705,
+        "p90": 10.000005550377722,
+        "p99": 10.000015120133092,
+        "maximum": 10.000027137665118
+      },
+      "mean_time_additive_axis_response_deg": {
+        "mean": 9.076789556012953,
+        "median": 9.098784168305084,
+        "p90": 9.726441789616093,
+        "p99": 10.183293810530415,
+        "maximum": 13.548615763563232
+      },
+      "worst_time_additive_axis_response_deg": {
+        "mean": 10.772341995154266,
+        "median": 10.511957417199397,
+        "p90": 11.983267588226608,
+        "p99": 15.116752952640358,
+        "maximum": 88.05979929867738
+      },
+      "mean_time_local_axis_response_deg": {
+        "mean": 10.000000717477462,
+        "median": 10.000000701754791,
+        "p90": 10.000005560355037,
+        "p99": 10.00001434795853,
+        "maximum": 10.000030709017247
+      },
+      "worst_time_local_axis_response_deg": {
+        "mean": 10.000008193443762,
+        "median": 10.000007440156745,
+        "p90": 10.000015123858581,
+        "p99": 10.000025513233131,
+        "maximum": 10.000040747938698
+      },
+      "local_vs_matrix_transport_max_deg": {
+        "mean": 1.631586479634523e-05,
+        "median": 1.666499673782919e-05,
+        "p90": 2.3319120084582497e-05,
+        "p99": 2.978434366079071e-05,
+        "maximum": 4.224238708636954e-05
+      }
+    },
+    "source_static_unprojected": {
+      "points": 39057,
+      "canonical_angle_deg": {
+        "mean": 10.000000743883303,
+        "median": 10.000000724522636,
+        "p90": 10.000004063582782,
+        "p99": 10.000011814238407,
+        "maximum": 10.000028496286463
+      },
+      "mean_time_additive_axis_response_deg": {
+        "mean": 9.988273548720587,
+        "median": 9.99999482836531,
+        "p90": 10.000001930770539,
+        "p99": 10.000017745324962,
+        "maximum": 10.295576742418607
+      },
+      "worst_time_additive_axis_response_deg": {
+        "mean": 10.004378357795327,
+        "median": 10.000001085234587,
+        "p90": 10.000254676600726,
+        "p99": 10.165211962462081,
+        "maximum": 12.483015412301548
+      },
+      "mean_time_local_axis_response_deg": {
+        "mean": 10.000000669740734,
+        "median": 10.000000740267964,
+        "p90": 10.00000438293067,
+        "p99": 10.000011626631327,
+        "maximum": 10.000030731219837
+      },
+      "worst_time_local_axis_response_deg": {
+        "mean": 10.000004408537585,
+        "median": 10.000003499235685,
+        "p90": 10.000010022461918,
+        "p99": 10.000020082999043,
+        "maximum": 10.000041528334753
+      },
+      "local_vs_matrix_transport_max_deg": {
+        "mean": 8.68215913756256e-06,
+        "median": 6.445849674396954e-06,
+        "p90": 1.8568350079179434e-05,
+        "p99": 2.6328917496188493e-05,
+        "maximum": 4.110545510854108e-05
+      }
+    }
+  },
+  "rows": [
+    {
+      "frame": "0001",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.370301474653754,
+      "local_response_mean_deg": 10.000000683865817,
+      "local_vs_matrix_transport_max_deg": 3.846721670771816e-05
+    },
+    {
+      "frame": "0002",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.373786671239175,
+      "local_response_mean_deg": 10.000000683819072,
+      "local_vs_matrix_transport_max_deg": 3.0473859376997344e-05
+    },
+    {
+      "frame": "0003",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.386183573511987,
+      "local_response_mean_deg": 10.000000705326297,
+      "local_vs_matrix_transport_max_deg": 3.5664854844985986e-05
+    },
+    {
+      "frame": "0004",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.408123913224964,
+      "local_response_mean_deg": 10.000000693416073,
+      "local_vs_matrix_transport_max_deg": 3.5807637219738385e-05
+    },
+    {
+      "frame": "0005",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.441078221751688,
+      "local_response_mean_deg": 10.000000696360082,
+      "local_vs_matrix_transport_max_deg": 3.3242398071968026e-05
+    },
+    {
+      "frame": "0006",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.479954098100157,
+      "local_response_mean_deg": 10.000000677737962,
+      "local_vs_matrix_transport_max_deg": 3.157808532191564e-05
+    },
+    {
+      "frame": "0007",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.523764813483227,
+      "local_response_mean_deg": 10.000000688302066,
+      "local_vs_matrix_transport_max_deg": 3.251073186809171e-05
+    },
+    {
+      "frame": "0008",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.56522927478376,
+      "local_response_mean_deg": 10.000000702068581,
+      "local_vs_matrix_transport_max_deg": 3.671226678881917e-05
+    },
+    {
+      "frame": "0009",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.605819322179086,
+      "local_response_mean_deg": 10.000000691104704,
+      "local_vs_matrix_transport_max_deg": 3.491088687020789e-05
+    },
+    {
+      "frame": "0011",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.673947456541264,
+      "local_response_mean_deg": 10.000000687572008,
+      "local_vs_matrix_transport_max_deg": 3.502553705361027e-05
+    },
+    {
+      "frame": "0012",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.69516932293659,
+      "local_response_mean_deg": 10.00000068822179,
+      "local_vs_matrix_transport_max_deg": 3.242092304495175e-05
+    },
+    {
+      "frame": "0013",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.708383010229008,
+      "local_response_mean_deg": 10.000000680712096,
+      "local_vs_matrix_transport_max_deg": 3.359140919378442e-05
+    },
+    {
+      "frame": "0014",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.713520909131791,
+      "local_response_mean_deg": 10.000000685829407,
+      "local_vs_matrix_transport_max_deg": 3.56341841887368e-05
+    },
+    {
+      "frame": "0015",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.70809963014319,
+      "local_response_mean_deg": 10.000000691074511,
+      "local_vs_matrix_transport_max_deg": 3.612178976560327e-05
+    },
+    {
+      "frame": "0016",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.691722363595865,
+      "local_response_mean_deg": 10.000000690333364,
+      "local_vs_matrix_transport_max_deg": 3.420426507979949e-05
+    },
+    {
+      "frame": "0017",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.659362334108788,
+      "local_response_mean_deg": 10.00000070011272,
+      "local_vs_matrix_transport_max_deg": 3.489000090550853e-05
+    },
+    {
+      "frame": "0018",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.626005247401993,
+      "local_response_mean_deg": 10.000000675518972,
+      "local_vs_matrix_transport_max_deg": 3.7932923861108555e-05
+    },
+    {
+      "frame": "0019",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.59965396945693,
+      "local_response_mean_deg": 10.000000699893182,
+      "local_vs_matrix_transport_max_deg": 3.27007566741586e-05
+    },
+    {
+      "frame": "0021",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.551771755355439,
+      "local_response_mean_deg": 10.000000700962792,
+      "local_vs_matrix_transport_max_deg": 3.4522451141542715e-05
+    },
+    {
+      "frame": "0022",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.531810946651417,
+      "local_response_mean_deg": 10.000000698897754,
+      "local_vs_matrix_transport_max_deg": 3.482726785942566e-05
+    },
+    {
+      "frame": "0023",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.517418041858608,
+      "local_response_mean_deg": 10.000000682838518,
+      "local_vs_matrix_transport_max_deg": 3.741048680443539e-05
+    },
+    {
+      "frame": "0024",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.510024368058287,
+      "local_response_mean_deg": 10.000000686029095,
+      "local_vs_matrix_transport_max_deg": 3.395830344041665e-05
+    },
+    {
+      "frame": "0025",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.512371916975457,
+      "local_response_mean_deg": 10.00000070171661,
+      "local_vs_matrix_transport_max_deg": 2.969856261220141e-05
+    },
+    {
+      "frame": "0026",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.524945988820244,
+      "local_response_mean_deg": 10.000000693894528,
+      "local_vs_matrix_transport_max_deg": 3.119488421376283e-05
+    },
+    {
+      "frame": "0027",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.543032472382452,
+      "local_response_mean_deg": 10.000000706398122,
+      "local_vs_matrix_transport_max_deg": 3.34173592702913e-05
+    },
+    {
+      "frame": "0028",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.563284327014737,
+      "local_response_mean_deg": 10.000000694323647,
+      "local_vs_matrix_transport_max_deg": 3.530537268954596e-05
+    },
+    {
+      "frame": "0029",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.581821446274516,
+      "local_response_mean_deg": 10.000000679335974,
+      "local_vs_matrix_transport_max_deg": 3.440612458546926e-05
+    },
+    {
+      "frame": "0031",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.596309621542687,
+      "local_response_mean_deg": 10.000000686070544,
+      "local_vs_matrix_transport_max_deg": 3.530537268954596e-05
+    },
+    {
+      "frame": "0032",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.590673170695064,
+      "local_response_mean_deg": 10.000000687188512,
+      "local_vs_matrix_transport_max_deg": 3.522269020440471e-05
+    },
+    {
+      "frame": "0033",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.577948285677865,
+      "local_response_mean_deg": 10.000000691872875,
+      "local_vs_matrix_transport_max_deg": 3.587881532790109e-05
+    },
+    {
+      "frame": "0034",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.558682656697506,
+      "local_response_mean_deg": 10.000000693253233,
+      "local_vs_matrix_transport_max_deg": 3.41722835252795e-05
+    },
+    {
+      "frame": "0035",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.531409390553444,
+      "local_response_mean_deg": 10.000000697532982,
+      "local_vs_matrix_transport_max_deg": 3.5201989238641046e-05
+    },
+    {
+      "frame": "0036",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.498733649426068,
+      "local_response_mean_deg": 10.000000687840627,
+      "local_vs_matrix_transport_max_deg": 3.4268138646319744e-05
+    },
+    {
+      "frame": "0037",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.469351739132566,
+      "local_response_mean_deg": 10.000000714453078,
+      "local_vs_matrix_transport_max_deg": 3.3264318547856216e-05
+    },
+    {
+      "frame": "0038",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.450502978542145,
+      "local_response_mean_deg": 10.000000699757575,
+      "local_vs_matrix_transport_max_deg": 3.2195304973023756e-05
+    },
+    {
+      "frame": "0039",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.445595051159602,
+      "local_response_mean_deg": 10.000000688976325,
+      "local_vs_matrix_transport_max_deg": 3.079508402623576e-05
+    },
+    {
+      "frame": "0041",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.478271830301804,
+      "local_response_mean_deg": 10.000000688461505,
+      "local_vs_matrix_transport_max_deg": 3.3515373570214436e-05
+    },
+    {
+      "frame": "0042",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.51649659657941,
+      "local_response_mean_deg": 10.00000071640954,
+      "local_vs_matrix_transport_max_deg": 3.235340282647995e-05
+    },
+    {
+      "frame": "0043",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.558906982132694,
+      "local_response_mean_deg": 10.000000688725821,
+      "local_vs_matrix_transport_max_deg": 3.5572763544074224e-05
+    },
+    {
+      "frame": "0044",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.599872065621643,
+      "local_response_mean_deg": 10.000000684125533,
+      "local_vs_matrix_transport_max_deg": 3.37753545072119e-05
+    },
+    {
+      "frame": "0045",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.634859899465223,
+      "local_response_mean_deg": 10.00000068722341,
+      "local_vs_matrix_transport_max_deg": 3.465942462776385e-05
+    },
+    {
+      "frame": "0046",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.662697027084846,
+      "local_response_mean_deg": 10.000000704815779,
+      "local_vs_matrix_transport_max_deg": 3.966143882204575e-05
+    },
+    {
+      "frame": "0047",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.679951866392916,
+      "local_response_mean_deg": 10.000000694620564,
+      "local_vs_matrix_transport_max_deg": 3.220662341421469e-05
+    },
+    {
+      "frame": "0048",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.689823009022321,
+      "local_response_mean_deg": 10.00000068864778,
+      "local_vs_matrix_transport_max_deg": 3.536725770231473e-05
+    },
+    {
+      "frame": "0049",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.691761648473257,
+      "local_response_mean_deg": 10.000000690792621,
+      "local_vs_matrix_transport_max_deg": 3.796173732812764e-05
+    },
+    {
+      "frame": "0051",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.66211167704291,
+      "local_response_mean_deg": 10.000000689462205,
+      "local_vs_matrix_transport_max_deg": 3.212731058884022e-05
+    },
+    {
+      "frame": "0052",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.637922088020972,
+      "local_response_mean_deg": 10.000000697926215,
+      "local_vs_matrix_transport_max_deg": 3.3264318547856216e-05
+    },
+    {
+      "frame": "0053",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.61416902452832,
+      "local_response_mean_deg": 10.00000069106396,
+      "local_vs_matrix_transport_max_deg": 3.3242398071968026e-05
+    },
+    {
+      "frame": "0054",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.590082209096837,
+      "local_response_mean_deg": 10.000000707259925,
+      "local_vs_matrix_transport_max_deg": 4.095444590293844e-05
+    },
+    {
+      "frame": "0055",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.56364390902543,
+      "local_response_mean_deg": 10.000000686877243,
+      "local_vs_matrix_transport_max_deg": 3.6172204011721625e-05
+    },
+    {
+      "frame": "0056",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.533095427584604,
+      "local_response_mean_deg": 10.000000680400285,
+      "local_vs_matrix_transport_max_deg": 3.6363140711539924e-05
+    },
+    {
+      "frame": "0057",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.498003572289413,
+      "local_response_mean_deg": 10.000000693659247,
+      "local_vs_matrix_transport_max_deg": 3.201366569578479e-05
+    },
+    {
+      "frame": "0058",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.464441055292724,
+      "local_response_mean_deg": 10.000000681992608,
+      "local_vs_matrix_transport_max_deg": 3.850509679243368e-05
+    },
+    {
+      "frame": "0059",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.435731820585893,
+      "local_response_mean_deg": 10.000000685625984,
+      "local_vs_matrix_transport_max_deg": 3.782708670811548e-05
+    },
+    {
+      "frame": "0061",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.408055925782147,
+      "local_response_mean_deg": 10.000000681233278,
+      "local_vs_matrix_transport_max_deg": 3.612178976560327e-05
+    },
+    {
+      "frame": "0062",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.43359314671587,
+      "local_response_mean_deg": 10.00000069872528,
+      "local_vs_matrix_transport_max_deg": 3.2465858510792826e-05
+    },
+    {
+      "frame": "0063",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.464996015681995,
+      "local_response_mean_deg": 10.000000686130551,
+      "local_vs_matrix_transport_max_deg": 3.614196390276141e-05
+    },
+    {
+      "frame": "0064",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.494779235494933,
+      "local_response_mean_deg": 10.000000684745082,
+      "local_vs_matrix_transport_max_deg": 3.569549914808619e-05
+    },
+    {
+      "frame": "0065",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.516825293999018,
+      "local_response_mean_deg": 10.000000687260473,
+      "local_vs_matrix_transport_max_deg": 3.5470159455129016e-05
+    },
+    {
+      "frame": "0066",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.525116942774096,
+      "local_response_mean_deg": 10.000000700698426,
+      "local_vs_matrix_transport_max_deg": 4.110545510854108e-05
+    },
+    {
+      "frame": "0067",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.522491860917416,
+      "local_response_mean_deg": 10.000000700675791,
+      "local_vs_matrix_transport_max_deg": 4.202613509209282e-05
+    },
+    {
+      "frame": "0068",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.509201440295856,
+      "local_response_mean_deg": 10.00000070302991,
+      "local_vs_matrix_transport_max_deg": 3.7439702339387466e-05
+    },
+    {
+      "frame": "0069",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.48744959003894,
+      "local_response_mean_deg": 10.000000676140083,
+      "local_vs_matrix_transport_max_deg": 3.2845327974766325e-05
+    },
+    {
+      "frame": "0071",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.422721743527646,
+      "local_response_mean_deg": 10.000000694616723,
+      "local_vs_matrix_transport_max_deg": 3.2745308134428406e-05
+    },
+    {
+      "frame": "0072",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.384199498531688,
+      "local_response_mean_deg": 10.000000695439867,
+      "local_vs_matrix_transport_max_deg": 3.783672050088803e-05
+    },
+    {
+      "frame": "0073",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.344502538927056,
+      "local_response_mean_deg": 10.000000687938892,
+      "local_vs_matrix_transport_max_deg": 3.3450062614542674e-05
+    },
+    {
+      "frame": "0074",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.30980925605402,
+      "local_response_mean_deg": 10.000000677106124,
+      "local_vs_matrix_transport_max_deg": 3.2059171995508594e-05
+    },
+    {
+      "frame": "0075",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.279877861548993,
+      "local_response_mean_deg": 10.000000688755394,
+      "local_vs_matrix_transport_max_deg": 3.291183900064185e-05
+    },
+    {
+      "frame": "0076",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.259618386021232,
+      "local_response_mean_deg": 10.000000687397367,
+      "local_vs_matrix_transport_max_deg": 3.167028430738275e-05
+    },
+    {
+      "frame": "0077",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.2449864187916,
+      "local_response_mean_deg": 10.00000068653526,
+      "local_vs_matrix_transport_max_deg": 3.773061349134081e-05
+    },
+    {
+      "frame": "0078",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.231954491600481,
+      "local_response_mean_deg": 10.000000680926098,
+      "local_vs_matrix_transport_max_deg": 3.328622458812832e-05
+    },
+    {
+      "frame": "0079",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.213063191860115,
+      "local_response_mean_deg": 10.000000689805596,
+      "local_vs_matrix_transport_max_deg": 3.930141831171694e-05
+    },
+    {
+      "frame": "0081",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.188071922291497,
+      "local_response_mean_deg": 10.000000694107165,
+      "local_vs_matrix_transport_max_deg": 3.739099709912489e-05
+    },
+    {
+      "frame": "0082",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.183281838766371,
+      "local_response_mean_deg": 10.000000690270882,
+      "local_vs_matrix_transport_max_deg": 3.662280939281052e-05
+    },
+    {
+      "frame": "0083",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.18135640407947,
+      "local_response_mean_deg": 10.000000669385111,
+      "local_vs_matrix_transport_max_deg": 3.263381544392757e-05
+    },
+    {
+      "frame": "0084",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.180417869049286,
+      "local_response_mean_deg": 10.000000701010784,
+      "local_vs_matrix_transport_max_deg": 3.6091507415919046e-05
+    },
+    {
+      "frame": "0085",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.185054921914437,
+      "local_response_mean_deg": 10.000000682007794,
+      "local_vs_matrix_transport_max_deg": 3.5295047971474754e-05
+    },
+    {
+      "frame": "0086",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.196750481286312,
+      "local_response_mean_deg": 10.000000681338253,
+      "local_vs_matrix_transport_max_deg": 3.503594119376358e-05
+    },
+    {
+      "frame": "0087",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.215360516260906,
+      "local_response_mean_deg": 10.000000683242833,
+      "local_vs_matrix_transport_max_deg": 3.5583007680656365e-05
+    },
+    {
+      "frame": "0088",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.239491249275593,
+      "local_response_mean_deg": 10.000000687725178,
+      "local_vs_matrix_transport_max_deg": 4.224238708636954e-05
+    },
+    {
+      "frame": "0089",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.263786490072661,
+      "local_response_mean_deg": 10.000000702266037,
+      "local_vs_matrix_transport_max_deg": 3.239843194058342e-05
+    },
+    {
+      "frame": "0091",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.30935214033224,
+      "local_response_mean_deg": 10.000000682257813,
+      "local_vs_matrix_transport_max_deg": 3.251073186809171e-05
+    },
+    {
+      "frame": "0092",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.328111819869195,
+      "local_response_mean_deg": 10.000000684248434,
+      "local_vs_matrix_transport_max_deg": 3.6642707687890615e-05
+    },
+    {
+      "frame": "0093",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.348785621068005,
+      "local_response_mean_deg": 10.000000683615278,
+      "local_vs_matrix_transport_max_deg": 3.47958589236576e-05
+    },
+    {
+      "frame": "0094",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.37214415834889,
+      "local_response_mean_deg": 10.000000688395344,
+      "local_vs_matrix_transport_max_deg": 3.556251645656677e-05
+    },
+    {
+      "frame": "0095",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.397909059074456,
+      "local_response_mean_deg": 10.000000683910827,
+      "local_vs_matrix_transport_max_deg": 3.528472023227151e-05
+    },
+    {
+      "frame": "0096",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.425785847204898,
+      "local_response_mean_deg": 10.000000691794114,
+      "local_vs_matrix_transport_max_deg": 3.5726117165851135e-05
+    },
+    {
+      "frame": "0097",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.456233222941938,
+      "local_response_mean_deg": 10.000000703872184,
+      "local_vs_matrix_transport_max_deg": 3.335185637960084e-05
+    },
+    {
+      "frame": "0098",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.488834670972746,
+      "local_response_mean_deg": 10.000000668508195,
+      "local_vs_matrix_transport_max_deg": 3.489000090550853e-05
+    },
+    {
+      "frame": "0099",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.529316153206203,
+      "local_response_mean_deg": 10.000000703287999,
+      "local_vs_matrix_transport_max_deg": 3.524337901100766e-05
+    },
+    {
+      "frame": "0101",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.599058752384995,
+      "local_response_mean_deg": 10.000000700335756,
+      "local_vs_matrix_transport_max_deg": 3.291183900064185e-05
+    },
+    {
+      "frame": "0102",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.631766493838178,
+      "local_response_mean_deg": 10.00000068192908,
+      "local_vs_matrix_transport_max_deg": 3.2443398557561e-05
+    },
+    {
+      "frame": "0103",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.663685249261436,
+      "local_response_mean_deg": 10.000000686738352,
+      "local_vs_matrix_transport_max_deg": 3.332999347565873e-05
+    },
+    {
+      "frame": "0104",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.695625933683681,
+      "local_response_mean_deg": 10.000000690612605,
+      "local_vs_matrix_transport_max_deg": 3.0581309165572243e-05
+    },
+    {
+      "frame": "0105",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.727446979697179,
+      "local_response_mean_deg": 10.000000684818732,
+      "local_vs_matrix_transport_max_deg": 3.459627348275303e-05
+    },
+    {
+      "frame": "0106",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.75269971741869,
+      "local_response_mean_deg": 10.000000692028719,
+      "local_vs_matrix_transport_max_deg": 3.523303612626226e-05
+    },
+    {
+      "frame": "0107",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.77049680747164,
+      "local_response_mean_deg": 10.000000694509339,
+      "local_vs_matrix_transport_max_deg": 3.264498184817016e-05
+    },
+    {
+      "frame": "0108",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.780040243409687,
+      "local_response_mean_deg": 10.00000068460771,
+      "local_vs_matrix_transport_max_deg": 3.8391344411550385e-05
+    },
+    {
+      "frame": "0109",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.779941918623532,
+      "local_response_mean_deg": 10.000000681803737,
+      "local_vs_matrix_transport_max_deg": 3.3055487125613644e-05
+    },
+    {
+      "frame": "0111",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.751735375451977,
+      "local_response_mean_deg": 10.000000690578089,
+      "local_vs_matrix_transport_max_deg": 3.458573708126526e-05
+    },
+    {
+      "frame": "0112",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.724250554948657,
+      "local_response_mean_deg": 10.00000070054526,
+      "local_vs_matrix_transport_max_deg": 3.3936831226167035e-05
+    },
+    {
+      "frame": "0113",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.689078367994389,
+      "local_response_mean_deg": 10.000000687414397,
+      "local_vs_matrix_transport_max_deg": 3.3526246359979845e-05
+    },
+    {
+      "frame": "0114",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.644449370141675,
+      "local_response_mean_deg": 10.000000686939488,
+      "local_vs_matrix_transport_max_deg": 3.478538297613019e-05
+    },
+    {
+      "frame": "0115",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.602040516539109,
+      "local_response_mean_deg": 10.000000689908209,
+      "local_vs_matrix_transport_max_deg": 3.115981406865207e-05
+    },
+    {
+      "frame": "0116",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.5667263636588,
+      "local_response_mean_deg": 10.000000677708057,
+      "local_vs_matrix_transport_max_deg": 3.233086475141693e-05
+    },
+    {
+      "frame": "0117",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.55148319690025,
+      "local_response_mean_deg": 10.00000069055051,
+      "local_vs_matrix_transport_max_deg": 3.262264521753703e-05
+    },
+    {
+      "frame": "0118",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.56254296787628,
+      "local_response_mean_deg": 10.000000695878608,
+      "local_vs_matrix_transport_max_deg": 3.828677450369656e-05
+    },
+    {
+      "frame": "0119",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.599532227957702,
+      "local_response_mean_deg": 10.000000697684092,
+      "local_vs_matrix_transport_max_deg": 3.8806806375219386e-05
+    },
+    {
+      "frame": "0121",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.690029697507004,
+      "local_response_mean_deg": 10.000000695145602,
+      "local_vs_matrix_transport_max_deg": 3.525371886131403e-05
+    },
+    {
+      "frame": "0122",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.713770269482833,
+      "local_response_mean_deg": 10.000000693625413,
+      "local_vs_matrix_transport_max_deg": 3.841032653602868e-05
+    },
+    {
+      "frame": "0123",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.702256740141998,
+      "local_response_mean_deg": 10.000000681386329,
+      "local_vs_matrix_transport_max_deg": 3.540845428902645e-05
+    },
+    {
+      "frame": "0124",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.682162024816177,
+      "local_response_mean_deg": 10.000000711846189,
+      "local_vs_matrix_transport_max_deg": 3.311057046181443e-05
+    },
+    {
+      "frame": "0125",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.652898738509046,
+      "local_response_mean_deg": 10.00000069050942,
+      "local_vs_matrix_transport_max_deg": 3.695962349306713e-05
+    },
+    {
+      "frame": "0126",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.618720689380343,
+      "local_response_mean_deg": 10.000000690937,
+      "local_vs_matrix_transport_max_deg": 3.281202190437014e-05
+    },
+    {
+      "frame": "0127",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.5853433512331,
+      "local_response_mean_deg": 10.000000699090679,
+      "local_vs_matrix_transport_max_deg": 3.105436600289344e-05
+    },
+    {
+      "frame": "0128",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.558540197257127,
+      "local_response_mean_deg": 10.00000067909211,
+      "local_vs_matrix_transport_max_deg": 3.2059171995508594e-05
+    },
+    {
+      "frame": "0129",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.53886678121079,
+      "local_response_mean_deg": 10.000000681894067,
+      "local_vs_matrix_transport_max_deg": 3.5572763544074224e-05
+    },
+    {
+      "frame": "0131",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.523354010140308,
+      "local_response_mean_deg": 10.000000690887918,
+      "local_vs_matrix_transport_max_deg": 3.8844355301638143e-05
+    },
+    {
+      "frame": "0132",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.525337283484633,
+      "local_response_mean_deg": 10.000000687522737,
+      "local_vs_matrix_transport_max_deg": 3.187675701844625e-05
+    },
+    {
+      "frame": "0133",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.528204569919,
+      "local_response_mean_deg": 10.000000677219818,
+      "local_vs_matrix_transport_max_deg": 3.62225480917726e-05
+    },
+    {
+      "frame": "0134",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.528935718830278,
+      "local_response_mean_deg": 10.00000068586679,
+      "local_vs_matrix_transport_max_deg": 3.2978215886223634e-05
+    },
+    {
+      "frame": "0135",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.5265321265864,
+      "local_response_mean_deg": 10.000000683048526,
+      "local_vs_matrix_transport_max_deg": 3.275643653173674e-05
+    },
+    {
+      "frame": "0136",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.5189991882435,
+      "local_response_mean_deg": 10.000000677582973,
+      "local_vs_matrix_transport_max_deg": 3.335185637960084e-05
+    },
+    {
+      "frame": "0137",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.509017278243416,
+      "local_response_mean_deg": 10.000000691511302,
+      "local_vs_matrix_transport_max_deg": 3.3915345417602314e-05
+    },
+    {
+      "frame": "0138",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.456346045713135,
+      "local_response_mean_deg": 10.000000705662545,
+      "local_vs_matrix_transport_max_deg": 3.353711562476856e-05
+    },
+    {
+      "frame": "0139",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.40647542316898,
+      "local_response_mean_deg": 10.00000066547159,
+      "local_vs_matrix_transport_max_deg": 3.4459048973905263e-05
+    },
+    {
+      "frame": "0141",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.365186513591594,
+      "local_response_mean_deg": 10.000000691612456,
+      "local_vs_matrix_transport_max_deg": 3.702858726474068e-05
+    },
+    {
+      "frame": "0142",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.366534706062408,
+      "local_response_mean_deg": 10.000000688503556,
+      "local_vs_matrix_transport_max_deg": 3.9945294366732675e-05
+    },
+    {
+      "frame": "0143",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.371917688230607,
+      "local_response_mean_deg": 10.000000697804841,
+      "local_vs_matrix_transport_max_deg": 3.987223478227243e-05
+    },
+    {
+      "frame": "0144",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.378285778992353,
+      "local_response_mean_deg": 10.000000688772783,
+      "local_vs_matrix_transport_max_deg": 3.4076158767983004e-05
+    },
+    {
+      "frame": "0145",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.381860627031783,
+      "local_response_mean_deg": 10.000000682424488,
+      "local_vs_matrix_transport_max_deg": 3.4575197468928104e-05
+    },
+    {
+      "frame": "0146",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.38147417171551,
+      "local_response_mean_deg": 10.00000069098449,
+      "local_vs_matrix_transport_max_deg": 3.459627348275303e-05
+    },
+    {
+      "frame": "0147",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.379172792996505,
+      "local_response_mean_deg": 10.000000698747751,
+      "local_vs_matrix_transport_max_deg": 3.774027191041398e-05
+    },
+    {
+      "frame": "0148",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.376929844962797,
+      "local_response_mean_deg": 10.000000685541066,
+      "local_vs_matrix_transport_max_deg": 3.282312768296007e-05
+    },
+    {
+      "frame": "0149",
+      "nonplane_points": 84640,
+      "additive_response_mean_deg": 9.378705825018654,
+      "local_response_mean_deg": 10.000000682040389,
+      "local_vs_matrix_transport_max_deg": 3.544960300051625e-05
+    }
+  ],
+  "source_iteration": 35000,
+  "camera_NN_container": 40000,
+  "learned_40000_geometry_material_feature_used": false,
+  "source_MLP_32_tensors_frozen": true,
+  "initial_raw_deformation_bit_exact": true,
+  "canonical_probe_degrees": 10,
+  "optimizer_steps": 0,
+  "GT_labels_read": false,
+  "training_prior_saved": false,
+  "scoring_mask_saved": false,
+  "production_pipeline_changed": false,
+  "new_Preset_implemented": false,
+  "source_PLY_sha256": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+  "created_at": "2026-10-10T10:16:06.875766+09:00",
+  "limitations": "全135 source预测姿态的人工10度扰动只读数学原型；source groups不是GT语义。投影支持的法线被既有plane固定，不期望它响应；未删任何点/评分像素。局部四元数运输与旧additive的参数响应比较不是GT normal误差，不是已支持训练或达7度。候选四元数/normal只在RAM，不导出监督/teacher/prior。仅NN/camera容器加载40k，源35k参数用于全部诊断，当前B09训练不变。"
+}

@@ -1,0 +1,15 @@
+{
+  "status": "FINISHED_QUALITY_FAILED",
+  "step": "finished",
+  "pid": 282335,
+  "training_pid": 282299,
+  "updated_at": "2026-10-10T09:52:24.787817+09:00",
+  "iteration": 55000,
+  "frames": 15,
+  "pipeline_exit_code": 0,
+  "verified_session_closed": true,
+  "verified_observed_at": "2026-10-10T09:53:11.283333+09:00",
+  "reviewed_at": "2026-10-10T09:53:11.304611+09:00",
+  "final_gs_normal_mae_deg": 16.841339870090675,
+  "commit_allowed": false
+}
