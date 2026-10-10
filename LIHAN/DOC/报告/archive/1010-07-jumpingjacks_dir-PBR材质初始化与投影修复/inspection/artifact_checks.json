@@ -1,0 +1,206 @@
+{
+  "automatic_status": "PASS",
+  "scope": "实际权重有限性、几何信赖域和opacity/scale/feature冻结、roughness已变化、全量图片与6视频解码、15帧背景数值；人工审阅待完成",
+  "manual_review": "FAILED",
+  "checkpoint": {
+    "40000": {
+      "gaussians": 99827,
+      "finite": true,
+      "geometry_unchanged": false,
+      "max_displacement": 0.03078901208937168,
+      "max_rotation_deg": 60.000038146972656,
+      "opacity_scale_feature_unchanged": true,
+      "roughness_range": [
+        0.45462653040885925,
+        0.8777862191200256
+      ],
+      "ply_sha256": "97dbbc0af55a74ff781b24866d273bc6d20fcbc5a45db83325b4c6adec783404",
+      "deform_sha256": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5",
+      "deform_finite_tensors": 32
+    },
+    "50000": {
+      "gaussians": 99827,
+      "finite": true,
+      "geometry_unchanged": false,
+      "max_displacement": 0.06572393327951431,
+      "max_rotation_deg": 60.000038146972656,
+      "opacity_scale_feature_unchanged": true,
+      "roughness_range": [
+        0.09370958805084229,
+        0.9829031825065613
+      ],
+      "ply_sha256": "5818b2b188d625da39c56819750e99bcfa020785d4477b3e000a3bf40bce13c5",
+      "deform_sha256": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5",
+      "deform_finite_tensors": 32
+    },
+    "55000": {
+      "gaussians": 99827,
+      "finite": true,
+      "geometry_unchanged": false,
+      "max_displacement": 0.06961311399936676,
+      "max_rotation_deg": 60.000064849853516,
+      "opacity_scale_feature_unchanged": true,
+      "roughness_range": [
+        0.06769326329231262,
+        0.9917746782302856
+      ],
+      "ply_sha256": "2e800c72fdbe48b8ed61b628429ad49bf257ffb2e62f62cf842d7e206700056d",
+      "deform_sha256": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5",
+      "deform_finite_tensors": 32
+    }
+  },
+  "rgb": {
+    "psnr": 19.35354474812191,
+    "ssim": 0.8932221968968709,
+    "lpips": 0.11383797228336334,
+    "psnr_foreground": 12.234762806258436,
+    "ssim_foreground_bbox": 0.7692404826482137,
+    "lpips_foreground_bbox": 0.22925928036371868
+  },
+  "images": {
+    "rgb": 150,
+    "alpha": 150,
+    "normal": 150,
+    "albedo": 150,
+    "directional": 72,
+    "hdr": 150
+  },
+  "videos": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/directional/rotating_directional.mp4": 72,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/hdr/hdr.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/insights/albedo.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/insights/alpha.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/insights/normal.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/insights/rgb.mp4": 150
+  },
+  "representatives": {
+    "rgb": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/insights/rgb/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/insights/rgb/0075.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/insights/rgb/0150.png"
+    ],
+    "alpha": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/insights/alpha/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/insights/alpha/0075.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/insights/alpha/0150.png"
+    ],
+    "normal": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/insights/normal/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/insights/normal/0075.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/insights/normal/0150.png"
+    ],
+    "albedo": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/insights/albedo/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/insights/albedo/0075.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/insights/albedo/0150.png"
+    ],
+    "directional": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/directional/0000.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/directional/0036.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/directional/0071.png"
+    ],
+    "hdr": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/hdr/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/hdr/0076.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/model_mlp/renders_stage2/ours_55000/hdr/0150.png"
+    ]
+  },
+  "background": [
+    {
+      "frame": "0010",
+      "mean_rgb_background_all": 0.0018121726160290925,
+      "mean_rgb_background_core": 0.00011342786359908348,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0020",
+      "mean_rgb_background_all": 0.008693750789481708,
+      "mean_rgb_background_core": 0.0009052664740574582,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0030",
+      "mean_rgb_background_all": 0.004923469932385854,
+      "mean_rgb_background_core": 0.0007675006774174137,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0040",
+      "mean_rgb_background_all": 0.003418818299069201,
+      "mean_rgb_background_core": 0.0010920346625262671,
+      "p99_background_core": 0.00392156862745098
+    },
+    {
+      "frame": "0050",
+      "mean_rgb_background_all": 0.002043562915104936,
+      "mean_rgb_background_core": 1.6099176008160584e-06,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0060",
+      "mean_rgb_background_all": 0.0037632615845949874,
+      "mean_rgb_background_core": 8.898502854554366e-05,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0070",
+      "mean_rgb_background_all": 0.000524164376983638,
+      "mean_rgb_background_core": 1.0917396792389423e-07,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0080",
+      "mean_rgb_background_all": 0.0018069709058549026,
+      "mean_rgb_background_core": 0.00038156570778013896,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0090",
+      "mean_rgb_background_all": 0.005235356721921341,
+      "mean_rgb_background_core": 0.0014683400419422952,
+      "p99_background_core": 0.00392156862745098
+    },
+    {
+      "frame": "0100",
+      "mean_rgb_background_all": 0.0032831411385447094,
+      "mean_rgb_background_core": 0.0001478431488960948,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0110",
+      "mean_rgb_background_all": 0.003665021938255625,
+      "mean_rgb_background_core": 0.00012366639965636936,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0120",
+      "mean_rgb_background_all": 0.006555864422473885,
+      "mean_rgb_background_core": 0.0009388355909766522,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0130",
+      "mean_rgb_background_all": 0.006240114621836409,
+      "mean_rgb_background_core": 0.0005300678479582867,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0140",
+      "mean_rgb_background_all": 0.008201685339344527,
+      "mean_rgb_background_core": 0.0015813316769487348,
+      "p99_background_core": 0.023529411764705882
+    },
+    {
+      "frame": "0150",
+      "mean_rgb_background_all": 0.003098442889707334,
+      "mean_rgb_background_core": 0.0003288713847295869,
+      "p99_background_core": 0.0
+    }
+  ],
+  "source_files": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/point_cloud/iteration_35000/point_cloud.ply": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/deform/iteration_35000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+  },
+  "manual_review_file": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-07-jumpingjacks_dir-PBR材质初始化与投影修复/inspection/visual_review.json",
+  "commit_allowed": false
+}

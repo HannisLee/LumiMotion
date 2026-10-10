@@ -1,0 +1,1 @@
+{"automatic_status": "PASS", "rgb": {"psnr": 18.912289595136517, "ssim": 0.8901072422663371, "lpips": 0.11933969706296921, "psnr_foreground": 11.9928638250002, "ssim_foreground_bbox": 0.7621153076489766, "lpips_foreground_bbox": 0.24486602246761321}, "background_mean_core": 0.0006557303984434007}

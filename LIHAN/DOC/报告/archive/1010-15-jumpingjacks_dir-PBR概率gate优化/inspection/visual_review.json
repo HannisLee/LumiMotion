@@ -1,0 +1,49 @@
+{
+  "status": "FAILED",
+  "iteration": 55000,
+  "actual_images_viewed": true,
+  "reviewed_at": "2026-10-10T10:46:04.803464+09:00",
+  "reviewed_test_frames": [
+    10,
+    80,
+    150
+  ],
+  "reviewed_insight_frames": [
+    1,
+    75,
+    150
+  ],
+  "reviewed_hdr_frames": [
+    1,
+    76,
+    150
+  ],
+  "reviewed_directional_frames": [
+    0,
+    36,
+    71
+  ],
+  "images": [
+    "inspection/rgb_final_55000_comparison.png",
+    "inspection/four_categories_final_55000.png",
+    "inspection/relight_final_55000.png",
+    "normal_depth/comparison_0010.png",
+    "normal_depth/comparison_0080.png",
+    "normal_depth/comparison_0150.png",
+    "model_mlp/renders_stage2/ours_55000/directional/0036.png"
+  ],
+  "rgb_background": "黑背景正常，人物/平台存在，概率gate相对B08头/衣服/部分腿略更完整。但人物手臂/衣服/双腿仍光度斑驳稀疏，脚周灰黑伪凸起明显；GT0080自身背光暗，不以暗单独判失败，预测肩颈轮廓和脚周仍与原RGB不同。",
+  "alpha": "人物与平台Alpha主体完整且大部饱和；手臂、身侧、腿和平台边缘细碎残影/薄雾仍明显。黑RGB区域不能一概叫透明度缺失；覆盖和缺失180指标按原全前景记录。",
+  "albedo_static_dynamic": "衣服/正背面光照和阴影烘入材质，脚周灰黑污染；平台棋盘格可见但污染明显。来源MLP32tensor冻结，native gate概率优化未解决材质-法线歧义。",
+  "normal_depth": "实际分别查看TEST0010/0080/0150 Normal/Depth/Mesh图。GS平台大部分上向但脚周伪凸起/弯曲与人体轴混合斑驳仍明显；Depth Normal人体/平台噪声更强，Mesh脚周凸起、背面缺面/腿脚差异仍明显，Expected/Median深度保留假凸起。七MAE/coverage/common/missing180完整记录，15.94度未达原7度。",
+  "relighting": "实际看HDR0001/0076/0150与转灯0000/0036/0071拼图，并直接查看0036黑帧：HDR暖色/方向变化有响应，但人物斑驳和平台/脚周伪几何仍明显。SUN背向0036接近黑，闭合轨迹照到背向/下半球且无间接光，是当前直接光模型的预期，不以黑单独判失败；0000/0036平均亮度.0742719/5.4159e-7、PNG均差18.93937确认响应，拼图像素与各原图一致。无重光照GT精度结论。",
+  "video_scope": "6视频由独立artifact audit全帧解码；人工只看列举首中尾代表图，不声明人工逐帧观看视频。",
+  "failed_quality_reasons": [
+    "人物与材质仍斑驳",
+    "平台脚周伪几何",
+    "预测Depth/Mesh与GS人体/平台不一致"
+  ],
+  "GT_labels_for_training": false,
+  "scoring_changed": false,
+  "points_or_frames_dropped": false
+}

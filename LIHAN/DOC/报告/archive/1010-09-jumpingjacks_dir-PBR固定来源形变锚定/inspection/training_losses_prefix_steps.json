@@ -1,0 +1,11 @@
+{
+  "status": "PASS_READ_ONLY_LOSS_PLOT",
+  "b04_last_observed_iteration": 50783,
+  "rgb_l1_display_trailing_window": 201,
+  "other_display_window": 1,
+  "raw_csv_rows": 37408,
+  "scope": "训练内部损失与光强；B04只是当前前缀，不是完整最终结果或GT法线MAE",
+  "gt_inputs": false,
+  "training_modified": false,
+  "image": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/inspection/training_losses_prefix_steps.png"
+}

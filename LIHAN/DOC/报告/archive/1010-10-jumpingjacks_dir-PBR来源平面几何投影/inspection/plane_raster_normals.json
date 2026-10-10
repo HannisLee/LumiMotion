@@ -1,0 +1,203 @@
+{
+  "status": "PASS_READ_ONLY_RASTER_NORMAL_AUDIT",
+  "iteration": 55000,
+  "rows": [
+    {
+      "frame": "0001",
+      "groups": {
+        "full": {
+          "points": 99827,
+          "alpha_gt_half_pixels": 20287,
+          "absolute_plane_angle_quantiles_deg": [
+            0.0,
+            51.59827423095703,
+            84.9721450805664,
+            89.5601577758789,
+            89.99723052978516
+          ],
+          "positive_plane_normal_fraction": 0.7360378503799438,
+          "mean_alpha_over_image": 0.1281181126832962,
+          "native_buffer_max_difference": {
+            "alpha": 0.0,
+            "world_normal": 0.0
+          }
+        },
+        "projected": {
+          "points": 15187,
+          "alpha_gt_half_pixels": 10074,
+          "absolute_plane_angle_quantiles_deg": [
+            0.0,
+            0.0,
+            0.0,
+            0.01978234015405178,
+            0.02797645330429077
+          ],
+          "positive_plane_normal_fraction": 1.0,
+          "mean_alpha_over_image": 0.06298390030860901,
+          "axis_absolute_dot_min": 0.9999998807907104
+        },
+        "dynamic": {
+          "points": 45583,
+          "alpha_gt_half_pixels": 20171,
+          "absolute_plane_angle_quantiles_deg": [
+            1.8192989826202393,
+            54.008644104003906,
+            85.19263458251953,
+            89.56674194335938,
+            89.99945831298828
+          ],
+          "positive_plane_normal_fraction": 0.7246541976928711,
+          "mean_alpha_over_image": 0.12730374932289124
+        },
+        "static_unprojected": {
+          "points": 39057,
+          "alpha_gt_half_pixels": 11468,
+          "absolute_plane_angle_quantiles_deg": [
+            0.1136409118771553,
+            54.62702941894531,
+            84.13648223876953,
+            89.2966537475586,
+            89.99808502197266
+          ],
+          "positive_plane_normal_fraction": 0.6500697731971741,
+          "mean_alpha_over_image": 0.06984557956457138
+        }
+      }
+    },
+    {
+      "frame": "0075",
+      "groups": {
+        "full": {
+          "points": 99827,
+          "alpha_gt_half_pixels": 16959,
+          "absolute_plane_angle_quantiles_deg": [
+            0.0,
+            64.48612976074219,
+            85.9643325805664,
+            89.64514923095703,
+            89.99478912353516
+          ],
+          "positive_plane_normal_fraction": 0.5823456645011902,
+          "mean_alpha_over_image": 0.10685539245605469,
+          "native_buffer_max_difference": {
+            "alpha": 0.0,
+            "world_normal": 0.0
+          }
+        },
+        "projected": {
+          "points": 15187,
+          "alpha_gt_half_pixels": 8439,
+          "absolute_plane_angle_quantiles_deg": [
+            0.0,
+            0.0,
+            0.0,
+            0.01978234015405178,
+            0.02797645330429077
+          ],
+          "positive_plane_normal_fraction": 0.0,
+          "mean_alpha_over_image": 0.05269346758723259,
+          "axis_absolute_dot_min": 0.9999998807907104
+        },
+        "dynamic": {
+          "points": 45583,
+          "alpha_gt_half_pixels": 16861,
+          "absolute_plane_angle_quantiles_deg": [
+            0.7925353050231934,
+            66.55827331542969,
+            86.3995132446289,
+            89.70880126953125,
+            89.99847412109375
+          ],
+          "positive_plane_normal_fraction": 0.6420140862464905,
+          "mean_alpha_over_image": 0.1057991161942482
+        },
+        "static_unprojected": {
+          "points": 39057,
+          "alpha_gt_half_pixels": 10379,
+          "absolute_plane_angle_quantiles_deg": [
+            0.21214209496974945,
+            65.74832916259766,
+            85.25911712646484,
+            89.44149017333984,
+            89.9986801147461
+          ],
+          "positive_plane_normal_fraction": 0.6194238662719727,
+          "mean_alpha_over_image": 0.0631355345249176
+        }
+      }
+    },
+    {
+      "frame": "0150",
+      "groups": {
+        "full": {
+          "points": 99827,
+          "alpha_gt_half_pixels": 20360,
+          "absolute_plane_angle_quantiles_deg": [
+            0.0,
+            53.265419006347656,
+            84.88823699951172,
+            89.50324249267578,
+            89.99787139892578
+          ],
+          "positive_plane_normal_fraction": 0.7362967133522034,
+          "mean_alpha_over_image": 0.12844984233379364,
+          "native_buffer_max_difference": {
+            "alpha": 0.0,
+            "world_normal": 0.0
+          }
+        },
+        "projected": {
+          "points": 15187,
+          "alpha_gt_half_pixels": 10074,
+          "absolute_plane_angle_quantiles_deg": [
+            0.0,
+            0.0,
+            0.0,
+            0.01978234015405178,
+            0.01978234015405178
+          ],
+          "positive_plane_normal_fraction": 1.0,
+          "mean_alpha_over_image": 0.06298354268074036,
+          "axis_absolute_dot_min": 0.9999998807907104
+        },
+        "dynamic": {
+          "points": 45583,
+          "alpha_gt_half_pixels": 20280,
+          "absolute_plane_angle_quantiles_deg": [
+            1.648651123046875,
+            54.97679901123047,
+            85.17057800292969,
+            89.530029296875,
+            89.99787139892578
+          ],
+          "positive_plane_normal_fraction": 0.72366863489151,
+          "mean_alpha_over_image": 0.12777943909168243
+        },
+        "static_unprojected": {
+          "points": 39057,
+          "alpha_gt_half_pixels": 11483,
+          "absolute_plane_angle_quantiles_deg": [
+            0.2084200084209442,
+            54.17493438720703,
+            84.22017669677734,
+            89.33575439453125,
+            89.99800872802734
+          ],
+          "positive_plane_normal_fraction": 0.6452146768569946,
+          "mean_alpha_over_image": 0.06986996531486511
+        }
+      }
+    }
+  ],
+  "installed_module": "/home/lihan/miniconda3/envs/lumimotion/lib/python3.8/site-packages/diff_surfel_rasterization/__init__.py",
+  "installed_extension": "/home/lihan/miniconda3/envs/lumimotion/lib/python3.8/site-packages/diff_surfel_rasterization/_C.cpython-38-x86_64-linux-gnu.so",
+  "extension_sha256": "49de0cdbfae3b83f513c0c2a387eba317f9a159aaf69c115b1bff7c615a889e4",
+  "source_files": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/point_cloud/iteration_55000/point_cloud.ply": "004214808c1e713e7a46c07e77a30f3b7a308dcbff53b8a981d1ec170e73cb61",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-10-jumpingjacks_dir-PBR来源平面几何投影/model_mlp/deform/iteration_55000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+  },
+  "gt_geometry_normal_material_inputs": false,
+  "optimizer_steps": 0,
+  "final_mae": false,
+  "limitations": "分组单独渲染并不等于联合渲染中该组的可见贡献，alpha区域不能用于改变评测mask。"
+}

@@ -1,0 +1,42 @@
+{
+  "status": "FAILED",
+  "reviewed_at": "2026-10-10T06:50:04.859858+09:00",
+  "iteration": 55000,
+  "rgb_background": "黑背景正常且主体平台存在；人物头手/衣服仍明显斑驳、稀疏，平台脚周伪起伏/灰块；与B04相近，PSNR略低。GT背光本来暗，不仅凭暗失败。",
+  "alpha": "主体平台基本覆盖，边缘薄雾化与稀疏残影；完整数值覆盖率已报告。",
+  "albedo_static_dynamic": "正背面光照仍烘入衣服/身体，平台棋盘格和脚周污染；冻结feature未修复源静动态误分类。",
+  "normal_depth": "GS身体斑驳、平台脚周伪起伏/异常轴；Depth更噪，Mesh局部头手腿缺面，0080明显。15187 plane组实际轴正确，但旧installed kernel在0075等三个训练帧错误反向；不是评分后翻转。",
+  "relighting": "HDR与转灯背景黑、人物平台可见且有照明响应；人体/脚周斑驳仍明显。未提供重光照GT，不作精度声明。",
+  "reviewed_test_frames": [
+    10,
+    80,
+    150
+  ],
+  "reviewed_insight_frames": [
+    1,
+    75,
+    150
+  ],
+  "reviewed_hdr_frames": [
+    1,
+    76,
+    150
+  ],
+  "reviewed_directional_frames": [
+    0,
+    36,
+    71
+  ],
+  "images": [
+    "inspection/rgb_final_55000_comparison.png",
+    "inspection/four_categories_final_55000.png",
+    "inspection/relight.png",
+    "normal_depth/comparison_0010.png",
+    "normal_depth/comparison_0080.png",
+    "normal_depth/comparison_0150.png",
+    "inspection/plane_raster_group_comparison.png"
+  ],
+  "normal_goal": "FAILED",
+  "commit_allowed": false,
+  "subsequent_native_kernel_diagnostic_is_final_training": false
+}

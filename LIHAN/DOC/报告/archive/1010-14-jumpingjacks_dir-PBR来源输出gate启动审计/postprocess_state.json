@@ -1,0 +1,8 @@
+{
+  "status": "WAITING_LIVE_TRAIN",
+  "step": "train",
+  "pid": 282335,
+  "training_pid": 282299,
+  "updated_at": "2026-10-10T09:10:47.744347+09:00",
+  "process_start": "10140426"
+}

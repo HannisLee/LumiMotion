@@ -1,0 +1,17 @@
+{
+  "README.md": "c90690a5b7b09619a27b77b5675ea4e6507a6a4c694dd5be1850df1f1e25bd58",
+  "process_handles.json": "678f46e62f02abfcf22e73d8f8e31deb8a93bcf39bf447fed521c90056ec9bd1",
+  "train_argv.json": "b0ab07734046921912cf3832a30cade45e0be0eec411caf9343f3dd8aea9107e",
+  "code_manifest.json": "e0bd3b6aef1cd67c3b04b9b94342cead7f1fca1fddb6c3b28c4c306c182ea80a",
+  "postprocess_state.json": "81e7a5e915e82667394eca2f53382a5622be8b223042f35560cbc453c0c40bd1",
+  "training_runtime.json": "f02c37cca4c4cd5623e413d2ccd87b038478fa86f4604e72cfb3f941bd6c9121",
+  "commands/audit_launch.py": "d157cd2b37678ef5417eca36ea8cfd165267e8189b2caf98cb616895fc15bc30",
+  "commands/audit_checkpoints_when_saved.py": "7b975638e3e55772df4477048433bdc1f19ccc40b5b2f9463533fb21608e19f4",
+  "commands/finish_manual_review.py": "3441803f422209f53ec93df9c5f0fdcb378fd28b804afd92b74ba8401ce3f93f",
+  "commands/launch_train.py": "bf641ace429489ae6c445a86fdb32673d4a2a9be44820eb7d368e66f4f13e538",
+  "logs/launch_audit.log": "92ea9e02ab7834fa74759368772f0e9423caf9b4dadced3aea9fc9e8916e9e84",
+  "model_mlp/pbr_geometry_source.json": "0906a5876b6ef9770f113f78f5ff3575f8d71d3d9cf90b30d0a8e62102390df5",
+  "model_mlp/pbr_feature_gate.json": "d7d8b565c505ed5d4d578706626466601d9490e6349718d0098c6d9c07055254",
+  "model_mlp/stage2_config.json": "5d4409946ef17bf2d370d81a0326b89e10deeb3edbdd770e286d047862054e4a",
+  "inspection/launch_audit.json": "92ea9e02ab7834fa74759368772f0e9423caf9b4dadced3aea9fc9e8916e9e84"
+}

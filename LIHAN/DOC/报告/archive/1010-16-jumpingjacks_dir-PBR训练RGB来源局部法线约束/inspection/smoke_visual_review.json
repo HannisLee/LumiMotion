@@ -1,0 +1,33 @@
+{
+  "actual_images_viewed": true,
+  "functional_status": "PASS",
+  "visual_quality": "FAILED_SMOKE_ONLY",
+  "actual_sessions_exit": {
+    "trainer_26981": 0,
+    "saved_load_70944": 0,
+    "GPU_78840": 0,
+    "shared_10852": 0,
+    "insights_73487": 0,
+    "CPU_81654": 0
+  },
+  "actual_sessions_closed": true,
+  "viewed_images": [
+    "inspection/four_categories.png",
+    "inspection/relight.png"
+  ],
+  "rgb_background": "RGB黑色背景正常，首尾人物和平台保留；中帧人物接近黑色但Alpha主体完整，不能解释为缺失。首尾人物/裤腿有明显黑斑，平台足周黑灰杂点，20步画质不通过。",
+  "alpha": "首中尾人物和完整椭圆平台均有Alpha；手臂、身体及脚周有少量模糊边缘和孤立点。没有删去难点或平台。",
+  "albedo_static_dynamic": "人物首尾和中帧均可见，但明暗及纹理斑块混入反照率，手臂/裤腿碎斑，平台颜色受阴影污染；不认定已经完成材质分解。",
+  "normal_depth": "实际渲染GS法线可见人物和平台，首尾平台主要紫蓝，中帧人物黄绿且表面杂色，足周法线噪点明显。此拼图只检查GS法线，未额外生成Depth/Mesh，不称其已验收。",
+  "relighting": "同首中尾的方向光与HDR16均通过共享入口有实际亮度/色彩响应；HDR有橙色轮廓与高光、平台蓝色响应。方向光中帧人物近黑，不能仅据此宣称代码异常，也不能据重光照有响应认定几何正确。",
+  "GT_normal_material_geometry_photometry_inputs": false,
+  "source_RGB_derived_constraint": true,
+  "full_MAE": false,
+  "normal_7_goal": "NOT_EVALUATED",
+  "videos_decoded": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-18-dir-PBR训练RGB来源局部法线/insights/insights/rgb.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-18-dir-PBR训练RGB来源局部法线/insights/insights/normal.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-18-dir-PBR训练RGB来源局部法线/insights/insights/albedo.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-18-dir-PBR训练RGB来源局部法线/insights/insights/alpha.mp4": 150
+  }
+}

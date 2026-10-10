@@ -1,0 +1,67 @@
+Loading trained model at iteration 35020
+Found transforms_train.json file, assuming Blender data set!
+Reading Training Transforms
+Read Train Transforms with 135 cameras
+Loading Training Cameras
+Loading Test Cameras
+LOAD PLY
+/home/lihan/reproduce/LumiMotion-stage2-perlight/scene/__init__.py:103: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  unique_fids = [torch.tensor(val, dtype=torch.float32, device="cuda") for val in unique_values]
+################ gaussian_color params: 156934
+/home/lihan/miniconda3/envs/lumimotion/lib/python3.8/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at ../aten/src/ATen/native/TensorShape.cpp:3526.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Using /home/lihan/.cache/torch_extensions/py38_cu121 as PyTorch extensions root...
+Detected CUDA files, patching ldflags
+Emitting ninja build file /home/lihan/.cache/torch_extensions/py38_cu121/renderutils_plugin/build.ninja...
+Building extension module renderutils_plugin...
+Using envvar MAX_JOBS (4) as the number of workers...
+ninja: no work to do.
+Loading extension module renderutils_plugin...
+{
+  "status": "PASS_NATIVE_PRESET_PBR_GGX_BVH_GRADIENTS_AND_RELIGHT",
+  "iteration": 35020,
+  "rows": [
+    {
+      "frame": "0001",
+      "photo_pixels": 1024,
+      "loss": 0.19712239503860474,
+      "gradients": {
+        "albedo": 0.002559316111728549,
+        "roughness": 0.000207079341635108,
+        "xyz": 0.7960099577903748,
+        "rotation": 0.040914181619882584
+      }
+    },
+    {
+      "frame": "0075",
+      "photo_pixels": 1024,
+      "loss": 0.2132851779460907,
+      "gradients": {
+        "albedo": 0.0017488313606008887,
+        "roughness": 0.00018046569311991334,
+        "xyz": 1.391809344291687,
+        "rotation": 0.1167352944612503
+      }
+    },
+    {
+      "frame": "0149",
+      "photo_pixels": 1024,
+      "loss": 0.19698667526245117,
+      "gradients": {
+        "albedo": 0.0025606737472116947,
+        "roughness": 0.00017939964891411364,
+        "xyz": 0.5097436308860779,
+        "rotation": 0.03576342761516571
+      }
+    }
+  ],
+  "source_files": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-13-dir-PBR原生CUDA与Preset冒烟/model_mlp/point_cloud/iteration_35020/point_cloud.ply": "2e9dae5af2d1055607550514e96982cd3a7808f6e376ddac90ab348ff0739e2d",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1010-13-dir-PBR原生CUDA与Preset冒烟/model_mlp/deform/iteration_35020/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+  },
+  "optimizer_steps": 0,
+  "gt_material_normal_geometry_inputs": false,
+  "hdr_samples": 16,
+  "full_training_mae": false,
+  "limitations": "仅20步smoke checkpoint的功能/非零有限梯度；HDR16仅smoke，最终仍150帧2048，不作为质量或7°结论。"
+}

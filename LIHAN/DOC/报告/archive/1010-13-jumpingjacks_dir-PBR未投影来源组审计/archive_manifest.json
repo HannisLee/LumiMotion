@@ -1,0 +1,12 @@
+{
+  "commands/audit_unprojected_plane_groups.py": "89315966b413e690e4796845f26b0050edc14e1003863d81b05bf97db88a72d6",
+  "logs/unprojected_plane_groups.log": "2ae632a926627d86dd43000641d745331bad7708fbdedd3d32c5898b0d79d245",
+  "inspection/unprojected_plane_groups.json": "ea6c64c870d3f6bf15bb476603d4ba54096ad1287dc3126445542649e7195b32",
+  "inspection/unprojected_plane_groups_40000/comparison.png": "efd438d83c3cb9950685c84b102cae7ad848b327e2e6cc5f10060a920645278f",
+  "inspection/unprojected_plane_groups_40000/0149_joint_groups.png": "066786714c5cc170a0976f015299238e1014e62ac56b279a74e50d6136a67f3c",
+  "inspection/unprojected_plane_groups_40000/0075_normal.png": "30737469755d87db36f9d7539964bcf5c7ef66c0a50516c0722c33ffe93a02bf",
+  "inspection/unprojected_plane_groups_40000/0149_normal.png": "b0ce5d7bb9426fe476947476c2ff18feb07e0e9dac3b97a56b5c635db92ed4bb",
+  "inspection/unprojected_plane_groups_40000/0001_normal.png": "08190756414ad02b8de46def6ba157bf76ed9f9f686c78f6dd673fdc86251475",
+  "inspection/unprojected_plane_groups_40000/0001_joint_groups.png": "9d6048e8d6431c0a96351bbf75c87eb519df871eb34ab4c1baa30d8e706033f7",
+  "inspection/unprojected_plane_groups_40000/0075_joint_groups.png": "b9f774a30497840319590cad348befae9c4e24477282b1e38f73a6e7d21d42d8"
+}

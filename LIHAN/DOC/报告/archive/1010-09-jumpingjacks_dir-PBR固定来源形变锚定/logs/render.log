@@ -1,0 +1,20 @@
+Loading trained model at iteration 55000
+Found transforms_train.json file, assuming Blender data set!
+Reading Training Transforms
+Read Train Transforms with 135 cameras
+Loading Training Cameras
+Loading Test Cameras
+LOAD PLY
+/home/lihan/reproduce/LumiMotion-stage2-perlight/scene/__init__.py:103: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  unique_fids = [torch.tensor(val, dtype=torch.float32, device="cuda") for val in unique_values]
+################ gaussian_color params: 156934
+evaluation {'psnr': 19.475974080557172, 'ssim': 0.8950952370961507, 'lpips': 0.11134533832470576, 'psnr_foreground': 12.349587008267934, 'ssim_foreground_bbox': 0.7730405648549398, 'lpips_foreground_bbox': 0.22556244830290476}
+/home/lihan/miniconda3/envs/lumimotion/lib/python3.8/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at ../aten/src/ATen/native/TensorShape.cpp:3526.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Using /home/lihan/.cache/torch_extensions/py38_cu121 as PyTorch extensions root...
+Detected CUDA files, patching ldflags
+Emitting ninja build file /home/lihan/.cache/torch_extensions/py38_cu121/renderutils_plugin/build.ninja...
+Building extension module renderutils_plugin...
+Allowing ninja to set a default number of workers... (overridable by setting the environment variable MAX_JOBS=N)
+ninja: no work to do.
+Loading extension module renderutils_plugin...

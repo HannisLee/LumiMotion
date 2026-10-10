@@ -1,0 +1,23 @@
+{
+  "status": "TRAINING_CURVE_SNAPSHOT_ONLY",
+  "stage2_steps": 3663,
+  "created_at": "2026-10-10T09:15:48.908778+09:00",
+  "snapshots": {
+    "B07 native Direct SUN": {
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-13-jumpingjacks_dir-PBR原生SUN直接光与真实光线预算/model_mlp/events.out.tfevents.1791587646.venus.271624.0",
+      "snapshot": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-14-jumpingjacks_dir-PBR来源输出gate微调/inspection/early_training/B07.tfevents",
+      "bytes": 4799360,
+      "sha256": "567b68807b903e8f373ee60d4888ad0d8ece781706f9afa76aaadce5dd8fa66b"
+    },
+    "B08 native Direct + gate": {
+      "source": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-14-jumpingjacks_dir-PBR来源输出gate微调/model_mlp/events.out.tfevents.1791591039.venus.282299.0",
+      "snapshot": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-14-jumpingjacks_dir-PBR来源输出gate微调/inspection/early_training/B08.tfevents",
+      "bytes": 684276,
+      "sha256": "3ed8df2694442054c0645a634d3adbb11b45de981fab16c857da1b991309d82c"
+    }
+  },
+  "optimizer_steps": 0,
+  "gt_labels_read": false,
+  "loss_selection": "B07/B08均all-eligible alpha>.9、相同Direct SUN/native GGX/BVH；B08新feature gate，total另含弱gate anchor，训练loss不代表法线MAE",
+  "limitations": "训练loss和RGB拟合光强，不是GT材质/法线MAE，不由曲线声明质量或7度通过。"
+}

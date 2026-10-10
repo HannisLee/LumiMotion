@@ -1,0 +1,154 @@
+[
+  {
+    "name": "render",
+    "argv": [
+      "/home/lihan/miniconda3/envs/lumimotion/bin/python",
+      "-u",
+      "-m",
+      "scripts.render_stage2",
+      "--model_path",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp",
+      "--load_iter",
+      "55000",
+      "--task",
+      "all",
+      "--hdr_filepath",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/example_envmaps/golden_bay_4k_32x16_rot330.hdr",
+      "--hdr_samples",
+      "2048"
+    ],
+    "log": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/logs/render.log"
+  },
+  {
+    "name": "albedo",
+    "argv": [
+      "/home/lihan/miniconda3/envs/lumimotion/bin/python",
+      "-u",
+      "-m",
+      "scripts.eval_albedo_gt",
+      "--model_path",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp",
+      "--iterations",
+      "55000",
+      "--gt_albedo_dir",
+      "/home/lihan/data/LH-data/danamic/jumpingjacks_direction_light/albedo",
+      "--split",
+      "test",
+      "--output_path",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/albedo",
+      "--save_float"
+    ],
+    "log": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/logs/albedo.log"
+  },
+  {
+    "name": "predicted_meshes",
+    "argv": [
+      "/home/lihan/miniconda3/envs/lumimotion/bin/python",
+      "-u",
+      "-m",
+      "scripts.extract_geometry_mesh_dynamic",
+      "--model_path",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp",
+      "--load_iter",
+      "55000",
+      "--split",
+      "test",
+      "--resolution",
+      "2",
+      "--voxel_size",
+      "0.02",
+      "--sdf_trunc",
+      "0.08",
+      "--alpha_threshold",
+      "0.5",
+      "--output_dir",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/predicted_meshes"
+    ],
+    "log": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/logs/predicted_meshes.log"
+  },
+  {
+    "name": "normal_depth",
+    "argv": [
+      "/home/lihan/miniconda3/envs/lumimotion/bin/python",
+      "-u",
+      "-m",
+      "scripts.eval_geometry_gt",
+      "--model_path",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp",
+      "--load_iter",
+      "55000",
+      "--gt_root",
+      "/home/lihan/data/LH-data/danamic/jumpingjacks_direction_light",
+      "--gt_depth_dir",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-04-jumpingjacks_direction_light-Stage2-GT-Lambertian/gt_depth",
+      "--split",
+      "test",
+      "--resolution",
+      "2",
+      "--output_dir",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/normal_depth",
+      "--pred_mesh_manifest",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/predicted_meshes/manifest.json",
+      "--save_arrays"
+    ],
+    "log": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/logs/normal_depth.log"
+  },
+  {
+    "name": "roughness",
+    "argv": [
+      "/home/lihan/miniconda3/envs/lumimotion/bin/python",
+      "-u",
+      "-m",
+      "scripts.eval_roughness_gt",
+      "--model_path",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/model_mlp",
+      "--iteration",
+      "55000",
+      "--gt_roughness_dir",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-02-jumpingjacks_dir-PBR方向光基线-GT评测专用/roughness_source_alpha",
+      "--split",
+      "test",
+      "--output_path",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/roughness"
+    ],
+    "log": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/logs/roughness.log"
+  },
+  {
+    "name": "verify_roughness",
+    "argv": [
+      "/home/lihan/miniconda3/envs/lumimotion/bin/python",
+      "-u",
+      "-m",
+      "scripts.verify_roughness_eval",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/roughness"
+    ],
+    "log": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/logs/verify_roughness.log"
+  },
+  {
+    "name": "verify_all_mae",
+    "argv": [
+      "/home/lihan/miniconda3/envs/lumimotion/bin/python",
+      "-u",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/commands/verify_all_mae.py"
+    ],
+    "log": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/logs/verify_all_mae.log"
+  },
+  {
+    "name": "audit_artifacts",
+    "argv": [
+      "/home/lihan/miniconda3/envs/lumimotion/bin/python",
+      "-u",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/commands/audit_artifacts.py"
+    ],
+    "log": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/logs/audit_artifacts.log"
+  },
+  {
+    "name": "write_results",
+    "argv": [
+      "/home/lihan/miniconda3/envs/lumimotion/bin/python",
+      "-u",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/commands/write_results.py"
+    ],
+    "log": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-16-jumpingjacks_dir-PBR训练RGB来源局部法线约束/logs/write_results.log"
+  }
+]

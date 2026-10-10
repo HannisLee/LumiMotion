@@ -1,0 +1,207 @@
+{
+  "status": "PASS_READ_ONLY_DIAGNOSTIC",
+  "method": "fixed_Stage1_prediction_canonical_vs_effective_plane",
+  "source_files": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/point_cloud/iteration_35000/point_cloud.ply": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/deform/iteration_35000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+  },
+  "source_iteration": 35000,
+  "plane": {
+    "method": "source_prediction_static_RANSAC_SVD",
+    "seed": 1010,
+    "source_points": 99827,
+    "eligible_points": 12603,
+    "ransac_inlier_fraction": 0.5946203284932159,
+    "plane_normal": [
+      -0.0029613651534769734,
+      -0.002400413027768733,
+      0.9999927341404656
+    ],
+    "plane_offset": 0.008403862980894893,
+    "band": 0.08,
+    "support_points": 14556,
+    "gt_normal_inputs": false,
+    "gt_geometry_inputs": false,
+    "gt_material_inputs": false,
+    "source_iteration": 35000,
+    "source_model": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp",
+    "optimizer_groups": [
+      "albedo_dc",
+      "albedo_dc_stage1",
+      "albedo_rest",
+      "rotation",
+      "roughness",
+      "xyz"
+    ],
+    "source_files": {
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/point_cloud/iteration_35000/point_cloud.ply": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/deform/iteration_35000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+    }
+  },
+  "support_feature_distribution": {
+    "min": 2.680836885815552e-09,
+    "p50": 2.9722803446929902e-05,
+    "p90": 0.01290934905409813,
+    "p99": 0.3761598467826843,
+    "max": 0.4994773268699646
+  },
+  "rows": [
+    {
+      "frame": 1,
+      "source_time": 0.006666666666666667,
+      "canonical_plane_distance": {
+        "min": 7.450580596923828e-08,
+        "p50": 0.012407801114022732,
+        "p90": 0.047771796584129333,
+        "p99": 0.07647315412759781,
+        "max": 0.07987216860055923
+      },
+      "effective_plane_distance": {
+        "min": 8.344650268554688e-07,
+        "p50": 0.01253332570195198,
+        "p90": 0.04787599295377731,
+        "p99": 0.07617588341236115,
+        "max": 0.10995111614465714
+      },
+      "source_deformation_distance": {
+        "min": 2.4207425994293708e-11,
+        "p50": 1.0373348686698591e-06,
+        "p90": 0.0004964867839589715,
+        "p99": 0.01830524206161499,
+        "max": 0.20837721228599548
+      },
+      "source_deformation_axis_shift_deg": {
+        "min": 0.0,
+        "p50": 0.0,
+        "p90": 0.03956468030810356,
+        "p99": 1.5582120418548584,
+        "max": 10.75885009765625
+      },
+      "effective_plane_axis_error_deg": {
+        "min": 0.1297215223312378,
+        "p50": 14.642343521118164,
+        "p90": 37.90577697753906,
+        "p99": 56.39878845214844,
+        "max": 59.982757568359375
+      }
+    },
+    {
+      "frame": 75,
+      "source_time": 0.5,
+      "canonical_plane_distance": {
+        "min": 7.450580596923828e-08,
+        "p50": 0.012407801114022732,
+        "p90": 0.047771796584129333,
+        "p99": 0.07647315412759781,
+        "max": 0.07987216860055923
+      },
+      "effective_plane_distance": {
+        "min": 2.5704503059387207e-06,
+        "p50": 0.012290094047784805,
+        "p90": 0.04719981178641319,
+        "p99": 0.07583802193403244,
+        "max": 0.08370766043663025
+      },
+      "source_deformation_distance": {
+        "min": 5.327775373653587e-11,
+        "p50": 9.953200788004324e-07,
+        "p90": 0.0004946939880028367,
+        "p99": 0.019300837069749832,
+        "max": 0.07784964889287949
+      },
+      "source_deformation_axis_shift_deg": {
+        "min": 0.0,
+        "p50": 0.0,
+        "p90": 0.05595291033387184,
+        "p99": 1.9952486753463745,
+        "max": 12.218853950500488
+      },
+      "effective_plane_axis_error_deg": {
+        "min": 0.1266688108444214,
+        "p50": 14.63932991027832,
+        "p90": 37.892677307128906,
+        "p99": 56.424522399902344,
+        "max": 61.00712203979492
+      }
+    },
+    {
+      "frame": 149,
+      "source_time": 0.9933333333333333,
+      "canonical_plane_distance": {
+        "min": 7.450580596923828e-08,
+        "p50": 0.012407801114022732,
+        "p90": 0.047771796584129333,
+        "p99": 0.07647315412759781,
+        "max": 0.07987216860055923
+      },
+      "effective_plane_distance": {
+        "min": 2.479180693626404e-06,
+        "p50": 0.012536948546767235,
+        "p90": 0.047896526753902435,
+        "p99": 0.07629120349884033,
+        "max": 0.106735460460186
+      },
+      "source_deformation_distance": {
+        "min": 1.1229281393632107e-11,
+        "p50": 1.0755272796814097e-06,
+        "p90": 0.0005096391541883349,
+        "p99": 0.01786099746823311,
+        "max": 0.2085702270269394
+      },
+      "source_deformation_axis_shift_deg": {
+        "min": 0.0,
+        "p50": 0.0,
+        "p90": 0.03956468030810356,
+        "p99": 1.504893183708191,
+        "max": 8.17603588104248
+      },
+      "effective_plane_axis_error_deg": {
+        "min": 0.1297215223312378,
+        "p50": 14.640228271484375,
+        "p90": 37.90577697753906,
+        "p99": 56.41481018066406,
+        "max": 59.98295593261719
+      }
+    }
+  ],
+  "gt_inputs": false,
+  "training_or_optimizer_steps": 0,
+  "current_training_modified": false,
+  "final_mae": false,
+  "B02_plane_optimization_diagnostic": [
+    {
+      "name": "source_35000",
+      "quaternion_norm_quantiles": [
+        0.8964122533798218,
+        1.0800704956054688,
+        1.4063557386398315,
+        1.79800283908844
+      ],
+      "canonical_axis_plane_angle_quantiles": [
+        4.215027809143066,
+        14.660745620727539,
+        37.985740661621094,
+        56.433895111083984
+      ],
+      "canonical_axis_plane_mean_deg": 17.9940242767334,
+      "canonical_plane_position_abs_mean": 0.01849955879151821
+    },
+    {
+      "name": "B02_55000",
+      "quaternion_norm_quantiles": [
+        0.8964122533798218,
+        1.0800704956054688,
+        1.406355857849121,
+        1.79800283908844
+      ],
+      "canonical_axis_plane_angle_quantiles": [
+        0.01978234015405178,
+        0.24708156287670135,
+        2.7159886360168457,
+        8.052157402038574
+      ],
+      "canonical_axis_plane_mean_deg": 0.9283847212791443,
+      "canonical_plane_position_abs_mean": 0.009913665242493153
+    }
+  ]
+}

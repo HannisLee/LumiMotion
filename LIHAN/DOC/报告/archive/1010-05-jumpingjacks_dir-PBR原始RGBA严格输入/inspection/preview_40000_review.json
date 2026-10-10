@@ -1,0 +1,38 @@
+{
+  "iteration": 40000,
+  "scope": "实际查看0010/0080/0150 RGB与GT及B00 40k/55k对照；不是最终MAE或四类完整审核",
+  "background": "PASS_BLACK_BACKGROUND",
+  "rgb_quality": "FAILED_SO_FAR",
+  "foreground": "人物/平台存在；平台起伏比B00减轻，人物衣服/皮肤斑驳、头手与边缘缺失仍明显，背光0080 GT也暗而预测平台缺棋盘格",
+  "metrics": {
+    "psnr": 18.152288464182984,
+    "ssim": 0.8832480907440186,
+    "lpips": 0.1147700935602188,
+    "psnr_foreground": 11.229736152077928,
+    "ssim_foreground_bbox": 0.745617703596751,
+    "lpips_foreground_bbox": 0.24591667254765828
+  },
+  "image": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-05-jumpingjacks_dir-PBR原始RGBA严格输入/inspection/preview_40000_rgb_comparison.png",
+  "checkpoint_audit": {
+    "status": "PASS",
+    "iteration": 40000,
+    "finite": true,
+    "gaussians": 99827,
+    "frozen_opacity_scale_feature": true,
+    "displacement_max": 0.03003785014152527,
+    "displacement_p95": 0.005163454031571744,
+    "rotation_deg_max": 60.00002670288086,
+    "rotation_deg_p95": 26.905084609985344,
+    "lighting": {
+      "format_version": 1,
+      "iteration": 40000,
+      "lights_sha256": "15fa8ab35b9aa4438bfbcacc1e7d5399579096000e43d4c3e1c5f6483973c1a8",
+      "intensity_scale": 3.141592653589793,
+      "effective_intensity_scale": 4.754127025604248,
+      "intensity_fitted_from_train_rgb": true
+    },
+    "final_mae": false
+  },
+  "final_mae_available": false,
+  "commit_allowed": false
+}

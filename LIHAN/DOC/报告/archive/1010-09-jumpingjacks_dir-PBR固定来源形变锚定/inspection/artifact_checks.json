@@ -1,0 +1,207 @@
+{
+  "automatic_status": "PASS",
+  "scope": "实际权重有限性、几何信赖域和opacity/scale/feature冻结、roughness已变化、全量图片与6视频解码、15帧背景数值；人工审阅待完成",
+  "manual_review": "FAILED",
+  "checkpoint": {
+    "40000": {
+      "gaussians": 99827,
+      "finite": true,
+      "geometry_unchanged": false,
+      "max_displacement": 0.02973010018467903,
+      "max_rotation_deg": 60.00002670288086,
+      "opacity_scale_feature_unchanged": true,
+      "roughness_range": [
+        0.4389266073703766,
+        0.8832119107246399
+      ],
+      "ply_sha256": "af430457cb08b8283bc36583bc205b311f6795e6b4bbcc928cfb8341675737aa",
+      "deform_sha256": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5",
+      "deform_finite_tensors": 32
+    },
+    "50000": {
+      "gaussians": 99827,
+      "finite": true,
+      "geometry_unchanged": false,
+      "max_displacement": 0.06370601058006287,
+      "max_rotation_deg": 60.000038146972656,
+      "opacity_scale_feature_unchanged": true,
+      "roughness_range": [
+        0.10204418003559113,
+        0.982597291469574
+      ],
+      "ply_sha256": "f9bd9a56d04fc17443b8a4f9bc983908ddb09d52338e719b144498e9102a30c6",
+      "deform_sha256": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5",
+      "deform_finite_tensors": 32
+    },
+    "55000": {
+      "gaussians": 99827,
+      "finite": true,
+      "geometry_unchanged": false,
+      "max_displacement": 0.06966798007488251,
+      "max_rotation_deg": 60.000038146972656,
+      "opacity_scale_feature_unchanged": true,
+      "roughness_range": [
+        0.06572796404361725,
+        0.990555465221405
+      ],
+      "ply_sha256": "509c6deac87f736424850cf4ad40ecc2deb928330e0c06de10ec37096d683ebe",
+      "deform_sha256": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5",
+      "deform_finite_tensors": 32
+    }
+  },
+  "rgb": {
+    "psnr": 19.475974080557172,
+    "ssim": 0.8950952370961507,
+    "lpips": 0.11134533832470576,
+    "psnr_foreground": 12.349587008267934,
+    "ssim_foreground_bbox": 0.7730405648549398,
+    "lpips_foreground_bbox": 0.22556244830290476
+  },
+  "images": {
+    "rgb": 150,
+    "alpha": 150,
+    "normal": 150,
+    "albedo": 150,
+    "directional": 72,
+    "hdr": 150
+  },
+  "videos": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/directional/rotating_directional.mp4": 72,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/hdr/hdr.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/insights/albedo.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/insights/alpha.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/insights/normal.mp4": 150,
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/insights/rgb.mp4": 150
+  },
+  "representatives": {
+    "rgb": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/insights/rgb/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/insights/rgb/0075.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/insights/rgb/0150.png"
+    ],
+    "alpha": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/insights/alpha/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/insights/alpha/0075.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/insights/alpha/0150.png"
+    ],
+    "normal": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/insights/normal/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/insights/normal/0075.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/insights/normal/0150.png"
+    ],
+    "albedo": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/insights/albedo/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/insights/albedo/0075.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/insights/albedo/0150.png"
+    ],
+    "directional": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/directional/0000.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/directional/0036.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/directional/0071.png"
+    ],
+    "hdr": [
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/hdr/0001.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/hdr/0076.png",
+      "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/model_mlp/renders_stage2/ours_55000/hdr/0150.png"
+    ]
+  },
+  "background": [
+    {
+      "frame": "0010",
+      "mean_rgb_background_all": 0.001730963982906526,
+      "mean_rgb_background_core": 0.0001092530587051552,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0020",
+      "mean_rgb_background_all": 0.008562083816630654,
+      "mean_rgb_background_core": 0.0008732305938716499,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0030",
+      "mean_rgb_background_all": 0.0047067223669799855,
+      "mean_rgb_background_core": 0.0007087236083944257,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0040",
+      "mean_rgb_background_all": 0.003260867112130097,
+      "mean_rgb_background_core": 0.0010613187111273618,
+      "p99_background_core": 0.00392156862745098
+    },
+    {
+      "frame": "0050",
+      "mean_rgb_background_all": 0.0019576817746033907,
+      "mean_rgb_background_core": 3.4316664648973882e-06,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0060",
+      "mean_rgb_background_all": 0.0037145124507115775,
+      "mean_rgb_background_core": 6.44654120357177e-05,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0070",
+      "mean_rgb_background_all": 0.0005093162600091959,
+      "mean_rgb_background_core": 2.1834793584778847e-07,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0080",
+      "mean_rgb_background_all": 0.0017165680262297808,
+      "mean_rgb_background_core": 0.0003412977642963446,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0090",
+      "mean_rgb_background_all": 0.005019366852542958,
+      "mean_rgb_background_core": 0.0013148386897465668,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0100",
+      "mean_rgb_background_all": 0.003291571385185182,
+      "mean_rgb_background_core": 0.00013127032347223764,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0110",
+      "mean_rgb_background_all": 0.0036927307701592,
+      "mean_rgb_background_core": 0.00014487243486303145,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0120",
+      "mean_rgb_background_all": 0.006188421847959801,
+      "mean_rgb_background_core": 0.0007863007225649175,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0130",
+      "mean_rgb_background_all": 0.005954916356330142,
+      "mean_rgb_background_core": 0.00048607620028364427,
+      "p99_background_core": 0.0
+    },
+    {
+      "frame": "0140",
+      "mean_rgb_background_all": 0.00790501538530647,
+      "mean_rgb_background_core": 0.0013228826205365055,
+      "p99_background_core": 0.0196078431372549
+    },
+    {
+      "frame": "0150",
+      "mean_rgb_background_all": 0.0028867494818514304,
+      "mean_rgb_background_core": 0.0003028431873847383,
+      "p99_background_core": 0.0
+    }
+  ],
+  "source_files": {
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/point_cloud/iteration_35000/point_cloud.ply": "8ebd88b6f847a20178458777d51aa191d5f67ba4bbc490fd1e99ef62f66d5529",
+    "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-02-jumpingjacks_direction_light-原版LumiMotion-Stage1/model_mlp/deform/iteration_35000/deform.pth": "e9ddf76b59a1ef8a85caa16891473e3a60663d903a5ad3928ac3e6ca46892bf5"
+  },
+  "final_status": "FAILED",
+  "commit_allowed": false,
+  "manual_review_file": "/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1010-09-jumpingjacks_dir-PBR固定来源形变锚定/inspection/visual_review.json"
+}

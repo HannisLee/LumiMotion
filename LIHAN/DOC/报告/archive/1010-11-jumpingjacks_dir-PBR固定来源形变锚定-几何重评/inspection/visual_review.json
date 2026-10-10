@@ -1,0 +1,13 @@
+{
+  "status": "FAILED",
+  "reviewed_geometry_frames": [
+    10,
+    80,
+    150
+  ],
+  "scope": "真实更正后的3帧Normal/Depth/Mesh误差图；非逐张150审阅",
+  "normal_depth": "平台脚周伪起伏和异常方向、人物头手/衣服/四肢斑驳；Depth更噪、Mesh腿部/手/局部头缺失，尤其0080。",
+  "rgb_alpha_albedo_hdr": "原B04原生FrozenScene图像不受GeometryRun遗漏影响，沿用其已实际审阅FAILED；背景正常而人体斑驳、脚周伪结构、Alpha边雾、Albedo残留照明。",
+  "commit_allowed": false,
+  "normal7_status": "FAILED"
+}

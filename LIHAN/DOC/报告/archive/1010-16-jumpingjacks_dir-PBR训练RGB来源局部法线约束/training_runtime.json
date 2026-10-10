@@ -1,0 +1,26 @@
+{
+  "status": "TRAIN_COMPLETED",
+  "started_at": "2026-10-10T11:11:25.974063+09:00",
+  "training_pid": 306459,
+  "process_start_ticks": "10865815",
+  "source_iteration": 35000,
+  "target_iteration": 55000,
+  "steps_planned": 20000,
+  "preset": "pbr_gt_directional_source_rgb_normal",
+  "gt_training_inputs": [
+    "light_direction_only"
+  ],
+  "quality": "FAILED",
+  "normal_goal": "FAILED",
+  "training_exit_code": 0,
+  "verified_training_session_closed": true,
+  "child_finished_at": "2026-10-10T11:41:41.045005+09:00",
+  "iteration": 55000,
+  "steps_completed": 20000,
+  "finished_at": "2026-10-10T11:41:41.517407+09:00",
+  "unified_session_id": 4419,
+  "session_exit_verified_at": "2026-10-10T11:42:38.690439+09:00",
+  "iterations_stopped_by_user": true,
+  "new_training_started": false,
+  "final_gs_normal_mae_deg": 15.540066466250822
+}

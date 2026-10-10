@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "iteration": 40000,
+  "finite": true,
+  "gaussians": 99827,
+  "frozen_opacity_scale_feature": true,
+  "displacement_max": 0.03003785014152527,
+  "displacement_p95": 0.005163454031571744,
+  "rotation_deg_max": 60.00002670288086,
+  "rotation_deg_p95": 26.905084609985344,
+  "lighting": {
+    "format_version": 1,
+    "iteration": 40000,
+    "lights_sha256": "15fa8ab35b9aa4438bfbcacc1e7d5399579096000e43d4c3e1c5f6483973c1a8",
+    "intensity_scale": 3.141592653589793,
+    "effective_intensity_scale": 4.754127025604248,
+    "intensity_fitted_from_train_rgb": true
+  },
+  "final_mae": false
+}

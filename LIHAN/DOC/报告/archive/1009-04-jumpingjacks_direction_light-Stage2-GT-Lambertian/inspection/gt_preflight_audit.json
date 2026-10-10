@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "frames": 15,
+  "source_blend": "/home/lihan/data/LH-data/danamic/jumpingjacks_direction_light/scene_snapshot.blend",
+  "source_blend_sha256": "a9f1491e17e84179ecabbb7d98bb0cbe48264778521df5da707cc92269fa682c",
+  "camera_error_max": 0,
+  "alpha_hit_iou_min": 0.9979268847651313,
+  "meters_per_world_unit": 1,
+  "geometry_shading_normal_gap_deg_range": [
+    0.6771666190087352,
+    1.048069292267692
+  ],
+  "normal_reference": "signed world-space Blender shading Normal EXR; geometry/normal-map discrepancy diagnostic only"
+}

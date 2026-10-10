@@ -1,0 +1,21 @@
+00:00.312  blend            | Read blend: "/home/lihan/reproduce/LumiMotion-stage2-perlight/data/LH-data/danamic/jumpingjacks_environment_light/scene_snapshot.blend"
+/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/commands/export_jump_roughness_gt.py:60: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  if not material.use_nodes:
+00:01.664  render           | Saved: '/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0010.exr'
+00:01.948  render           | Saved: '/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0020.exr'
+00:02.227  render           | Saved: '/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0030.exr'
+00:02.495  render           | Saved: '/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0040.exr'
+00:02.762  render           | Saved: '/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0050.exr'
+00:03.030  render           | Saved: '/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0060.exr'
+00:03.304  render           | Saved: '/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0070.exr'
+00:03.574  render           | Saved: '/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0080.exr'
+00:03.851  render           | Saved: '/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0090.exr'
+00:04.128  render           | Saved: '/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0100.exr'
+00:04.403  render           | Saved: '/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0110.exr'
+00:04.679  render           | Saved: '/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0120.exr'
+00:04.956  render           | Saved: '/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0130.exr'
+00:05.228  render           | Saved: '/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0140.exr'
+00:05.518  render           | Saved: '/home/lihan/reproduce/LumiMotion-stage2-perlight/output/1009-03-jumpingjacks_environment_light-MAE/gt_roughness/roughness_0150.exr'
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
