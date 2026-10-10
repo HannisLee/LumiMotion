@@ -49,7 +49,8 @@ with (CONTROL / 'sync.lock').open('a') as sync_lock:
         with tempfile.TemporaryDirectory(dir=CONTROL) as temp:
             isolated_env = dict(os.environ, GIT_INDEX_FILE=str(Path(temp) / 'index'))
             git('read-tree', parent, env=isolated_env)
-            git('rm', '-r', '--cached', '--ignore-unmatch', '--', 'LIHAN', 'LIHAN.md', env=isolated_env)
+            # 只清空临时索引中的共享路径；不删除工作区文件。
+            git('rm', '-r', '-f', '--cached', '--ignore-unmatch', '--', 'LIHAN', 'LIHAN.md', env=isolated_env)
             git('read-tree', '--prefix=LIHAN/', shared, env=isolated_env)
             git('update-index', '--add', '--cacheinfo', '100644,' + li_md + ',LIHAN.md', env=isolated_env)
             tree = git('write-tree', env=isolated_env)
