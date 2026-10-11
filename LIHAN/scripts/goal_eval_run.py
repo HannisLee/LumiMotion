@@ -19,11 +19,15 @@ def main():
     p.add_argument('--protocol', type=Path, default=CONTROL / 'protocol.json')
     p.add_argument('--gpu', type=int)
     p.add_argument('--execute', action='store_true')
+    p.add_argument('--plan_destination', type=Path,
+                   help='仅生成计划时将计划保存到此目录，保持实际output尚未创建。')
     args = p.parse_args()
     if subprocess.check_output(['hostname']).decode().strip() != 'ushas':
         p.error('当前执行器只允许ushas。')
     if args.execute and args.gpu is None:
         p.error('执行前须与trainer协调GPU，并显式提供--gpu。')
+    if args.execute and args.plan_destination is not None:
+        p.error('--plan_destination仅供不执行的计划。')
     args.output = args.output.resolve()
     args.model = args.model.resolve()
     if not args.output.is_relative_to(ROOT / 'output'):
@@ -50,15 +54,18 @@ def main():
         ('four_classes', boot + ['LIHAN.scripts.goal_eval_visuals'] + shared +
             ['--output_dir', str(args.output / 'four_classes')]),
     ]
-    args.output.mkdir(parents=True)
-    (args.output / 'logs').mkdir()
-    write(args.output / 'protocol.json', protocol)
+    plan_directory = args.plan_destination.resolve() if args.plan_destination is not None else args.output
+    if not plan_directory.is_relative_to(ROOT / 'output'):
+        p.error('计划也必须保存在output内。')
+    plan_directory.mkdir(parents=True, exist_ok=False)
+    (plan_directory / 'logs').mkdir()
+    write(plan_directory / 'protocol.json', protocol)
     plan = dict(model=str(args.model), iteration=args.iteration, gpu=args.gpu,
                 command={k: str(v) if isinstance(v, Path) else v for k, v in vars(args).items()},
                 steps=[dict(name=n, command=c, shell=shlex.join(c)) for n, c in commands],
                 wrapper_sha256={str(p.relative_to(ROOT)): digest(p) for p in
                     sorted((ROOT / 'LIHAN/scripts').glob('goal_eval*.py'))})
-    write(args.output / 'plan.json', plan)
+    write(plan_directory / 'plan.json', plan)
     lines = ['# 静态DL Goal评测记录', '', f'模型：`{args.model}`；迭代：{args.iteration}。',
              f"source：`{protocol['source_path']}`；固定15测试帧：10、20、…、150。",
              '原协议：前景有效像素加权MAE；阈值GS<3.51°、Depth<7.35°、Mesh<5.46°。',
@@ -71,10 +78,10 @@ def main():
               'RGB：PENDING；Alpha：PENDING；Normal：PENDING；分离：PENDING。',
               '静态几何分离语义：零几何输出头冻结，红／绿显示原binary feature门控，不能声称学到运动。',
               '最终结论：PENDING。数值未达标、异常或验收失败均保留完整结果，禁止覆盖或删除。', '']
-    readme = args.output / 'README.md'
+    readme = plan_directory / 'README.md'
     readme.write_text('\n'.join(lines))
     if not args.execute:
-        print('评测计划已保存：' + str(args.output / 'plan.json'))
+        print('评测计划已保存：' + str(plan_directory / 'plan.json'))
         return
     environment = dict(os.environ, CUDA_VISIBLE_DEVICES=str(args.gpu),
         TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD='1', TORCH_CUDA_ARCH_LIST='8.6')
