@@ -26,20 +26,9 @@ T13/T14从同一静态DL Stage1随机初始化和同一135帧源数据从头训�
 
 ## 正式启动记录
 
-- 实际输出目录：`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k`。预注册方案中的目录名曾写作`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal-reg-2000-Stage1-10k`；该目录名与Goal/watch使用的实际目录不一致，未用于训练，实际目录以launcher state、marker和下面路径为准，未在旧目录训练或覆盖结果。
-- 启动时间：2026-10-11T12:42:04Z；child PID `2197354`，supervisor PID `2197343`；物理GPU `GPU1`（UUID `GPU-b8e1473e-b813-9d70-aa90-5ebbf901aec4`），Conda Python `/home/han.li/miniconda3/envs/lumimotion-ushas/bin/python`。启动后`gpu_verified=true`，训练仍在运行，当前尚无退出码。
-- 正式marker：`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k/model_mlp/early_geometry_training.json`；实际记录`normal_start=2000`、`dist_start=8000`、`smoke_schedule=false`、`iterations=10000`、保存步数5000/8000/9000/10000。T13/T14启动argv唯一实验变量为`--start_normal_reg 2000`，其余科学配置一致；root公平性复核待marker齐全后进行。
-- 完整命令：`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k/commands/train.json`；命令SHA256=`add7c3c12c1c718e1928c3278ff95df8e6c7b37253ae1fe503cd8ffa2a17cf3b`；训练日志：`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k/logs/train.log`；实时状态：`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k/state.json`。原生训练源码/.so运行时采集：`output/1011-08-LH-static-jumpingjacks_DL_V2-Goal评测协议/T13_training_runtime_module_audit.json`，审计状态由evaluator记录为PASS_CAPTURED。
-- Smoke及fresh：T13/T14均20步、实际物理/V/计划的normal/dist分支覆盖并exit0；T13 fresh首个helper读取错误保留，`render_parity_retry1`实际exit0/PASS；T14 `render_parity` exit0/PASS。fresh八项最大差均为0。Smoke阶段训练进程退出后未采集其maps，文档不将fresh运行maps冒充训练maps。
-- 本次为Stage1从头训练，允许原Stage1的增密与opacity/scale更新；没有冻结它们。实际训练仅优化135训练相机；15个测试相机由原加载器管理/评测，不作为训练监督或进入loss/优化。
-- 终点评测计划以实际目录为准：稳定的iteration10000后由evaluator执行原15帧协议与150方向四类可视化；中间checkpoint是否补评不在本计划承诺范围。定量指标、decode、目检和最终PASS/FAILED待实际评测后记录。
-
-
-## 正式启动记录
-
 - 实际输出目录：`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k`。预注册方案中的目录名曾写作`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal-reg-2000-Stage1-10k`；该名称未用于训练，实际目录以launcher state、marker和下列路径为准，没有在旧目录训练或覆盖结果。
-- 启动时间：2026-10-11T12:42:04Z；child PID `2197354`，supervisor PID `2197343`；物理GPU `GPU1`（UUID `GPU-b8e1473e-b813-9d70-aa90-5ebbf901aec4`），Conda Python `/home/han.li/miniconda3/envs/lumimotion-ushas/bin/python`。启动后`gpu_verified=true`，训练仍在运行，当前尚无退出码。
-- 正式marker：`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k/model_mlp/early_geometry_training.json`；实际记录`normal_start=2000`、`dist_start=8000`、`smoke_schedule=false`、`iterations=10000`、保存步数5000/8000/9000/10000。T13/T14启动argv唯一实验变量为`--start_normal_reg`（T13=2000，T14=8000），其余科学配置一致；root公平性复核待marker齐全后进行。
+- 启动时间：2026-10-11T12:42:04Z；child PID `2197354`，supervisor PID `2197343`；物理GPU `GPU1`（UUID `GPU-b8e1473e-b813-9d70-aa90-5ebbf901aec4`），Conda Python `/home/han.li/miniconda3/envs/lumimotion-ushas/bin/python`。启动后`gpu_verified=true`；正式训练已完成10000步，launcher state记录`training_exit_code=0`。
+- 正式marker：`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k/model_mlp/early_geometry_training.json`；实际记录`normal_start=2000`、`dist_start=8000`、`smoke_schedule=false`、`iterations=10000`、保存步数5000/8000/9000/10000。T13/T14启动argv唯一实验变量为`--start_normal_reg`（T13=2000，T14=8000），其余科学配置一致；root已完成`output/1011-09-静态DL-Goal训练总控/T13_T14_runtime_fairness_audit.json` 13项公平性审计，全部PASS。
 - 完整命令：`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k/commands/train.json`；命令SHA256=`add7c3c12c1c718e1928c3278ff95df8e6c7b37253ae1fe503cd8ffa2a17cf3b`；训练日志：`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k/logs/train.log`；实时状态：`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k/state.json`。原生训练源码/.so运行时采集：`output/1011-08-LH-static-jumpingjacks_DL_V2-Goal评测协议/T13_training_runtime_module_audit.json`，evaluator记录审计状态PASS_CAPTURED。
 - Smoke及fresh：T13/T14均20步、实际物理/V/normal/dist计划分支覆盖并exit0；T13 fresh首个helper读取错误留档，`render_parity_retry1`实际exit0/PASS；T14 `render_parity` exit0/PASS。fresh八项最大差均为0。Smoke训练进程退出后未采集其maps，不把fresh运行maps当作训练maps。
 - 本次为Stage1从头训练，允许原Stage1增密与opacity/scale更新；没有冻结它们。只优化原135训练相机；source中的15个测试相机由原加载器管理/评测，不作为训练监督或进入loss/优化。
@@ -49,3 +38,29 @@ T13/T14从同一静态DL Stage1随机初始化和同一135帧源数据从头训�
 ## 当前训练边界审计
 
 T13在step2001的审计显示normal_active=true、dist_active=false；step5000 normal_active=true、dist_active=false、trace_rays=49353，XYZ/rotation/albedo/light梯度均有限非零。对应日志`logs/train.log`与`model_mlp/static_dl_gradient_audit/`保留。
+
+
+step8001边界审计：`normal_active=true`、`dist_active=true`，trace_rays=60566，mean_visibility=0.6467810273；normal_loss=0.0240646526、dist_loss=6.54125216e-08。XYZ/rotation/albedo/log_intensity梯度均有限非零，详见`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k/logs/train.log`。
+
+## 正式训练终态与评测交接
+
+- 训练于2026-10-11T12:49:20Z完成，标准launcher state为`TRAINING_COMPLETED_PENDING_EVAL`、`training_exit_code=0`、`gpu_verified=true`。10000步结束日志、checkpoint与运行时审计保留在实际输出目录；训练未重启。
+- step8001日程审计已证实normal与dist均启用，trace_rays=60566，mean_visibility=0.6467810273，normal_loss=0.0240646526，dist_loss=6.54125216e-08；XYZ/rotation/albedo/log_intensity梯度有限非零。
+- 最终评测状态：evaluation_10000原15+150已由evaluator在GPU1启动。按实际目录运行原15帧协议与150方向四类可视化，不执行中间检查点评测。
+
+
+原15帧最终数字结果：iteration10000三项GS/Depth/Mesh=3.255367462/5.887606053/4.750743594°；coverage=0.997227406/0.965224438/0.993122048；expected深度绝对误差=0.017805510m；阈值依次为3.51/7.35/5.46°。数字结论：数字阈值PASS；最终人工验收已完成，见下方最终验收段。完整来源、复算摘要与指标SHA见`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k/evaluation_10000/goal_mae_summary.json`；最终视觉验收已完成，详情见本目录`FINAL_REVIEW_COMPLETED.json`。
+
+## 最终验收（PASS）
+
+- 阶段：Stage1，iteration 10000；输出模型：`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k/model_mlp`；source：`output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/eval_view`。本轮仅训练并验收Stage1；没有从该checkpoint继续训练Stage2。
+- 渲染入口完整命令：`OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 /home/han.li/miniconda3/envs/lumimotion-ushas/bin/python LIHAN/scripts/goal_eval_run.py --model /home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k/model_mlp --iteration 10000 --output /home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k/evaluation_10000 --gpu 1 --execute`。四个实际子命令、环境、逐步退出码与日志记录在`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k/evaluation_10000/README.md`、`plan.json`和`executed.json`；渲染产物在`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k/evaluation_10000`，子任务日志在`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k/evaluation_10000/logs`。
+- 原15帧GS/Depth/Mesh MAE：3.255367462° / 5.887606053° / 4.750743594°；coverage：0.997227406 / 0.965224438 / 0.993122048。阈值分别为3.51° / 7.35° / 5.46°。Expected深度绝对误差`0.017805510 m`，Median为`0.016098744 m`。数字判定：PASS；15帧完整性：PASS。
+- 四类代表图：`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k/evaluation_10000/four_classes/four_classes_10_80_150.png`；原几何代表图：`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k/evaluation_10000/normal_depth/comparison_0080.png`。四类视频：`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k/evaluation_10000/four_classes/rgb.mp4`、`alpha.mp4`、`normal.mp4`、`separation.mp4`。600张PNG与四段各150帧、400×400视频均完整解码通过；人工目检范围为四类10/80/150与原几何0080，不声称逐视频帧人工检查。解码证据：`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k/evaluation_10000/artifact_decode_audit.json`；目检证据：`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k/evaluation_10000/visual_review_completed.json`。
+- RGB目检：人物／棋盘圆台可辨，脚周大面积灰白拖影较旧续训代表图少；仍有长黑色投影与模糊分叉影、台面高亮，不能把三法线达标表述为RGB／材质／阴影完全正确。
+- Alpha目检：人物与圆台轮廓连续，80俯视近满盘白；组合轮廓掩膜不单独证明腿足几何或接触正确，原coverage如实保留。
+- Normal目检：GS平台接近均一、人体／腿面连续，原0080仍见脚部／人体边界误差；ExpectedDepth和Mesh平台仍有细纹，量化原15三项均达标但不代表每像素／每帧完美。
+- Separation目检：主体与圆台近乎均匀橄榄黄绿feature门控；零几何头为静态冻结约束，不表示学习到运动分离。
+- fresh parity、源码与实际native/tracer、checkpoint稳定性均通过；最终验收marker：`output/1011-27-LH-static-jumpingjacks_DL_V2-T13-normal2000-Stage1早期法线正则10k/evaluation_10000/FINAL_REVIEW_COMPLETED.json`。最终整体结论：**PASS**。launcher的`state.json`仍保留训练结束时的`TRAINING_COMPLETED_PENDING_EVAL`状态；评测终态以此处FINAL_REVIEW_COMPLETED marker为准。失败checkpoint与所有渲染、数组、统计、日志均保留，没有覆盖或删除。
+
+最终阶段说明：Stage1最终PASS，达到本轮三项法线阈值；Stage2尚未训练。
