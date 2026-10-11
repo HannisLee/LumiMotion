@@ -43,3 +43,30 @@ T04与T05两组iteration10020 smoke的fresh/fresh renderer parity均由evaluator
 ## 正式训练执行记录
 
 T04 `control`于2026-10-11T09:10:30.346339+00:00至2026-10-11T09:13:11.623112+00:00完成，PID 2017851，GPU1，实际UUID `GPU-b8e1473e-b813-9d70-aa90-5ebbf901aec4`；launcher确认gpu_verified=true、exit code 0。训练首相机真实梯度审计PASS（11项true，参数更新数0），点数保持81,323。iteration 10500、11000、12000 PLY/PTH/lighting完整保存，逐文件SHA见`output/1011-16-LH-static-jumpingjacks_DL_V2-T04-静态分流control-2k/training_completion_audit.json`。训练metrics最后一条step photo=0.01136760仅为训练值，不替代测试评测。当前训练结束、完整15帧Goal评测及四类目检待执行；尚无最终PASS/FAILED。
+
+
+## iteration 12000最终评测与目检
+
+完整15帧Goal评测四阶段全部exit 0，完整性PASS，600张PNG及4个各150帧MP4全部解码；fresh RGB parity PASS（八项含逐surfel visibility最大差0），训练/评测renderer来源、native .so SHA及稳定checkpoint核对通过。全参数、原始命令、渲染日志和逐帧数组见`output/1011-16-LH-static-jumpingjacks_DL_V2-T04-静态分流control-2k/evaluation_12000/README.md`。
+
+- GS-render：6.91798432° / coverage 0.99938900；阈值<3.51°。
+- Depth-normal：13.66069230° / coverage 0.96730850；阈值<7.35°。
+- Mesh：8.87916647° / coverage 0.99651672；阈值<5.46°。
+- completeness PASS，三项数值阈值均FAILED；visual integrity PASS，但存在明确几何缺陷。最终结论：**FAILED**。
+- RGB：人物与圆台可辨，脚周出现灰白延伸／拖影，投射阴影边界有明显黑色伸展；不能把图像拟合视为准确几何。
+- Alpha：人体和圆台总体连续，代表帧无大块缺失，脚与台面接触区域有薄外扩；80俯视圆台近满盘白。
+- Normal：平台整体相对平坦但脚／小腿有异常抬高和延伸伪表面，帧80原Depth/Mesh误差在脚周突出；人体表面仍有法线偏差。
+- 分离：人物与台面均为黄绿／橄榄色连续binary feature门控；保存零时变几何为显式约束，不代表学会运动分离。
+
+代表图：`output/1011-16-LH-static-jumpingjacks_DL_V2-T04-静态分流control-2k/evaluation_12000/four_classes/four_classes_10_80_150.png`；四类视频分别在`evaluation_12000/four_classes/`。保留全部失败checkpoint、评测、统计及日志。
+
+
+## 中间与最终checkpoint趋势
+
+10500/11000仅geometry_only全15帧评测，四个中间pipeline完整性PASS，数值阈值FAILED；视觉目检按DEFERRED_INTERMEDIATE处理。三点指标（GS/Depth/Mesh MAE，单位度）为：
+
+- iteration 10500: 6.60908960° / 12.77645969° / 8.57978193°；coverage 0.99927824 / 0.96719405 / 0.99575435。完整摘要和逐帧数据在`evaluation_10500/goal_mae_summary.json`及同目录。
+- iteration 11000: 6.67739958° / 13.00208654° / 8.64794811°；coverage 0.99936131 / 0.96728266 / 0.99614938。完整摘要和逐帧数据在`evaluation_11000/goal_mae_summary.json`及同目录。
+- iteration 12000: 6.91798432° / 13.66069230° / 8.87916647°；coverage 0.99938900 / 0.96730850 / 0.99651672。完整摘要和逐帧数据在`evaluation_12000/goal_mae_summary.json`及同目录。
+
+10500→11000→12000三项误差均缓慢上升；control/split变化接近，最终12000的完整目检结论仍以`evaluation_12000/FINAL_REVIEW_COMPLETED.json`为准。
