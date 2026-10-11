@@ -21,3 +21,13 @@
 有效训练在独立目录`output/1011-15-LH-static-jumpingjacks_DL_V2-T03-方向Lambertian阴影BVH-GPU2重试`，由`LIHAN/scripts/goal_train_job.py`监督；PID 1985466，物理GPU2 UUID `GPU-c64dda28-ea42-7b20-b990-06c1c8f61cd6`，`gpu_verified=true`。旧#12错误GPU结果单独保留，未计入本实验。当前训练继续至35000步，完整启动器命令、子进程环境、日志、checkpoint和最终退出码记录于该目录。
 
 10k checkpoint完整15帧评测：`output/1011-15-LH-static-jumpingjacks_DL_V2-T03-方向Lambertian阴影BVH-GPU2重试/evaluation_10000/goal_mae_summary.json`显示完整性PASS，数值阈值FAILED。GS-render MAE 6.604177153°（coverage 0.998091304）；depth-normal MAE 12.780289326°（coverage 0.966031111）；mesh MAE 8.617989945°（coverage 0.995224567）。Goal阈值分别3.51°、7.35°、5.46°。15帧网格/法线数组、逐帧CSV和日志完整保留；代表mesh帧10、80、150已目检，四类渲染可视化暂缓至后续评测。中期10k数值未达标，训练继续到35000步，最终结论待最终checkpoint。
+
+
+## 35k训练完成状态
+
+2026-10-11T08:31:05Z，T03 #15正式重试完成35000步，PID 1985466，物理GPU2；监督器记录training_exit_code=0、`gpu_verified=true`、`launcher_error=null`。10k/20k/30k/35k PLY和deform.pth均完整。10k中期完整15帧评测完整性PASS但数值FAILED，原结果保留；35k完整Goal评测待执行，最终结论仍PENDING。
+
+
+## 35k最终评测结果（2026-10-11）
+
+T03 #15最终15帧Goal评测完整性PASS、阈值FAILED：GS-render MAE 23.030097664°（coverage 0.998696770）、depth-normal MAE 33.117905401°（coverage 0.966640270）、mesh MAE 29.228796856°（coverage 0.989736604）；阈值分别3.51°、7.35°、5.46°。全部指标、渲染数组和检查命令见`output/1011-15-LH-static-jumpingjacks_DL_V2-T03-方向Lambertian阴影BVH-GPU2重试/evaluation_35000/`。四个150帧MP4及600张PNG完整，OpenCV首尾帧解码PASS；fresh RGB重载parity七项最大差0。目检发现圆台RGB强烈旋涡/拖影、Alpha边缘薄晕、Normal平台波浪/扭曲、Separation均一黄绿门控并有淡外扩，最终结论FAILED。

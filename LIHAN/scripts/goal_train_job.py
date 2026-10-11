@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[2]
 ENVIRONMENTS = {name: f"lumimotion-{name}" for name in
                 ("mahadevi", "minakshi", "parvati", "ushas", "garuda")}
 ENVIRONMENTS["venus"] = "lumimotion"
+TRAINING_MODULES = {"scripts.train_static_dl", "scripts.train_static_dl_shadow_split"}
 
 
 def now():
@@ -56,7 +57,8 @@ def main():
     expected_python = Path.home() / "miniconda3/envs" / ENVIRONMENTS[host] / "bin/python"
     if Path(argv[0]).absolute() != expected_python:
         raise ValueError(f"当前服务器必须使用 {expected_python}")
-    if Path(argv[1]).resolve() != ROOT / "LIHAN/scripts/bootstrap_1011.py" or argv[3] != "scripts.train_static_dl":
+    if (Path(argv[1]).resolve() != ROOT / "LIHAN/scripts/bootstrap_1011.py"
+            or argv[3] not in TRAINING_MODULES):
         raise ValueError("必须通过仓库 bootstrap 加载原生训练入口")
     model = Path(argv[argv.index("--model_path") + 1]).resolve()
     if model.parent != output:
