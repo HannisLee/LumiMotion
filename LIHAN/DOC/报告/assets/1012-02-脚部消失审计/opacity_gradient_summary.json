@@ -1,0 +1,518 @@
+[
+  {
+    "experiment": "T13",
+    "state": "saved",
+    "checkpoint": 9000,
+    "parameter_updates": 0,
+    "frames": 135,
+    "weighted_losses": {
+      "photo": 0.0052551663290985205,
+      "alpha": 0.0004290846530003128,
+      "normal": 0.0019295422205080589,
+      "distortion": 5.318295792407029e-05
+    },
+    "groups": {
+      "feet_height": {
+        "points": 1186,
+        "photo": {
+          "signed_sum": -1.9725024458239204e-07,
+          "absolute_sum": 1.4426316283788765e-06,
+          "positive_fraction": 0.6391231028667791,
+          "negative_fraction": 0.35497470489038785,
+          "zero_fraction": 0.005902192242833052
+        },
+        "alpha": {
+          "signed_sum": -9.94982940483169e-09,
+          "absolute_sum": 9.94982940483169e-09,
+          "positive_fraction": 0.0,
+          "negative_fraction": 0.9949409780775716,
+          "zero_fraction": 0.00505902192242833
+        },
+        "normal": {
+          "signed_sum": 2.056225696378533e-07,
+          "absolute_sum": 1.7268041574425297e-06,
+          "positive_fraction": 0.3524451939291737,
+          "negative_fraction": 0.642495784148398,
+          "zero_fraction": 0.00505902192242833
+        },
+        "distortion": {
+          "signed_sum": 1.6515652845328077e-08,
+          "absolute_sum": 3.2770692826034065e-08,
+          "positive_fraction": 0.1315345699831366,
+          "negative_fraction": 0.863406408094435,
+          "zero_fraction": 0.00505902192242833
+        },
+        "total": {
+          "signed_sum": 1.493814316688713e-08,
+          "absolute_sum": 9.832640444074059e-07,
+          "positive_fraction": 0.43676222596964587,
+          "negative_fraction": 0.5581787521079258,
+          "zero_fraction": 0.00505902192242833
+        }
+      },
+      "platform_height": {
+        "points": 27798,
+        "photo": {
+          "signed_sum": -0.00010507648403290659,
+          "absolute_sum": 0.00020384788513183594,
+          "positive_fraction": 0.3675084538456004,
+          "negative_fraction": 0.6324915461543996,
+          "zero_fraction": 0.0
+        },
+        "alpha": {
+          "signed_sum": -1.562807483423967e-05,
+          "absolute_sum": 1.7198355635628104e-05,
+          "positive_fraction": 0.0022663500971292897,
+          "negative_fraction": 0.9977336499028707,
+          "zero_fraction": 0.0
+        },
+        "normal": {
+          "signed_sum": -3.5437180940789403e-06,
+          "absolute_sum": 1.2323848750384059e-05,
+          "positive_fraction": 0.5907259515073027,
+          "negative_fraction": 0.4089143103820419,
+          "zero_fraction": 0.00035973811065544283
+        },
+        "distortion": {
+          "signed_sum": 4.4450910507976005e-08,
+          "absolute_sum": 2.6050415158351825e-07,
+          "positive_fraction": 0.6061227426433556,
+          "negative_fraction": 0.39387725735664436,
+          "zero_fraction": 0.0
+        },
+        "total": {
+          "signed_sum": -0.00012420382699929178,
+          "absolute_sum": 0.00021386865410022438,
+          "positive_fraction": 0.3482624649255342,
+          "negative_fraction": 0.6517375350744657,
+          "zero_fraction": 0.0
+        }
+      },
+      "upper_body": {
+        "points": 24427,
+        "photo": {
+          "signed_sum": 6.021330136718461e-07,
+          "absolute_sum": 0.00014030694728717208,
+          "positive_fraction": 0.5399353174765629,
+          "negative_fraction": 0.4596552994637082,
+          "zero_fraction": 0.0004093830597289884
+        },
+        "alpha": {
+          "signed_sum": 1.627922392799519e-05,
+          "absolute_sum": 1.8049031496047974e-05,
+          "positive_fraction": 0.4869611495476317,
+          "negative_fraction": 0.5127113440045851,
+          "zero_fraction": 0.0003275064477831907
+        },
+        "normal": {
+          "signed_sum": -5.2427640184760094e-05,
+          "absolute_sum": 8.928702300181612e-05,
+          "positive_fraction": 0.328611782044459,
+          "negative_fraction": 0.6709378965898392,
+          "zero_fraction": 0.00045032136570188723
+        },
+        "distortion": {
+          "signed_sum": -3.2926250241871458e-06,
+          "absolute_sum": 3.6689089029096067e-06,
+          "positive_fraction": 0.09358496745404675,
+          "negative_fraction": 0.90608752609817,
+          "zero_fraction": 0.0003275064477831907
+        },
+        "total": {
+          "signed_sum": -3.883890531142242e-05,
+          "absolute_sum": 0.00016652964404784143,
+          "positive_fraction": 0.4001719408850862,
+          "negative_fraction": 0.5995005526671306,
+          "zero_fraction": 0.0003275064477831907
+        }
+      }
+    }
+  },
+  {
+    "experiment": "T13",
+    "state": "reset",
+    "checkpoint": 9000,
+    "parameter_updates": 0,
+    "frames": 135,
+    "weighted_losses": {
+      "photo": 0.0561758644051022,
+      "alpha": 0.04614287521000262,
+      "normal": 0.05626268989785954,
+      "distortion": 7.459096353462276e-05
+    },
+    "groups": {
+      "feet_height": {
+        "points": 1186,
+        "photo": {
+          "signed_sum": -4.893350251222728e-06,
+          "absolute_sum": 4.994458322471473e-06,
+          "positive_fraction": 0.0387858347386172,
+          "negative_fraction": 0.9612141652613828,
+          "zero_fraction": 0.0
+        },
+        "alpha": {
+          "signed_sum": -3.4185613912995905e-05,
+          "absolute_sum": 3.4185613912995905e-05,
+          "positive_fraction": 0.0,
+          "negative_fraction": 1.0,
+          "zero_fraction": 0.0
+        },
+        "normal": {
+          "signed_sum": -3.070691309403628e-05,
+          "absolute_sum": 0.0021686535328626633,
+          "positive_fraction": 0.5067453625632378,
+          "negative_fraction": 0.49325463743676223,
+          "zero_fraction": 0.0
+        },
+        "distortion": {
+          "signed_sum": 4.850296022596012e-07,
+          "absolute_sum": 4.850296022596012e-07,
+          "positive_fraction": 1.0,
+          "negative_fraction": 0.0,
+          "zero_fraction": 0.0
+        },
+        "total": {
+          "signed_sum": -6.930084782652557e-05,
+          "absolute_sum": 0.0021699604112654924,
+          "positive_fraction": 0.4966273187183811,
+          "negative_fraction": 0.5033726812816189,
+          "zero_fraction": 0.0
+        }
+      },
+      "platform_height": {
+        "points": 27798,
+        "photo": {
+          "signed_sum": -0.003909835126250982,
+          "absolute_sum": 0.00391194736585021,
+          "positive_fraction": 0.007518526512698755,
+          "negative_fraction": 0.9924814734873012,
+          "zero_fraction": 0.0
+        },
+        "alpha": {
+          "signed_sum": -0.005038192495703697,
+          "absolute_sum": 0.005038192495703697,
+          "positive_fraction": 0.0,
+          "negative_fraction": 1.0,
+          "zero_fraction": 0.0
+        },
+        "normal": {
+          "signed_sum": -0.0012451768852770329,
+          "absolute_sum": 0.007861465215682983,
+          "positive_fraction": 0.3839844593136197,
+          "negative_fraction": 0.47924311101518097,
+          "zero_fraction": 0.13677242967119937
+        },
+        "distortion": {
+          "signed_sum": 1.2479125871323049e-05,
+          "absolute_sum": 1.2479125871323049e-05,
+          "positive_fraction": 1.0,
+          "negative_fraction": 0.0,
+          "zero_fraction": 0.0
+        },
+        "total": {
+          "signed_sum": -0.01018072385340929,
+          "absolute_sum": 0.013844966888427734,
+          "positive_fraction": 0.20335995395352183,
+          "negative_fraction": 0.7966400460464782,
+          "zero_fraction": 0.0
+        }
+      },
+      "upper_body": {
+        "points": 24427,
+        "photo": {
+          "signed_sum": -0.0003889325016643852,
+          "absolute_sum": 0.00041021552169695497,
+          "positive_fraction": 0.09514062308101691,
+          "negative_fraction": 0.9048184386130101,
+          "zero_fraction": 4.093830597289884e-05
+        },
+        "alpha": {
+          "signed_sum": -0.0023137873504310846,
+          "absolute_sum": 0.0023137873504310846,
+          "positive_fraction": 0.0,
+          "negative_fraction": 0.9999590616940272,
+          "zero_fraction": 4.093830597289884e-05
+        },
+        "normal": {
+          "signed_sum": -0.0024675840977579355,
+          "absolute_sum": 0.03321002051234245,
+          "positive_fraction": 0.48966307774184303,
+          "negative_fraction": 0.5098456625864821,
+          "zero_fraction": 0.0004912596716747861
+        },
+        "distortion": {
+          "signed_sum": 4.8248090024571866e-05,
+          "absolute_sum": 4.8248090024571866e-05,
+          "positive_fraction": 0.9999590616940272,
+          "negative_fraction": 0.0,
+          "zero_fraction": 4.093830597289884e-05
+        },
+        "total": {
+          "signed_sum": -0.005122055299580097,
+          "absolute_sum": 0.033576708287000656,
+          "positive_fraction": 0.459327793015925,
+          "negative_fraction": 0.5406312686781021,
+          "zero_fraction": 4.093830597289884e-05
+        }
+      }
+    }
+  },
+  {
+    "experiment": "T14",
+    "state": "saved",
+    "checkpoint": 9000,
+    "parameter_updates": 0,
+    "frames": 135,
+    "weighted_losses": {
+      "photo": 0.005022230523603934,
+      "alpha": 0.0004278560061249192,
+      "normal": 0.0021607191181155267,
+      "distortion": 5.382773307010885e-05
+    },
+    "groups": {
+      "feet_height": {
+        "points": 2240,
+        "photo": {
+          "signed_sum": 3.905392986780498e-06,
+          "absolute_sum": 6.631526957789902e-06,
+          "positive_fraction": 0.5424107142857143,
+          "negative_fraction": 0.4575892857142857,
+          "zero_fraction": 0.0
+        },
+        "alpha": {
+          "signed_sum": -6.568692612063387e-08,
+          "absolute_sum": 6.568692612063387e-08,
+          "positive_fraction": 0.0,
+          "negative_fraction": 1.0,
+          "zero_fraction": 0.0
+        },
+        "normal": {
+          "signed_sum": -4.840509973291773e-06,
+          "absolute_sum": 6.6601896833162755e-06,
+          "positive_fraction": 0.3736607142857143,
+          "negative_fraction": 0.6263392857142858,
+          "zero_fraction": 0.0
+        },
+        "distortion": {
+          "signed_sum": -2.3980692986924623e-08,
+          "absolute_sum": 2.6464832103556546e-08,
+          "positive_fraction": 0.09196428571428572,
+          "negative_fraction": 0.9080357142857143,
+          "zero_fraction": 0.0
+        },
+        "total": {
+          "signed_sum": -1.0247847512800945e-06,
+          "absolute_sum": 7.24286655895412e-06,
+          "positive_fraction": 0.3776785714285714,
+          "negative_fraction": 0.6223214285714286,
+          "zero_fraction": 0.0
+        }
+      },
+      "platform_height": {
+        "points": 23269,
+        "photo": {
+          "signed_sum": 9.312492693425156e-06,
+          "absolute_sum": 0.00016757400589995086,
+          "positive_fraction": 0.42107525033306115,
+          "negative_fraction": 0.5294168206626843,
+          "zero_fraction": 0.04950792900425459
+        },
+        "alpha": {
+          "signed_sum": -8.708994755579624e-06,
+          "absolute_sum": 9.840057828114368e-06,
+          "positive_fraction": 0.0020628303751772745,
+          "negative_fraction": 0.9484292406205681,
+          "zero_fraction": 0.04950792900425459
+        },
+        "normal": {
+          "signed_sum": -2.2683458155370317e-05,
+          "absolute_sum": 3.0381535907508805e-05,
+          "positive_fraction": 0.5136877390519575,
+          "negative_fraction": 0.4366324294125231,
+          "zero_fraction": 0.04967983153551936
+        },
+        "distortion": {
+          "signed_sum": 1.1964470303382768e-08,
+          "absolute_sum": 2.1156031948521559e-07,
+          "positive_fraction": 0.6047960806222872,
+          "negative_fraction": 0.3456959903734583,
+          "zero_fraction": 0.04950792900425459
+        },
+        "total": {
+          "signed_sum": -2.206799399573356e-05,
+          "absolute_sum": 0.00016822628094814718,
+          "positive_fraction": 0.3988568481670893,
+          "negative_fraction": 0.5516352228286562,
+          "zero_fraction": 0.04950792900425459
+        }
+      },
+      "upper_body": {
+        "points": 18354,
+        "photo": {
+          "signed_sum": -1.244577651959844e-05,
+          "absolute_sum": 8.979740232462063e-05,
+          "positive_fraction": 0.4891576768006974,
+          "negative_fraction": 0.5106788710907704,
+          "zero_fraction": 0.00016345210853220007
+        },
+        "alpha": {
+          "signed_sum": 1.0185840437770821e-05,
+          "absolute_sum": 1.1706266377586871e-05,
+          "positive_fraction": 0.45248992045330716,
+          "negative_fraction": 0.5474555955105154,
+          "zero_fraction": 5.448403617740002e-05
+        },
+        "normal": {
+          "signed_sum": -2.7724205210688524e-05,
+          "absolute_sum": 5.698361565009691e-05,
+          "positive_fraction": 0.37490465293668956,
+          "negative_fraction": 0.6249863789909557,
+          "zero_fraction": 0.00010896807235480004
+        },
+        "distortion": {
+          "signed_sum": -1.8980049389938358e-06,
+          "absolute_sum": 2.0717191091534914e-06,
+          "positive_fraction": 0.11545167265991065,
+          "negative_fraction": 0.884493843303912,
+          "zero_fraction": 5.448403617740002e-05
+        },
+        "total": {
+          "signed_sum": -3.188214759575203e-05,
+          "absolute_sum": 0.00011229752271901816,
+          "positive_fraction": 0.36613272311212813,
+          "negative_fraction": 0.6338127928516945,
+          "zero_fraction": 5.448403617740002e-05
+        }
+      }
+    }
+  },
+  {
+    "experiment": "T14",
+    "state": "reset",
+    "checkpoint": 9000,
+    "parameter_updates": 0,
+    "frames": 135,
+    "weighted_losses": {
+      "photo": 0.031267033006857944,
+      "alpha": 0.029682303592562676,
+      "normal": 0.023306072937945524,
+      "distortion": 0.00021010409712929416
+    },
+    "groups": {
+      "feet_height": {
+        "points": 2240,
+        "photo": {
+          "signed_sum": -2.3034301193547435e-05,
+          "absolute_sum": 2.3412185328197666e-05,
+          "positive_fraction": 0.044642857142857144,
+          "negative_fraction": 0.9553571428571429,
+          "zero_fraction": 0.0
+        },
+        "alpha": {
+          "signed_sum": -2.7691272407537326e-05,
+          "absolute_sum": 2.7691272407537326e-05,
+          "positive_fraction": 0.0,
+          "negative_fraction": 1.0,
+          "zero_fraction": 0.0
+        },
+        "normal": {
+          "signed_sum": 0.0007981295930221677,
+          "absolute_sum": 0.0009294921183027327,
+          "positive_fraction": 0.8602678571428571,
+          "negative_fraction": 0.13973214285714286,
+          "zero_fraction": 0.0
+        },
+        "distortion": {
+          "signed_sum": 2.044538632617332e-06,
+          "absolute_sum": 2.044538632617332e-06,
+          "positive_fraction": 1.0,
+          "negative_fraction": 0.0,
+          "zero_fraction": 0.0
+        },
+        "total": {
+          "signed_sum": 0.0007494485471397638,
+          "absolute_sum": 0.0008973600342869759,
+          "positive_fraction": 0.8441964285714286,
+          "negative_fraction": 0.15580357142857143,
+          "zero_fraction": 0.0
+        }
+      },
+      "platform_height": {
+        "points": 23269,
+        "photo": {
+          "signed_sum": -0.0021676411852240562,
+          "absolute_sum": 0.002176439855247736,
+          "positive_fraction": 0.02191757273625854,
+          "negative_fraction": 0.9780394516309253,
+          "zero_fraction": 4.297563281619322e-05
+        },
+        "alpha": {
+          "signed_sum": -0.002787546720355749,
+          "absolute_sum": 0.002787546720355749,
+          "positive_fraction": 0.0,
+          "negative_fraction": 0.9999570243671838,
+          "zero_fraction": 4.297563281619322e-05
+        },
+        "normal": {
+          "signed_sum": 0.00289952103048563,
+          "absolute_sum": 0.005298523232340813,
+          "positive_fraction": 0.4004899222141046,
+          "negative_fraction": 0.5466500494219777,
+          "zero_fraction": 0.052860028363917656
+        },
+        "distortion": {
+          "signed_sum": 1.4524072867061477e-05,
+          "absolute_sum": 1.4524072867061477e-05,
+          "positive_fraction": 0.9999570243671838,
+          "negative_fraction": 0.0,
+          "zero_fraction": 4.297563281619322e-05
+        },
+        "total": {
+          "signed_sum": -0.0020411426667124033,
+          "absolute_sum": 0.008925177156925201,
+          "positive_fraction": 0.07374618591258757,
+          "negative_fraction": 0.9262108384545963,
+          "zero_fraction": 4.297563281619322e-05
+        }
+      },
+      "upper_body": {
+        "points": 18354,
+        "photo": {
+          "signed_sum": -0.00041614685324020684,
+          "absolute_sum": 0.00042583452886901796,
+          "positive_fraction": 0.015691402419091206,
+          "negative_fraction": 0.9843085975809088,
+          "zero_fraction": 0.0
+        },
+        "alpha": {
+          "signed_sum": -0.001929538557305932,
+          "absolute_sum": 0.001929538557305932,
+          "positive_fraction": 0.0,
+          "negative_fraction": 1.0,
+          "zero_fraction": 0.0
+        },
+        "normal": {
+          "signed_sum": 0.0013922807993367314,
+          "absolute_sum": 0.002395791932940483,
+          "positive_fraction": 0.6930914242127056,
+          "negative_fraction": 0.3069085757872943,
+          "zero_fraction": 0.0
+        },
+        "distortion": {
+          "signed_sum": 0.00011099365656264126,
+          "absolute_sum": 0.00011099365656264126,
+          "positive_fraction": 1.0,
+          "negative_fraction": 0.0,
+          "zero_fraction": 0.0
+        },
+        "total": {
+          "signed_sum": -0.0008424108382314444,
+          "absolute_sum": 0.0026056328788399696,
+          "positive_fraction": 0.39718862373324615,
+          "negative_fraction": 0.6028113762667539,
+          "zero_fraction": 0.0
+        }
+      }
+    }
+  }
+]
