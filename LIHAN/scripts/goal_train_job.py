@@ -19,7 +19,8 @@ ROOT = Path(__file__).resolve().parents[2]
 ENVIRONMENTS = {name: f"lumimotion-{name}" for name in
                 ("mahadevi", "minakshi", "parvati", "ushas", "garuda")}
 ENVIRONMENTS["venus"] = "lumimotion"
-TRAINING_MODULES = {"scripts.train_static_dl", "scripts.train_static_dl_shadow_split"}
+TRAINING_MODULES = {"scripts.train_static_dl", "scripts.train_static_dl_shadow_split",
+                    "scripts.train_static_dl_censored"}
 
 
 def now():
