@@ -14,6 +14,7 @@ CORE_DIRS = ("arguments", "scene", "gaussian_renderer", "utils", "assets")
 CORE_FILES = ("scripts/train_stage1.py", "scripts/train_static_dl.py",
               "scripts/train_static_dl_shadow_split.py",
               "scripts/train_static_dl_censored.py",
+              "scripts/train_static_dl_depth_statistic.py",
               "LIHAN/scripts/goal_smoke_static_dl.py")
 
 
