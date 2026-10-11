@@ -12,7 +12,7 @@
 
 调度按GPU实际空余显存和进程数，每卡最多2个计算任务；05/06的依赖等待不占GPU。原生源相机平移符号仅在输入中预补偿，MAE使用原始世界相机，不改变训练算法。
 
-全15测试帧：Albedo线性RGB MAE、Roughness参数MAE、GS Render／Depth／Mesh Normal角度MAE（度）、Expected／Median Z Depth MAE（世界单位，并记录单位比例）；同时保存覆盖率、共同像素法线分数、逐帧CSV、NPZ、代表图、日志与独立复算。Stage1记录几何MAE，SH无物理Albedo/Roughness。Lambertian无Roughness参数，记N/A。
+全15测试帧：Albedo线性RGB MAE、Roughness参数MAE、GS Render／Depth／Mesh Normal角度MAE（度）、Expected／Median Z Depth MAE（世界单位，并记录单位比例）；同时保存覆盖率、共同像素法线分数、逐帧CSV、NPZ、代表图、日志与独立复算。Stage1记录几何MAE及原生get_albedo的SH/DC参考MAE，后者尚未完成材质／光照分解；Stage1 Roughness记N/A。Lambertian无Roughness参数，记N/A。
 
 RGB／Alpha／Normal／分离四类目检与最终PASS/FAILED必须在实际验收后回填，启动前状态，实际验收见下方结果回填；失败产物全部保留。
 
@@ -113,7 +113,7 @@ RGB／Alpha／Normal／分离四类目检与最终PASS/FAILED必须在实际验�
 日志：`logs/eval55000_verify_all_mae.log`。
 
 
-## 训练结果回填（2026-10-11 02:42:21 UTC）
+## 训练结果回填（2026-10-11 05:51:35 UTC）
 
 最终结论：**FAILED**。原生Stage2首步失败；同时Stage1动态分离和地面几何有可见缺陷，不能验收完整原生管线。
 
@@ -129,9 +129,9 @@ RGB／Alpha／Normal／分离四类目检与最终PASS/FAILED必须在实际验�
 
 ### 定量结果
 
-| 编号／迭代 | Albedo MAE | Roughness MAE | GS Normal ° | Depth Normal ° | Mesh Normal ° | Expected Z | Median Z |
+| 编号／迭代 | Albedo MAE（35k为SH/DC参考） | Roughness MAE | GS Normal ° | Depth Normal ° | Mesh Normal ° | Expected Z | Median Z |
 |---|---|---|---|---|---|---|---|
-| 03／35000 | N/A | N/A | 14.54508423 | 24.55663096 | 18.61244331 | 0.03370737 | 0.03245218 |
+| 03／35000 | 0.16789033 | N/A | 14.54508423 | 24.55663096 | 18.61244331 | 0.03370737 | 0.03245218 |
 | 03／55000 | 未产出 | 未产出 | 未产出 | 未产出 | 未产出 | 未产出 | 未产出 |
 
 法线单位为度；深度是相机Z世界单位，单位比例与逐帧统计详见normal_depth/metrics.json。Albedo采用线性RGB前景核心区域，不作拟合后替代分数；Roughness为r参数。
@@ -152,13 +152,15 @@ RGB／Alpha／Normal／分离四类目检与最终PASS/FAILED必须在实际验�
 - **Alpha**：主要肢体轮廓存在，举臂与下臂姿态均可见；细部边缘有明显锯齿和毛刺，圆盘下缘不平整。
 - **Normal**：人物及地面有明显噪声；测试帧80的Depth Normal和Mesh Normal相对GT更粗糙，地面非真实平面起伏显著。
 - **分离**：人物大部分呈红色、地面主体绿色；人物胸腹有绿色夹杂，地面投影／周边区域有大量红色污染，分离不纯。
-- **材质与重光照**：没有原生55k材质或HDR，Stage1展示不能替代材质／光照分解。
+- **材质与重光照**：已补测35k原生get_albedo。GT对比帧10／80／150中，地面明显偏白、棋盘变淡，人物衣服有强烈明暗与彩色斑块，地面仍有黑色残留；不能由较低的Albedo参考MAE判定材质质量最好。原生55k材质及HDR仍未产出。
 
-目检范围：本组固定相机四类视频的索引0、75、149；几何GT对比测试帧80。
+目检范围：本组固定相机四类视频的索引0、75、149；几何GT对比测试帧80。；本次新增Albedo GT对比测试帧10、80、150。
 
 ### 原始失败及本次补评测
 
-原生Stage2在首个材质训练步调用nvdiffrast.texture失败，CUDA 209；没有55k检查点。原环境二进制只含sm_120内核，A40为sm_86。35000的几何分数仅代表Stage1，不能称为完成两阶段。
+原生Stage2在首个材质训练步调用nvdiffrast.texture失败，CUDA 209；没有55k检查点。原环境二进制只含sm_120内核，A40为sm_86。35000分数仅代表Stage1，不能称为完成两阶段。
+
+原生模型确实保存_albedo_dc并提供get_albedo。现补测全15测试帧的get_albedo，使用与05/06相同的线性RGB、去预测Alpha及GT前景核心口径；该值来自Stage1 SH/DC外观，尚未进行Stage2材质／光照分解，作为参考值记录。原生get_albedo自带[0.03,0.97]钳位，评测后未额外缩放或裁剪。Roughness在Stage1未经过材质优化，仍不作为已学习Roughness指标。补评日志、旧汇总备份：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段/review_albedo_1011`。
 
 ### 实际执行命令、退出码与日志
 
@@ -218,6 +220,22 @@ RGB／Alpha／Normal／分离四类目检与最终PASS/FAILED必须在实际验�
 /home/han.li/miniconda3/envs/lumimotion-ushas/bin/python /home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/review_1011_artifacts.py '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段'
 ```
 
+#### 原生Stage1补评_albedo
+
+退出码：0；日志：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段/review_albedo_1011/albedo.log`。
+
+```bash
+/home/han.li/miniconda3/envs/lumimotion-ushas/bin/python /home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/bootstrap_1011.py /home/han.li/reproduce/LumiMotion-stage2-perlight scripts.eval_albedo_gt --model_path '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段/model_mlp' --source_path '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段/eval_view' --iterations 35000 --gt_albedo_dir /mnt/workspace/users/han.li/lumimotion/data/LH-data/danamic/LH-dynamic-jumpingjacks_DL_V2/albedo --split test --output_path '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段/evaluation_35000/albedo' --save_float
+```
+
+#### 原生Stage1补评_verify_all_mae
+
+退出码：0；日志：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段/review_albedo_1011/verify_all_mae.log`。
+
+```bash
+/home/han.li/miniconda3/envs/lumimotion-ushas/bin/python /home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/audit_1011_mae.py '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段/evaluation_35000' 35000
+```
+
 ### RGB测试指标
 
 ```json
@@ -240,6 +258,9 @@ RGB／Alpha／Normal／分离四类目检与最终PASS/FAILED必须在实际验�
 - 视频：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段/model_mlp/renders_stage1_insights/ours_35000/alpha_camframe_0010.mp4`；解码帧数：150；代表图：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段/inspection/renders_stage1_insights__ours_35000__alpha_camframe_0010.jpg`。
 - 视频：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段/model_mlp/renders_stage1_insights/ours_35000/full_render_camframe_0010.mp4`；解码帧数：150；代表图：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段/inspection/renders_stage1_insights__ours_35000__full_render_camframe_0010.jpg`。
 - 视频：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段/model_mlp/renders_stage1_insights/ours_35000/small_gaussians_camframe_0010.mp4`；解码帧数：150；代表图：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段/inspection/renders_stage1_insights__ours_35000__small_gaussians_camframe_0010.jpg`。
+- GT对比：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段/evaluation_35000/albedo/iteration_35000/0010_comparison.png`。
+- GT对比：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段/evaluation_35000/albedo/iteration_35000/0080_comparison.png`。
+- GT对比：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段/evaluation_35000/albedo/iteration_35000/0150_comparison.png`。
 - GT对比：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段/evaluation_35000/normal_depth/comparison_0010.png`。
 - GT对比：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段/evaluation_35000/normal_depth/comparison_0080.png`。
 - GT对比：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段/evaluation_35000/normal_depth/comparison_0150.png`。
