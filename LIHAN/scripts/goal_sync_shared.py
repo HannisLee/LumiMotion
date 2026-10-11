@@ -6,7 +6,6 @@ import json
 import os
 from pathlib import Path
 import subprocess
-import tempfile
 from datetime import datetime, timezone, timedelta
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -77,22 +76,19 @@ def main():
             if shared == expected and li_md == expected_md:
                 candidates[name] = parent
                 continue
-            with tempfile.TemporaryDirectory(dir=control) as temp:
-                env = dict(os.environ, GIT_INDEX_FILE=str(Path(temp) / 'index'))
-                git('read-tree', parent, env=env)
-                git('rm', '-r', '-f', '--cached', '--ignore-unmatch', '--',
-                    'LIHAN', 'LIHAN.md', env=env)
-                git('read-tree', '--prefix=LIHAN/', shared, env=env)
-                git('update-index', '--add', '--cacheinfo',
-                    '100644,' + li_md + ',LIHAN.md', env=env)
-                tree = git('write-tree', env=env)
-                candidate = git('commit-tree', tree, '-p', parent,
-                                input=(args.message + '\n').encode())
-                changed = git('-c', 'core.quotepath=false', 'diff-tree',
-                              '--no-commit-id', '--name-only', '-r', parent, candidate).splitlines()
-                if any(not (p.startswith('LIHAN/') or p == 'LIHAN.md') for p in changed):
-                    raise AssertionError('共享同步涉及实现文件：' + name)
-                candidates[name] = candidate
+            # 直接替换顶层树的两项，不扫描巨大的历史归档工作区。
+            entries = git('ls-tree', parent).splitlines()
+            entries = [line for line in entries if line.split('\t', 1)[1] not in {'LIHAN', 'LIHAN.md'}]
+            entries.extend(['040000 tree ' + shared + '\tLIHAN',
+                            '100644 blob ' + li_md + '\tLIHAN.md'])
+            tree = git('mktree', input=('\n'.join(entries) + '\n').encode())
+            candidate = git('commit-tree', tree, '-p', parent,
+                            input=(args.message + '\n').encode())
+            changed = git('-c', 'core.quotepath=false', 'diff-tree',
+                          '--no-commit-id', '--name-only', '-r', parent, candidate).splitlines()
+            if any(not (p.startswith('LIHAN/') or p == 'LIHAN.md') for p in changed):
+                raise AssertionError('共享同步涉及实现文件：' + name)
+            candidates[name] = candidate
         git('push', '--atomic', 'origin',
             *[sha + ':refs/heads/' + name for name, sha in candidates.items()])
         for name, sha in candidates.items():
