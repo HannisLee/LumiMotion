@@ -18,6 +18,8 @@ def verify_sources(model, marker, digest):
         raise AssertionError('深度统计量实际训练入口不正确。')
     if marker['normal_depth_statistic'] != marker['args']['normal_depth_statistic']:
         raise AssertionError('深度统计量顶层与args冲突。')
+    if marker['loss_model'] != marker['args']['loss_model']:
+        raise AssertionError('损失模式顶层与args冲突。')
     if marker['normal_depth_statistic'] not in ('median', 'expected'):
         raise AssertionError('仅允许本轮预注册的median或expected。')
     if marker['photo_depth_ratio'] != 1:
@@ -83,6 +85,8 @@ def main():
     record = next(r for r in metadata['frames'] if r['source_frame'] == args.frame)
     camera, _, intrinsics, _ = run.camera(metadata, record, 2)
     static = read(run.model / 'static_dl_training.json')
+    if static['normal_depth_statistic'] != marker['normal_depth_statistic']:
+        raise AssertionError('static保存metadata与实际入口统计量不同。')
     config = static['args']
     trained = static['rasterizer_provenance']
     for key in ('method', 'source_sha256', 'extension_sha256', 'source_files'):
