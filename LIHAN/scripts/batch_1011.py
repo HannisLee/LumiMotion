@@ -269,7 +269,7 @@ def prepare():
                  '只读01组35000步Stage1来源，Stage2新增20000步至55000；独立输出，不覆盖原生模型。\n\n')
         text += '输入Alpha沿用既有转换器的albedo Alpha；不以GT albedo RGB、normal、depth、roughness或骨骼作为训练监督。原生组不读取GT光照；05/06使用GT方向，05两盏单位白光×π、06只用训练RGB标定非负光强；不把标定值解释为Blender原能量。\n\n'
         text += '调度按GPU实际空余显存和进程数，每卡最多2个计算任务；05/06的依赖等待不占GPU。原生源相机平移符号仅在输入中预补偿，MAE使用原始世界相机，不改变训练算法。\n\n'
-        text += '全15测试帧：Albedo线性RGB MAE、Roughness参数MAE、GS Render／Depth／Mesh Normal角度MAE（度）、Expected／Median Z Depth MAE（世界单位，并记录单位比例）；同时保存覆盖率、共同像素法线分数、逐帧CSV、NPZ、代表图、日志与独立复算。Stage1记录几何MAE，SH无物理Albedo/Roughness。Lambertian无Roughness参数，记N/A。\n\n'
+        text += '全15测试帧：Albedo线性RGB MAE、Roughness参数MAE、GS Render／Depth／Mesh Normal角度MAE（度）、Expected／Median Z Depth MAE（世界单位，并记录单位比例）；同时保存覆盖率、共同像素法线分数、逐帧CSV、NPZ、代表图、日志与独立复算。Stage1记录几何MAE及原生get_albedo的SH/DC参考MAE；Stage1 Roughness记N/A。Lambertian无Roughness参数，记N/A。\n\n'
         text += 'RGB／Alpha／Normal／分离四类目检与最终PASS/FAILED必须在实际验收后回填，当前为PENDING；失败产物全部保留。\n\n'
         text += '\n\n'.join('## ' + step + '\n\n```bash\n' + shell_line(command) + '\n```\n\n日志：`logs/' + step + '.log`。' for step, command in planned)
         Path(exp['document']).parent.mkdir(parents=True, exist_ok=True)
@@ -415,9 +415,7 @@ def run(index):
             failures.append('GT部分准备失败：' + str(gt_path / 'failed.json'))
         for iteration in ([35000, 55000] if exp['kind'] == 'native' else [55000]):
             for name, command in eval_commands(exp, iteration):
-                # SH阶段不把SH颜色解释为物理材质。
-                if iteration == 35000 and name == 'albedo':
-                    continue
+                # 35k的get_albedo仍补测，汇总注明其SH/DC参考语义。
                 try:
                     gpu_step(exp, f'eval{iteration}_{name}', command)
                 except Exception as error:
@@ -489,7 +487,7 @@ def refresh():
             state = read_json(Path(exp['output']) / 'state.json')
             lines.append(f'| {exp["id"]:02d} | {exp["dataset"]}／{exp["kind"]} | {state.get("status")} | {state.get("stage")} | {state.get("gpu", "—")} |')
             all_rows.append(dict(experiment=exp['id'], dataset=exp['dataset'], method=exp['kind'], **state))
-        lines += ['', '评测均为完整15测试帧，训练和测试135/15严格分离。Albedo为线性RGB，法线为角度（度），深度为相机Z，粗糙度为原始r参数。保留覆盖率和共同有效像素，禁止将缺失预测当作零误差。Lambertian无Roughness，Stage1无物理Albedo/Roughness，均标N/A。', '',
+        lines += ['', '评测均为完整15测试帧，训练和测试135/15严格分离。Albedo为线性RGB，法线为角度（度），深度为相机Z，粗糙度为原始r参数。保留覆盖率和共同有效像素，禁止将缺失预测当作零误差。Lambertian与Stage1 Roughness标N/A；Stage1 get_albedo补测并注明SH/DC参考语义，未完成Stage2材质分解。', '',
                   '| 编号／迭代 | Albedo MAE | Roughness MAE | GS Normal ° | Depth Normal ° | Mesh Normal ° | Expected Z | Median Z |',
                   '|---|---|---|---|---|---|---|---|']
         metric_rows = []
@@ -503,7 +501,7 @@ def refresh():
                 values = []
                 for key in ['albedo', 'roughness', 'gs_render', 'depth_normal', 'mesh', 'expected', 'median']:
                     value = result.get(key)
-                    if key == 'roughness' and (exp['kind'] == 'lambertian' or iteration == 35000) or key == 'albedo' and iteration == 35000:
+                    if key == 'roughness' and (exp['kind'] == 'lambertian' or iteration == 35000):
                         value = 'N/A'
                     values.append(f'{value:.8f}' if isinstance(value, (int, float)) else str(value or 'PENDING'))
                 lines.append(f'| {exp["id"]:02d}／{iteration} | ' + ' | '.join(values) + ' |')
