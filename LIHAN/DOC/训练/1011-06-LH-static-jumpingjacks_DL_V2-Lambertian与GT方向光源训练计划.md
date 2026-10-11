@@ -12,7 +12,7 @@
 
 调度按GPU实际空余显存和进程数，每卡最多2个计算任务；05/06的依赖等待不占GPU。原生源相机平移符号仅在输入中预补偿，MAE使用原始世界相机，不改变训练算法。
 
-全15测试帧：Albedo线性RGB MAE、Roughness参数MAE、GS Render／Depth／Mesh Normal角度MAE（度）、Expected／Median Z Depth MAE（世界单位，并记录单位比例）；同时保存覆盖率、共同像素法线分数、逐帧CSV、NPZ、代表图、日志与独立复算。Stage1记录几何MAE，SH无物理Albedo/Roughness。Lambertian无Roughness参数，记N/A。
+全15测试帧：Albedo线性RGB MAE、Roughness参数MAE、GS Render／Depth／Mesh Normal角度MAE（度）、Expected／Median Z Depth MAE（世界单位，并记录单位比例）；同时保存覆盖率、共同像素法线分数、逐帧CSV、NPZ、代表图、日志与独立复算。Stage1记录几何MAE及原生get_albedo的SH/DC参考MAE，后者尚未完成材质／光照分解；Stage1 Roughness记N/A。Lambertian无Roughness参数，记N/A。
 
 RGB／Alpha／Normal／分离四类目检与最终PASS/FAILED必须在实际验收后回填，启动前状态，实际验收见下方结果回填；失败产物全部保留。
 
@@ -65,7 +65,7 @@ RGB／Alpha／Normal／分离四类目检与最终PASS/FAILED必须在实际验�
 日志：`logs/eval55000_verify_all_mae.log`。
 
 
-## 训练结果回填（2026-10-11 02:42:22 UTC）
+## 训练结果回填（2026-10-11 05:51:35 UTC）
 
 最终结论：**FAILED**。训练、15帧全部适用MAE和六段视频解码完成；实际GT材质对比发现投影残留与明显材质偏差，质量验收FAILED。
 
@@ -81,7 +81,7 @@ RGB／Alpha／Normal／分离四类目检与最终PASS/FAILED必须在实际验�
 
 ### 定量结果
 
-| 编号／迭代 | Albedo MAE | Roughness MAE | GS Normal ° | Depth Normal ° | Mesh Normal ° | Expected Z | Median Z |
+| 编号／迭代 | Albedo MAE（35k为SH/DC参考） | Roughness MAE | GS Normal ° | Depth Normal ° | Mesh Normal ° | Expected Z | Median Z |
 |---|---|---|---|---|---|---|---|
 | 06／55000 | 0.20741376 | N/A | 10.50885900 | 18.51896640 | 14.10656756 | 0.03192593 | 0.03039268 |
 
