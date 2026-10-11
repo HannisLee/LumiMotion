@@ -70,6 +70,8 @@ def main():
     marker_path = model / ('censored_training.json' if censored else 'shadow_split_training.json')
     marker = read(marker_path)
     route = 'control' if censored else marker['args']['route']
+    if censored and marker['args']['route'] != route:
+        raise AssertionError('censored入口必须明确固定control。')
     if route not in ('control', 'split'):
         raise AssertionError('仅检查实际两组训练路线。')
     sources = verify_sources(Path(args.model_path), marker, digest)
@@ -90,6 +92,8 @@ def main():
         raise AssertionError('实际加载.so哈希不同。')
     light_path = run.model / 'static_dl_lighting' / f'iteration_{args.load_iter}' / 'lighting.json'
     lighting = read(light_path)
+    if censored and lighting['loss_model'] != marker['loss_model']:
+        raise AssertionError('保存lighting与新训练marker损失模式不同。')
     if lighting['shadow_gradient_route'] != route:
         raise AssertionError('保存光照的梯度路线与训练记录不同。')
     if args.load_iter != lighting['initial_iteration'] + lighting['stage2_step']:
