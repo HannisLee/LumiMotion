@@ -98,6 +98,10 @@ def physical_renderer(run, iteration, eval_directions):
     def render(camera):
         return render_photometric(camera, run.pc, pipe, background, evaluation, visibility, iteration)
 
+    # 只供一致性审计读取同一评测对象；不改变任何渲染输出或梯度。
+    render.eval_visibility = visibility
+    render.eval_lights = evaluation
+
     return render, dict(mode=mode, visibility_enabled=visibility is not None,
                         intensity_from_train_rgb=intensity.tolist(), directions_only=True,
                         test_directions_used_only_for_evaluation=True, sources=sources)
