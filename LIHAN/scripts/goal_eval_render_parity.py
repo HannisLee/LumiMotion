@@ -34,6 +34,12 @@ def main():
     record = next(r for r in metadata['frames'] if r['source_frame'] == args.frame)
     camera, _, intrinsics, _ = run.camera(metadata, record, 2)
     config = read(run.model / 'static_dl_training.json')['args']
+    training_backend = read(run.model / 'static_dl_training.json')['rasterizer_provenance']
+    for key in ('method', 'source_sha256', 'extension_sha256', 'source_files'):
+        if training_backend[key] != effective_backend[key]:
+            raise AssertionError('训练／评测实际原生光栅来源不同：' + key)
+    if digest(effective_backend['extension_path']) != training_backend['extension_sha256']:
+        raise AssertionError('实际加载.so哈希改变。')
     lighting = read(run.model / 'static_dl_lighting' / f'iteration_{args.load_iter}' / 'lighting.json')
     reference_lights = DirectionOnlyLights(config['static_dl_directions'])
     with torch.no_grad():
@@ -73,7 +79,8 @@ def main():
     report = dict(status='PASS', scope='保存checkpoint重载后，原训练函数vs评测wrapper，同训练camera、fresh/fresh BVH；非旧缓存图。',
         frame=args.frame, model=str(run.model), iteration=args.load_iter, checks=checks,
         geometry_maps='PASS：原GeometryRun world normal/alpha/mixed depth一致；三几何头严格0',
-        physical_provenance=provenance, effective_rasterizer=effective_backend, sources=run.files)
+        physical_provenance=provenance, training_rasterizer=training_backend,
+        effective_rasterizer=effective_backend, sources=run.files)
     write(args.output_dir / 'parity.json', report)
     print('物理重载一致性PASS：' + str(args.output_dir), flush=True)
 
