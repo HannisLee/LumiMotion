@@ -26,3 +26,8 @@
 ## 35k训练完成状态
 
 2026-10-11T08:11:49Z，T02重试目录`output/1011-14-LH-static-jumpingjacks_DL_V2-T02-方向Lambertian无遮蔽-GPU1重试`完成35000步，PID 1985209、GPU1，监督器记录training_exit_code=0、`gpu_verified=true`、`launcher_error=null`。10000/20000/30000/35000四组PLY与deform.pth均完整。10k中期15帧评测结果FAILED已保留；35k完整Goal评测待执行，当前最终实验判定仍为PENDING。
+
+
+## 35k最终评测结果（2026-10-11）
+
+T02 #14最终checkpoint完整15帧Goal评测已完成，完整性PASS，数值FAILED：GS-render MAE 8.003342631°（coverage 0.998216827）、depth-normal MAE 18.568503593°（coverage 0.966173248）、mesh MAE 13.999613416°（coverage 0.994355132）；阈值分别3.51°、7.35°、5.46°。详细指标、逐帧数组、完整命令、统计及渲染见`output/1011-14-LH-static-jumpingjacks_DL_V2-T02-方向Lambertian无遮蔽-GPU1重试/evaluation_35000/`。600张PNG及4个150帧视频均完成解码；fresh RGB重载parity exit0，RGB/linearRGB/alpha/worldNormal/surfDepth/intensity/meanVisibility七项最大差值为0。代表图目检：RGB人物/圆台可辨，Alpha轮廓连续，Normal整体连续覆盖，但脚边和平台可见突出、延伸的异常结构；Separation为均一黄绿门控，符合冻结零几何头语义，不代表学到运动。该组35k最终Goal结论FAILED；T02 10k中期失败结果仍保留。
