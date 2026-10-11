@@ -21,9 +21,9 @@ T10在T08 expected设置上固定配置再延长1000步，观察已见连续改�
 
 ## 实际执行记录
 
-当前状态：20步smoke、入口审计及fresh parity已PASS；正式T10训练已在GPU1启动。
+当前状态：20步smoke审计/fresh parity、正式T10训练、13000终点评测及四类视觉验收均已结束；训练exit0/gpu_verified=true，最终验收完整性PASS、数值FAILED。
 
-冒烟启动命令：`bash /home/han.li/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1011-22-staticDL-T10-expected-20步续训冒烟/commands/train.sh`。启动时间2026-10-11约11:48 UTC，训练PID=2173649、supervisor PID=2173644，GPU1 UUID=`GPU-b8e1473e-b813-9d70-aa90-5ebbf901aec4`；启动器已实际核验gpu_verified=true，launcher exit0，iteration12020。首帧统计审计与公共审计PASS；stable模型SHA见`checkpoint_12020_ready.json`。fresh parity待evaluator执行。日志与退出码见冒烟目录`logs/train.log`和`state.json`。
+冒烟启动命令：`bash /home/han.li/reproduce/LumiMotion-stage2-perlight/output/smoke_test/1011-22-staticDL-T10-expected-20步续训冒烟/commands/train.sh`。启动时间2026-10-11约11:48 UTC，训练PID=2173649、supervisor PID=2173644，GPU1 UUID=`GPU-b8e1473e-b813-9d70-aa90-5ebbf901aec4`；启动器已实际核验gpu_verified=true，launcher exit0，iteration12020。首帧统计审计与公共审计PASS；stable模型SHA见`checkpoint_12020_ready.json`。该smoke fresh parity已由evaluator实际执行并PASS，八项最大差为0；独立稳定性复核也PASS。日志与退出码见冒烟目录`logs/train.log`和`state.json`。
 
 Fresh parity证据：`output/smoke_test/1011-22-staticDL-T10-expected-20步续训冒烟/render_parity/parity.json`八输出均PASS且最大差0。evaluator另做独立10秒SHA稳定性复核；首轮三文件hash记录位于`checkpoint_12020_ready.json`，只作为hash引用，evaluator复核marker单独保存。
 
@@ -31,6 +31,8 @@ Fresh parity证据：`output/smoke_test/1011-22-staticDL-T10-expected-20步续�
 
 独立稳定性复核已完成：`checkpoint_12020_eval_ready.json`记录10秒READY_STABLE；随后GPU2运行`render_parity_stable_recheck`并exit0/PASS，8map max_abs=0，完整性与来源/实际native模块匹配。冻结项81323点、opacity、scale、deform均精确PASS。evaluator保存的二次审计、NPZ、完整命令和日志均保留；首次READY schema不符及拒覆盖记录不覆盖。
 
-正式训练已于2026-10-11T11:50:24Z启动并于2026-10-11T11:51:55.297962+00:00正常结束，launcher exit0/gpu_verified=true，GPU1 UUID=`GPU-b8e1473e-b813-9d70-aa90-5ebbf901aec4`，训练PID=2174378。12250/12500/13000共9个PLY/deform/lighting经过10秒稳定SHA审计，见`output/1011-22-LH-static-jumpingjacks_DL_V2-T10-expected续训-1k/checkpoint_completion_audit.json`。真实step1/250/500/1000训练诊断、snapshot和输入来源SHA见`output/1011-09-静态DL-Goal训练总控/T10_training_diagnostics.json`。终点评测原15指标已完成，完整性PASS/数值FAILED；四类视频解码与人工目检仍由evaluator收尾。
+正式训练已于2026-10-11T11:50:24Z启动并于2026-10-11T11:51:55.297962+00:00正常结束，launcher exit0/gpu_verified=true，GPU1 UUID=`GPU-b8e1473e-b813-9d70-aa90-5ebbf901aec4`，训练PID=2174378。12250/12500/13000共9个PLY/deform/lighting经过10秒稳定SHA审计，见`output/1011-22-LH-static-jumpingjacks_DL_V2-T10-expected续训-1k/checkpoint_completion_audit.json`。真实step1/250/500/1000训练诊断、snapshot和输入来源SHA见`output/1011-09-静态DL-Goal训练总控/T10_training_diagnostics.json`。终点评测原15指标已完成，完整性PASS/数值FAILED；四类视频解码与人工目检均已完成，最终FAILED结论已保留。
 
-原15帧终点评测（iteration13000）真实完成，三个子步骤exit0、完整性PASS/阈值FAILED：GS=5.236901942°（coverage=0.999326234），Depth=10.437567496°（coverage=0.967290039），Mesh=8.242430432°（coverage=0.996055238）；expected depth absolute error=0.038771129米。数值摘要`output/1011-22-LH-static-jumpingjacks_DL_V2-T10-expected续训-1k/evaluation_13000/goal_mae_summary.json`。相较T08@12000三项略降但改善趋缓，未达到目标阈值。T10最终fresh八项差0和真实train/eval native+tracer映射一致证据已落`evaluation_13000/render_parity`与`native_binding_audit.json`；完整150四类目检待最终marker。
+原15帧终点评测（iteration13000）真实完成，三个子步骤exit0、完整性PASS/阈值FAILED：GS=5.236901942°（coverage=0.999326234），Depth=10.437567496°（coverage=0.967290039），Mesh=8.242430432°（coverage=0.996055238）；expected depth absolute error=0.038771129米。数值摘要`output/1011-22-LH-static-jumpingjacks_DL_V2-T10-expected续训-1k/evaluation_13000/goal_mae_summary.json`。相较T08@12000三项略降但改善趋缓，未达到目标阈值。T10最终fresh八项差0和真实train/eval native+tracer映射一致证据已落`evaluation_13000/render_parity`与`native_binding_audit.json`；完整150帧四类已完成，代表帧目检已完成，详见output README。
+
+T10最终视觉验收已于2026-10-11完成：evaluation_13000所有四子命令exit0，600张PNG逐张PIL解码、四类MP4各150帧400×400逐帧OpenCV解码PASS。四类10/80/150与原0080人工检查发现脚周灰白伪表面/长黑影，接触Alpha薄外扩，Mesh细纹与脚/人体误差；separation为均匀binary feature门控，非运动分离。最终FINAL_REVIEW_COMPLETED状态FAILED；详细命令、图像、视频和完整性见`output/1011-22-LH-static-jumpingjacks_DL_V2-T10-expected续训-1k/evaluation_13000/README.md`。
