@@ -14,7 +14,7 @@
 
 全15测试帧：Albedo线性RGB MAE、Roughness参数MAE、GS Render／Depth／Mesh Normal角度MAE（度）、Expected／Median Z Depth MAE（世界单位，并记录单位比例）；同时保存覆盖率、共同像素法线分数、逐帧CSV、NPZ、代表图、日志与独立复算。Stage1记录几何MAE，SH无物理Albedo/Roughness。Lambertian无Roughness参数，记N/A。
 
-RGB／Alpha／Normal／分离四类目检与最终PASS/FAILED必须在实际验收后回填，当前为PENDING；失败产物全部保留。
+RGB／Alpha／Normal／分离四类目检与最终PASS/FAILED必须在实际验收后回填，启动前状态，实际验收见下方结果回填；失败产物全部保留。
 
 ## stage1
 
@@ -113,18 +113,133 @@ RGB／Alpha／Normal／分离四类目检与最终PASS/FAILED必须在实际验�
 日志：`logs/eval55000_verify_all_mae.log`。
 
 
-## 实际执行状态
+## 训练结果回填（2026-10-11 02:42:21 UTC）
+
+最终结论：**FAILED**。原生Stage2首步失败，无55k检查点、材质MAE与完整两阶段渲染；Stage1另有平面起伏与分离污染。
+
+判定口径：未预先约定数值阈值，MAE不作任意门槛判定。最终FAILED依据必要训练阶段缺失，或GT对比中明确可见的投影残留／材质污染。视频完整解码与首、中、尾图像抽查分别记录，未声称逐帧人工检查全部视频。
+
+- 原始训练／渲染执行结论：`FAILED`；失败标记与退出码证据：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/review_1011/original_terminal_result.json`；补评测开始时状态快照：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/review_1011/original_state.json`。
+- 实际有效检查点：35000；model：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/model_mlp`；Stage1冻结副本：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/stage1_frozen`。
+- 原生输入source：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/data_view`；MAE输入source：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/eval_view`；渲染source由模型cfg_args读取。
+- 渲染目录：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/model_mlp/renders_stage1_insights/ours_35000`；评测目录：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/evaluation_35000`。
+- 本次只评测与渲染已有检查点，未重启训练，未删除或覆盖原始失败结果。
+- 目检拼图：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/inspection/review_four_classes.png`；来源与视频帧索引：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/inspection/review_four_classes_sources.json`。
+- 完整视频解码、检查点有限性：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/inspection/artifacts.json`；全15测试帧MAE独立复算：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/evaluation_35000/mae_summary.json`。
+
+### 定量结果
+
+| 编号／迭代 | Albedo MAE | Roughness MAE | GS Normal ° | Depth Normal ° | Mesh Normal ° | Expected Z | Median Z |
+|---|---|---|---|---|---|---|---|
+| 01／35000 | N/A | N/A | 10.50885900 | 18.51896640 | 14.10656756 | 0.03192593 | 0.03039268 |
+| 01／55000 | 未产出 | 未产出 | 未产出 | 未产出 | 未产出 | 未产出 | 未产出 |
+
+法线单位为度；深度是相机Z世界单位，单位比例与逐帧统计详见normal_depth/metrics.json。Albedo采用线性RGB前景核心区域，不作拟合后替代分数；Roughness为r参数。
+
+### 覆盖率与共同像素
+
+| 指标 | 有效像素覆盖率 | 共同像素法线MAE ° |
+|---|---|---|
+| gs_render | 99.84401853% | 10.20114250 |
+| depth_normal | 96.63836849% | 18.51738002 |
+| mesh | 99.36222959% | 13.93375559 |
+| expected | 99.84401853% | N/A |
+| median | 99.84401853% | N/A |
+
+### RGB、Alpha、Normal、分离与材质目检
+
+- **RGB**：固定测试相机首／中／尾图中人物姿态保持静态，地面亮度与投影随时刻变化；暗面细节弱，投影有破碎边缘。
+- **Alpha**：人物与圆盘轮廓整体闭合；圆盘下缘可见局部毛刺，细手指有轻微边界误差。
+- **Normal**：圆盘GT为平面，预测出现大面积块状起伏；测试帧80的Depth/Mesh Normal也可见对应错误。
+- **分离**：红色表示binary feature高、绿色表示低；静态人物多数为绿，但腿部及地面投影出现红色块，未得到纯静态分离。
+- **材质与重光照**：原生Stage2首步失败，没有55k材质或HDR。Stage1的Albedo命名视频实际为去SH高阶／颜色MLP的DC展示，不是可验收的物理Albedo。
+
+目检范围：本组固定相机四类视频的索引0、75、149；几何GT对比测试帧80。
+
+### 原始失败及本次补评测
+
+原生Stage2在首个材质训练步调用nvdiffrast.texture失败，CUDA 209；没有55k检查点。原环境二进制只含sm_120内核，A40为sm_86。35000的几何分数仅代表Stage1，不能称为完成两阶段。
+
+### 实际执行命令、退出码与日志
+
+#### stage1
+
+退出码：0；日志：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/logs/stage1.log`。
+
+```bash
+/home/han.li/miniconda3/envs/lumimotion-ushas/bin/python /home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/bootstrap_1011.py '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-07-六组训练总控/native' scripts.train_stage1 --source_path '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/data_view' --model_path '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/model' --is_blender --eval --load2gpu_on_the_fly --resolution 2 --train_light_folder images --test_light_folder images --gt_alpha_mask_as_scene_mask --iterations 35000 --test_iterations 35000 --save_iterations 10000 20000 30000 35000 --densify_until_iter 20000 --lambda_separation 0.001 --d_xyz_loss_weight 0.001 --binarization_warm_up 1000 --depth_ratio 1.0 --d_color_reg_loss_weight 0.01
+```
+
+#### stage2
+
+退出码：1；日志：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/logs/stage2.log`。
+
+```bash
+/home/han.li/miniconda3/envs/lumimotion-ushas/bin/python /home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/bootstrap_1011.py '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-07-六组训练总控/native' scripts.train_stage2 --source_path '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/data_view' --model_path '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/model' --is_blender --eval --load2gpu_on_the_fly --resolution 2 --train_light_folder images --test_light_folder images --gt_alpha_mask_as_scene_mask --load_iter 35000 --iterations 55000 --test_iterations 55000 --save_iterations 40000 50000 55000 --diffuse_sample_num 512 --depth_ratio 0
+```
+
+#### stage1_insights
+
+退出码：0；日志：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/review_1011/stage1_insights.log`。
+
+```bash
+/home/han.li/miniconda3/envs/lumimotion-ushas/bin/python /home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/bootstrap_1011.py '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-07-六组训练总控/native' scripts.render_stage1_insights --source_path '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/data_view' --model_path '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/model' --is_blender --eval --load2gpu_on_the_fly --resolution 2 --train_light_folder images --test_light_folder images --load_iter 35000 --depth_ratio 0
+```
+
+#### predicted_meshes
+
+退出码：0；日志：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/review_1011/predicted_meshes.log`。
+
+```bash
+/home/han.li/miniconda3/envs/lumimotion-ushas/bin/python /home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/bootstrap_1011.py /home/han.li/reproduce/LumiMotion-stage2-perlight scripts.extract_geometry_mesh_dynamic --model_path '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/model_mlp' --source_path '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/eval_view' --load_iter 35000 --split test --resolution 2 --voxel_size 0.02 --sdf_trunc 0.08 --alpha_threshold 0.5 --output_dir '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/evaluation_35000/predicted_meshes'
+```
+
+#### normal_depth
+
+退出码：0；日志：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/review_1011/normal_depth.log`。
+
+```bash
+/home/han.li/miniconda3/envs/lumimotion-ushas/bin/python /home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/bootstrap_1011.py /home/han.li/reproduce/LumiMotion-stage2-perlight scripts.eval_geometry_gt --model_path '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/model_mlp' --source_path '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/eval_view' --load_iter 35000 --gt_root /mnt/workspace/users/han.li/lumimotion/data/LH-data/static/LH-static-jumpingjacks_DL_V2 --gt_depth_dir '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-07-六组训练总控/GT-LH-static-jumpingjacks_DL_V2/gt_depth' --split test --resolution 2 --output_dir '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/evaluation_35000/normal_depth' --pred_mesh_manifest '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/evaluation_35000/predicted_meshes/manifest.json' --save_arrays
+```
+
+#### verify_all_mae
+
+退出码：0；日志：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/review_1011/verify_all_mae.log`。
+
+```bash
+/home/han.li/miniconda3/envs/lumimotion-ushas/bin/python /home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/audit_1011_mae.py '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/evaluation_35000' 35000
+```
+
+#### artifact_audit
+
+退出码：1；日志：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/review_1011/artifact_audit.log`。
+
+```bash
+/home/han.li/miniconda3/envs/lumimotion-ushas/bin/python /home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/review_1011_artifacts.py '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段'
+```
+
+### RGB测试指标
 
 ```json
 {
-  "status": "FAILED",
-  "stage": "失败",
-  "updated_at": "2026-10-10 17:17:02 UTC",
-  "runner_pid": 1649036,
-  "launched_at": "2026-10-10 15:43:44 UTC",
-  "child_pid": 1685050,
-  "gpu": 3,
-  "error": "stage2退出码1；日志/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/logs/stage2.log",
-  "traceback": "Traceback (most recent call last):\n  File \"/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/batch_1011.py\", line 385, in run\n    write_json(out / 'stage1_ready.json', dict(iteration=35000, model=str(frozen), time=now()))\n  File \"/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/batch_1011.py\", line 350, in gpu_step\n    execute(exp, step, command, gpu)\n  File \"/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/batch_1011.py\", line 295, in execute\n    raise RuntimeError(f'{step}退出码{code}；日志{log_path}')\nRuntimeError: stage2退出码1；日志/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/logs/stage2.log\n"
+  "experiment": 1,
+  "iteration": 35000,
+  "protocol": "Stage1原始日志（已四舍五入；不与05/06直接比较）",
+  "psnr": 26.42,
+  "ssim": 0.98,
+  "lpips": 0.04
 }
 ```
+
+### 保留产物与代表文件
+
+- 视频：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/model_mlp/renders_stage1_insights/ours_35000/Albedo_camframe_0010.mp4`；解码帧数：150；代表图：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/inspection/renders_stage1_insights__ours_35000__Albedo_camframe_0010.jpg`。
+- 视频：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/model_mlp/renders_stage1_insights/ours_35000/Normals_camframe_0010.mp4`；解码帧数：150；代表图：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/inspection/renders_stage1_insights__ours_35000__Normals_camframe_0010.jpg`。
+- 视频：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/model_mlp/renders_stage1_insights/ours_35000/Separation_camframe_0010.mp4`；解码帧数：150；代表图：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/inspection/renders_stage1_insights__ours_35000__Separation_camframe_0010.jpg`。
+- 视频：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/model_mlp/renders_stage1_insights/ours_35000/Separation_large_camframe_0010.mp4`；解码帧数：150；代表图：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/inspection/renders_stage1_insights__ours_35000__Separation_large_camframe_0010.jpg`。
+- 视频：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/model_mlp/renders_stage1_insights/ours_35000/alpha_camframe_0010.mp4`；解码帧数：150；代表图：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/inspection/renders_stage1_insights__ours_35000__alpha_camframe_0010.jpg`。
+- 视频：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/model_mlp/renders_stage1_insights/ours_35000/full_render_camframe_0010.mp4`；解码帧数：150；代表图：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/inspection/renders_stage1_insights__ours_35000__full_render_camframe_0010.jpg`。
+- 视频：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/model_mlp/renders_stage1_insights/ours_35000/small_gaussians_camframe_0010.mp4`；解码帧数：150；代表图：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/inspection/renders_stage1_insights__ours_35000__small_gaussians_camframe_0010.jpg`。
+- GT对比：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/evaluation_35000/normal_depth/comparison_0010.png`。
+- GT对比：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/evaluation_35000/normal_depth/comparison_0080.png`。
+- GT对比：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/evaluation_35000/normal_depth/comparison_0150.png`。

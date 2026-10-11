@@ -31,7 +31,8 @@ with (CONTROL / 'sync.lock').open('a') as sync_lock:
     with (CONTROL / 'report.lock').open('a') as report_lock:
         fcntl.flock(report_lock, fcntl.LOCK_EX)
         git('add', '--', 'LIHAN', 'LIHAN.md',
-            'submodules/2dgs_rasterizer_lumimotion/diff-surfel-rasterization/cuda_rasterizer/rasterizer_impl.h')
+            'submodules/2dgs_rasterizer_lumimotion/diff-surfel-rasterization/cuda_rasterizer/rasterizer_impl.h',
+            'scene/renderutils/ops.py')
         if git('diff', '--cached', '--name-only'):
             git('commit', '-m', '1011：六组训练、全部MAE与共享资料更新')
         source = git('rev-parse', 'HEAD')
