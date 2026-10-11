@@ -20,7 +20,8 @@ ENVIRONMENTS = {name: f"lumimotion-{name}" for name in
                 ("mahadevi", "minakshi", "parvati", "ushas", "garuda")}
 ENVIRONMENTS["venus"] = "lumimotion"
 TRAINING_MODULES = {"scripts.train_static_dl", "scripts.train_static_dl_shadow_split",
-                    "scripts.train_static_dl_censored", "scripts.train_static_dl_depth_statistic"}
+                    "scripts.train_static_dl_censored", "scripts.train_static_dl_depth_statistic",
+                    "scripts.train_static_dl_direction_weighted", "scripts.train_static_dl_early_geometry"}
 
 
 def now():
