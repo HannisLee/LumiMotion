@@ -92,7 +92,11 @@ def main():
     lighting = json.loads(lighting_path.read_text())
     if lighting['ambient_fraction'] != 0. or lighting['ambient_mode'] != 'zero' or lighting['optimizer_updates'] != 2000 or lighting['normal_opacity_route'] != 'full':
         parser.error('G2-T03源lighting必须保存a0与2000次真实更新。')
-    expected_init = Path('output/1012-06-LH-static-jumpingjacks_DL_V2-G2-T03-normal透明度梯度控制2k/model_mlp').resolve()
+    # marker已通过固定SHA核验；其绝对模型路径不受bootstrap切换到快照cwd影响。
+    expected_init = Path(marker['args']['model_path'])
+    if not expected_init.is_absolute():
+        parser.error('已验证来源marker的model_path必须为绝对路径。')
+    expected_init = expected_init.resolve()
     if init != expected_init:
         parser.error('共同源必须是已验收的G2-T03 full@14000。')
     expected_assets = {'point_cloud.ply': '9b43deb28405aa9e07c41026d102e550c1713b8a90b8fee48a3ead8b0cd250e2', 'deform.pth': '343c279787bb2cf08d8d5527e80d02bec5dc510a2f01fd00d04431f654383ef0', 'lighting.json': 'd190cc031d3ba94cfbeeae4e3c9f4c92e8c9e5dfd7922ddac8c3ef313b947e51'}
