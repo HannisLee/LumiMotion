@@ -12,8 +12,7 @@ def main(index):
     iteration=35000 if exp['kind']=='native' else 55000
     if exp['kind']=='native':
         tasks.append(b.native_commands(exp)[2])
-    tasks.extend((name,command) for name,command in b.eval_commands(exp,iteration)
-                 if not(iteration==35000 and name=='albedo'))
+    tasks.extend(b.eval_commands(exp,iteration))
     tasks.append(('artifact_audit',[b.PY,str(b.ROOT/'LIHAN/scripts/review_1011_artifacts.py'),str(out)]))
     results=[]
     for name,command in tasks:

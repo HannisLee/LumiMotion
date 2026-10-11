@@ -5,7 +5,7 @@ from pathlib import Path
 import batch_1011 as b
 
 KEYS=['albedo','roughness','gs_render','depth_normal','mesh','expected','median']
-HEADER='| 编号／迭代 | Albedo MAE | Roughness MAE | GS Normal ° | Depth Normal ° | Mesh Normal ° | Expected Z | Median Z |'
+HEADER='| 编号／迭代 | Albedo MAE（35k为SH/DC参考） | Roughness MAE | GS Normal ° | Depth Normal ° | Mesh Normal ° | Expected Z | Median Z |'
 RULE='未预先约定数值阈值，MAE不作任意门槛判定。最终FAILED依据必要训练阶段缺失，或GT对比中明确可见的投影残留／材质污染。视频完整解码与首、中、尾图像抽查分别记录，未声称逐帧人工检查全部视频。'
 
 def value(x):return f'{x:.8f}' if isinstance(x,(float,int)) else str(x)
@@ -57,10 +57,11 @@ def main():
         for it in ([35000,55000] if index<=4 else [55000]):
             path=out/f'evaluation_{it}/mae_summary.json';metrics=b.read_json(path) if path.exists() else {}
             absent=not path.exists();record=dict(experiment=index,dataset=exp['dataset'],method=exp['kind'],iteration=it,
-                status=metrics.get('status','UNAVAILABLE'),reason='原生Stage2首步失败，无55k检查点' if absent else '；'.join(metrics.get('errors',[])))
+                status=metrics.get('status','UNAVAILABLE'),reason='原生Stage2首步失败，无55k检查点' if absent else '；'.join(metrics.get('errors',[])),
+                albedo_semantics='Stage1原生get_albedo／SH DC参考值' if it==35000 else '未产出Stage2材质' if absent else 'Stage2材质Albedo')
             vals=[]
             for key in KEYS:
-                na=(it==35000 and key in {'albedo','roughness'}) or (index==6 and key=='roughness')
+                na=(it==35000 and key=='roughness') or (index==6 and key=='roughness')
                 item='N/A' if na else metrics.get(key,'未产出' if absent else '失败：GT超范围' if index==5 and key=='roughness' else '评测失败')
                 record[key]=None if isinstance(item,str) else item;vals.append(value(item))
             rows.append(record);metric_table.append(f'| {index:02d}／{it} | '+' | '.join(vals)+' |')
@@ -83,6 +84,9 @@ def main():
             evidence=str(out/'FAILED') if original_status=='FAILED' else str(out/'review_1011/original_state.json'),
             last_command=original_commands[-1]))
         commands=original_commands+actual
+        albedo_review=out/'review_albedo_1011'
+        if (albedo_review/'completed.json').exists():
+            commands+=b.read_json(albedo_review/'executed.json')
         required_audit=out/'review_1011/verify_all_mae_required.json'
         if required_audit.exists():commands.append(dict(step='PBR必需Roughness的独立复算',**b.read_json(required_audit)))
         retries=sorted((out/'review_1011').glob('hdr_retry*.json'))
@@ -109,7 +113,8 @@ def main():
         for key in ['RGB','Alpha','Normal','分离','材质与重光照']:
             actualtext.append('- **'+key+'**：'+review[key])
         actualtext+=['','目检范围：'+review['范围'],'','### 原始失败及本次补评测','']
-        if index<=4:actualtext+=['原生Stage2在首个材质训练步调用nvdiffrast.texture失败，CUDA 209；没有55k检查点。原环境二进制只含sm_120内核，A40为sm_86。35000的几何分数仅代表Stage1，不能称为完成两阶段。']
+        if index<=4:actualtext+=['原生Stage2在首个材质训练步调用nvdiffrast.texture失败，CUDA 209；没有55k检查点。原环境二进制只含sm_120内核，A40为sm_86。35000分数仅代表Stage1，不能称为完成两阶段。', '',
+            '原生模型确实保存_albedo_dc并提供get_albedo。现补测全15测试帧的get_albedo，使用与05/06相同的线性RGB、去预测Alpha及GT前景核心口径；该值来自Stage1 SH/DC外观，尚未进行Stage2材质／光照分解，作为参考值记录。原生get_albedo自带[0.03,0.97]钳位，评测后未额外缩放或裁剪。Roughness在Stage1未经过材质优化，仍不作为已学习Roughness指标。补评日志、旧汇总备份：`'+str(albedo_review)+'`。']
         elif index==5:actualtext+=['训练正常保存55k，原始RGB／材质／转灯渲染完成后，HDR入口因同一CUDA架构不匹配失败。原始logs/render.log及其不完整渲染目录完整保留。第一次补渲染跨过纹理采样后暴露renderutils的模块载入错误，该失败目录也保留；修复load返回模块的缓存后再单独补渲染，最终状态见`'+str(retry)+'`。', '', 'Roughness测试已实际执行，但GT EXR去预乘后出现超出[0,1]的值，严格评测器拒绝，未夹取、未剔除异常后生成通过分数。15帧中48个越界像素（其中帧30有1个前景核心像素，r约1.0014025），审计见roughness_gt_audit.json。旧审计错误地将缺失Roughness视为可选，已增加PBR必需Roughness检查，整项MAE复算状态更正为FAILED；几何与Albedo独立数值保留。']
         else:actualtext+=['训练及全部适用MAE已完成；原来的AWAITING_VISUAL_REVIEW已完成实际图像目检。Lambertian没有Roughness参数，且HDR入口是无可见性漫反射球面积分；不能认作完整PBR。分离仅继承01 Stage1，不存在新训练的Stage2分离模块。']
         actualtext+=['','### 实际执行命令、退出码与日志','']
@@ -134,6 +139,8 @@ def main():
             if '0010' in path.name or '0080' in path.name or '0150' in path.name:actualtext.append('- GT对比：`'+str(path)+'`。')
         originaltext=(out/'review_1011/original_training_document.md').read_text().split('\n\n## 实际执行状态')[0]
         originaltext=originaltext.replace('当前为PENDING','启动前状态，实际验收见下方结果回填')
+        originaltext=originaltext.replace('Stage1记录几何MAE，SH无物理Albedo/Roughness。',
+            'Stage1记录几何MAE及原生get_albedo的SH/DC参考MAE，后者尚未完成材质／光照分解；Stage1 Roughness记N/A。')
         content=originaltext+'\n\n'+'\n'.join(actualtext)+'\n'
         Path(exp['document']).write_text(content);(out/'README.md').write_text(content)
         b.write_json(out/'inspection/final_review.json',review)
@@ -142,7 +149,7 @@ def main():
         sections.append((exp,review))
     alltable=[HEADER,'|---|---|---|---|---|---|---|---|']
     for row in rows:
-        vals=['N/A' if row['iteration']==35000 and k in {'albedo','roughness'} or row['experiment']==6 and k=='roughness' else value(row[k]) if row[k] is not None else '失败：GT超范围' if row['experiment']==5 and k=='roughness' else '未产出' for k in KEYS]
+        vals=['N/A' if row['iteration']==35000 and k=='roughness' or row['experiment']==6 and k=='roughness' else value(row[k]) if row[k] is not None else '失败：GT超范围' if row['experiment']==5 and k=='roughness' else '未产出' for k in KEYS]
         alltable.append(f'| {row["experiment"]:02d}／{row["iteration"]} | '+' | '.join(vals)+' |')
     lines=['# 四个V2数据集六组训练与全部MAE总报告','',f'结果回填：{b.now()}；服务器ushas；Conda环境lumimotion-ushas。实验编号1011为用户指定，原始启动为2026-10-10，补评测为2026-10-11。','',
         '## 完成情况与最终结论','',
@@ -154,13 +161,19 @@ def main():
         original_status='FAILED' if (Path(exp['output'])/'FAILED').exists() else origin['status']
         lines.append(f'| {index:02d} | {exp["dataset"]}／{exp["kind"]} | {35000 if index<=4 else 55000} | {original_status} | {review["结论"]} |')
     lines+=['','## 全部适用MAE','',
-        '各个已评测检查点均使用完整15测试帧（10、20、…、150），135训练帧与测试帧分离。法线是角度（度）；深度为相机Z世界单位；Albedo为线性RGB；Roughness为原始r参数。Stage1的Albedo/Roughness及Lambertian Roughness为N/A；原生55k未产出，不能用Stage1代填。05 Roughness已尝试测试，但GT去预乘后超范围而失败，不能填N/A或虚构通过分数。','']+alltable
+        '各个已评测检查点均使用完整15测试帧（10、20、…、150），135训练帧与测试帧分离。法线是角度（度）；深度为相机Z世界单位；Albedo为线性RGB；Roughness为原始r参数。原生Stage1确实有get_albedo及保存的_albedo_dc，现已补齐其Albedo MAE；35k列是SH/DC外观参考，55k列是Stage2材质。两者使用相同评分口径，但训练阶段和参数语义不同，不应把35k称为完成材质分解。Stage1 Roughness及Lambertian Roughness仍为N/A；原生55k未产出，不能用Stage1代填。05 Roughness已尝试测试，但GT去预乘后超范围而失败，不能填N/A或虚构通过分数。','']+alltable
     lines+=['','MAE原始数组、15帧逐帧指标、预测Mesh训练视角清单和独立复算在各组evaluation_*/目录。汇总CSV／JSON：`'+str(b.CONTROL/'mae_summary.csv')+'`、`'+str(b.CONTROL/'mae_summary.json')+'`。各组文档列出覆盖率和共同有效像素法线分数。','',
         '05第二次HDR补渲染状态：'+(b.read_json(hdr_final)['status']+'；完整帧数'+str(b.read_json(hdr_final).get('decoded_frames',0)) if hdr_done else 'RUNNING；MAE与图像目检已回填，完整视频完成后再次更新路径与解码结果')+'。','',
         '## RGB结果与05／06比较','',
         '| 编号／迭代 | 全图PSNR | 全图SSIM | 全图LPIPS | 前景PSNR |','|---|---|---|---|---|']
     for row in rgb:lines.append(f'| {row["experiment"]:02d}／{row["iteration"]} | {value(row["psnr"])} | {value(row["ssim"])} | {value(row["lpips"])} | {value(row.get("psnr_foreground","原始日志未记"))} |')
     pbr=next(r for r in rows if r['experiment']==5);lambert=next(r for r in rows if r['experiment']==6)
+    lines+=['','### 原生Stage1 Albedo补评','',
+        '01—04全15测试帧的get_albedo已实际渲染并独立复算。原生定义为clamp(SH2RGB(_albedo_dc),0.03,0.97)，线性化后用对应相机／时刻几何光栅化，按预测Alpha去预乘；未添加GT光照、未执行训练、未拟合缩放。该值可以显示DC颜色与GT Albedo的差距，但不能证明已经分离光照。每组保存完整15帧NPZ／CSV、首中尾GT对比图、原渲染器一致性检查、权重及GT哈希；旧汇总保存在review_albedo_1011/mae_summary.json。','']
+    for exp in experiments[:4]:
+        native=next(r for r in rows if r['experiment']==exp['id'] and r['iteration']==35000)
+        detail=b.read_json(Path(exp['output'])/'evaluation_35000/mae_summary.json')['details']['albedo']
+        lines.append(f'- {exp["id"]:02d} {exp["dataset"]}：Albedo MAE {native["albedo"]:.8f}；前景预测Alpha覆盖率{detail["coverage_pct"]:.4f}%。')
     lines+=['','01—04的RGB分数来自原始训练日志，已被原程序四舍五入，仅作训练重建证据；05/06使用统一新渲染评测协议，有完整逐帧JSON及前景指标。不能直接按上述不同协议的分数比较原生35k与GT光源55k。','',
         f'05 Albedo MAE {pbr["albedo"]:.8f}，06 {lambert["albedo"]:.8f}；05降低{lambert["albedo"]-pbr["albedo"]:.8f}（{100*(1-pbr["albedo"]/lambert["albedo"]):.2f}%）。两组在同一静态DL、同一01冻结Stage1及135/15划分下可比较，但优化损失、光强约定和渲染方程不同，不能把差值单独归因于BRDF。','',
         'GT对比图显示，两组预测Albedo均残留GT Albedo不存在的黑色投影；05另有局部颜色噪声，06地面色块偏白。DL地面预测法线出现与投影／色块区域相近的起伏；颜色或阴影被几何吸收是可能解释，具体因果仍需额外实验确认。以上可见缺陷是质量验收失败的依据。','',

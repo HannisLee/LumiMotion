@@ -99,8 +99,13 @@ def geometry():
 
 def albedo():
     metrics = json.loads((ROOT / f'albedo/iteration_{ITERATION}/metrics.json').read_text())
-    if len(metrics['frames']) != 15:
+    if [int(row['frame']) for row in metrics['frames']] != expected_ids or metrics['split'] != 'test':
         raise AssertionError('Albedo评测未覆盖15测试帧。')
+    if not metrics.get('checkpoint_unchanged') or not metrics['renderer_check'].get('passed'):
+        raise AssertionError('Albedo权重不变或原生材质光栅一致性核验未通过。')
+    for path, digest in {**metrics['checkpoint_hashes'], **metrics['gt_file_hashes']}.items():
+        if hashlib.sha256(Path(path).read_bytes()).hexdigest() != digest:
+            raise AssertionError('Albedo权重或GT来源发生改变：' + path)
     total, count = 0., 0
     for row in metrics['frames']:
         with np.load(ROOT / f'albedo/iteration_{ITERATION}' / (row['frame'] + '.npz')) as data:
@@ -113,9 +118,11 @@ def albedo():
     results['albedo'] = total / count
     check_close(results['albedo'], metrics['summaries']['raw']['foreground']['mae_linear'])
     details['albedo'] = metrics['summaries']['raw']['foreground']
+    details['albedo']['parameter_semantics'] = ('Stage1原生get_albedo／SH DC参考值，非完成Stage2后的材质分解'
+        if ITERATION == 35000 else 'Stage2材质Albedo')
 
 
-for name, operation in [('geometry', geometry)] + ([('albedo', albedo)] if ITERATION == 55000 else []):
+for name, operation in [('geometry', geometry), ('albedo', albedo)]:
     try:
         operation()
     except Exception as error:
