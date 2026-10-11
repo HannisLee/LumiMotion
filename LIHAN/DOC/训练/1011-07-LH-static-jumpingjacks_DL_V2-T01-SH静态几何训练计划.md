@@ -35,3 +35,12 @@ CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 MKL_NUM_THREADS=
 实际正式输出为`output/1011-13-LH-static-jumpingjacks_DL_V2-T01-SH静态零形变-nativeRasterizer`，模型目录`model_mlp`，使用修正后的核心快照`output/1011-09-静态DL-Goal训练总控/snapshots/T01-sh-native-assets-20261011`。训练入口通过`LIHAN/scripts/bootstrap_1011.py`先绑定仓库native CUDA rasterizer再导入快照，完整参数命令保存在实验目录`commands/train.sh`；PID 1972511、GPU0、监督session 75000。初始直接run_static_dl.py及#10目录属于协议失败历史，不作为本次有效训练，均保留。当前正式训练继续至35000步。
 
 iteration_10000的15帧Goal评测已完成：Mesh、normal_depth与独立audit三个步骤均exit 0，完整性PASS；数值阈值FAILED。GS-render MAE 11.257213802°（coverage 0.998600782）、depth-normal MAE 22.836470255°（coverage 0.966570124）、mesh MAE 16.853138010°（coverage 0.993374941），目标阈值为3.51°、7.35°、5.46°。原始预测网格、15帧数组、逐帧CSV、日志和审计结果保留在`output/1011-13-LH-static-jumpingjacks_DL_V2-T01-SH静态零形变-nativeRasterizer/evaluation_10000/`；详细结论见其中`goal_mae_summary.json`和`README.md`。此为10k中期检查，训练继续，35k最终评测未执行。
+
+
+## 35k正式训练与最终Goal评测（2026-10-11）
+
+正式重试于2026-10-11T09:03:49.854134+00:00完成，PID 1972511，GPU0，exit code 0；状态元数据在修复旧监督器尾部字面量\n后恢复为有效JSON，原始文件保留为`state_before_newline_repair_20261011T090800Z.txt`。35k checkpoint与训练日志保留于`output/1011-13-LH-static-jumpingjacks_DL_V2-T01-SH静态零形变-nativeRasterizer`输出目录。
+
+完整15帧最终评测于`evaluation_35000/`完成，三步骤退出0，600 PNG及四个150帧视频完整解码；完整性PASS，数值门槛FAILED（阈值GS<3.51°、Depth<7.35°、Mesh<5.46°）。结果：GS-render 11.87401019°、coverage 0.99901058；depth-normal 20.29112808°、coverage 0.96695592；mesh 15.04399513°、coverage 0.99385304。独立完整性审计PASS，最终状态FAILED。
+
+代表10/80/150帧目检（未宣称逐视频帧人工检查）：RGB人物与台面纹理可辨，但脚周和投射阴影有明显黑色毛刺/拖影；Alpha轮廓连续、代表帧无大块缺失，覆盖率高不代表深度准确；Normal平台广泛多面折痕/皱褶、脚周明显且人体表面仍有误差；分离图人物和圆台均为绿色低binary feature门控，静态几何来自零形变头冻结而非学得运动分离。细节、代表图视频、完整四类目检见`output/1011-13-LH-static-jumpingjacks_DL_V2-T01-SH静态零形变-nativeRasterizer/evaluation_35000/README.md`及`visual_review_completed.json`。原始失败评测和所有checkpoint/数组/日志保留。
