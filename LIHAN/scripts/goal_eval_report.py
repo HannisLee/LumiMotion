@@ -32,12 +32,16 @@ def main():
         if sorted(frames) != list(FRAMES):
             raise AssertionError('逐帧CSV缺失／重复：' + str(directory))
         protocols.add(r['protocol_sha256'])
+        review_path = directory / 'visual_review_completed.json'
+        review = read(review_path) if review_path.exists() else None
         rows.append(dict(experiment=Path(r['model']).parent.name, model=r['model'],
             iteration=r['iteration'], evaluation=str(directory), source=r['source'],
             values={k: r['values'][k] for k in r['thresholds']}, thresholds=r['thresholds'],
             coverage={k: r['details'][k]['coverage'] for k in r['thresholds']},
             missing_penalty=r['missing_penalty'], completeness=r['completeness'],
-            numeric_status=r['status'], visual_review=completed['visual_review'],
+            numeric_status=r['status'], visual_review=review['status'] if review else completed['visual_review'],
+            manual_review_scope=review.get('manual_scope') if review else None,
+            manual_review_sha256=digest(review_path) if review else None,
             summary_sha256=digest(directory / 'goal_mae_summary.json')))
     if len(protocols) != 1:
         raise AssertionError('协议哈希不同，禁止合并为同口径比较。')
