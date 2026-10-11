@@ -14,8 +14,16 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 def verify_sources(model, marker, digest):
     from goal_eval_render import training_render_sources
     sources = training_render_sources(model)
-    expected = ('scripts/train_static_dl_shadow_split.py', 'scene/static_dl_shadow_split.py',
-                'scene/static_dl_shadow_split_audit.py')
+    if (model / 'censored_training.json').exists():
+        if marker['actual_entrypoint'] != 'scripts/train_static_dl_censored.py':
+            raise AssertionError('censored实际训练入口未明确记录。')
+        if marker['loss_model'] != marker['args']['loss_model']:
+            raise AssertionError('censored损失模式记录冲突。')
+        expected = ('scripts/train_static_dl_censored.py', 'scene/static_dl_censored.py',
+                    'scene/static_dl_censored_audit.py', 'scene/static_dl_shadow_split.py')
+    else:
+        expected = ('scripts/train_static_dl_shadow_split.py', 'scene/static_dl_shadow_split.py',
+                    'scene/static_dl_shadow_split_audit.py')
     saved = marker['new_sources']
     for relative in expected:
         matching = [(Path(path), sha) for path, sha in saved.items()
@@ -57,9 +65,11 @@ def main():
     output = args.output_dir.resolve()
     if not output.is_relative_to(ROOT / 'output'):
         raise AssertionError('评测输出必须位于output。')
-    marker_path = Path(args.model_path) / 'shadow_split_training.json'
+    model = Path(args.model_path)
+    censored = (model / 'censored_training.json').is_file()
+    marker_path = model / ('censored_training.json' if censored else 'shadow_split_training.json')
     marker = read(marker_path)
-    route = marker['args']['route']
+    route = 'control' if censored else marker['args']['route']
     if route not in ('control', 'split'):
         raise AssertionError('仅检查实际两组训练路线。')
     sources = verify_sources(Path(args.model_path), marker, digest)
@@ -144,6 +154,9 @@ def main():
     runtime_modules = {path: digest(path) for path in mapped}
     report = dict(status='PASS', scope='真实新Stage2 checkpoint，同训练相机，新分流前向vs原物理评测；两侧fresh BVH。',
         model=str(run.model), source=str(run.source), iteration=args.load_iter, route=route,
+        actual_entrypoint=marker.get('actual_entrypoint', 'scripts/train_static_dl_shadow_split.py'),
+        loss_model=marker.get('loss_model', '原two_sided鲁棒残差'),
+        loss_scope='此处仅验证前向重载与来源，不代替新损失梯度审计。',
         frame=args.frame, checks=checks, saved_zero_heads=heads,
         geometry_maps='PASS：真实XYZ/q渲染的原GeometryRun world normal、alpha、mixed depth一致；三时变几何输出严格0。',
         training_rasterizer=trained, effective_rasterizer=backend, physical_provenance=physical,
