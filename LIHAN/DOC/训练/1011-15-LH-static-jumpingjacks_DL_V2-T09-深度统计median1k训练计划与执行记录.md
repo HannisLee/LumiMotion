@@ -20,7 +20,7 @@
 
 ## 输出与记录要求
 
-正式保存全局iteration11250、11500、12000。每组记录完整训练和评测命令、native source与实际.so SHA、GPU UUID/PID/exit、训练日志与各checkpoint SHA。终点iteration12000执行完整15帧协议、四类150帧视频及代表帧目检；中间11250/11500检查点保留，按需要补完整15帧几何诊断，不预先承诺重复四类视频。定量或完整性失败均标记FAILED并保留输出。当前状态：正式训练尚未启动；修订起点smoke及fresh parity均已通过；正式配对训练运行中。
+正式保存全局iteration11250、11500、12000。每组记录完整训练和评测命令、native source与实际.so SHA、GPU UUID/PID/exit、训练日志与各checkpoint SHA。终点iteration12000执行完整15帧协议、四类150帧视频及代表帧目检；中间11250/11500检查点保留，按需要补完整15帧几何诊断，不预先承诺重复四类视频。定量或完整性失败均标记FAILED并保留输出。历史计划起始状态为未启动；当前训练exit0且终点评测已完成，最终结论FAILED。
 
 
 ## 计划修订｜共同起点改为T06@11000
@@ -34,5 +34,13 @@
 
 - 修订起点smoke：`output/smoke_test/1011-21-staticDL-T09-median-20步深度统计冒烟`，iteration11020；训练exit0、gpu_verified=true；首帧12项公共审计与13项统计分支审计均PASS。fresh parity真实exit0，8项检查最大差为0，native source/.so和快照源码匹配；证据见该smoke目录的`render_parity/parity.json`。
 - 正式启动命令：`bash /home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-21-LH-static-jumpingjacks_DL_V2-T09-深度统计median-1k/commands/train.sh`；完整argv、child环境和命令SHA见`output/1011-21-LH-static-jumpingjacks_DL_V2-T09-深度统计median-1k/commands/train.json`及`state.json`。
-- 启动时间：2026-10-11T11:23:43Z；GPU=GPU2，UUID=`GPU-c64dda28-ea42-7b20-b990-06c1c8f61cd6`，训练PID=2163941，supervisor PID=2163931；启动器实测`gpu_verified=true`，当前训练运行中。日志：`output/1011-21-LH-static-jumpingjacks_DL_V2-T09-深度统计median-1k/logs/train.log`。
+- 启动时间：2026-10-11T11:23:43Z；GPU=GPU2，UUID=`GPU-c64dda28-ea42-7b20-b990-06c1c8f61cd6`，训练PID=2163941，supervisor PID=2163931；启动器实测`gpu_verified=true`，训练已exit0。日志：`output/1011-21-LH-static-jumpingjacks_DL_V2-T09-深度统计median-1k/logs/train.log`。
 - 实际模型目录：`output/1011-21-LH-static-jumpingjacks_DL_V2-T09-深度统计median-1k/model_mlp`；起始checkpoint为T06@11000，目标全局保存点11250、11500、12000。训练来源、参数和statistic选择记录于`model_mlp/depth_statistic_training.json`及`model_mlp/censored_training.json`。终点完整15帧评测和四类150帧可视化尚未执行，待checkpoint稳定后安排。
+
+终点训练已于2026-10-11 11:25:24 UTC正常结束，launcher exit0且gpu_verified=true。11250/11500/12000三个checkpoint的PLY、deform、lighting共9项通过10秒稳定SHA复核，记录在`output/1011-21-LH-static-jumpingjacks_DL_V2-T09-深度统计median-1k/checkpoint_completion_audit.json`。evaluator已启动`output/1011-21-LH-static-jumpingjacks_DL_V2-T09-深度统计median-1k/evaluation_12000`终点评测；训练原生CUDA源码及实际so映射、固定参数审计已由evaluator记录，最终MAE与可视化结论待其完成后补入。
+
+step 1/250/500/1000的实际训练诊断、固定参数核验及source/native/so SHA汇总见`output/1011-09-静态DL-Goal训练总控/T08_T09_training_diagnostics.json`；仅引用日志现有记录，不做插值。
+
+最终评测已于2026-10-11完成。T06@11000起点，median统计，终点iteration12000；完整15帧三步骤exit0、完整性PASS/数值FAILED：GS 6.076377704°（coverage 0.999377920），Depth 13.895960591°（0.967297423），Mesh 8.855353019°（0.996442884）。600 PNG与四个150帧视频全部完整解码；fresh parity八项最大差0。
+
+四类10/80/150目检：RGB脚周伪表面/灰白拖影与长条黑影持续、平台高亮；Alpha连续但脚与平台接触处薄外扩；separation为近乎均一橄榄黄绿binary feature门控，不代表学到运动分离。Normal观察：原0080 Depth台面皱纹/起伏明显；Mesh平台细碎纹理和人体/脚周误差持续。最终MAE仍未达阈值，故验收FAILED。详细命令、图像/视频、完整性及人工目检证据见`output/1011-21-LH-static-jumpingjacks_DL_V2-T09-深度统计median-1k/evaluation_12000/README.md`与`FINAL_REVIEW_COMPLETED.json`。
