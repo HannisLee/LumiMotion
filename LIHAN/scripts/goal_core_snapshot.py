@@ -12,6 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 CORE_DIRS = ("arguments", "scene", "gaussian_renderer", "utils", "assets")
 CORE_FILES = ("scripts/train_stage1.py", "scripts/train_static_dl.py",
+              "scripts/train_static_dl_shadow_split.py",
               "LIHAN/scripts/goal_smoke_static_dl.py")
 
 
