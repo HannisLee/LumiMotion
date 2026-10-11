@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-CORE_DIRS = ("arguments", "scene", "gaussian_renderer", "utils")
+CORE_DIRS = ("arguments", "scene", "gaussian_renderer", "utils", "assets")
 CORE_FILES = ("scripts/train_stage1.py", "scripts/train_static_dl.py",
               "LIHAN/scripts/goal_smoke_static_dl.py")
 
