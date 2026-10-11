@@ -6,4 +6,11 @@
 
 训练总步数35000；checkpoint为10000、20000、30000、35000；训练代码快照`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-09-静态DL-Goal训练总控/snapshots/T01-sh-native-assets-20261011`，启动通过仓库`LIHAN/scripts/bootstrap_1011.py`绑定native CUDA rasterizer。训练命令和参数完整记录在`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-12-LH-static-jumpingjacks_DL_V2-T03-方向Lambertian阴影BVH/commands/train.sh`。输出目录`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-12-LH-static-jumpingjacks_DL_V2-T03-方向Lambertian阴影BVH`，模型为`model_mlp`，日志为`logs/train.log`。
 
-20步物理冒烟已完成：T02路径的xyz/rotation/albedo/log_intensity梯度有限非零，T03路径trace_rays=100000、首步visibility梯度非零；峰值显存余量足够。等待fresh/fresh parity检查通过后启动。正式输出需记录进程PID/starttime/exit code、每100步物理日志、checkpoint与native光栅源/so SHA。正式Goal评测按协议记录定量指标、实际渲染输出和四类可视化目检；当前计划状态：RUNNING；已通过fresh/fresh parity验证，正式训练PID与GPU见对应output state.json。
+20步物理冒烟已完成：T02路径的xyz/rotation/albedo/log_intensity梯度有限非零；T03首步执行trace_rays=100000，XYZ/q/albedo/light总loss梯度有限非零。visibility值作为硬可见度结果，不对其反向传播，不能称visibility自身有非零梯度。正式输出需记录进程PID/starttime/exit code、每100步物理日志、checkpoint与native光栅源/so SHA。正式Goal评测按协议记录定量指标、实际渲染输出和四类可视化目检；当前计划状态：RUNNING；fresh/fresh parity七项最大绝对差为0，训练/评测source、.so与四个python实现SHA一致。正式目录分别为output/1011-14…和output/1011-15…；监督器保存PID、child环境、物理GPU UUID、pmon核验和最终退出码。
+
+
+## 调度异常与新编号重试（2026-10-11T07:44:02.517559+00:00）
+
+旧正式目录`output/1011-12-LH-static-jumpingjacks_DL_V2-T03-方向Lambertian阴影BVH`的启动器未将`gpu_physical=2`映射到子进程`CUDA_VISIBLE_DEVICES`；`nvidia-smi pmon`确认其进程实际落在GPU0，与T01共卡。经核验PID与命令后发送SIGTERM，退出码-15。保留该目录日志、cfg、输入点云和梯度/物理诊断；这些中断结果不纳入正式实验。
+
+新重试使用独立目录`output/1011-15-LH-static-jumpingjacks_DL_V2-T03-方向Lambertian阴影BVH-GPU2重试`，不覆盖旧失败现场。标准启动器必须显式传递`child_env.CUDA_VISIBLE_DEVICES`，并记录子进程environ和pmon物理卡核验结果。参数不变：35000步，10000/20000/30000/35000保存；物理在1000步切换，可见度在5000步切换；基础normal/distortion regularization起点维持仓库默认8000；T03 BVH interval=1。共享点云及训练输入不变。
