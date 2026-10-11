@@ -21,6 +21,8 @@ def main():
     p.add_argument('--execute', action='store_true')
     p.add_argument('--plan_destination', type=Path,
                    help='仅生成计划时将计划保存到此目录，保持实际output尚未创建。')
+    p.add_argument('--geometry_only', action='store_true',
+                   help='完整15帧中间诊断，仅暂缓150帧四类视频；不改变任何MAE或Mesh要求。')
     args = p.parse_args()
     if subprocess.check_output(['hostname']).decode().strip() != 'ushas':
         p.error('当前执行器只允许ushas。')
@@ -54,6 +56,8 @@ def main():
         ('four_classes', boot + ['LIHAN.scripts.goal_eval_visuals'] + shared +
             ['--output_dir', str(args.output / 'four_classes')]),
     ]
+    if args.geometry_only:
+        commands = [item for item in commands if item[0] != 'four_classes']
     plan_directory = args.plan_destination.resolve() if args.plan_destination is not None else args.output
     if not plan_directory.is_relative_to(ROOT / 'output'):
         p.error('计划也必须保存在output内。')
@@ -74,7 +78,8 @@ def main():
         lines += [f'### {name}', '', '```bash', shlex.join(command), '```', '']
     lines += ['## 定量与目检', '', '定量指标：待执行；`goal_mae_summary.json`保存独立复算及三阈值结论。',
               '原始数组：`normal_depth/prediction_0010.npz`至`prediction_0150.npz`；逐帧CSV保留。',
-              '代表图：`four_classes/four_classes_10_80_150.png`；四类全150帧PNG及视频。',
+              ('中间诊断暂缓150帧四类视频；几何代表图：normal_depth/comparison_0010.png、0080、0150。'
+               if args.geometry_only else '代表图：`four_classes/four_classes_10_80_150.png`；四类全150帧PNG及视频。'),
               'RGB：PENDING；Alpha：PENDING；Normal：PENDING；分离：PENDING。',
               '静态几何分离语义：零几何输出头冻结，红／绿显示原binary feature门控，不能声称学到运动。',
               '最终结论：PENDING。数值未达标、异常或验收失败均保留完整结果，禁止覆盖或删除。', '']
@@ -109,11 +114,12 @@ def main():
         f.write('\n## 执行结果\n\n')
         for key in protocol['thresholds']:
             f.write(f'- {key} MAE：{report["values"][key]:.8f}°；coverage={report["details"][key]["coverage"]:.8f}。\n')
-        f.write(f'\n数值验收：**{report["status"]}**。四类完整性通过；实际目检结论仍须人工回填。\n')
+        visual_status = '中间诊断暂缓四类视频，完整15帧MAE和数组核验通过。' if args.geometry_only else '四类完整性通过；实际目检结论仍须人工回填。'
+        f.write(f'\n数值验收：**{report["status"]}**。{visual_status}\n')
         if report['status'] == 'FAILED':
             f.write('\n最终结论：**FAILED**，未同时达到三个法线阈值。\n')
     write(args.output / 'PIPELINE_COMPLETED.json', dict(pipeline='PASS', goal_numeric=report['status'],
-                                                     visual_review='PENDING'))
+                                                     visual_review='DEFERRED_INTERMEDIATE' if args.geometry_only else 'PENDING'))
 
 
 if __name__ == '__main__':

@@ -28,6 +28,29 @@ def prepare_directions(output):
     return output
 
 
+def training_render_sources(model):
+    """兼容旧冒烟与正式启动元数据；缺失来源明确拒绝。无需CUDA。"""
+    model = Path(model)
+    candidates = [model.parent / 'commands.json', model.parent / 'commands/train.json']
+    available = [(path, read(path)) for path in candidates if path.is_file()]
+    if not available:
+        raise AssertionError('静态DL训练marker存在，但缺少记录snapshot的启动元数据。')
+    snapshots = {str(Path(record['snapshot']).resolve()) for _, record in available if record.get('snapshot')}
+    if len(snapshots) != 1 or any(not record.get('snapshot') for _, record in available):
+        raise AssertionError('静态DL训练启动元数据缺少snapshot或不同记录相互冲突。')
+    snapshot = Path(next(iter(snapshots)))
+    sources = {str(path): digest(path) for path, _ in available}
+    for relative in ('scene/static_dl_photometric.py', 'gaussian_renderer/__init__.py',
+                     'scene/gaussian_model.py', 'scene/cameras.py'):
+        saved_path = snapshot / relative
+        current_path = ROOT / relative
+        if digest(saved_path) != digest(current_path):
+            raise AssertionError('评测物理代码与训练快照不同，需显式适配：' + relative)
+        sources[str(saved_path)] = digest(saved_path)
+        sources[str(current_path)] = digest(current_path)
+    return sources
+
+
 def physical_renderer(run, iteration, eval_directions):
     """返回真实物理renderer或None（SH/尚未进入物理阶段）。"""
     import numpy as np
@@ -37,6 +60,7 @@ def physical_renderer(run, iteration, eval_directions):
     marker = run.model / 'static_dl_training.json'
     if not marker.exists():
         return None, None
+    run.files.update(training_render_sources(run.model))
     config = read(marker)['args']
     mode = config.get('static_dl_mode', 'sh')
     if mode == 'sh' or iteration <= config['static_dl_physical_start']:
