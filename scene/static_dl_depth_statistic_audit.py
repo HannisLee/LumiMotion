@@ -1,0 +1,221 @@
+"""深度统计量的实际native缓冲与梯度审计；保持原光度路径检查。"""
+import torch
+import random
+
+from scene.static_dl_shadow_split import render_split_photometric
+from scene.static_dl_depth_statistic import geometry_regularization
+from scene.static_dl_censored import loss_for_mode, audit_real_residual, photometric_diagnostics
+
+
+def audit_checkpoint_routes(camera, pc, pipe, background, lights, settings):
+    statistic_audit = audit_geometry_depth_statistic(camera, pc, pipe, background, lights, settings)
+    directions, _ = lights.for_camera(camera)
+    directions = directions.detach().clone().requires_grad_(True)
+    receiver = pc.get_xyz.detach().clone().requires_grad_(True)
+    parameters = dict(xyz=pc._xyz, rotation=pc._rotation, scale=pc._scaling,
+                      opacity=pc._opacity, material=pc._albedo_dc, light=lights.log_intensity,
+                      direction=directions, receiver_origin=receiver)
+    original = {k:v.requires_grad for k,v in parameters.items()}
+    for value in parameters.values():
+        value.requires_grad_(True)
+    target = camera.original_image_train_light.cuda()
+    alpha = camera.gt_alpha_mask.cuda()
+    if pipe.white_background:
+        target = alpha*target+(1-alpha)*background[:, None, None]
+
+    def summary(gradients):
+        return {k:dict(is_none=v is None, norm=0. if v is None else float(v.norm()),
+                       max_abs=0. if v is None else float(v.abs().max()),
+                       finite=v is None or bool(torch.isfinite(v).all())) for k,v in gradients.items()}
+
+    def grads(loss):
+        return {k:None if g is None else g.detach().cpu() for k,g in zip(parameters,
+            torch.autograd.grad(loss, tuple(parameters.values()), allow_unused=True))}
+
+    def render(route, detach_camera=True):
+        return render_split_photometric(camera, pc, pipe, background, directions,
+            lights.log_intensity.exp(), settings.shadow_bias, route=route,
+            receiver_positions=receiver, detach_camera=detach_camera)
+
+    def photo(package):
+        return loss_for_mode(settings.loss_model)(package['render'], target, alpha, settings.shadow_weight,
+            settings.highlight_weight, settings.residual_threshold)[0]
+
+    def difference(left, right, key):
+        a, b = left[key], right[key]
+        if a is None and b is None:
+            return 0., 0.
+        a = torch.zeros_like(b) if a is None else a
+        b = torch.zeros_like(a) if b is None else b
+        return float((a-b).abs().max()), float((a-b).norm()/a.norm().clamp_min(1e-20))
+
+    try:
+        all_grads, forward, initial_photo = {}, {}, {}
+        visibility_stats = None
+        residual_audit = None
+        initial_diagnostics = None
+        for route in ('control', 'split', 'occluder'):
+            package = render(route)
+            if route in ('control', 'split'):
+                forward[route] = {k:package[k].detach().cpu() for k in
+                    ('render', 'render_linear', 'rend_alpha', 'rend_normal', 'surf_depth')}
+            if route == 'control':
+                residual_audit = audit_real_residual(package['render'], target, alpha, settings)
+                initial_diagnostics = photometric_diagnostics(package['render'], package['render_linear'], target, alpha, pc, settings)
+            value = photo(package)
+            initial_photo[route] = float(value.detach())
+            visibility = package['light_visibility']
+            visibility_stats = dict(mean=float(visibility.mean()),
+                zero_fraction=float((visibility==0).float().mean()),
+                below_point_one_fraction=float((visibility<.1).float().mean()),
+                above_point_nine_fraction=float((visibility>.9).float().mean()))
+            all_grads[route] = grads(value)
+        summaries = {k:summary(v) for k,v in all_grads.items()}
+        forward_diff = {k:float((forward['control'][k]-forward['split'][k]).abs().max())
+                        for k in forward['control']}
+        common = {k:difference(all_grads['control'], all_grads['split'], k)
+                  for k in ('rotation', 'material', 'light')}
+        xyz = all_grads['split']['xyz']
+        expected_xyz = all_grads['occluder']['xyz']
+        xyz_error = (float((xyz-expected_xyz).norm()/expected_xyz.norm().clamp_min(1e-20))
+                     if xyz is not None and expected_xyz is not None else 1e30)
+        package = render('split')
+        map_grads = summary(grads(package['rend_alpha'].mean()+package['surf_depth'].mean()+package['rend_normal'].square().mean()))
+        negative_arrays = grads(photo(render('control', detach_camera=False)))
+        negative = summary(negative_arrays)
+        negative_q_difference = difference(all_grads['control'], negative_arrays, 'rotation')[0]
+        terms, _ = geometry_regularization(camera, pc, pipe, background, alpha, settings.normal_depth_statistic)
+        geometry = summary(grads(settings.alpha_weight*terms['alpha']+
+            settings.normal_weight*terms['normal']+settings.dist_weight*terms['distortion']))
+        def zero(group, names):
+            return all(group[k]['finite'] and group[k]['norm']==0 for k in names)
+        def nonzero(group, names):
+            return all(group[k]['finite'] and group[k]['norm']>0 for k in names)
+        checks = dict(depth_statistic_contract=statistic_audit['status']=='PASS', real_residual_semantics=residual_audit['status']=='PASS', forward_equal=all(v==0 for v in forward_diff.values()),
+            receiver_allowed=nonzero(summaries['control'], ('rotation','material','light')),
+            receiver_forbidden=zero(summaries['control'], ('xyz','scale','opacity','direction','receiver_origin')),
+            shadow_allowed=nonzero(summaries['occluder'], ('xyz',)),
+            shadow_forbidden=zero(summaries['occluder'], ('rotation','material','light','scale','opacity','direction','receiver_origin')),
+            common_gradients_equal=all(a<=2e-6 and r<=1e-5 for a,r in common.values()),
+            xyz_matches_shadow=xyz_error<1e-4,
+            camera_maps_forbidden=zero(map_grads, parameters),
+            negative_control_nonzero=nonzero(negative, ('xyz','rotation')) and negative_q_difference>1e-8,
+            real_geometry_allowed=nonzero(geometry, ('xyz','rotation')),
+            real_geometry_forbidden=zero(geometry, ('material','light','scale','opacity','direction','receiver_origin')))
+        return dict(status='PASS' if all(checks.values()) else 'FAILED', camera=camera.image_name_train_light,
+            checks=checks, loss_model=settings.loss_model, residual_semantics=residual_audit,
+            normal_depth_statistic=settings.normal_depth_statistic, statistic_audit=statistic_audit,
+            photometric_diagnostics=initial_diagnostics, forward_max_abs_difference=forward_diff, gradients=summaries,
+            initial_photometric_loss=initial_photo, visibility=visibility_stats,
+            common_gradient_difference_abs_relative=common, xyz_shadow_relative_error=xyz_error,
+            camera_maps=map_grads, camera_negative_control=negative,
+            camera_rotation_bypass_negative_difference=negative_q_difference, geometry=geometry,
+            parameter_updates=0, note='只用原训练RGB/自身Alpha计算导数；未更新模型，不参与测试MAE。')
+    finally:
+        for name, value in parameters.items():
+            value.requires_grad_(original[name])
+
+
+def audit_geometry_depth_statistic(camera, pc, pipe, background, lights, settings):
+    """直接捕获实际native allmap，核验统计量、首步旧函数同义及旁路。"""
+    from scene.static_dl_shadow_split import geometry_regularization as old_geometry
+    from torch.nn.modules.module import register_module_forward_hook
+
+    parameters = dict(xyz=pc._xyz, rotation=pc._rotation, scale=pc._scaling,
+        opacity=pc._opacity, material=pc._albedo_dc, light=lights.log_intensity)
+    flags = {k:v.requires_grad for k,v in parameters.items()}
+    snapshot = {k:v.detach().clone() for k,v in vars(pc).items()
+                if isinstance(v, torch.Tensor) and v.is_leaf}
+    initial_light = lights.log_intensity.detach().clone()
+    python_rng, cpu_rng, gpu_rng = random.getstate(), torch.get_rng_state(), torch.cuda.get_rng_state()
+    alpha = camera.gt_alpha_mask.cuda()
+    pipe_ratio = pipe.depth_ratio
+    raw_buffers = []
+
+    def capture(module, inputs, output):
+        if module.__class__.__name__ == 'GaussianRasterizer':
+            if not isinstance(output, tuple) or len(output) != 3:
+                raise RuntimeError('native rasterizer返回格式改变，禁止静默略过统计量核验。')
+            raw_buffers.append(output[2].detach())
+
+    def gradients(loss, retain_graph=False):
+        return {k:None if g is None else g.detach().clone() for k,g in zip(parameters,
+            torch.autograd.grad(loss, tuple(parameters.values()), allow_unused=True, retain_graph=retain_graph))}
+
+    def summary(values):
+        return {k:dict(norm=0. if v is None else float(v.norm()),
+                       max_abs=0. if v is None else float(v.abs().max()),
+                       is_none=v is None, finite=v is None or bool(torch.isfinite(v).all()))
+                for k,v in values.items()}
+
+    def compare(a, b):
+        report = {}
+        for k in a:
+            left, right = a[k], b[k]
+            if left is None and right is None:
+                absolute, relative = 0., 0.
+            else:
+                left = torch.zeros_like(right) if left is None else left
+                right = torch.zeros_like(left) if right is None else right
+                absolute = float((left-right).abs().max())
+                relative = float((left-right).norm()/left.norm().clamp_min(1e-20))
+            report[k] = dict(max_abs=absolute, relative_l2=relative,
+                             passed=absolute<=2e-6 and relative<=1e-5)
+        return report
+
+    for value in parameters.values():
+        value.requires_grad_(True)
+    handle = register_module_forward_hook(capture)
+    try:
+        losses, packs, gradient_sets, raw_errors = {}, {}, {}, {}
+        for mode in ('original', 'median', 'expected'):
+            raw_buffers.clear()
+            terms, package = (old_geometry(camera, pc, pipe, background, alpha) if mode == 'original'
+                else geometry_regularization(camera, pc, pipe, background, alpha, mode))
+            if len(raw_buffers) != 1:
+                raise RuntimeError('未唯一捕获实际geometry native allmap。')
+            raw = raw_buffers[0]
+            reference = (raw[0:1]/raw[1:2] if mode == 'expected' else raw[5:6])
+            reference = torch.nan_to_num(reference, 0, 0)
+            raw_errors[mode] = float((package['surf_depth'].detach()-reference).abs().max())
+            losses[mode] = {k:float(v.detach()) for k,v in terms.items()}
+            packs[mode] = {k:package[k].detach().clone() for k in
+                          ('surf_depth', 'rend_alpha', 'rend_normal', 'rend_dist')}
+            gradient_sets[mode] = {key:gradients(terms[key], retain_graph=(key!='distortion'))
+                for key in ('normal', 'alpha', 'distortion')}
+        median_grads = {k:compare(gradient_sets['original'][k], gradient_sets['median'][k])
+                        for k in ('normal', 'alpha', 'distortion')}
+        common_grads = {k:compare(gradient_sets['median'][k], gradient_sets['expected'][k])
+                        for k in ('alpha', 'distortion')}
+        maps_equal = {k:float((packs['median'][k]-packs['expected'][k]).abs().max())
+                      for k in ('rend_alpha', 'rend_normal', 'rend_dist')}
+        values_equal = all(losses['original'][k]==losses['median'][k] for k in losses['original'])
+        expected = summary(gradient_sets['expected']['normal'])
+        median = summary(gradient_sets['median']['normal'])
+        foreground = (alpha>.99) & (packs['median']['rend_alpha']>.5)
+        depth_difference = (packs['median']['surf_depth']-packs['expected']['surf_depth']).abs()[foreground]
+        unchanged = all(torch.equal(v, getattr(pc,k)) for k,v in snapshot.items()) and torch.equal(initial_light, lights.log_intensity)
+        rng_equal = random.getstate()==python_rng and torch.equal(torch.get_rng_state(),cpu_rng) and torch.equal(torch.cuda.get_rng_state(),gpu_rng)
+        checks = dict(raw_native_depth_matches=all(v==0 for v in raw_errors.values()),
+            median_old_forward_equal=values_equal,
+            median_old_gradients_equal=all(v['passed'] for term in median_grads.values() for v in term.values()),
+            alpha_normal_dist_maps_equal=all(v==0 for v in maps_equal.values()),
+            alpha_dist_values_equal=all(losses['median'][k]==losses['expected'][k] for k in ('alpha','distortion')),
+            alpha_dist_gradients_equal=all(v['passed'] for term in common_grads.values() for v in term.values()),
+            both_depths_active=depth_difference.numel()>0 and float(depth_difference.max())>0,
+            expected_xyz_rotation_allowed=all(expected[k]['finite'] and expected[k]['norm']>0 for k in ('xyz','rotation')),
+            expected_other_forbidden=all(expected[k]['finite'] and expected[k]['norm']==0 for k in ('scale','opacity','material','light')),
+            all_geometry_gradients_finite=all(v is None or bool(torch.isfinite(v).all()) for group in gradient_sets.values() for term in group.values() for v in term.values()),
+            source_parameters_unchanged=unchanged, rng_unchanged=bool(rng_equal), photo_pipe_unchanged=pipe.depth_ratio==pipe_ratio==1.)
+        return dict(status='PASS' if all(checks.values()) else 'FAILED', checks=checks,
+            selected_statistic=settings.normal_depth_statistic, values=losses, native_depth_max_error=raw_errors,
+            median_old_gradient_comparison=median_grads, common_alpha_dist_gradient_comparison=common_grads,
+            common_map_max_difference=maps_equal, normal_gradients=dict(median=median,expected=expected),
+            foreground_depth_difference_mean=float(depth_difference.mean()) if depth_difference.numel() else None,
+            foreground_depth_difference_max=float(depth_difference.max()) if depth_difference.numel() else None,
+            parameter_updates=0, photo_depth_ratio=pipe_ratio,
+            note='只改变训练normal损失的深度统计量；双向XYZ/q梯度保留。原评测与像素中心定义未修改。')
+    finally:
+        handle.remove()
+        for key, value in parameters.items():
+            value.requires_grad_(flags[key])
