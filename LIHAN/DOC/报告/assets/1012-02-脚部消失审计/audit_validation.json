@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "model": "1011-01",
+      "regional_original_function": "PASS",
+      "foreground_original_metrics": "PASS"
+    },
+    {
+      "model": "1011-27",
+      "regional_original_function": "PASS",
+      "foreground_original_metrics": "PASS"
+    },
+    {
+      "model": "1011-28",
+      "regional_original_function": "PASS",
+      "foreground_original_metrics": "PASS"
+    }
+  ],
+  "experiment_count": 18,
+  "checkpoint_count": 41,
+  "test_frames_per_checkpoint": 15,
+  "new_checkpoint_renders": 8,
+  "new_render_frames": 120,
+  "gradient_states": 4,
+  "gradient_frames_per_state": 135,
+  "source_hash_check": "PASS",
+  "image_decode": "PASS",
+  "parameter_optimizer_updates": 0,
+  "note": "PASS仅表示审计数值与来源核验；T13/T14脚部完整性结论为FAILED。"
+}

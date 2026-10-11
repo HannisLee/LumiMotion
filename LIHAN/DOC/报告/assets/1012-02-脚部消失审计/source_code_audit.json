@@ -1,0 +1,53 @@
+{
+  "source_code_sha256": {
+    "scene/static_dl_early_geometry.py": "bb14e04dd4a9035f79e72c0d848ac72fef0d624023fc41879f10e692e68895a7",
+    "scene/static_dl_photometric.py": "11eeb3f6f6edcdf5eb139f39f33299cf13e77080516be70f928b1f4af5c84e05",
+    "scene/static_dl_censored.py": "0b101abf66a304ffd977fc333e276d20dfd513a0850fc84dbe3bc553d7898d8b",
+    "scene/gaussian_model.py": "ecc51a879b9de64c15d9ff3f4c56d642bb271351a2bca6065b2d091db0b5fd92",
+    "scripts/train_static_dl.py": "fabae1911624a031db7b325c7f48c8035a61cd29a747e916f20832067030dabe",
+    "scripts/eval_geometry_gt.py": "181bbf006b9c032b9728e193ec6e5094d061baad30be503182c32e2512775e9e",
+    "utils/geometry_eval_utils.py": "4a8a373af98736d7780df41c446d137dcf3433e8e4ccacc50f24e2a48a344935"
+  },
+  "training_snapshot_match": [
+    {
+      "model": "1011-27",
+      "file": "scene/static_dl_early_geometry.py",
+      "same_as_training": true
+    },
+    {
+      "model": "1011-27",
+      "file": "scripts/train_static_dl.py",
+      "same_as_training": true
+    },
+    {
+      "model": "1011-27",
+      "file": "scene/static_dl_censored.py",
+      "same_as_training": true
+    },
+    {
+      "model": "1011-27",
+      "file": "scene/static_dl_photometric.py",
+      "same_as_training": true
+    },
+    {
+      "model": "1011-28",
+      "file": "scene/static_dl_early_geometry.py",
+      "same_as_training": true
+    },
+    {
+      "model": "1011-28",
+      "file": "scripts/train_static_dl.py",
+      "same_as_training": true
+    },
+    {
+      "model": "1011-28",
+      "file": "scene/static_dl_censored.py",
+      "same_as_training": true
+    },
+    {
+      "model": "1011-28",
+      "file": "scene/static_dl_photometric.py",
+      "same_as_training": true
+    }
+  ]
+}
