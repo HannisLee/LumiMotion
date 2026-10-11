@@ -17,7 +17,9 @@ CORE_FILES = ("scripts/train_stage1.py", "scripts/train_static_dl.py",
               "scripts/train_static_dl_depth_statistic.py",
               "LIHAN/scripts/goal_smoke_static_dl.py")
 EXTRA_ENTRIES = ("scripts/train_static_dl_direction_weighted.py",
-                 "scripts/train_static_dl_early_geometry.py")
+                 "scripts/train_static_dl_early_geometry.py",
+                 "scripts/train_static_dl_ambient.py",
+                 "scripts/train_static_dl_normal_opacity.py")
 
 
 def digest(path: Path) -> str:
