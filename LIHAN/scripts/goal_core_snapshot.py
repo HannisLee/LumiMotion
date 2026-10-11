@@ -16,6 +16,8 @@ CORE_FILES = ("scripts/train_stage1.py", "scripts/train_static_dl.py",
               "scripts/train_static_dl_censored.py",
               "scripts/train_static_dl_depth_statistic.py",
               "LIHAN/scripts/goal_smoke_static_dl.py")
+EXTRA_ENTRIES = ("scripts/train_static_dl_direction_weighted.py",
+                 "scripts/train_static_dl_early_geometry.py")
 
 
 def digest(path: Path) -> str:
@@ -29,9 +31,15 @@ def digest(path: Path) -> str:
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("name", help="快照子目录名")
+    parser.add_argument("--extra-entry", action="append", choices=EXTRA_ENTRIES, default=[],
+                        help="额外打包已完成的新入口；可重复指定，不纳入尚未完成的实验入口。")
     parser.add_argument("--control", type=Path,
                         default=ROOT / "output/1011-09-静态DL-Goal训练总控")
     args = parser.parse_args()
+    included_files = CORE_FILES + tuple(dict.fromkeys(args.extra_entry))
+    for relative in included_files:
+        if not (ROOT / relative).is_file():
+            raise FileNotFoundError(f"快照入口尚未完成：{relative}")
     destination = (args.control / "snapshots" / args.name).resolve()
     if destination.exists():
         raise FileExistsError(f"快照已存在，拒绝覆盖：{destination}")
@@ -39,7 +47,7 @@ def main():
     for directory in CORE_DIRS:
         shutil.copytree(ROOT / directory, destination / directory,
                         ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
-    for relative in CORE_FILES:
+    for relative in included_files:
         target = destination / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(ROOT / relative, target)
@@ -69,7 +77,7 @@ def main():
         "source_root": str(ROOT),
         "destination": str(destination),
         "included_directories": list(CORE_DIRS),
-        "included_files": list(CORE_FILES),
+        "included_files": list(included_files),
         "excluded": ["LIHAN/DOC", "archive", "output", "data", "large history artifacts"],
         "runtime_dependencies": ["lumimotion-ushas Conda environment", "bootstrap_1011.py repository native_module CUDA rasterizer"],
         "file_sha256": files,
