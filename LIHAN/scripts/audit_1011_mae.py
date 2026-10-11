@@ -121,6 +121,8 @@ for name, operation in [('geometry', geometry)] + ([('albedo', albedo)] if ITERA
     except Exception as error:
         errors.append(f'{name}：{type(error).__name__}：{error}')
 roughness = ROOT / 'roughness/metrics.json'
+if '--require-roughness' in sys.argv[3:] and not roughness.exists():
+    errors.append('PBR Roughness评测失败：缺少metrics.json；不能把仅几何及Albedo通过记为全部MAE通过。')
 if roughness.exists():
     metrics = json.loads(roughness.read_text())
     results['roughness'] = metrics['summaries']['foreground']['mae']
@@ -128,6 +130,12 @@ if roughness.exists():
     verification = list((ROOT / 'roughness').glob('*verif*.json'))
     if not verification:
         errors.append('Roughness缺少独立验证JSON。')
+    else:
+        verified = json.loads(verification[0].read_text())
+        if not verified.get('passed') or verified.get('frames') != 15:
+            errors.append('Roughness独立验证没有通过全部15帧。')
+        elif verified.get('metrics_sha256') != hashlib.sha256(roughness.read_bytes()).hexdigest():
+            errors.append('Roughness独立验证与指标文件哈希不一致。')
 results.update(status='FAILED' if errors else 'PASS', iteration=ITERATION, test_frames=15,
                details=details, errors=errors)
 ROOT.mkdir(parents=True, exist_ok=True)

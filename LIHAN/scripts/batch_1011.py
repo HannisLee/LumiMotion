@@ -149,7 +149,8 @@ def eval_commands(exp, iteration):
         ('verify_roughness', [PY, '-m', 'scripts.verify_roughness_eval', str(out / 'roughness'),
                               '--output', str(out / 'roughness/verification.json')])
     ]) + [('verify_all_mae', [PY, str(ROOT / 'LIHAN/scripts/audit_1011_mae.py'),
-                             str(out), str(iteration)])]
+                             str(out), str(iteration)] +
+          (['--require-roughness'] if iteration == 55000 and exp['kind'] != 'lambertian' else []))]
 
 
 def shell_line(command):
@@ -295,7 +296,7 @@ def execute(exp, step, command, gpu=None):
         raise RuntimeError(f'{step}退出码{code}；日志{log_path}')
 
 
-def gpu_acquire(exp):
+def gpu_acquire(exp, update_waiting=True):
     import collections
     lock_file = CONTROL / 'gpu.lock'
     while True:
@@ -331,7 +332,8 @@ def gpu_acquire(exp):
                 write_json(allocations_path, active)
                 return gpu
             write_json(allocations_path, active)
-        update(exp, status='WAITING_GPU', stage='等待每卡最多2任务及12GB空闲显存')
+        if update_waiting:
+            update(exp, status='WAITING_GPU', stage='等待每卡最多2任务及12GB空闲显存')
         time.sleep(20)
 
 
@@ -470,6 +472,8 @@ def prepare_gt(index):
 
 
 def refresh():
+    if (CONTROL / 'final_backfill.json').exists():
+        return  # 已验收的实际结论由backfill_1011_report.py维护，避免旧监控回退为PENDING。
     if not CONFIG.exists():
         return
     with (CONTROL / 'report.lock').open('a') as lock:
