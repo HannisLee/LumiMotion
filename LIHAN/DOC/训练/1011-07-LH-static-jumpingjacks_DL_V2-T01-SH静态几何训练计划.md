@@ -18,4 +18,13 @@ CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 MKL_NUM_THREADS=
 
 ## 检查点与状态
 
-计划保存iteration 10000、20000、30000、35000；测试重建在35000执行。训练中追加每阶段检查点、日志尾部、运行PID、GPU占用与迭代状态。完整训练结束后由评测代理对完整15帧按既有协议评测GS／Depth／Mesh法线MAE；四类可视化RGB／Alpha／Normal／分离目检和最终PASS/FAILED在实验README及本计划回填。当前计划状态：PENDING。
+计划保存iteration 10000、20000、30000、35000；测试重建在35000执行。训练中追加每阶段检查点、日志尾部、运行PID、GPU占用与迭代状态。完整训练结束后由评测代理对完整15帧按既有协议评测GS／Depth／Mesh法线MAE；四类可视化RGB／Alpha／Normal／分离目检和最终PASS/FAILED在实验README及本计划回填。当前计划状态：RUNNING；正式重试PID 1972511，启动于2026-10-11T07:31:24Z，output/1011-13-LH-static-jumpingjacks_DL_V2-T01-SH静态零形变-nativeRasterizer。
+
+
+## 启动协议修正及T01正式重试（2026-10-11T07:35:15.408272+00:00）
+
+第一次#10启动日志止于`Reading Training Transforms`，无traceback、无退出码，PID已不存在，退出原因未知。该入口直接运行旧快照，未经过`bootstrap_1011.py`绑定仓库native rasterizer，故标记启动协议失败并保留日志/配置/模型目录，不用于本Goal结论。首轮smoke同样因未绑定native rasterizer而作废，零梯度审计及渲染文件完整保留。
+
+验证后的SH smoke位于`output/smoke_test/1011-06-LH-static-jumpingjacks_DL_V2-T01-SH-native-assets冒烟`：bootstrap成功，exit 0；20/20步d_color梯度有限且非零；151个任意时间点输出几何严格为零；点云与共同初始化sha吻合。`static_dl_training.json`保存repository native source SHA及.so SHA。独立重载验证见同目录`reload_validation/`。
+
+正式T01重试输出改用`output/1011-13-LH-static-jumpingjacks_DL_V2-T01-SH静态零形变-nativeRasterizer`，避免覆盖失败#10。启动命令先执行`LIHAN/scripts/bootstrap_1011.py <snapshot> scripts.train_static_dl`；使用带退出码监督的持久exec session。核心快照为`output/1011-09-静态DL-Goal训练总控/snapshots/T01-sh-native-assets-20261011`，包括训练入口依赖的`assets/bsdf_256_256.bin`。
