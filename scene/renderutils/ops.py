@@ -75,12 +75,10 @@ def _get_plugin():
 
     # Compile and load.
     source_paths = [os.path.join(os.path.dirname(__file__), fn) for fn in source_files]
-    torch.utils.cpp_extension.load(name='renderutils_plugin', sources=source_paths, extra_cflags=opts,
+    _cached_plugin = torch.utils.cpp_extension.load(name='renderutils_plugin', sources=source_paths, extra_cflags=opts,
          extra_cuda_cflags=opts, extra_ldflags=ldflags, with_cuda=True, verbose=True)
 
-    # Import, cache, and return the compiled module.
-    import renderutils_plugin
-    _cached_plugin = renderutils_plugin
+    # load() returns the module even when the build directory is not on sys.path.
     return _cached_plugin
 
 #----------------------------------------------------------------------------
