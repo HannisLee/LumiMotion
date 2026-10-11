@@ -1,0 +1,482 @@
+{
+  "1011-27": [
+    {
+      "iteration": 8700,
+      "camera": "image_0108",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.004044635687023401,
+      "alpha": 0.003878974821418524,
+      "normal": 0.017913993448019028,
+      "distortion": 5.388355361901631e-08,
+      "visibility": 0.6523732542991638,
+      "points": 63780,
+      "light": [
+        6.331375598907471
+      ],
+      "shadow_downweight_fraction": 0.012756249867379665,
+      "highlight_downweight_fraction": 0.003381249960511923
+    },
+    {
+      "iteration": 8800,
+      "camera": "image_0071",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.004458107985556126,
+      "alpha": 0.005230269860476255,
+      "normal": 0.019489876925945282,
+      "distortion": 4.15043679424798e-08,
+      "visibility": 0.6585270166397095,
+      "points": 64270,
+      "light": [
+        6.321173667907715
+      ],
+      "shadow_downweight_fraction": 0.013043750077486038,
+      "highlight_downweight_fraction": 0.00459374999627471
+    },
+    {
+      "iteration": 8900,
+      "camera": "image_0135",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.004022330977022648,
+      "alpha": 0.0038976629730314016,
+      "normal": 0.02331492118537426,
+      "distortion": 7.420106840072549e-08,
+      "visibility": 0.6522524356842041,
+      "points": 64768,
+      "light": [
+        6.3377909660339355
+      ],
+      "shadow_downweight_fraction": 0.06383749842643738,
+      "highlight_downweight_fraction": 0.0033187498338520527
+    },
+    {
+      "iteration": 9000,
+      "camera": "image_0104",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.004636452067643404,
+      "alpha": 0.006965174805372953,
+      "normal": 0.014460108242928982,
+      "distortion": 1.2444914432307996e-08,
+      "visibility": 0.6525167226791382,
+      "points": 65252,
+      "light": [
+        6.338840007781982
+      ],
+      "shadow_downweight_fraction": 0.013987499289214611,
+      "highlight_downweight_fraction": 0.0041624996811151505
+    },
+    {
+      "iteration": 9100,
+      "camera": "image_0077",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.009647767059504986,
+      "alpha": 0.0031801355071365833,
+      "normal": 0.03624474257230759,
+      "distortion": 1.4858245833693218e-07,
+      "visibility": 0.6364684104919434,
+      "points": 65721,
+      "light": [
+        6.7075090408325195
+      ],
+      "shadow_downweight_fraction": 0.02005000039935112,
+      "highlight_downweight_fraction": 0.02433124929666519
+    },
+    {
+      "iteration": 9200,
+      "camera": "image_0019",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.00596885709092021,
+      "alpha": 0.0071552167646586895,
+      "normal": 0.015754127874970436,
+      "distortion": 1.5528799579556107e-08,
+      "visibility": 0.7033471465110779,
+      "points": 53091,
+      "light": [
+        6.669581413269043
+      ],
+      "shadow_downweight_fraction": 0.14356249570846558,
+      "highlight_downweight_fraction": 0.00771249970421195
+    },
+    {
+      "iteration": 9300,
+      "camera": "image_0038",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.004890268202871084,
+      "alpha": 0.004029237665235996,
+      "normal": 0.020220790058374405,
+      "distortion": 6.080022529886264e-08,
+      "visibility": 0.6944040060043335,
+      "points": 53811,
+      "light": [
+        6.6445512771606445
+      ],
+      "shadow_downweight_fraction": 0.07056874781847,
+      "highlight_downweight_fraction": 0.006887499708682299
+    },
+    {
+      "iteration": 9400,
+      "camera": "image_0076",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.005118349101394415,
+      "alpha": 0.0061914678663015366,
+      "normal": 0.01488307025283575,
+      "distortion": 1.53518815437792e-08,
+      "visibility": 0.6835827827453613,
+      "points": 54487,
+      "light": [
+        6.629358768463135
+      ],
+      "shadow_downweight_fraction": 0.01821875013411045,
+      "highlight_downweight_fraction": 0.004981250036507845
+    },
+    {
+      "iteration": 9500,
+      "camera": "image_0087",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.004467094782739878,
+      "alpha": 0.0035602522548288107,
+      "normal": 0.022141294553875923,
+      "distortion": 8.658970074293393e-08,
+      "visibility": 0.6595135927200317,
+      "points": 55101,
+      "light": [
+        6.625483989715576
+      ],
+      "shadow_downweight_fraction": 0.014624999836087227,
+      "highlight_downweight_fraction": 0.0043312497437000275
+    },
+    {
+      "iteration": 9600,
+      "camera": "image_0054",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.004102341365069151,
+      "alpha": 0.0030097458511590958,
+      "normal": 0.02060513012111187,
+      "distortion": 9.231711572965651e-08,
+      "visibility": 0.6768279075622559,
+      "points": 55615,
+      "light": [
+        6.635939121246338
+      ],
+      "shadow_downweight_fraction": 0.01458125002682209,
+      "highlight_downweight_fraction": 0.002868749899789691
+    },
+    {
+      "iteration": 9700,
+      "camera": "image_0004",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.00415465934202075,
+      "alpha": 0.0049712322652339935,
+      "normal": 0.015581886284053326,
+      "distortion": 1.9539129425538704e-08,
+      "visibility": 0.7085029482841492,
+      "points": 56126,
+      "light": [
+        6.631265640258789
+      ],
+      "shadow_downweight_fraction": 0.15803124010562897,
+      "highlight_downweight_fraction": 0.0035062499810010195
+    },
+    {
+      "iteration": 9800,
+      "camera": "image_0074",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.004641177598387003,
+      "alpha": 0.0029709634836763144,
+      "normal": 0.021404581144452095,
+      "distortion": 8.610677326714722e-08,
+      "visibility": 0.6851825714111328,
+      "points": 56582,
+      "light": [
+        6.620904445648193
+      ],
+      "shadow_downweight_fraction": 0.014525000005960464,
+      "highlight_downweight_fraction": 0.0035749999806284904
+    },
+    {
+      "iteration": 9900,
+      "camera": "image_0047",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.0044403295032680035,
+      "alpha": 0.004462407436221838,
+      "normal": 0.021829921752214432,
+      "distortion": 5.461465946154931e-08,
+      "visibility": 0.6738454103469849,
+      "points": 57007,
+      "light": [
+        6.618239402770996
+      ],
+      "shadow_downweight_fraction": 0.016993749886751175,
+      "highlight_downweight_fraction": 0.0038999998942017555
+    },
+    {
+      "iteration": 10000,
+      "camera": "image_0141",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.0035703720059245825,
+      "alpha": 0.0029443970415741205,
+      "normal": 0.021135015413165092,
+      "distortion": 8.957451314017817e-08,
+      "visibility": 0.6439946889877319,
+      "points": 57465,
+      "light": [
+        6.631706714630127
+      ],
+      "shadow_downweight_fraction": 0.07080624997615814,
+      "highlight_downweight_fraction": 0.002300000051036477
+    }
+  ],
+  "1011-28": [
+    {
+      "iteration": 8700,
+      "camera": "image_0108",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.004694437608122826,
+      "alpha": 0.00385667709633708,
+      "normal": 0.019060522317886353,
+      "distortion": 5.2629236080292685e-08,
+      "visibility": 0.5141879320144653,
+      "points": 74968,
+      "light": [
+        11.566593170166016
+      ],
+      "shadow_downweight_fraction": 0.012887499295175076,
+      "highlight_downweight_fraction": 0.005743749905377626
+    },
+    {
+      "iteration": 8800,
+      "camera": "image_0071",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.004603051580488682,
+      "alpha": 0.005126339849084616,
+      "normal": 0.022543705999851227,
+      "distortion": 4.226902916570907e-08,
+      "visibility": 0.5254511833190918,
+      "points": 75678,
+      "light": [
+        11.535606384277344
+      ],
+      "shadow_downweight_fraction": 0.011143749579787254,
+      "highlight_downweight_fraction": 0.005574999842792749
+    },
+    {
+      "iteration": 8900,
+      "camera": "image_0135",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.0036342875100672245,
+      "alpha": 0.003932800143957138,
+      "normal": 0.026291044428944588,
+      "distortion": 7.502121235347659e-08,
+      "visibility": 0.5946059226989746,
+      "points": 76356,
+      "light": [
+        11.530004501342773
+      ],
+      "shadow_downweight_fraction": 0.06300625205039978,
+      "highlight_downweight_fraction": 0.003924999851733446
+    },
+    {
+      "iteration": 9000,
+      "camera": "image_0104",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.004821282811462879,
+      "alpha": 0.0067305671982467175,
+      "normal": 0.01761961542069912,
+      "distortion": 1.2822934714051826e-08,
+      "visibility": 0.5160942673683167,
+      "points": 76999,
+      "light": [
+        11.516480445861816
+      ],
+      "shadow_downweight_fraction": 0.014174999669194221,
+      "highlight_downweight_fraction": 0.00494999997317791
+    },
+    {
+      "iteration": 9100,
+      "camera": "image_0077",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.008928804658353329,
+      "alpha": 0.003187567228451371,
+      "normal": 0.04167434945702553,
+      "distortion": 1.982236170761098e-07,
+      "visibility": 0.5900861024856567,
+      "points": 77641,
+      "light": [
+        11.615233421325684
+      ],
+      "shadow_downweight_fraction": 0.02514375001192093,
+      "highlight_downweight_fraction": 0.01178749930113554
+    },
+    {
+      "iteration": 9200,
+      "camera": "image_0019",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.006977637764066458,
+      "alpha": 0.03720145672559738,
+      "normal": 0.0034944317303597927,
+      "distortion": 8.223924652384085e-09,
+      "visibility": 0.6873353719711304,
+      "points": 58648,
+      "light": [
+        11.513506889343262
+      ],
+      "shadow_downweight_fraction": 0.16208124160766602,
+      "highlight_downweight_fraction": 0.005649999715387821
+    },
+    {
+      "iteration": 9300,
+      "camera": "image_0038",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.006291751284152269,
+      "alpha": 0.004047457594424486,
+      "normal": 0.02010459080338478,
+      "distortion": 7.520043965314471e-08,
+      "visibility": 0.6658286452293396,
+      "points": 59468,
+      "light": [
+        11.449479103088379
+      ],
+      "shadow_downweight_fraction": 0.08660624921321869,
+      "highlight_downweight_fraction": 0.00413749972358346
+    },
+    {
+      "iteration": 9400,
+      "camera": "image_0076",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.007352342829108238,
+      "alpha": 0.011247924529016018,
+      "normal": 0.005141829140484333,
+      "distortion": 1.0249871174039527e-08,
+      "visibility": 0.5575516223907471,
+      "points": 60251,
+      "light": [
+        11.400744438171387
+      ],
+      "shadow_downweight_fraction": 0.027306249365210533,
+      "highlight_downweight_fraction": 0.003949999809265137
+    },
+    {
+      "iteration": 9500,
+      "camera": "image_0087",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.005894494708627462,
+      "alpha": 0.0036429695319384336,
+      "normal": 0.022956056520342827,
+      "distortion": 9.484794105674155e-08,
+      "visibility": 0.5229612588882446,
+      "points": 60984,
+      "light": [
+        11.39628791809082
+      ],
+      "shadow_downweight_fraction": 0.018549999222159386,
+      "highlight_downweight_fraction": 0.0028874999843537807
+    },
+    {
+      "iteration": 9600,
+      "camera": "image_0054",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.005467016715556383,
+      "alpha": 0.003026077523827553,
+      "normal": 0.02038014493882656,
+      "distortion": 9.588872984522823e-08,
+      "visibility": 0.6090434193611145,
+      "points": 61686,
+      "light": [
+        11.402799606323242
+      ],
+      "shadow_downweight_fraction": 0.01926874928176403,
+      "highlight_downweight_fraction": 0.0023312498815357685
+    },
+    {
+      "iteration": 9700,
+      "camera": "image_0004",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.005916218739002943,
+      "alpha": 0.00508519820868969,
+      "normal": 0.011571675539016724,
+      "distortion": 2.122954789740561e-08,
+      "visibility": 0.6999884843826294,
+      "points": 62371,
+      "light": [
+        11.394974708557129
+      ],
+      "shadow_downweight_fraction": 0.16716249287128448,
+      "highlight_downweight_fraction": 0.003674999810755253
+    },
+    {
+      "iteration": 9800,
+      "camera": "image_0074",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.006057067308574915,
+      "alpha": 0.0029799360781908035,
+      "normal": 0.021224727854132652,
+      "distortion": 8.777350046784704e-08,
+      "visibility": 0.5640023946762085,
+      "points": 63044,
+      "light": [
+        11.36296272277832
+      ],
+      "shadow_downweight_fraction": 0.017606249079108238,
+      "highlight_downweight_fraction": 0.002512499922886491
+    },
+    {
+      "iteration": 9900,
+      "camera": "image_0047",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.005811299663037062,
+      "alpha": 0.004499005153775215,
+      "normal": 0.021093087270855904,
+      "distortion": 5.7780543016860975e-08,
+      "visibility": 0.6375739574432373,
+      "points": 63646,
+      "light": [
+        11.35831356048584
+      ],
+      "shadow_downweight_fraction": 0.02306249924004078,
+      "highlight_downweight_fraction": 0.0037812499795109034
+    },
+    {
+      "iteration": 10000,
+      "camera": "image_0141",
+      "normal_active": true,
+      "dist_active": true,
+      "photo": 0.004018701612949371,
+      "alpha": 0.002940780483186245,
+      "normal": 0.021273482590913773,
+      "distortion": 8.923083072431837e-08,
+      "visibility": 0.6340125203132629,
+      "points": 64309,
+      "light": [
+        11.361905097961426
+      ],
+      "shadow_downweight_fraction": 0.07262499630451202,
+      "highlight_downweight_fraction": 0.002868749899789691
+    }
+  ]
+}
