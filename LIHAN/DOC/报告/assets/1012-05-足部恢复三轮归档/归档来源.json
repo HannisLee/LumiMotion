@@ -1,0 +1,27 @@
+[
+  {
+    "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/spatial_diagnostic/figures/footwear_zoom_0010.png",
+    "archived": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-05-足部恢复三轮归档/T03侧面鞋部.png",
+    "sha256": "b7842b6cd120aa54b197d205e8ca421274c4d635204039ba7d3901dab6b99f6c"
+  },
+  {
+    "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/spatial_diagnostic/figures/footwear_zoom_0150.png",
+    "archived": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-05-足部恢复三轮归档/T03正面鞋部.png",
+    "sha256": "17271ae2ee706b939b334d0b460accb4c6c4c0f27527e91503d97a6f97263180"
+  },
+  {
+    "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/spatial_diagnostic/figures/footwear_zoom_0080.png",
+    "archived": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-05-足部恢复三轮归档/T03俯视鞋部.png",
+    "sha256": "3f157b01f3c68ceb73b435ea16fcae0d8cb88fcc1825b1dda326f51d33459329"
+  },
+  {
+    "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/four_classes/four_classes_10_80_150.png",
+    "archived": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-05-足部恢复三轮归档/T03四类三视角.png",
+    "sha256": "ab9428334913e4bfe4412d08e2421f95713a015a3ab54884751f7acb14a3fd6f"
+  },
+  {
+    "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-10-LH-static-jumpingjacks_DL_V2-F-T02-跳过重置足部恢复2k/evaluation_16000/spatial_diagnostic/figures/footwear_zoom_0150.png",
+    "archived": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-05-足部恢复三轮归档/T02正面鞋部.png",
+    "sha256": "2cb85d7c68b6af2e6ca8c7508db1c606f19f6162744d34c0654a1adb5b29b523"
+  }
+]
