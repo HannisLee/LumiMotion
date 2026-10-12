@@ -2,11 +2,14 @@
 """最佳T06增密配对独立来源适配；实际RGB仍冻结ambient renderer，a固定0。"""
 from pathlib import Path
 import sys
+import argparse
+import random
+import math
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from goal_eval_protocol import FRAMES, read, digest
+from goal_eval_protocol import FRAMES, PYTHON, read, digest
 
 ENTRY = 'scripts/train_static_dl_foot_densify.py'
 NEW_SOURCES = (ENTRY, 'scene/static_dl_foot_densify.py', 'scene/static_dl_foot_recovery.py', 'scene/static_dl_normal_opacity.py', 'scene/static_dl_ambient.py',
@@ -15,7 +18,9 @@ NEW_SOURCES = (ENTRY, 'scene/static_dl_foot_densify.py', 'scene/static_dl_foot_r
 
 
 def actual_sources(model):
-    model = Path(model)
+    model = Path(model).resolve()
+    if not model.is_relative_to(ROOT / 'output') or model.name != 'model_mlp':
+        raise AssertionError('实际模型必须仓库output内model_mlp。')
     marker_path = model / 'foot_densify_training.json'
     marker = read(marker_path)
     route = marker['normal_opacity_route']
@@ -45,8 +50,10 @@ def actual_sources(model):
     budget = 110 if marker['smoke'] else 2000
     if marker['update_budget'] != budget or marker['args']['steps'] != budget or marker['args']['smoke'] != marker['smoke']:
         raise AssertionError('正式2k或真实110步smoke预算错误。')
-    if marker['args']['save_steps'] != ([100,110] if marker['smoke'] else [500,1000,1500,2000]):
+    if set(marker['args']['save_steps']) != ({100,110} if marker['smoke'] else {500,1000,1500,2000}):
         raise AssertionError('保存迭代不符预注册预算。')
+    if marker['args']['audit_only'] or marker['frozen_training_inputs_match'] is not True or marker['frozen_native_provenance_match'] is not True:
+        raise AssertionError('须真实训练入口及原输入/native冻结门禁，不能使用audit_only模型。')
     if marker['train_images'] != 135 or marker['test_images_loaded'] or marker['forbidden_gt_supervision']:
         raise AssertionError('必须仅135训练RGB/Alpha，无额外GT监督。')
     for group in ('initial_sources', 'training_inputs'):
@@ -74,6 +81,22 @@ def actual_sources(model):
     for name,expected in initial_marker_sha.items():
         if marker['initial_sources'].get(str(init/name)) != expected:
             raise AssertionError('冻结T06起点marker SHA错误：'+name)
+    initial = read(init/'reset_audit_training.json')
+    if len(marker['training_inputs']) != 137 or marker['training_inputs'] != initial['training_inputs']:
+        raise AssertionError('必须完整匹配G2-T06冻结的137训练输入集合与SHA。')
+    # 只接受entry明确更新的运行/方法元数据，loss和其余物理配置逐项保持。
+    inherited = read(init/'static_dl_training.json')['args']
+    allowed = {'model_path','source_path','iterations','data_device','load2gpu_on_the_fly','save_iterations',
+               'test_iterations','ambient_mode','ambient_cap','ambient_lr','normal_opacity_route','reset_policy','densification_route'}
+    config = marker['inherited_config']
+    if set(config)-set(inherited)-allowed or set(inherited)-set(config) or any(config[k] != v for k,v in inherited.items() if k not in allowed):
+        raise AssertionError('存在未经允许的loss/物理/学习率/增密配置改变。')
+    if Path(config['model_path']).resolve() != model or Path(config['source_path']).resolve() != Path(inherited['source_path']).resolve():
+        raise AssertionError('实际模型或原训练source不同。')
+    if config['iterations'] != 16000+budget or config['save_iterations'] != [16000+n for n in sorted(set(marker['args']['save_steps']))] or config['test_iterations']:
+        raise AssertionError('真实保存迭代/预算或测试加载不符。')
+    if ('smoke_test' in model.parts) != bool(marker['smoke']):
+        raise AssertionError('smoke与正式模型输出范围不符。')
     if marker['initial_point_count'] != 67081 or marker['source_boundary_reset_replayed'] or marker['xyz_lr_global_schedule_steps'] != 30000:
         raise AssertionError('实际T06点数/边界reset/原30k LR声明不符。')
     if marker['inherited_direct_intensity'] != read(init/'static_dl_lighting/iteration_16000/lighting.json')['intensity_from_train_rgb']:
@@ -85,9 +108,20 @@ def actual_sources(model):
     for path in available:
         record = read(path)
         argv = record.get('argv') or record.get('command')
-        if not isinstance(argv, list) or len(argv) < 4 or Path(argv[1]).resolve() != ROOT / 'LIHAN/scripts/bootstrap_1011.py' or argv[3] != 'scripts.train_static_dl_foot_densify':
-            raise AssertionError('必须真实bootstrap+foot_recovery模块。')
+        if not isinstance(argv, list) or len(argv) < 4 or Path(argv[0]).absolute() != Path(PYTHON) or Path(argv[1]).resolve() != ROOT / 'LIHAN/scripts/bootstrap_1011.py' or argv[3] != 'scripts.train_static_dl_foot_densify':
+            raise AssertionError('必须ushas Python、真实bootstrap及foot_densify模块。')
+        parsed = parse_training_argv(argv)
+        for k in ('init_model','model_path','source_path'):
+            if Path(parsed[k]).resolve() != Path(marker['args'][k]).resolve():
+                raise AssertionError('真实CLI路径与marker不同：'+k)
+        for k in ('init_iteration','densification_route','steps','seed','smoke','audit_only'):
+            if parsed[k] != marker['args'][k]:
+                raise AssertionError('真实CLI与marker不同：'+k)
+        if set(parsed['save_steps']) != set(marker['args']['save_steps']) or Path(parsed['model_path']).resolve() != model:
+            raise AssertionError('CLI保存预算/模型路径不一致。')
         snapshot = Path(argv[2]).resolve()
+        if not snapshot.is_relative_to(ROOT/'output') or snapshot == ROOT/'output':
+            raise AssertionError('必须output内独立训练快照。')
         if record.get('snapshot') and Path(record['snapshot']).resolve() != snapshot:
             raise AssertionError('snapshot元数据冲突。')
         manifest_path = snapshot / 'snapshot_manifest.json'
@@ -96,6 +130,12 @@ def actual_sources(model):
         manifest = read(manifest_path)
         if manifest['status'] != 'READY' or Path(manifest['destination']).resolve() != snapshot:
             raise AssertionError('snapshot尚未READY或目录不符。')
+        if record.get('snapshot_manifest_sha256') != digest(manifest_path) or record.get('entry_sha256') != manifest['file_sha256'].get(ENTRY):
+            raise AssertionError('真实命令未绑定manifest/entry SHA。')
+        for relative, expected in manifest['file_sha256'].items():
+            saved = (snapshot/relative).resolve()
+            if not saved.is_relative_to(snapshot) or digest(saved) != expected:
+                raise AssertionError('完整快照文件SHA不一致：'+relative)
         snapshots.add(snapshot)
         sources.update({str(path.resolve()): digest(path), str(manifest_path): digest(manifest_path), str(Path(argv[1]).resolve()): digest(argv[1])})
         for relative in NEW_SOURCES + ('scene/cameras.py',):
@@ -118,6 +158,62 @@ def actual_sources(model):
     sources.update(marker['initial_sources'])
     sources.update(marker['training_inputs'])
     return marker, sources
+
+
+def parse_training_argv(argv):
+    """CPU独立解析真实CLI，不能用marker自我证明入口或配置。"""
+    parser = argparse.ArgumentParser(add_help=False)
+    for k in ('init_model','model_path','source_path','densification_route'):
+        parser.add_argument('--'+k,required=True)
+    for k in ('init_iteration','steps'):
+        parser.add_argument('--'+k,type=int,required=True)
+    parser.add_argument('--seed',type=int,default=1012)
+    parser.add_argument('--save_steps',type=int,nargs='+',required=True)
+    parser.add_argument('--smoke',action='store_true')
+    parser.add_argument('--audit_only',action='store_true')
+    try:
+        return vars(parser.parse_args(argv[4:]))
+    except SystemExit as error:
+        raise AssertionError('真实训练CLI无效或存在未允许参数。') from error
+
+
+def initialization_evidence(model, marker):
+    """CPU核对真实初始化原始数值和独立seed/LR，PASS只描述已有训练证据。"""
+    model = Path(model).resolve()
+    path = model/'initialization_audit.json'
+    audit = read(path)
+    keys = {'parameters_unchanged','gaussian_adam_empty','light_adam_empty','statistics_zero'}
+    if audit['status'] != 'PASS' or set(audit['checks']) != keys or not all(v is True for v in audit['checks'].values()):
+        raise AssertionError('真实初始化四检查未通过。')
+    before,after = audit['loaded_parameter_hashes'],audit['initialized_parameter_hashes']
+    required = {'_xyz','_rotation','_scaling','_opacity','_albedo_dc','light_log_intensity'}
+    if before != after or not required.issubset(before):
+        raise AssertionError('加载后参数与新优化器初始化后参数SHA不同。')
+    for name,item in before.items():
+        if len(item['sha256']) != 64 or any(c not in '0123456789abcdef' for c in item['sha256']) or item['dtype'] != 'torch.float32':
+            raise AssertionError('实际参数哈希格式/精度无效：'+name)
+        if name != 'light_log_intensity' and (not item['shape'] or item['shape'][0] != marker['initial_point_count']):
+            raise AssertionError('实际加载参数形状与T06点数不符：'+name)
+    if audit['point_count'] != marker['initial_point_count'] or audit['optimizer_updates'] != 0 or audit['restored_optimizer'] is not False or audit['gaussian_optimizer_state_count'] != 0 or audit['light_optimizer_state_count'] != 0:
+        raise AssertionError('实际初始化非零更新或非新Adam。')
+    if set(audit['statistic_nonzero_counts']) != {'xyz_gradient_accum','denom','max_radii2D'} or any(v != 0 for v in audit['statistic_nonzero_counts'].values()):
+        raise AssertionError('实际增密统计未全部清零。')
+    config = marker['inherited_config']
+    t = min(max(16000/config['position_lr_max_steps'],0),1)
+    expected_lr = math.exp((1-t)*math.log(config['position_lr_init']*5)+t*math.log(config['position_lr_final']*5))
+    if not math.isclose(audit['xyz_lr'],expected_lr,rel_tol=1e-12,abs_tol=1e-15) or audit['xyz_lr'] != marker['initial_xyz_lr'] or marker['initial_optimizer_groups']['xyz'] != audit['xyz_lr']:
+        raise AssertionError('实际16k起点XYZ LR与原30k日程不同。')
+    metadata_path = Path(config['source_path'])/'transforms_train.json'
+    records = sorted(read(metadata_path)['frames'],key=lambda r:int(Path(r['file_path']).stem.split('_')[-1]))
+    if len(records) != 135 or {r['source_frame'] for r in records} != set(range(1,151))-set(FRAMES):
+        raise AssertionError('首相机推导必须原135训练输入。')
+    index = random.Random(marker['args']['seed']).randrange(len(records))
+    name = Path(records[index]['file_path']).stem
+    if audit['expected_first_camera_index'] != index or audit['expected_first_camera'] != name or marker['expected_first_camera_index'] != index or marker['expected_first_camera'] != name:
+        raise AssertionError('实际初始化首相机与独立seed推导不符。')
+    return dict(status='PASS_RECORDED_INITIALIZATION_EVIDENCE',path=str(path),sha256=digest(path),
+                checks=audit['checks'],point_count=audit['point_count'],expected_xyz_lr=expected_lr,
+                first_camera_index=index,first_camera=name,optimizer_state_restored=False)
 
 
 def physical_renderer(run, iteration, eval_directions):
