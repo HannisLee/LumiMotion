@@ -1,0 +1,27 @@
+[
+  {
+    "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-09-LH-static-jumpingjacks_DL_V2-G2-T06-reset后normal阻断透明度2k/evaluation_16000/spatial_diagnostic/figures/footwear_zoom_0010.png",
+    "destination": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-06-足部恢复新轮最佳法线基线复核/T06侧面鞋部.png",
+    "sha256": "7ef81ce7b210549877ec0f94e045af9147f37889ccb94f5e8496e7e6a3f5d8ab"
+  },
+  {
+    "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-09-LH-static-jumpingjacks_DL_V2-G2-T06-reset后normal阻断透明度2k/evaluation_16000/spatial_diagnostic/figures/footwear_zoom_0020.png",
+    "destination": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-06-足部恢复新轮最佳法线基线复核/T06正面鞋部.png",
+    "sha256": "905cefc17c9f889a197eba3595250bfeed96a4a5515c1da6626746ed8e31d7c6"
+  },
+  {
+    "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-09-LH-static-jumpingjacks_DL_V2-G2-T06-reset后normal阻断透明度2k/evaluation_16000/spatial_diagnostic/figures/footwear_zoom_0080.png",
+    "destination": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-06-足部恢复新轮最佳法线基线复核/T06俯视鞋部.png",
+    "sha256": "f41c22fb6e6dd20ac168ffe94e487448e3289814fd9eed6ae1374704b646c7f0"
+  },
+  {
+    "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-09-LH-static-jumpingjacks_DL_V2-G2-T06-reset后normal阻断透明度2k/evaluation_16000/four_classes/four_classes_10_80_150.png",
+    "destination": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-06-足部恢复新轮最佳法线基线复核/T06四类三视角.png",
+    "sha256": "a32ad3325b9574d1f2e9386251a4d01dea6d7fc3f338bfa6f805ab1a74b0d06f"
+  },
+  {
+    "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-13-LH-static-jumpingjacks_DL_V2-G2-T06新轮冻结基线复核/基线复核.json",
+    "destination": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-06-足部恢复新轮最佳法线基线复核/基线复核.json",
+    "sha256": "08f26bcfcaad545c257af301c9e5e04e80f05487a5339ce5c9af6fd7aa7b413b"
+  }
+]
