@@ -1,0 +1,707 @@
+{
+  "rounds": [
+    {
+      "label": "F-T01",
+      "output": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-09-LH-static-jumpingjacks_DL_V2-F-T01-保留重置足部恢复2k",
+      "iteration": 16000,
+      "values": {
+        "gs_render": 2.9604311069733855,
+        "depth_normal": 5.779198766500639,
+        "mesh": 4.3026051631680895,
+        "expected": 0.014375255991212789,
+        "median": 0.012118109332565501
+      },
+      "numeric": "FAILED",
+      "foot": "PARTIAL",
+      "overall": "FAILED",
+      "shoe": {
+        "ids": [
+          4
+        ],
+        "name": "Character_Mesh_Ch02_Sneakers",
+        "eligible_pixels": 6185,
+        "eligible_pixel_share": 0.011417105537619224,
+        "alpha_valid_pixels": 6185,
+        "alpha_coverage": 1.0,
+        "normal": {
+          "gs_render": {
+            "valid_pixels": 6185,
+            "coverage": 1.0,
+            "mae_deg": 19.849434648924383,
+            "error_sum_deg": 122768.7533035973,
+            "missing180_mae_deg": 19.849434648924383,
+            "valid_pixel_share": 0.01144130895233867,
+            "error_contribution_share": 0.07671298744721695,
+            "exceed_threshold_counts": {
+              "2.0": 5970,
+              "5.0": 5073,
+              "10.0": 3623,
+              "30.0": 1387,
+              "60.0": 345
+            }
+          },
+          "depth_normal": {
+            "valid_pixels": 6185,
+            "coverage": 1.0,
+            "mae_deg": 26.787739749130818,
+            "error_sum_deg": 165682.17034837411,
+            "missing180_mae_deg": 26.787739749130818,
+            "valid_pixel_share": 0.01181990177155197,
+            "error_contribution_share": 0.054787603837399446,
+            "exceed_threshold_counts": {
+              "2.0": 6079,
+              "5.0": 5586,
+              "10.0": 4571,
+              "30.0": 2136,
+              "60.0": 551
+            }
+          },
+          "mesh": {
+            "valid_pixels": 6185,
+            "coverage": 1.0,
+            "mae_deg": 28.775669050045963,
+            "error_sum_deg": 177977.51307453428,
+            "missing180_mae_deg": 28.775669050045963,
+            "valid_pixel_share": 0.011501712704511051,
+            "error_contribution_share": 0.07692304214361609,
+            "exceed_threshold_counts": {
+              "2.0": 6115,
+              "5.0": 5672,
+              "10.0": 4653,
+              "30.0": 2364,
+              "60.0": 749
+            }
+          }
+        },
+        "point_geometry": {
+          "expected": {
+            "valid_pixels": 6185,
+            "eligible_pixels": 6185,
+            "coverage": 1.0,
+            "distance_m": {
+              "count": 6185,
+              "mean": 0.037691861198560994,
+              "p10": 0.003732538750928103,
+              "median": 0.01120602152053759,
+              "p90": 0.1252564698611961
+            },
+            "height_delta_m": {
+              "count": 6185,
+              "mean": -0.020638928740179602,
+              "p10": -0.09956897061134669,
+              "median": -0.00759179477699945,
+              "p90": -0.001697117054459338
+            },
+            "predicted_height_m": {
+              "count": 6185,
+              "mean": 0.15936281094721846,
+              "p10": 0.021557276531393704,
+              "median": 0.16853426327804755,
+              "p90": 0.2441571634433558
+            },
+            "same_ray_close_counts": {
+              "0.01": 2790,
+              "0.02": 4181,
+              "0.05": 4902,
+              "0.1": 5276
+            },
+            "same_ray_close_fraction": {
+              "0.01": 0.4510913500404204,
+              "0.02": 0.6759902991107518,
+              "0.05": 0.7925626515763945,
+              "0.1": 0.8530315278900565
+            },
+            "gt_elevated_pixels": 6185,
+            "predicted_near_plane_elevated_gt_pixels": 518,
+            "plane_replacement_proxy_fraction": 0.08375101050929669,
+            "below_plane_pixels": 1,
+            "above_plane_pixels": 5666
+          },
+          "median": {
+            "valid_pixels": 6185,
+            "eligible_pixels": 6185,
+            "coverage": 1.0,
+            "distance_m": {
+              "count": 6185,
+              "mean": 0.03650014456869761,
+              "p10": 0.0017742915668906242,
+              "median": 0.009638408028126714,
+              "p90": 0.13348082151212295
+            },
+            "height_delta_m": {
+              "count": 6185,
+              "mean": -0.019883498256085683,
+              "p10": -0.11157631779140047,
+              "median": -0.006378320709615082,
+              "p90": 0.001177180373122156
+            },
+            "predicted_height_m": {
+              "count": 6185,
+              "mean": 0.1601182414313124,
+              "p10": -0.0051456766527280704,
+              "median": 0.1723264023641491,
+              "p90": 0.2444680510259218
+            },
+            "same_ray_close_counts": {
+              "0.01": 3180,
+              "0.02": 4469,
+              "0.05": 5220,
+              "0.1": 5290
+            },
+            "same_ray_close_fraction": {
+              "0.01": 0.5141471301535974,
+              "0.02": 0.7225545675020211,
+              "0.05": 0.8439773645917542,
+              "0.1": 0.8552950687146321
+            },
+            "gt_elevated_pixels": 6185,
+            "predicted_near_plane_elevated_gt_pixels": 816,
+            "plane_replacement_proxy_fraction": 0.13193209377526274,
+            "below_plane_pixels": 15,
+            "above_plane_pixels": 5354
+          },
+          "mesh_depth": {
+            "valid_pixels": 6185,
+            "eligible_pixels": 6185,
+            "coverage": 1.0,
+            "distance_m": {
+              "count": 6185,
+              "mean": 0.054873854489016397,
+              "p10": 0.0017272619356452415,
+              "median": 0.009079942594785187,
+              "p90": 0.193207060857735
+            },
+            "height_delta_m": {
+              "count": 6185,
+              "mean": -0.04133184205297569,
+              "p10": -0.13842370252111208,
+              "median": -0.006539187620546727,
+              "p90": 2.6051241025017858e-05
+            },
+            "predicted_height_m": {
+              "count": 6185,
+              "mean": 0.1386698976344224,
+              "p10": -0.006613494812074804,
+              "median": 0.16178550301069095,
+              "p90": 0.2412115482645561
+            },
+            "same_ray_close_counts": {
+              "0.01": 3248,
+              "0.02": 4128,
+              "0.05": 4650,
+              "0.1": 4699
+            },
+            "same_ray_close_fraction": {
+              "0.01": 0.525141471301536,
+              "0.02": 0.6674211802748585,
+              "0.05": 0.751818916734034,
+              "0.1": 0.7597413096200485
+            },
+            "gt_elevated_pixels": 6185,
+            "predicted_near_plane_elevated_gt_pixels": 1487,
+            "plane_replacement_proxy_fraction": 0.24042037186742118,
+            "below_plane_pixels": 0,
+            "above_plane_pixels": 4698
+          }
+        }
+      },
+      "final_review_sha256": "2d163d98d4bee57df5d932d6ebe31c44984307ab21ecf034d1d6c6f52b2f8f9d"
+    },
+    {
+      "label": "F-T02",
+      "output": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-10-LH-static-jumpingjacks_DL_V2-F-T02-跳过重置足部恢复2k",
+      "iteration": 16000,
+      "values": {
+        "gs_render": 2.7748653969040467,
+        "depth_normal": 5.545685124204474,
+        "mesh": 4.249532330679964,
+        "expected": 0.013720882857340164,
+        "median": 0.011876579867479916
+      },
+      "numeric": "PASS",
+      "foot": "PARTIAL",
+      "overall": "FAILED",
+      "shoe": {
+        "ids": [
+          4
+        ],
+        "name": "Character_Mesh_Ch02_Sneakers",
+        "eligible_pixels": 6185,
+        "eligible_pixel_share": 0.011417105537619224,
+        "alpha_valid_pixels": 6185,
+        "alpha_coverage": 1.0,
+        "normal": {
+          "gs_render": {
+            "valid_pixels": 6185,
+            "coverage": 1.0,
+            "mae_deg": 19.244015987484477,
+            "error_sum_deg": 119024.23888259148,
+            "missing180_mae_deg": 19.244015987484477,
+            "valid_pixel_share": 0.011441160801491698,
+            "error_contribution_share": 0.07934578795243105,
+            "exceed_threshold_counts": {
+              "2.0": 5958,
+              "5.0": 5062,
+              "10.0": 3666,
+              "30.0": 1306,
+              "60.0": 302
+            }
+          },
+          "depth_normal": {
+            "valid_pixels": 6185,
+            "coverage": 1.0,
+            "mae_deg": 26.521809042864806,
+            "error_sum_deg": 164037.38893011882,
+            "missing180_mae_deg": 26.521809042864806,
+            "valid_pixel_share": 0.011819766241906757,
+            "error_contribution_share": 0.056527115438080255,
+            "exceed_threshold_counts": {
+              "2.0": 6111,
+              "5.0": 5650,
+              "10.0": 4626,
+              "30.0": 2050,
+              "60.0": 533
+            }
+          },
+          "mesh": {
+            "valid_pixels": 6185,
+            "coverage": 1.0,
+            "mae_deg": 27.58907155908791,
+            "error_sum_deg": 170638.4075929587,
+            "missing180_mae_deg": 27.58907155908791,
+            "valid_pixel_share": 0.011495449214648009,
+            "error_contribution_share": 0.07463145266529556,
+            "exceed_threshold_counts": {
+              "2.0": 6097,
+              "5.0": 5650,
+              "10.0": 4642,
+              "30.0": 2210,
+              "60.0": 662
+            }
+          }
+        },
+        "point_geometry": {
+          "expected": {
+            "valid_pixels": 6185,
+            "eligible_pixels": 6185,
+            "coverage": 1.0,
+            "distance_m": {
+              "count": 6185,
+              "mean": 0.035612333645550234,
+              "p10": 0.002836919211278665,
+              "median": 0.010793583262705353,
+              "p90": 0.12239546524930985
+            },
+            "height_delta_m": {
+              "count": 6185,
+              "mean": -0.0189967618570521,
+              "p10": -0.09505585846825397,
+              "median": -0.007146908615141001,
+              "p90": -0.00021998908229079353
+            },
+            "predicted_height_m": {
+              "count": 6185,
+              "mean": 0.16100497783034598,
+              "p10": 0.02658278065832748,
+              "median": 0.17055376434015557,
+              "p90": 0.24559418410943865
+            },
+            "same_ray_close_counts": {
+              "0.01": 2895,
+              "0.02": 4243,
+              "0.05": 4982,
+              "0.1": 5348
+            },
+            "same_ray_close_fraction": {
+              "0.01": 0.46806790622473726,
+              "0.02": 0.6860145513338722,
+              "0.05": 0.8054971705739693,
+              "0.1": 0.8646725949878739
+            },
+            "gt_elevated_pixels": 6185,
+            "predicted_near_plane_elevated_gt_pixels": 500,
+            "plane_replacement_proxy_fraction": 0.08084074373484236,
+            "below_plane_pixels": 2,
+            "above_plane_pixels": 5683
+          },
+          "median": {
+            "valid_pixels": 6185,
+            "eligible_pixels": 6185,
+            "coverage": 1.0,
+            "distance_m": {
+              "count": 6185,
+              "mean": 0.03548395779326374,
+              "p10": 0.0017359924454055302,
+              "median": 0.009631935418028969,
+              "p90": 0.13082353043617204
+            },
+            "height_delta_m": {
+              "count": 6185,
+              "mean": -0.018825175621749773,
+              "p10": -0.10969205035070785,
+              "median": -0.006197842183553348,
+              "p90": 0.0018630799194056644
+            },
+            "predicted_height_m": {
+              "count": 6185,
+              "mean": 0.1611765640656483,
+              "p10": -0.0047105143215958375,
+              "median": 0.1731261750796591,
+              "p90": 0.24482570547536397
+            },
+            "same_ray_close_counts": {
+              "0.01": 3177,
+              "0.02": 4465,
+              "0.05": 5216,
+              "0.1": 5333
+            },
+            "same_ray_close_fraction": {
+              "0.01": 0.5136620856911883,
+              "0.02": 0.7219078415521423,
+              "0.05": 0.8433306386418755,
+              "0.1": 0.8622473726758286
+            },
+            "gt_elevated_pixels": 6185,
+            "predicted_near_plane_elevated_gt_pixels": 763,
+            "plane_replacement_proxy_fraction": 0.12336297493936944,
+            "below_plane_pixels": 19,
+            "above_plane_pixels": 5403
+          },
+          "mesh_depth": {
+            "valid_pixels": 6185,
+            "eligible_pixels": 6185,
+            "coverage": 1.0,
+            "distance_m": {
+              "count": 6185,
+              "mean": 0.05015682486366432,
+              "p10": 0.00122012220212329,
+              "median": 0.008141732432141162,
+              "p90": 0.1779710163626982
+            },
+            "height_delta_m": {
+              "count": 6185,
+              "mean": -0.037510197905785074,
+              "p10": -0.13377972508645825,
+              "median": -0.0054924910786269265,
+              "p90": 0.0006127983543592583
+            },
+            "predicted_height_m": {
+              "count": 6185,
+              "mean": 0.142491541781613,
+              "p10": -0.006036922432218716,
+              "median": 0.16477862271688082,
+              "p90": 0.24285107800418473
+            },
+            "same_ray_close_counts": {
+              "0.01": 3397,
+              "0.02": 4202,
+              "0.05": 4748,
+              "0.1": 4831
+            },
+            "same_ray_close_fraction": {
+              "0.01": 0.549232012934519,
+              "0.02": 0.6793856103476152,
+              "0.05": 0.7676637025060631,
+              "0.1": 0.7810832659660469
+            },
+            "gt_elevated_pixels": 6185,
+            "predicted_near_plane_elevated_gt_pixels": 1328,
+            "plane_replacement_proxy_fraction": 0.2147130153597413,
+            "below_plane_pixels": 0,
+            "above_plane_pixels": 4857
+          }
+        }
+      },
+      "final_review_sha256": "aac6e09fc5907bf04c7bb997ad5ae05d1e97e87b10736b9595fb44aa76b5f995"
+    },
+    {
+      "label": "F-T03",
+      "output": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k",
+      "iteration": 18000,
+      "values": {
+        "gs_render": 2.777640687397028,
+        "depth_normal": 5.5623343647160635,
+        "mesh": 4.242261114472106,
+        "expected": 0.013517831821767154,
+        "median": 0.011676069145771942
+      },
+      "numeric": "PASS",
+      "foot": "PARTIAL",
+      "overall": "FAILED",
+      "shoe": {
+        "ids": [
+          4
+        ],
+        "name": "Character_Mesh_Ch02_Sneakers",
+        "eligible_pixels": 6185,
+        "eligible_pixel_share": 0.011417105537619224,
+        "alpha_valid_pixels": 6185,
+        "alpha_coverage": 1.0,
+        "normal": {
+          "gs_render": {
+            "valid_pixels": 6185,
+            "coverage": 1.0,
+            "mae_deg": 15.97735589662625,
+            "error_sum_deg": 98819.94622063336,
+            "missing180_mae_deg": 15.97735589662625,
+            "valid_pixel_share": 0.011439446763570588,
+            "error_contribution_share": 0.06580120784929719,
+            "exceed_threshold_counts": {
+              "2.0": 5947,
+              "5.0": 4866,
+              "10.0": 3169,
+              "30.0": 887,
+              "60.0": 190
+            }
+          },
+          "depth_normal": {
+            "valid_pixels": 6185,
+            "coverage": 1.0,
+            "mae_deg": 23.809666767438824,
+            "error_sum_deg": 147262.78895660912,
+            "missing180_mae_deg": 23.809666767438824,
+            "valid_pixel_share": 0.011818117546799555,
+            "error_contribution_share": 0.050587652981210644,
+            "exceed_threshold_counts": {
+              "2.0": 6077,
+              "5.0": 5552,
+              "10.0": 4307,
+              "30.0": 1759,
+              "60.0": 397
+            }
+          },
+          "mesh": {
+            "valid_pixels": 6185,
+            "coverage": 1.0,
+            "mae_deg": 24.09225313140121,
+            "error_sum_deg": 149010.58561771648,
+            "missing180_mae_deg": 24.09225313140121,
+            "valid_pixel_share": 0.011496624434927433,
+            "error_contribution_share": 0.06529055580714546,
+            "exceed_threshold_counts": {
+              "2.0": 6061,
+              "5.0": 5507,
+              "10.0": 4353,
+              "30.0": 1825,
+              "60.0": 476
+            }
+          }
+        },
+        "point_geometry": {
+          "expected": {
+            "valid_pixels": 6185,
+            "eligible_pixels": 6185,
+            "coverage": 1.0,
+            "distance_m": {
+              "count": 6185,
+              "mean": 0.025343966331683225,
+              "p10": 0.0019963465739215526,
+              "median": 0.008849348155968582,
+              "p90": 0.07604208892605452
+            },
+            "height_delta_m": {
+              "count": 6185,
+              "mean": -0.010529996011905086,
+              "p10": -0.04385784929991132,
+              "median": -0.005504495217394378,
+              "p90": 0.0008925257693704294
+            },
+            "predicted_height_m": {
+              "count": 6185,
+              "mean": 0.169471743675493,
+              "p10": 0.07782508225802191,
+              "median": 0.1733644492107942,
+              "p90": 0.24685636340277597
+            },
+            "same_ray_close_counts": {
+              "0.01": 3390,
+              "0.02": 4720,
+              "0.05": 5373,
+              "0.1": 5712
+            },
+            "same_ray_close_fraction": {
+              "0.01": 0.5481002425222312,
+              "0.02": 0.7631366208569119,
+              "0.05": 0.868714632174616,
+              "0.1": 0.9235246564268391
+            },
+            "gt_elevated_pixels": 6185,
+            "predicted_near_plane_elevated_gt_pixels": 220,
+            "plane_replacement_proxy_fraction": 0.03556992724333064,
+            "below_plane_pixels": 0,
+            "above_plane_pixels": 5965
+          },
+          "median": {
+            "valid_pixels": 6185,
+            "eligible_pixels": 6185,
+            "coverage": 1.0,
+            "distance_m": {
+              "count": 6185,
+              "mean": 0.02390056769277717,
+              "p10": 0.0012648563612351093,
+              "median": 0.007874374684635907,
+              "p90": 0.03916585915982513
+            },
+            "height_delta_m": {
+              "count": 6185,
+              "mean": -0.010493555728082811,
+              "p10": -0.025826888889389454,
+              "median": -0.004723262229703096,
+              "p90": 0.0027839899050093263
+            },
+            "predicted_height_m": {
+              "count": 6185,
+              "mean": 0.16950818395931527,
+              "p10": 0.08603713956033518,
+              "median": 0.175426714934531,
+              "p90": 0.24468549402446343
+            },
+            "same_ray_close_counts": {
+              "0.01": 3653,
+              "0.02": 5010,
+              "0.05": 5642,
+              "0.1": 5702
+            },
+            "same_ray_close_fraction": {
+              "0.01": 0.5906224737267582,
+              "0.02": 0.8100242522231205,
+              "0.05": 0.9122069523039612,
+              "0.1": 0.9219078415521422
+            },
+            "gt_elevated_pixels": 6185,
+            "predicted_near_plane_elevated_gt_pixels": 413,
+            "plane_replacement_proxy_fraction": 0.06677445432497979,
+            "below_plane_pixels": 12,
+            "above_plane_pixels": 5760
+          },
+          "mesh_depth": {
+            "valid_pixels": 6185,
+            "eligible_pixels": 6185,
+            "coverage": 1.0,
+            "distance_m": {
+              "count": 6185,
+              "mean": 0.03869813583555494,
+              "p10": 0.0008956747871839036,
+              "median": 0.005911520431061481,
+              "p90": 0.14607306938721568
+            },
+            "height_delta_m": {
+              "count": 6185,
+              "mean": -0.028129074383772473,
+              "p10": -0.12228074789431388,
+              "median": -0.003791008401634599,
+              "p90": 0.0010621014840353385
+            },
+            "predicted_height_m": {
+              "count": 6185,
+              "mean": 0.1518726653036256,
+              "p10": -0.0044616892854151035,
+              "median": 0.16821024436950438,
+              "p90": 0.24338884554839527
+            },
+            "same_ray_close_counts": {
+              "0.01": 3939,
+              "0.02": 4679,
+              "0.05": 5137,
+              "0.1": 5195
+            },
+            "same_ray_close_fraction": {
+              "0.01": 0.6368633791430881,
+              "0.02": 0.7565076798706548,
+              "0.05": 0.8305578011317704,
+              "0.1": 0.8399353274050121
+            },
+            "gt_elevated_pixels": 6185,
+            "predicted_near_plane_elevated_gt_pixels": 965,
+            "plane_replacement_proxy_fraction": 0.15602263540824576,
+            "below_plane_pixels": 0,
+            "above_plane_pixels": 5220
+          }
+        }
+      },
+      "final_review_sha256": "0bc7d0a0c9d3f59847baf23b524eceb444671400f705d6c1edc45bf70e112cbd"
+    }
+  ],
+  "baseline": {
+    "gs_render": 2.756110384679971,
+    "depth_normal": 5.4240755738486985,
+    "mesh": 4.287353582304789,
+    "expected": 0.01413659298879845,
+    "median": 0.012312863852336329
+  },
+  "frozen_max_mae": {
+    "gs_render": 2.856110384679971,
+    "depth_normal": 5.624075573848699,
+    "mesh": 4.487353582304789
+  },
+  "later_reference": {
+    "path": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-09-LH-static-jumpingjacks_DL_V2-G2-T06-reset后normal阻断透明度2k/evaluation_16000/goal_mae_summary.json",
+    "sha256": "215eb0b6c84056bb191eecccc957bb96d21f9c9c86012815d51b145113f9bd7d",
+    "values": {
+      "gs_render": 2.6683778383745302,
+      "depth_normal": 5.404577799172339,
+      "mesh": 4.20848728697561,
+      "expected": 0.013922491867768139,
+      "median": 0.011875602120791683
+    }
+  },
+  "manual_review": {
+    "status": "REVIEW_COMPLETED",
+    "quality": "FAILED_GEOMETRY",
+    "model": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/model_mlp",
+    "iteration": 18000,
+    "reviewer": "root（指定子Agent因账户usage limit未能执行，明确记录角色执行限制）",
+    "manual_frames": [
+      10,
+      80,
+      150
+    ],
+    "manual_footwear_zoom_frames": [
+      10,
+      20,
+      40,
+      80,
+      90,
+      140,
+      150
+    ],
+    "manual_full_frame_diagnostics": [
+      10,
+      150
+    ],
+    "manual_each_video_frame": false,
+    "notes": {
+      "RGB": "双腿与鞋主体可见且连续；暗侧较黑、投影模糊。相较T02鞋主体和末端继续改善，鞋尖仍偏低，不能仅凭黄色鞋面判定完整恢复。",
+      "Alpha": "人物与台面合并轮廓连续，鞋object4 Alpha覆盖100%；台面遮住鞋部缺损对Alpha的影响，无法用该覆盖率证明鞋面完整。",
+      "Normal": "腿部主体连续，鞋轮廓接近GT且较T02改善。0010／0020／0090／0140／0150仍见鞋尖偏低或末端小幅短缩；Expected及Mesh均留有残差，未达到完整稳定恢复验收。",
+      "Separation": "人物与平台近同橄榄色，静态门控不能解读为运动分离或鞋部独立保护。"
+    },
+    "images": [
+      "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/four_classes/four_classes_10_80_150.png",
+      "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/spatial_diagnostic/figures/footwear_zoom_0010.png",
+      "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/spatial_diagnostic/figures/footwear_zoom_0020.png",
+      "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/spatial_diagnostic/figures/footwear_zoom_0040.png",
+      "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/spatial_diagnostic/figures/footwear_zoom_0080.png",
+      "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/spatial_diagnostic/figures/footwear_zoom_0090.png",
+      "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/spatial_diagnostic/figures/footwear_zoom_0140.png",
+      "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/spatial_diagnostic/figures/footwear_zoom_0150.png",
+      "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/spatial_diagnostic/figures/full_frame_0010.png",
+      "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/spatial_diagnostic/figures/full_frame_0150.png"
+    ],
+    "foot_recovery": "PARTIAL",
+    "leg_continuity": "主体连续",
+    "reason": "大面积鞋缺失明显缓解，但多视角鞋尖高度与末端仍有残差，完整稳定恢复未通过。"
+  },
+  "source_sha256": {
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/goal_mae_summary.json": "23aea8c181e7b91febd82a487a4da6d005d0fd837fc17b595dd7d19d03b179f4",
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/goal3_final/goal3_acceptance.json": "204a2eb53a489ead762bf786e641a7f10eaf04749b83df5320af9ad24545f49a",
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/artifact_decode_audit.json": "1ce45d205b17271b7d8df5590311652dcd753931c3731abfab8650926ae40377",
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/visual_review_completed.json": "e8d2c41e85509a9d24aac198ad0ce56d27b7db97a0f07911c166de21279f1808",
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/spatial_diagnostic/summary.json": "03edacead6cf44612bb5dbb1f0e50e4c8ef0ec26b580a82eddb2e3018bd4e0cc",
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/checkpoint_after_audit.json": "a56346e7ce6c55d46fbf88ed2f7389b1ad24cab6bd951acd2560f8333e1030ea",
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/executed.json": "a7036b81a2be3b39005f4d65a766205277ac97a23e4d7ebf7d14898ee9c8443d",
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/fresh_parity_18000/parity.json": "bf1efc3bf4c0ee11b955ce2f7e0274a9e5f9979ceb6b41c7c8f079af085d5055",
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/actual_runtime_capture.json": "8651e92e4784f1f4360386c2d2f77117b4dbb0d8de9717ba97f92c77e9e6d942",
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/root_archive_preflight.json": "4fc40befceb36390720fb66f46184937bd4095c7016246057e4711b9ffdcf09f"
+  }
+}
