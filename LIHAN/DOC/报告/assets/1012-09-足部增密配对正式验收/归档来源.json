@@ -1,0 +1,32 @@
+[
+  {
+    "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-16-LH-static-jumpingjacks_DL_V2-F-T04-原增密续训2k/evaluation_18000/spatial_diagnostic/figures/footwear_zoom_0010.png",
+    "copy": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-09-足部增密配对正式验收/T04侧面鞋部.png",
+    "sha256": "7e9cb9e937db63142624ef0ed231943e3587237ca533ceaf4bd8d1db78cf8a29"
+  },
+  {
+    "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-16-LH-static-jumpingjacks_DL_V2-F-T04-原增密续训2k/evaluation_18000/spatial_diagnostic/figures/footwear_zoom_0020.png",
+    "copy": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-09-足部增密配对正式验收/T04正面鞋部.png",
+    "sha256": "583f67cd2017d9bb1d8e1f833017ad263f52e124714c99090ec48a898e94323f"
+  },
+  {
+    "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-16-LH-static-jumpingjacks_DL_V2-F-T04-原增密续训2k/evaluation_18000/four_classes/four_classes_10_80_150.png",
+    "copy": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-09-足部增密配对正式验收/T04四类三视角.png",
+    "sha256": "b700cbbe3e952dbeec922cd314dba4c97653164082595efe0335537025cf0a52"
+  },
+  {
+    "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-17-LH-static-jumpingjacks_DL_V2-F-T05-非normal增密下限2k/evaluation_18000/spatial_diagnostic/figures/footwear_zoom_0010.png",
+    "copy": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-09-足部增密配对正式验收/T05侧面鞋部.png",
+    "sha256": "6bca5e638837071e0ed824b364d17355b8028896436dc15b525ab7b3f61fc85f"
+  },
+  {
+    "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-17-LH-static-jumpingjacks_DL_V2-F-T05-非normal增密下限2k/evaluation_18000/spatial_diagnostic/figures/footwear_zoom_0020.png",
+    "copy": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-09-足部增密配对正式验收/T05正面鞋部.png",
+    "sha256": "064ad70ed87a97870cf0f009c2bd7f0e348fd66699858fbe9ec34e23b265489a"
+  },
+  {
+    "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-17-LH-static-jumpingjacks_DL_V2-F-T05-非normal增密下限2k/evaluation_18000/four_classes/four_classes_10_80_150.png",
+    "copy": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-09-足部增密配对正式验收/T05四类三视角.png",
+    "sha256": "29fa332082c2c188320f2a709e857740453e75f1a2b2dd5b70482d420bac91da"
+  }
+]
