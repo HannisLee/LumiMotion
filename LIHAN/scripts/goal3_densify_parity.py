@@ -28,7 +28,7 @@ def main():
     from scripts.eval_geometry_gt import GeometryRun
     from scene.static_dl_photometric import DirectionOnlyLights, StaticVisibility
     from scene.static_dl_ambient import render_photometric
-    from goal3_densify_render import actual_sources, physical_renderer, ENTRY
+    from goal3_densify_render import actual_sources, physical_renderer, initialization_evidence, ENTRY
     from goal_eval_protocol import FRAMES, CONTROL, read, write, digest
     from utils.geometry_eval_utils import unit_normal
     import diff_surfel_rasterization as rasterizer
@@ -43,6 +43,8 @@ def main():
         raise AssertionError('输出必须output内。')
     output.mkdir(parents=True, exist_ok=False)
     marker, sources = actual_sources(args.model_path)
+    initialization = initialization_evidence(args.model_path,marker)
+    sources[initialization['path']] = initialization['sha256']
     run = GeometryRun(args.model_path, args.load_iter, args.source_path)
     run.files.update(sources)
     for path, sha in marker['initial_sources'].items():
@@ -62,6 +64,19 @@ def main():
     runtime = read(runtime_path)
     if runtime['status'] != 'PASS_CAPTURED' or not runtime['process_alive_during_hash'] or runtime['actual_module'] != 'scripts.train_static_dl_foot_densify':
         raise AssertionError('实际训练存活期native/tracer未完整捕获。')
+    state_path,supervisor_path = run.model.parent/'state.json',run.model.parent/'supervisor_result.json'
+    state,supervisor = read(state_path),read(supervisor_path)
+    if state['status'] != 'TRAINING_COMPLETED_PENDING_EVAL' or state['exit_code'] != 0 or state['training_exit_code'] != 0 or state['gpu_verified'] is not True or state['launcher_error'] is not None:
+        raise AssertionError('真实训练未正常退出或GPU身份未验证。')
+    if supervisor['status'] != 'PASS_TRAINING_AND_LIVE_RUNTIME' or supervisor['launcher_exit_code'] != 0 or supervisor['capture_exit_code'] != 0 or supervisor['training_pid'] != state['pid'] or runtime['pid'] != state['pid'] or runtime['argv'] != state['argv']:
+        raise AssertionError('实际launcher/supervisor/runtime PID或argv不同。')
+    commands = [p for p in (run.model.parent/'commands/train.json',run.model.parent/'commands.json') if p.is_file()]
+    matched = [p for p in commands if digest(p) == state['command_sha256'] and read(p)['argv'] == state['argv']]
+    if len(matched) != 1 or read(matched[0])['gpu_physical'] != state['gpu_physical']:
+        raise AssertionError('实际启动命令SHA/argv/GPU与状态不同。')
+    if not any(row[0] == str(state['pid']) and row[1] == state['gpu_uuid'] for row in state['actual_gpu_rows']):
+        raise AssertionError('没有真实训练PID的GPU UUID行。')
+    run.files.update({str(p):digest(p) for p in (state_path,supervisor_path)})
     run.files.update({str(p):digest(p) for p in (finished_path,runtime_path)})
     for key in ('method', 'source_sha256', 'extension_sha256', 'source_files'):
         if trained[key] != backend[key]:
@@ -122,7 +137,8 @@ def main():
     independent = dict(status='PASS',seed=marker['args']['seed'],first_camera_index=index,
         first_camera=name,first_training_iteration=first['iteration'],initial_adam_state_empty=marker['initial_adam_state_empty'],
         initial_density_statistics_zero=marker['initial_density_statistics_zero'],optimizer_state_restored=False,
-        scope='实际冻结entry的零Adam/零统计断言、训练审计和seed首相机独立复核；无历史Adam恢复声明。')
+        initialization_audit=initialization,
+        scope='实际初始化参数哈希/Adam状态数量/三统计非零数、独立LR和seed首相机复核；无历史Adam恢复声明。')
     metadata = read(run.source / 'transforms_train.json')
     record = next(r for r in metadata['frames'] if r['source_frame'] == args.frame)
     camera, _, intrinsics, _ = run.camera(metadata, record, 2)
@@ -172,6 +188,14 @@ def main():
     for key in ('xyz_gradient_accum','denom','max_radii2D'):
         if len(saved_optimizer[key]) != len(run.pc.get_xyz) or not torch.isfinite(saved_optimizer[key]).all():
             raise AssertionError('新保存增密统计与checkpoint点数不一致。')
+    expected_stack = []
+    camera_rng = random.Random(marker['args']['seed'])
+    for _ in range(args.load_iter-16000):
+        if not expected_stack:
+            expected_stack = list(range(135))
+        expected_stack.pop(camera_rng.randrange(len(expected_stack)))
+    if saved_optimizer['remaining_camera_indices'] != expected_stack or saved_optimizer['camera_rng'] != camera_rng.getstate():
+        raise AssertionError('实际保存相机余栈/RNG与独立seed序列不同。')
     run.files[str(optimizer_path)] = digest(optimizer_path)
     arrays.update(geometry)
     arrays['real_xyz']=run.pc.get_xyz.detach().cpu().numpy()
