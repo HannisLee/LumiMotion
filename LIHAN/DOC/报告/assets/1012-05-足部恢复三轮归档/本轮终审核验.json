@@ -1,0 +1,91 @@
+{
+  "status": "FAILED",
+  "pipeline": "PASS",
+  "original_measurement_completeness": "PASS",
+  "original_goal_numeric": "PASS",
+  "goal3_numeric": "PASS",
+  "goal3_geometry": "FAILED",
+  "model": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/model_mlp",
+  "iteration": 18000,
+  "values": {
+    "gs_render": 2.777640687397028,
+    "depth_normal": 5.5623343647160635,
+    "mesh": 4.242261114472106,
+    "expected": 0.013517831821767154,
+    "median": 0.011676069145771942
+  },
+  "delta": {
+    "gs_render": 0.021530302717057026,
+    "depth_normal": 0.13825879086736492,
+    "mesh": -0.04509246783268317
+  },
+  "max_mae": {
+    "gs_render": 2.856110384679971,
+    "depth_normal": 5.624075573848699,
+    "mesh": 4.487353582304789
+  },
+  "coverage": {
+    "gs_render": 0.9980470011869359,
+    "depth_normal": 0.9660680300739666,
+    "mesh": 0.9930832830316153
+  },
+  "original_protocol_sha256": "7cf1e7f6e1ce7f223319899febdfb1d443440add68cddee191fe5bf47e1646be",
+  "original_six_source_sha256": {
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/scripts/eval_geometry_gt.py": "181bbf006b9c032b9728e193ec6e5094d061baad30be503182c32e2512775e9e",
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/scripts/extract_geometry_mesh_dynamic.py": "810c134e4e96151d943f619ee5fff7776d566b8b854ffc5dc779301e08d86da8",
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/utils/geometry_eval_utils.py": "4a8a373af98736d7780df41c446d137dcf3433e8e4ccacc50f24e2a48a344935",
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/utils/predicted_mesh.py": "1a6f367d30d752a74beec53021d581a41302c77201236237562f4aa6417c6a73",
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/audit_1011_mae.py": "60ce2db67b6a32f599c95658f6aa390d4256d20d53d4097594eea38c6471caa7",
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/bootstrap_1011.py": "693be49305394f8c07ba67421f1d74ee5cf9d4ec8ed425aebfdf0b6355558783"
+  },
+  "fresh_status": "PASS",
+  "decode_status": "PASS",
+  "manual_review_completed": true,
+  "manual_frames": [
+    10,
+    80,
+    150
+  ],
+  "manual_footwear_zoom_frames": [
+    10,
+    20,
+    40,
+    80,
+    90,
+    140,
+    150
+  ],
+  "all_visual_frames_automatically_decoded": 150,
+  "checkpoint_unchanged": true,
+  "region_sums_reconstructed": {
+    "gs_render": {
+      "mae": 2.7776406873970276,
+      "valid_pixels": 540673
+    },
+    "depth_normal": {
+      "mae": 5.562334364716064,
+      "valid_pixels": 523349
+    },
+    "mesh": {
+      "mae": 4.242261114472104,
+      "valid_pixels": 537984
+    }
+  },
+  "foot_recovery": "PARTIAL",
+  "reset_policy": "skip_all",
+  "clock_shift_diagnostic": false,
+  "smoke": false,
+  "agent_execution_limitation": "root（指定子Agent因账户usage limit未能执行，明确记录角色执行限制）",
+  "sources": {
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/goal_mae_summary.json": "23aea8c181e7b91febd82a487a4da6d005d0fd837fc17b595dd7d19d03b179f4",
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/goal3_final/goal3_acceptance.json": "204a2eb53a489ead762bf786e641a7f10eaf04749b83df5320af9ad24545f49a",
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/artifact_decode_audit.json": "1ce45d205b17271b7d8df5590311652dcd753931c3731abfab8650926ae40377",
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/visual_review_completed.json": "e8d2c41e85509a9d24aac198ad0ce56d27b7db97a0f07911c166de21279f1808",
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/spatial_diagnostic/summary.json": "03edacead6cf44612bb5dbb1f0e50e4c8ef0ec26b580a82eddb2e3018bd4e0cc",
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/checkpoint_after_audit.json": "a56346e7ce6c55d46fbf88ed2f7389b1ad24cab6bd951acd2560f8333e1030ea",
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/executed.json": "a7036b81a2be3b39005f4d65a766205277ac97a23e4d7ebf7d14898ee9c8443d",
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/fresh_parity_18000/parity.json": "bf1efc3bf4c0ee11b955ce2f7e0274a9e5f9979ceb6b41c7c8f079af085d5055",
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/actual_runtime_capture.json": "8651e92e4784f1f4360386c2d2f77117b4dbb0d8de9717ba97f92c77e9e6d942",
+    "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/root_archive_preflight.json": "4fc40befceb36390720fb66f46184937bd4095c7016246057e4711b9ffdcf09f"
+  }
+}
