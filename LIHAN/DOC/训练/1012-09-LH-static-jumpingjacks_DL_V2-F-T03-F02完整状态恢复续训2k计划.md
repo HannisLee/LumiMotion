@@ -46,3 +46,55 @@
 - PID 2567197，GPU1 UUID `GPU-b8e1473e-b813-9d70-aa90-5ebbf901aec4`，2026-10-12T02:10:42Z真实退出码0，GPU验证通过。监督器状态`TRAINING_COMPLETED_PENDING_EVAL`；supervisor与实际活跃runtime捕获PASS。
 - raster SHA256 `f9514476baec5854c88862404f266242e62b1f828304f541745260fb012d43f3`；surfel tracer SHA256 `5b666e2b3b9fcae5b3137f3689b1ea43e44e2f892874c08ffb0257244ac8809e`。日志在输出目录`logs/train.log`，runtime/source审计见`actual_runtime_capture.json`与`model_mlp/foot_resume_training.json`。
 - 训练完整性通过不表示定量或视觉效果通过。本阶段Goal已暂停，因此尚未启动正式fresh/原15/150步评测；render命令、MAE、代表图/视频、RGB/Alpha/Normal/Separation目检及最终`PASS`/`FAILED`均保持`PENDING`。完整训练checkpoint和日志保留，等待恢复评测指令。
+
+
+## 正式18000收尾与最终验收（2026-10-12）
+
+当前状态：**FAILED**（法线数值PASS，足部部分恢复，联合验收FAILED）。source=`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/eval_view`，model=`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/model_mlp`，iteration18000，render输出=`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000`，日志=`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/logs`及根`logs/`。
+
+- 原15帧GS／Depth／Mesh MAE：2.777640687397°／5.562334364716°／4.242261114472°；相对冻结基线：+0.021530°／+0.138259°／-0.045092°，三项预注册上限全部满足。
+- 鞋object4局部MAE：15.977355896626°／23.809666767439°／24.092253131401°；Expected2厘米比例76.313662%，Mesh75.650768%，近台面代理3.556993%。
+- 代表图：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/four_classes/four_classes_10_80_150.png`；足部图：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/spatial_diagnostic/figures/footwear_zoom_0010.png`、`0080.png`、`0150.png`。视频：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/four_classes/rgb.mp4`、`alpha.mp4`、`normal.mp4`、`separation.mp4`。
+- fresh正式18000 PASS、11前向差0；六评测子命令exit0，600PNG／4×150视频完整解码PASS、checkpoint不变。训练93项状态恢复及活跃runtime证据保留。
+- 人工检查范围：四类10／80／150、鞋10／20／40／80／90／140／150、全景诊断10／150。未逐帧人工检查所有视频。
+- 四类结论：RGB：双腿与鞋主体可见且连续；暗侧较黑、投影模糊。相较T02鞋主体和末端继续改善，鞋尖仍偏低，不能仅凭黄色鞋面判定完整恢复。；Alpha：人物与台面合并轮廓连续，鞋object4 Alpha覆盖100%；台面遮住鞋部缺损对Alpha的影响，无法用该覆盖率证明鞋面完整。；Normal：腿部主体连续，鞋轮廓接近GT且较T02改善。0010／0020／0090／0140／0150仍见鞋尖偏低或末端小幅短缩；Expected及Mesh均留有残差，未达到完整稳定恢复验收。；Separation：人物与平台近同橄榄色，静态门控不能解读为运动分离或鞋部独立保护。
+- 最终终审：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/FINAL_REVIEW_COMPLETED.json`；报告：`/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/1012-05-足部恢复三轮训练归档与验收报告.md`。指定子Agent因usage limit未能参与本次补评，root直接完成原脚本及终审，执行限制如实记录。
+- 失败结果保留：全部checkpoint／optimizer、渲染、统计、日志未覆盖或删除；不从smoke继续训练，不启动下一轮。
+
+完整实际渲染／评测命令（沿原15帧协议）：
+
+### predicted_meshes
+
+```bash
+/home/han.li/miniconda3/envs/lumimotion-ushas/bin/python /home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/bootstrap_1011.py /home/han.li/reproduce/LumiMotion-stage2-perlight scripts.extract_geometry_mesh_dynamic --model_path '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/model_mlp' --source_path '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/eval_view' --load_iter 18000 --frames 10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 --split test --resolution 2 --voxel_size .02 --sdf_trunc .08 --depth_trunc 20 --alpha_threshold .5 --output_dir '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/predicted_meshes'
+```
+
+### normal_depth
+
+```bash
+/home/han.li/miniconda3/envs/lumimotion-ushas/bin/python /home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/bootstrap_1011.py /home/han.li/reproduce/LumiMotion-stage2-perlight scripts.eval_geometry_gt --model_path '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/model_mlp' --source_path '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/eval_view' --load_iter 18000 --frames 10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 --gt_root /mnt/workspace/users/han.li/lumimotion/data/LH-data/static/LH-static-jumpingjacks_DL_V2 --gt_depth_dir '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-07-六组训练总控/GT-LH-static-jumpingjacks_DL_V2/gt_depth' --split test --resolution 2 --alpha_threshold .5 --interior_radius 2 --output_dir '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/normal_depth' --pred_mesh_manifest '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/predicted_meshes/manifest.json' --save_arrays
+```
+
+### audit
+
+```bash
+/home/han.li/miniconda3/envs/lumimotion-ushas/bin/python /home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/goal_eval_audit.py '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000' 18000 --protocol '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-08-LH-static-jumpingjacks_DL_V2-Goal评测协议/protocol.json'
+```
+
+### goal3_numeric
+
+```bash
+/home/han.li/miniconda3/envs/lumimotion-ushas/bin/python /home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/goal3_foot_resume_target.py --evaluation '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000' --output '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/goal3_numeric'
+```
+
+### spatial_diagnostic
+
+```bash
+/home/han.li/miniconda3/envs/lumimotion-ushas/bin/python /home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/goal2_error_spatial_diagnostic.py --evaluation '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000' --gt_depth_dir '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-07-六组训练总控/GT-LH-static-jumpingjacks_DL_V2/gt_depth' --output '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/spatial_diagnostic' --figures
+```
+
+### four_classes
+
+```bash
+/home/han.li/miniconda3/envs/lumimotion-ushas/bin/python /home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/bootstrap_1011.py /home/han.li/reproduce/LumiMotion-stage2-perlight LIHAN.scripts.goal3_foot_resume_visuals --model_path '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/model_mlp' --source_path '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/eval_view' --load_iter 18000 --output_dir '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/evaluation_18000/four_classes'
+```
