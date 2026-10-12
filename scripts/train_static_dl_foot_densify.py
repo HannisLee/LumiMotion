@@ -32,6 +32,14 @@ def write_json(path, value):
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
 
 
+def parameter_hashes(pc, lights):
+    values = {name: value for name, value in vars(pc).items() if isinstance(value, torch.nn.Parameter)}
+    values['light_log_intensity'] = lights.log_intensity
+    return {name: dict(shape=list(value.shape), dtype=str(value.dtype),
+                sha256=hashlib.sha256(value.detach().cpu().contiguous().numpy().tobytes()).hexdigest())
+            for name,value in sorted(values.items())}
+
+
 def main():
     parser = ArgumentParser(description=__doc__)
     parser.add_argument('--init_model', type=Path, required=True)
@@ -73,6 +81,9 @@ def main():
     marker = json.loads(marker_path.read_text())
     continuation = json.loads(continuation_path.read_text())
     finished = json.loads(finished_path.read_text())
+    for key in ('method', 'source_sha256', 'extension_sha256'):
+        if provenance.get(key) != marker['rasterizer_provenance'][key]:
+            raise AssertionError('实际native与冻结G2-T06来源不同：' + key)
     config = marker['args'].copy()
     if (marker['actual_entrypoint'] != 'scripts/train_static_dl_reset_audit.py'
             or continuation['ambient_mode'] != 'zero' or continuation['smoke']
@@ -142,7 +153,12 @@ def main():
     cameras = cameraList_from_camInfos(infos, 1., pipe)
     if len(cameras) != 135 or {frame_key(c.image_name_train_light) for c in cameras} != expected:
         raise AssertionError('实际加载相机必须恰为原135训练帧。')
+    training_inputs = {str(p): digest(p) for p in [metadata_path, Path(config['static_dl_directions'])]
+                       + [Path(i.image_path_train_light) for i in infos]}
+    if len(training_inputs) != 137 or training_inputs != continuation['training_inputs']:
+        raise AssertionError('原137训练输入必须逐项匹配G2-T06冻结SHA。')
     pc.camera_extent = getNerfppNorm(infos)['radius']
+    loaded_parameter_hashes = parameter_hashes(pc, lights)
     # 原G2-T06实参继承原30k XYZ LR，零Adam及零增密累计；不声称恢复不可用的状态。
     pc.training_setup(pipe)
     pc.update_learning_rate(clock_start)
@@ -157,7 +173,29 @@ def main():
         raise AssertionError('共同起点必须新Adam零动量和零增密统计。')
     preview = random.Random(args.seed)
     expected_first_camera_index = list(range(len(cameras))).pop(preview.randrange(len(cameras)))
+    initialized_parameter_hashes = parameter_hashes(pc, lights)
+    initialization = dict(
+        loaded_parameter_hashes=loaded_parameter_hashes,
+        initialized_parameter_hashes=initialized_parameter_hashes,
+        gaussian_optimizer_state_count=len(pc.optimizer.state),
+        light_optimizer_state_count=len(light_optimizer.state),
+        statistic_nonzero_counts={name: int(torch.count_nonzero(getattr(pc, name)))
+            for name in ('xyz_gradient_accum', 'denom', 'max_radii2D')},
+        point_count=initial_count, xyz_lr=float(pc.optimizer.param_groups[0]['lr']),
+        expected_first_camera_index=expected_first_camera_index,
+        expected_first_camera=cameras[expected_first_camera_index].image_name_train_light,
+        optimizer_updates=0, restored_optimizer=False,
+        scope='冻结PLY/lighting参数重载后至新优化器初始化前后哈希；不是恢复历史Adam。')
+    initialization['checks'] = dict(
+        parameters_unchanged=loaded_parameter_hashes == initialized_parameter_hashes,
+        gaussian_adam_empty=initialization['gaussian_optimizer_state_count'] == 0,
+        light_adam_empty=initialization['light_optimizer_state_count'] == 0,
+        statistics_zero=all(v == 0 for v in initialization['statistic_nonzero_counts'].values()))
+    initialization['status'] = 'PASS' if all(initialization['checks'].values()) else 'FAILED'
+    if initialization['status'] != 'PASS':
+        raise AssertionError('真实初始化参数/优化器/统计核验失败。')
     output.mkdir(parents=True)
+    write_json(output / 'initialization_audit.json', initialization)
     (output / 'cfg_args').write_text(str(Namespace(**config)))
     root = Path(__file__).resolve().parents[1]
     source_files = ('scripts/train_static_dl_foot_densify.py', 'scene/static_dl_foot_densify.py', 'scene/static_dl_foot_recovery.py',
@@ -175,8 +213,8 @@ def main():
                  inherited_config=config,
                  initial_sources={str(p): digest(p) for p in initial_files},
                  new_sources={str(root / p): digest(root / p) for p in source_files},
-                 training_inputs={str(p): digest(p) for p in [metadata_path, Path(config['static_dl_directions'])]
-                                  + [Path(i.image_path_train_light) for i in infos]},
+                 training_inputs=training_inputs,
+                 frozen_training_inputs_match=True, frozen_native_provenance_match=True,
                  expected_first_camera_index=expected_first_camera_index, expected_first_camera=cameras[expected_first_camera_index].image_name_train_light,
                  initial_adam_state_empty=True, initial_density_statistics_zero=True,
                  initial_point_count=initial_count, train_images=135, test_images_loaded=False,
