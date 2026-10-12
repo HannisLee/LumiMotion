@@ -33,6 +33,19 @@ def main():
         p.error('结果/计划均禁止覆盖，失败重试另建目录。')
     protocol_path = CONTROL / 'protocol.json'
     protocol = verify(read(protocol_path))
+    if args.execute:
+        from goal3_densify_render import actual_sources, initialization_evidence
+        marker, actual = actual_sources(model)
+        initialization_evidence(model,marker)
+        fresh_path = model.parent / f'fresh_parity_{args.iteration}/parity.json'
+        fresh = read(fresh_path)
+        if fresh['status'] != 'PASS' or Path(fresh['model']).resolve() != model or fresh['iteration'] != args.iteration or fresh['source'] != protocol['source_path'] or fresh['densification_route'] != marker['densification_route']:
+            raise AssertionError('执行完整评测前必须对应模型/迭代/原source的真实fresh PASS。')
+        for path,expected in fresh['sources'].items():
+            if digest(path) != expected:
+                raise AssertionError('fresh后来源变化，禁止执行正式评测：'+path)
+        if marker['smoke'] or args.iteration != 18000 or marker['update_budget'] != 2000:
+            raise AssertionError('正式完整评测只接真实2k终点18000，不接smoke。')
     shared = ['--model_path', str(model), '--source_path', protocol['source_path'], '--load_iter', str(args.iteration)]
     boot = [PYTHON, str(ROOT / 'LIHAN/scripts/bootstrap_1011.py'), str(ROOT)]
     frames = ['--frames'] + list(map(str, FRAMES))
