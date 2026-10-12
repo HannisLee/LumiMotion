@@ -28,3 +28,44 @@
 按用户“继续，收尾实验，归档文档”要求，本计划以 **NOT RUN（未执行）** 归档。本轮未启动GPU诊断、smoke、正式训练或新模型评测；无本轮PID、训练日志、checkpoint、MAE及四类可视化。以上均为预注册方案，不能写作已执行结果；足部是否恢复与法线是否退化均无本轮证据。现存起点模型脚部仍为部分恢复、完整性FAILED。
 
 命令草案、未冻结snapshot状态和资源核查见`output/1012-15-LH-static-jumpingjacks_DL_V2-F-T04-T05增密配对总控/README.md`。未来若另行继续，须先完成输入SHA／native来源／snapshot门禁审查、真实诊断及smoke/fresh验证；不能直接将本草案视为已通过训练验收。
+
+
+## 重新激活阶段真实正式结果与独立终审
+
+此前NOT RUN收尾保持为历史；本次用户重新激活后已真实完成16001—18000共2000更新，训练来源及独立fresh PASS。
+## Sol独立18000正式评测与最终验收（2026-10-12）
+
+最终 **FAILED**：本轮新严格数值FAILED（GS超上限），历史门槛PASS；腿足主体部分恢复，鞋尖/脚掌边缘仍短缩、偏低，几何FAILED。完整六步骤、fresh、来源及文件有效性PASS不能替代联合验收。
+
+source：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/eval_view`；model：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-17-LH-static-jumpingjacks_DL_V2-F-T05-非normal增密下限2k/model_mlp`；iteration18000；route `non_normal_floor`；reset skip_all；真实2000更新，无前移clock。
+原15TEST三MAE（度）：GS **2.7749693553243664**／Depth **5.590313484619281**／Mesh **4.1938444762068015**。
+相对同一G2-T06基线变化：`{'gs_render': 0.10659151694983615, 'depth_normal': 0.18573568544694208, 'mesh': -0.0146428107688088}`。新上限：`{'gs_render': '2.7683778383745302', 'depth_normal': '5.604577799172339', 'mesh': '4.40848728697561'}`；历史上限：`{'gs_render': '2.856110384679971', 'depth_normal': '5.624075573848699', 'mesh': '4.487353582304789'}`。
+GS／Depth／Mesh覆盖率：`{'gs_render': 0.9980876117482662, 'depth_normal': 0.9661123325045087, 'mesh': 0.9929891403667134}`；原eligible541731，缺失惩罚另见goal_mae_summary.json，不修改原conditional-valid数学。
+原6源码SHA不变；协议 `7cf1e7f6e1ce7f223319899febdfb1d443440add68cddee191fe5bf47e1646be`，互斥8对象+unknown复算恢复三主MAE与有效像素数量。
+新Adam、零统计、seed首相机image_0096、真实训练内17/18/40与增密梯度算子审计、训练存活native/tracer及194来源SHA均独立fresh核查。11前向max_abs全0，真实exit0，4资产前后不变。
+
+### 完整实际fresh与六步骤执行命令
+
+```bash
+env CUDA_VISIBLE_DEVICES=1 OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1 TORCH_CUDA_ARCH_LIST=8.6 'LD_LIBRARY_PATH=/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-07-六组训练总控/tools/libs/usr/lib/x86_64-linux-gnu' /home/han.li/miniconda3/envs/lumimotion-ushas/bin/python /home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/bootstrap_1011.py /home/han.li/reproduce/LumiMotion-stage2-perlight LIHAN.scripts.goal3_densify_parity --model_path '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-17-LH-static-jumpingjacks_DL_V2-F-T05-非normal增密下限2k/model_mlp' --source_path '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/eval_view' --load_iter 18000 --frame 96 --output_dir '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-17-LH-static-jumpingjacks_DL_V2-F-T05-非normal增密下限2k/fresh_parity_18000'
+```
+
+```bash
+env CUDA_VISIBLE_DEVICES=1 OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1 TORCH_CUDA_ARCH_LIST=8.6 'LD_LIBRARY_PATH=/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-07-六组训练总控/tools/libs/usr/lib/x86_64-linux-gnu' /home/han.li/miniconda3/envs/lumimotion-ushas/bin/python /home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/goal3_densify_run.py --model '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-17-LH-static-jumpingjacks_DL_V2-F-T05-非normal增密下限2k/model_mlp' --iteration 18000 --output '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-17-LH-static-jumpingjacks_DL_V2-F-T05-非normal增密下限2k/evaluation_18000' --gpu 1 --execute
+```
+
+真实PID：fresh 2661666，评测总控2661959；两实际exit0。日志：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-17-LH-static-jumpingjacks_DL_V2-F-T05-非normal增密下限2k/logs/fresh18000.log`、`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-17-LH-static-jumpingjacks_DL_V2-F-T05-非normal增密下限2k/logs/evaluation18000.log`，各六子命令与日志完整列于 `/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-17-LH-static-jumpingjacks_DL_V2-F-T05-非normal增密下限2k/evaluation_18000/plan.json`、`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-17-LH-static-jumpingjacks_DL_V2-F-T05-非normal增密下限2k/evaluation_18000/executed.json`及下面渲染清单。
+渲染输出：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-17-LH-static-jumpingjacks_DL_V2-F-T05-非normal增密下限2k/evaluation_18000/four_classes`，RGB/Alpha/Normal/Separation各150 PNG与150帧MP4，完整CPU解码PASS。
+
+### 四类人工目检
+
+- rgb：侧向10、斜俯视80和斜正面150均有连续双腿与双鞋主体；鞋尖仍钝、短缩，颜色存在不等于完整三维鞋形。真实a0 RGB含直射和阴影，未新增训练光照。
+- alpha：轮廓和平台连续；平台与脚共用Alpha，可在鞋射线上保持1，因此Alpha完整不能排除平台替代或鞋尖偏低。
+- normal：双腿主体连续、没有大段消失；鞋尖/鞋底边缘仍偏平，鞋部GT外轮廓内存在局部低高度与边缘大角误差，完整足形FAILED。
+- separation：原static feature flag分离完整输出；单一静态标签显示符合现入口，但不表示动作/语义足部区域，也不能证明鞋尖完整。
+
+人工范围：四类PNG及真实视频抽帧10/80/150；鞋部10/20/40/80/90/140/150。自动完整视频解码不称人工逐帧验收。代表图：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-17-LH-static-jumpingjacks_DL_V2-F-T05-非normal增密下限2k/evaluation_18000/four_classes/four_classes_10_80_150.png`，真实视频抽帧：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-17-LH-static-jumpingjacks_DL_V2-F-T05-非normal增密下限2k/evaluation_18000/manual_review/actual_video_10_80_150.png`；关键鞋证据：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-17-LH-static-jumpingjacks_DL_V2-F-T05-非normal增密下限2k/evaluation_18000/spatial_diagnostic/figures/footwear_zoom_0020.png`、`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-17-LH-static-jumpingjacks_DL_V2-F-T05-非normal增密下限2k/evaluation_18000/spatial_diagnostic/figures/footwear_zoom_0140.png`。四视频：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-17-LH-static-jumpingjacks_DL_V2-F-T05-非normal增密下限2k/evaluation_18000/four_classes/rgb.mp4`, `/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-17-LH-static-jumpingjacks_DL_V2-F-T05-非normal增密下限2k/evaluation_18000/four_classes/alpha.mp4`, `/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-17-LH-static-jumpingjacks_DL_V2-F-T05-非normal增密下限2k/evaluation_18000/four_classes/normal.mp4`, `/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-17-LH-static-jumpingjacks_DL_V2-F-T05-非normal增密下限2k/evaluation_18000/four_classes/separation.mp4`.
+同GT object_4鞋6185原eligible像素局部MAE：{'gs_render': 17.090985903700602, 'depth_normal': 24.47837486406081, 'mesh': 26.112361449650187}；Expected/Median/Mesh同射线2cm内率：{'expected': 0.7500404203718675, 'median': 0.7993532740501212, 'mesh_depth': 0.7345189975747777}；近平台替代代理：{'expected': 0.04090541632983023, 'median': 0.07760711398544867, 'mesh_depth': 0.1864187550525465}。
+GT语义仅离线；Alpha包含平台，不能拿全白鞋区域替代三维足形证据。终审：`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-17-LH-static-jumpingjacks_DL_V2-F-T05-非normal增密下限2k/evaluation_18000/FINAL_REVIEW_COMPLETED.json`、`/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-17-LH-static-jumpingjacks_DL_V2-F-T05-非normal增密下限2k/evaluation_18000/goal3_final/goal3_acceptance.json`。checkpoint、失败渲染、统计及日志原样保留。
+
+完整训练与六渲染命令、source/model/iteration、日志和所有代表图视频见实验根README；本组最终FAILED，不修改原门槛或历史归档。
