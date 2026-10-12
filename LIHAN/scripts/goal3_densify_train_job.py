@@ -46,6 +46,31 @@ def ticks(pid):
     return Path(f"/proc/{pid}/stat").read_text().rsplit(")", 1)[1].split()[19]
 
 
+
+def verify_snapshot(spec):
+    argv = spec['argv']
+    snapshot = Path(argv[2]).resolve()
+    if not snapshot.is_relative_to(ROOT / 'output') or snapshot == ROOT / 'output':
+        raise ValueError('训练必须使用output内独立冻结快照。')
+    manifest_path = snapshot / 'snapshot_manifest.json'
+    manifest_sha = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+    if manifest_sha != spec.get('snapshot_manifest_sha256'):
+        raise ValueError('命令必须绑定冻结snapshot manifest SHA。')
+    manifest = json.loads(manifest_path.read_text())
+    if manifest['status'] != 'READY' or Path(manifest['destination']).resolve() != snapshot:
+        raise ValueError('快照状态或destination不匹配。')
+    entry = argv[3].replace('.', '/') + '.py'
+    files = manifest['file_sha256']
+    if entry not in files or files[entry] != spec.get('entry_sha256'):
+        raise ValueError('入口未列入快照或未绑定入口SHA。')
+    for name, expected in files.items():
+        path = (snapshot / name).resolve()
+        if not path.is_relative_to(snapshot) or hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+            raise ValueError('快照文件来源不符：' + name)
+    return dict(snapshot=str(snapshot), manifest_sha256=manifest_sha,
+                entry=entry, entry_sha256=files[entry], verified_files=len(files))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--command", type=Path, required=True)
@@ -64,6 +89,7 @@ def main():
     if (Path(argv[1]).resolve() != ROOT / "LIHAN/scripts/bootstrap_1011.py"
             or argv[3] not in TRAINING_MODULES):
         raise ValueError("必须通过仓库 bootstrap 加载原生训练入口")
+    snapshot_proof = verify_snapshot(spec)
     model = Path(argv[argv.index("--model_path") + 1]).resolve()
     if model.parent != output:
         raise ValueError("模型必须输出到本任务目录")
@@ -83,7 +109,7 @@ def main():
     if len(occupants) >= 2:
         raise RuntimeError(f"GPU{gpu} 已有 {len(occupants)} 个计算进程，拒绝新增训练")
     proof = dict(host=host, gpu_physical=gpu, gpu_uuid=device[1], child_env=effective,
-                 argv=argv, existing_compute_pids=sorted(occupants), checked_at_utc=now())
+                 argv=argv, snapshot_verification=snapshot_proof, existing_compute_pids=sorted(occupants), checked_at_utc=now())
     if args.dry_run:
         print(json.dumps(proof, ensure_ascii=False, indent=2))
         return
