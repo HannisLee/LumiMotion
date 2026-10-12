@@ -1,0 +1,51 @@
+{
+  "status": "PASS",
+  "images": [
+    {
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-21-LH-static-jumpingjacks_DL_V2-F-T04中间检查点回溯/iteration_16500/evaluation_16500/spatial_diagnostic/figures/footwear_zoom_0020.png",
+      "destination": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-10-足部T04中间检查点轨迹审计/16500正面鞋部.png",
+      "sha256": "ff3017587e03c99c9f1afe8afc58d7ee2f45324518ad559cd4bed9b14cfeb001"
+    },
+    {
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-21-LH-static-jumpingjacks_DL_V2-F-T04中间检查点回溯/iteration_16500/evaluation_16500/spatial_diagnostic/figures/footwear_zoom_0010.png",
+      "destination": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-10-足部T04中间检查点轨迹审计/16500侧面鞋部.png",
+      "sha256": "d19c6e723e31425f26cd940fe023f486b011765e443c570afebdf9c348380b65"
+    },
+    {
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-21-LH-static-jumpingjacks_DL_V2-F-T04中间检查点回溯/iteration_16500/evaluation_16500/four_classes/four_classes_10_80_150.png",
+      "destination": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-10-足部T04中间检查点轨迹审计/16500四类三视角.png",
+      "sha256": "d6f55ef7b55e9184d233c8cc5fc3a9c16f33801be6d041fea914773df5f3f6f8"
+    },
+    {
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-21-LH-static-jumpingjacks_DL_V2-F-T04中间检查点回溯/iteration_17000/evaluation_17000/spatial_diagnostic/figures/footwear_zoom_0020.png",
+      "destination": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-10-足部T04中间检查点轨迹审计/17000正面鞋部.png",
+      "sha256": "2794ddda542fda0efeeda3debad5a98a1da63762cdf3c2db710f2b263f0d2347"
+    },
+    {
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-21-LH-static-jumpingjacks_DL_V2-F-T04中间检查点回溯/iteration_17000/evaluation_17000/spatial_diagnostic/figures/footwear_zoom_0010.png",
+      "destination": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-10-足部T04中间检查点轨迹审计/17000侧面鞋部.png",
+      "sha256": "e875bdf293c253167d0df5f5a945908565251cdcb1f1ac11d6bd6c31a32040d7"
+    },
+    {
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-21-LH-static-jumpingjacks_DL_V2-F-T04中间检查点回溯/iteration_17000/evaluation_17000/four_classes/four_classes_10_80_150.png",
+      "destination": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-10-足部T04中间检查点轨迹审计/17000四类三视角.png",
+      "sha256": "fe0dd47d43647bc09973a3f610477f9e00026028a9d7ff7de08e92f9770caaeb"
+    },
+    {
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-21-LH-static-jumpingjacks_DL_V2-F-T04中间检查点回溯/iteration_17500/evaluation_17500/spatial_diagnostic/figures/footwear_zoom_0020.png",
+      "destination": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-10-足部T04中间检查点轨迹审计/17500正面鞋部.png",
+      "sha256": "dea1af6c0d7944b863665792a969d19d6a9997d5069eb220a46095106c39e0fb"
+    },
+    {
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-21-LH-static-jumpingjacks_DL_V2-F-T04中间检查点回溯/iteration_17500/evaluation_17500/spatial_diagnostic/figures/footwear_zoom_0010.png",
+      "destination": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-10-足部T04中间检查点轨迹审计/17500侧面鞋部.png",
+      "sha256": "0971e4adb496219f848bdc26bf30423ea8f2ecec1fc902aae072e842190eade1"
+    },
+    {
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-21-LH-static-jumpingjacks_DL_V2-F-T04中间检查点回溯/iteration_17500/evaluation_17500/four_classes/four_classes_10_80_150.png",
+      "destination": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/DOC/报告/assets/1012-10-足部T04中间检查点轨迹审计/17500四类三视角.png",
+      "sha256": "6745430972c3307ccb719f33c0035f7ffd57673e2b1425a2135d74fddbd1e173"
+    }
+  ],
+  "scope": "原图复制，未编辑图像。"
+}
