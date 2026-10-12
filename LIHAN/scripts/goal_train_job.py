@@ -22,7 +22,8 @@ ENVIRONMENTS["venus"] = "lumimotion"
 TRAINING_MODULES = {"scripts.train_static_dl", "scripts.train_static_dl_shadow_split",
                     "scripts.train_static_dl_censored", "scripts.train_static_dl_depth_statistic",
                     "scripts.train_static_dl_direction_weighted", "scripts.train_static_dl_early_geometry",
-                    "scripts.train_static_dl_ambient", "scripts.train_static_dl_normal_opacity"}
+                    "scripts.train_static_dl_ambient", "scripts.train_static_dl_normal_opacity",
+                    "scripts.train_static_dl_reset_audit"}
 
 
 def now():
