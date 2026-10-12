@@ -22,8 +22,20 @@
 
 若高差距档未呈现更大的normal残差及更强几何梯度冲突，停止该方案正式训练。若支持，再由Astra提出同起点、同预算的单因素实验；本计划本身不批准任何新2k训练。
 
-## 输出与执行状态
+## 实际执行与结果
 
-输出：`output/1012-12-LH-static-jumpingjacks_DL_V2-G2-预测深度混合法线梯度零更新诊断`。独立入口由规划Agent实现，完整命令、源SHA、GPU／活跃模块、日志及诊断汇总运行后追加。每卡任务上限2，尊重并发足部Goal及其他已有任务。
+输出：`output/1012-12-LH-static-jumpingjacks_DL_V2-G2-预测深度混合法线梯度零更新诊断`。主机`ushas`，Python为`/home/han.li/miniconda3/envs/lumimotion-ushas/bin/python`。固定模型`output/1012-09-LH-static-jumpingjacks_DL_V2-G2-T06-reset后normal阻断透明度2k/model_mlp`@16000，使用`stage1-reset-audit-native-assets-20261012-retry1`快照。helper SHA256：`965e54c6f5e79636c23f7613e1c398b10a056542cd8cd46f0e7f86205b0af02b`。
 
-当前状态：预注册完成，尚未执行。常规执行由Luna负责；现有Agent唤醒曾被工具以agent thread limit reached拒绝，待空闲后重试，不视作科学失败。
+完整命令：
+
+```bash
+CUDA_DEVICE_ORDER=PCI_BUS_ID CUDA_VISIBLE_DEVICES=GPU-b8e1473e-b813-9d70-aa90-5ebbf901aec4 /home/han.li/miniconda3/envs/lumimotion-ushas/bin/python /home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/scripts/goal2_normal_confidence_profile.py --model /home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-09-LH-static-jumpingjacks_DL_V2-G2-T06-reset后normal阻断透明度2k/model_mlp --iteration 16000 --snapshot /home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-01-静态DL-两度目标总控/snapshots/stage1-reset-audit-native-assets-20261012-retry1 --output /home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-12-LH-static-jumpingjacks_DL_V2-G2-预测深度混合法线梯度零更新诊断
+```
+
+进程PID `2569688`，exit code `0`；运行于GPU1（UUID `GPU-b8e1473e-b813-9d70-aa90-5ebbf901aec4`），结束后释放。实际加载native rasterizer SHA256为`f9514476baec5854c88862404f266242e62b1f828304f541745260fb012d43f3`，surfel tracer SHA256为`5b666e2b3b9fcae5b3137f3689b1ea43e44e2f892874c08ffb0257244ac8809e`。完整执行日志为输出目录内`logs/profile.log`，启动资源为`logs/prelaunch_resources.json`，命令亦记录于`logs/command.txt`与`plan.json`。
+
+零更新核验`PASS`：135/135原TRAIN帧完成，4,494,614个有效像素；`optimizer_created=false`、参数更新数0、未加载测试图，模型参数、输入、源码及CPU/CUDA随机状态前后不变。未运行训练或科学MAE。
+
+观测结果为混合证据。tau为0.00858005米；delta大于tau的像素占14.28%，其法线残差均值为0.15670，低于tau/2档为0.000503，中间档为0.005293，显示高分歧像素有更大残差。但梯度冲突没有随分歧档一致增强。这里分别报告summary中的三种口径：对全体点聚合的负内积点比例（`negative_point_fraction`），高档XYZ/quaternion为55.51%/52.80%，低档为53.36%/43.62%；存在负内积的视角占比（`negative_view_fraction`），高档XYZ/quaternion为28.15%/41.48%，低档为49.63%/32.59%；负内积点-视角对占比（`negative_point_view_fraction`），高档XYZ/quaternion为49.28%/49.91%，低档为49.44%/48.65%。因此不能据此声称高分歧区存在更强冲突。候选权重下汇总normal梯度范数降至uniform的XYZ 0.416、quaternion 0.277，逐视角范数降至0.246/0.193，表明候选显著缩小了梯度量级；这不足以证明几何修复或训练收益。
+
+本次仅为诊断，不启动基于该权重的训练，也不把诊断`PASS`解释为科学假设获支持或模型修复成功。规划Agent复核135帧后判定：高深度差像素承担96.54%的normal残差，但与RGB的梯度冲突并未一致增强；候选主要显著减弱normal梯度。按预注册门槛，置信度调权方案本轮科学结论为**FAILED／停止正式训练**，诊断执行本身PASS。完整本轮归档见`LIHAN/DOC/报告/1012-05-静态DL两度目标T01至T06与脚部机制归档报告.md`。
