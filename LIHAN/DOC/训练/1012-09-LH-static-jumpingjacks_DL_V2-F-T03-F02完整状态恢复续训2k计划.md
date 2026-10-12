@@ -21,7 +21,7 @@
 
 使用冻结原15帧与原掩膜评测RGB／Alpha／Normal／Separation及Goal三类法线与局部鞋部诊断。对比F-T02@16000与冻结基线；分别报告全局数值门槛、Expected/Mesh鞋尖长度和高度、多视角腿足完整性。保留渲染命令、source/model/iteration、渲染目录、日志、定量结果、代表图/视频、四类目检及最终`PASS`/`FAILED`。在完成目检前不得将训练exit 0或fresh通过视为最终通过；失败结果及模型、渲染、统计和日志必须保留。
 
-当前状态：resume入口已稳定；py_compile与CPU静态接口审查通过。真实恢复烟测已从F-T02@16000运行110步至16110并保存16100/16110；93项状态恢复检查、GPU/runtime capture和source provenance均PASS。fresh parity仍待执行/完成，故正式2k未启动，不能从烟测继续。正式命令以parity通过后存档的`commands/train.json`为准。
+当前状态：resume入口已稳定；py_compile与CPU静态接口审查通过。真实恢复烟测已从F-T02@16000运行110步至16110并保存16100/16110；93项状态恢复检查、GPU/runtime capture和source provenance均PASS。fresh parity已通过；root批准后正式2k从正式F-T02@16000重新恢复并已启动，绝不从smoke续训。正式完整命令与argv已存档于输出目录`commands/train.json`。
 
 ## 真实状态恢复烟测记录（2026-10-12）
 
@@ -30,4 +30,19 @@
 - 训练PID 2564275，物理GPU1 UUID `GPU-b8e1473e-b813-9d70-aa90-5ebbf901aec4`，真实退出码0；supervisor与活跃runtime采集均PASS。raster/tracer SHA与配对训练一致，见smoke目录`actual_runtime_capture.json`。
 - `state_restore_audit.json`的93项均为true；Adam组和LR、增密统计、RNG、相机余栈匹配。恢复后余栈25项，期望下一相机`image_0054`（index48），restored xyz LR=`6.861567188727149e-05`。这只是审计起点结果；下一相机与真实16101更新的逐项parity还需fresh工具终审。
 - 首次supervisor预检因output目录和model_path不在同一任务目录而拒绝，未创建训练PID、无CUDA更新；原日志和拒绝状态保留于smoke目录`attempts/preflight-output-mismatch`。修正为整个smoke任务都在`output/smoke_test`后第二次执行成功。
-- 当前烟测不是正式结果；fresh parity通过前不启动正式续训。
+- 当前烟测不是正式结果；fresh parity通过后，root已批准正式续训并于2026-10-12启动；实际GPU/PID/退出码及评测结果待运行结束后补录。
+
+
+## 真实16110 Fresh parity与正式训练启动
+
+- 独立fresh：`output/smoke_test/1012-17-F-T03-F02状态恢复真实续训110步smoke/fresh_parity_16110`，真实checkpoint@16110，status=PASS。11项真实前向输出最大绝对差为0；实际首个训练camera为`image_0054`、global iteration 16001，与保存的camera_rng/余栈和metadata一致；Adam组LR一致。训练新科学源13项、起点资产7项及相关177条来源通过审查，fresh checkpoint哈希一致；审计详情见`parity.json`和`logs/fresh_parity_16110.log`。
+- root已批准正式续训从正式F-T02@16000重新初始化完整训练状态，2000次更新至18000；GPU1，启动、source、reset和runtime都以正式输出目录状态和日志为准。命令为`output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/commands/train.sh`，实际child argv在`commands/train.json`。烟测模型不参与正式训练。
+
+## 正式训练执行记录（2026-10-12）
+
+正式训练从真实F-T02@16000 optimizer/checkpoint与camera余栈恢复，不使用烟测产物；global 16001–18000完成2000次optimizer更新，保存16500、17000、17500、18000。训练使用固定`detach_opacity`、ambient=0、`reset_policy=skip_all`；训练终点point_count=55957，Opacity reset performed/skipped均为0，clock_shift_diagnostic=false，initial_sources_unchanged=true。监督边界仍为原135张训练图的RGB/Alpha、相机及允许的GT光照方向，不使用测试图或其他GT监督。
+
+- 完整child argv、命令JSON：`output/1012-11-LH-static-jumpingjacks_DL_V2-F-T03-F02完整状态恢复续训2k/commands/train.json`；shell入口`commands/train.sh`；bootstrap `argv[2]`指向不可变`foot-resume-stable`快照。命令SHA256 `c86c0a811240a240ba0f96af435d206ba59b5f66dcf1a430755bcb14e88819c1`。
+- PID 2567197，GPU1 UUID `GPU-b8e1473e-b813-9d70-aa90-5ebbf901aec4`，2026-10-12T02:10:42Z真实退出码0，GPU验证通过。监督器状态`TRAINING_COMPLETED_PENDING_EVAL`；supervisor与实际活跃runtime捕获PASS。
+- raster SHA256 `f9514476baec5854c88862404f266242e62b1f828304f541745260fb012d43f3`；surfel tracer SHA256 `5b666e2b3b9fcae5b3137f3689b1ea43e44e2f892874c08ffb0257244ac8809e`。日志在输出目录`logs/train.log`，runtime/source审计见`actual_runtime_capture.json`与`model_mlp/foot_resume_training.json`。
+- 训练完整性通过不表示定量或视觉效果通过。本阶段Goal已暂停，因此尚未启动正式fresh/原15/150步评测；render命令、MAE、代表图/视频、RGB/Alpha/Normal/Separation目检及最终`PASS`/`FAILED`均保持`PENDING`。完整训练checkpoint和日志保留，等待恢复评测指令。
