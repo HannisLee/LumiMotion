@@ -1,0 +1,60 @@
+{
+  "status": "PASS_EVIDENCE_GOAL_FAILED",
+  "utc": "2026-10-12T01:58:38.740821+00:00",
+  "runs": [
+    {
+      "path": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-09-LH-static-jumpingjacks_DL_V2-F-T01-保留重置足部恢复2k/evaluation_16000/FINAL_REVIEW_COMPLETED.json",
+      "sha256": "2d163d98d4bee57df5d932d6ebe31c44984307ab21ecf034d1d6c6f52b2f8f9d",
+      "checks": {
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-09-LH-static-jumpingjacks_DL_V2-F-T01-保留重置足部恢复2k/evaluation_16000/goal_mae_summary.json": true,
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-09-LH-static-jumpingjacks_DL_V2-F-T01-保留重置足部恢复2k/evaluation_16000/goal3_final/goal3_acceptance.json": true,
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-09-LH-static-jumpingjacks_DL_V2-F-T01-保留重置足部恢复2k/evaluation_16000/artifact_decode_audit.json": true,
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-09-LH-static-jumpingjacks_DL_V2-F-T01-保留重置足部恢复2k/evaluation_16000/visual_review_completed.json": true,
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-09-LH-static-jumpingjacks_DL_V2-F-T01-保留重置足部恢复2k/fresh_parity_16000/parity.json": true,
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-09-LH-static-jumpingjacks_DL_V2-F-T01-保留重置足部恢复2k/evaluation_16000/spatial_diagnostic/summary.json": true,
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-09-LH-static-jumpingjacks_DL_V2-F-T01-保留重置足部恢复2k/evaluation_16000/checkpoint_after_audit.json": true,
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-09-LH-static-jumpingjacks_DL_V2-F-T01-保留重置足部恢复2k/evaluation_16000/executed.json": true,
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-09-LH-static-jumpingjacks_DL_V2-F-T01-保留重置足部恢复2k/actual_runtime_capture.json": true
+      },
+      "status": "FAILED",
+      "numeric": "FAILED",
+      "geometry": "FAILED",
+      "values": {
+        "gs_render": 2.9604311069733855,
+        "depth_normal": 5.779198766500639,
+        "mesh": 4.3026051631680895,
+        "expected": 0.014375255991212789,
+        "median": 0.012118109332565501
+      }
+    },
+    {
+      "path": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-10-LH-static-jumpingjacks_DL_V2-F-T02-跳过重置足部恢复2k/evaluation_16000/FINAL_REVIEW_COMPLETED.json",
+      "sha256": "aac6e09fc5907bf04c7bb997ad5ae05d1e97e87b10736b9595fb44aa76b5f995",
+      "checks": {
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-10-LH-static-jumpingjacks_DL_V2-F-T02-跳过重置足部恢复2k/evaluation_16000/goal_mae_summary.json": true,
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-10-LH-static-jumpingjacks_DL_V2-F-T02-跳过重置足部恢复2k/evaluation_16000/goal3_final/goal3_acceptance.json": true,
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-10-LH-static-jumpingjacks_DL_V2-F-T02-跳过重置足部恢复2k/evaluation_16000/artifact_decode_audit.json": true,
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-10-LH-static-jumpingjacks_DL_V2-F-T02-跳过重置足部恢复2k/evaluation_16000/visual_review_completed.json": true,
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-10-LH-static-jumpingjacks_DL_V2-F-T02-跳过重置足部恢复2k/fresh_parity_16000/parity.json": true,
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-10-LH-static-jumpingjacks_DL_V2-F-T02-跳过重置足部恢复2k/evaluation_16000/spatial_diagnostic/summary.json": true,
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-10-LH-static-jumpingjacks_DL_V2-F-T02-跳过重置足部恢复2k/evaluation_16000/checkpoint_after_audit.json": true,
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-10-LH-static-jumpingjacks_DL_V2-F-T02-跳过重置足部恢复2k/evaluation_16000/executed.json": true,
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1012-10-LH-static-jumpingjacks_DL_V2-F-T02-跳过重置足部恢复2k/actual_runtime_capture.json": true
+      },
+      "status": "FAILED",
+      "numeric": "PASS",
+      "geometry": "FAILED",
+      "values": {
+        "gs_render": 2.7748653969040467,
+        "depth_normal": 5.545685124204474,
+        "mesh": 4.249532330679964,
+        "expected": 0.013720882857340164,
+        "median": 0.011876579867479916
+      }
+    }
+  ],
+  "root_manual_foot_frames_for_F02": [
+    10,
+    80
+  ]
+}
