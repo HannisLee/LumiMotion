@@ -20,9 +20,12 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 MODEL = ROOT / 'output/1012-16-LH-static-jumpingjacks_DL_V2-F-T04-原增密续训2k/model_mlp'
 SNAPSHOT = ROOT / 'output/1012-20-LH-static-jumpingjacks_DL_V2-F-T04-T05执行总控/snapshots/foot-densify-stable'
-OUTPUT = ROOT / 'output/1012-23-LH-static-jumpingjacks_DL_V2-F-T07光度支持与几何梯度零更新诊断'
+OUTPUT = ROOT / 'output/1012-25-LH-static-jumpingjacks_DL_V2-G2-T07光度支持与几何梯度零更新诊断'
+PROBE_OUTPUT = ROOT / 'output/smoke_test/1012-23-staticDL-G2-T07真实native零更新探针'
+PROBE_FRAMES = ('0001', '0071', '0149')
 BOOTSTRAP = ROOT / 'LIHAN/scripts/bootstrap_1011.py'
 ITERATION, SEED = 16500, 1012
+GRADIENT_TOLERANCE = dict(atol=1e-8, rtol=1e-3, relative_l2_max=1e-3)
 PARAMETERS = ('xyz', 'scaling', 'rotation', 'opacity')
 BRANCHES = ('photo', 'alpha', 'distortion', 'normal', 'normal_render', 'normal_depth')
 PAIRS = tuple(itertools.combinations(BRANCHES, 2))
@@ -52,8 +55,24 @@ def tensor_digest(values):
     h = hashlib.sha256()
     for name, value in sorted(values.items()):
         h.update(name.encode()); h.update(str(tuple(value.shape)).encode())
+        h.update(str(value.dtype).encode()); h.update(str(value.device).encode())
+        h.update(str(value.requires_grad).encode())
         h.update(value.detach().cpu().contiguous().numpy().tobytes())
     return h.hexdigest()
+
+
+def model_tensors(pc, lights):
+    """冻结全部pc公开/私有Tensor及灯参数、方向；tracer的BVH缓存不算模型参数。"""
+    import torch
+    values = {f'pc.{n}': v for n, v in vars(pc).items() if isinstance(v, torch.Tensor)}
+    values.update({f'lights.parameter.{n}': v for n, v in lights.named_parameters()})
+    values.update({f'lights.buffer.{n}': v for n, v in lights.named_buffers()})
+    values.update({f'lights.direction.{n}': v for n, v in lights.directions.items()})
+    return values
+
+
+def grad_fields_empty(values):
+    return all(v.grad is None for v in values.values() if v.is_leaf or v.retains_grad)
 
 
 def rng_snapshot():
@@ -63,6 +82,19 @@ def rng_snapshot():
             'numpy': hashlib.sha256(pickle.dumps(np.random.get_state())).hexdigest(),
             'torch': tensor_digest({'state': torch.get_rng_state()}),
             'cuda': tensor_digest({str(i): s for i, s in enumerate(torch.cuda.get_rng_state_all())})}
+
+
+def camera_input_paths(cfg, metadata):
+    """在图像加载前复现冻结loader路径规则；只解析原TRAIN相机JSON，不打开候选图片。"""
+    paths = []
+    for frame in metadata['frames']:
+        raw = Path(os.path.join(cfg['source_path'], cfg['train_light_folder'], frame['file_path']))
+        image = raw if frame['file_path'].endswith(('jpg','png')) else Path(str(raw)+'.png')
+        rgba = raw.parent.parent / 'rgba'
+        if rgba.exists():
+            image = Path(str(rgba / raw.name).replace('.jpg','.png'))
+        paths.append(image.resolve())
+    return paths
 
 
 def preflight():
@@ -101,6 +133,10 @@ def preflight():
     # marker固定SHA使此137项白名单不能通过改写marker扩张到GT/test。
     if len(t['training_inputs']) != 137:
         raise AssertionError('原输入不是137项。')
+    whitelist = {Path(p).resolve() for p in t['training_inputs']}
+    camera_paths = camera_input_paths(cfg, metadata)
+    if len(set(camera_paths)) != 135 or any(p not in whitelist for p in camera_paths):
+        raise AssertionError('冻结loader实际将读取的图像不在原135 TRAIN白名单，加载前拒绝。')
     for p, h in t['training_inputs'].items():
         if digest(p) != h:
             raise AssertionError('原TRAIN输入变化：' + p)
@@ -139,7 +175,9 @@ def initialize():
     cfg, training, static, lighting, inputs, sources = preflight()
     if Path.cwd().resolve() != SNAPSHOT:
         raise AssertionError('未通过真实原bootstrap进入固定快照。')
-    for func in (render_photometric, geometry_losses, censored_photometric_loss, readCamerasFromTransforms, cameraList_from_camInfos):
+    for func in (render_photometric, geometry_losses, censored_photometric_loss,
+                 readCamerasFromTransforms, cameraList_from_camInfos, GaussianModel,
+                 DirectionOnlyLights, StaticVisibility, frame_key):
         p = str(Path(sys.modules[func.__module__].__file__).resolve())
         if p not in sources or digest(p) != sources[p]:
             raise AssertionError('实际科学函数来源未冻结：' + p)
@@ -223,7 +261,9 @@ def gradient_match(actual, expected):
     diff = a - b
     rel = float(np.linalg.norm(diff) / max(np.linalg.norm(a), np.linalg.norm(b), 1e-30))
     maximum = float(np.max(np.abs(diff)))
-    return dict(passed=bool(np.allclose(a, b, atol=1e-8, rtol=1e-3) and rel <= 1e-3), max_abs=maximum, relative_l2=rel)
+    return dict(passed=bool(np.allclose(a, b, atol=GRADIENT_TOLERANCE['atol'],
+        rtol=GRADIENT_TOLERANCE['rtol']) and rel <= GRADIENT_TOLERANCE['relative_l2_max']),
+        max_abs=maximum, relative_l2=rel, tolerance=GRADIENT_TOLERANCE)
 
 
 def pixel_diagnostics(image, target, alpha, dphoto, geometry):
@@ -278,11 +318,25 @@ def cpu_check():
     direct = torch.autograd.grad(normal, p, retain_graph=True)[0]
     vr, vd = torch.autograd.grad(normal, (rn, dn), retain_graph=True)
     split = torch.autograd.grad(rn, p, vr.detach(), retain_graph=True)[0] + torch.autograd.grad(dn, p, vd.detach())[0]
+    fake_pc = Namespace(weight=torch.nn.Parameter(torch.ones(2)), unused=torch.zeros(3))
+    fake_lights = torch.nn.Module(); fake_lights.log_intensity = torch.nn.Parameter(torch.zeros(2))
+    fake_lights.directions = {'0001':torch.tensor([[0.,0.,1.]])}
+    inventory = model_tensors(fake_pc, fake_lights)
+    inventory_before = tensor_digest(inventory)
+    fake_pc.weight.grad = torch.ones_like(fake_pc.weight)
+    grad_nonempty_detected = not grad_fields_empty(model_tensors(fake_pc, fake_lights))
+    fake_pc.weight.grad = None
     calls = {n.func.attr for n in ast.walk(ast.parse(Path(__file__).read_text())) if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute)}
     checks = dict(frozen_sources_and_137_inputs=True, no_test_frames=t['train_images'] == 135 and not t['test_images_loaded'],
         exact_censor_derivative=bool(torch.allclose(grad, ref, atol=1e-8, rtol=1e-6)), satisfied_fullcode_zero=bool((grad[..., 2] == 0).all()),
         opposing_gradients=stats['photo_vs_normal__xyz__cos'][0] == -1., tiny_gradients_supported=bool(stats['photo_vs_normal__xyz__supported'][1]),
         zero_gradients_unsupported=not bool(stats['photo_vs_normal__xyz__supported'][2]), vjp_sum=bool(torch.equal(direct, split)),
+        all_model_tensor_inventory=set(inventory)=={'pc.weight','pc.unused','lights.parameter.log_intensity','lights.direction.0001'},
+        grad_fields_complete=grad_nonempty_detected and grad_fields_empty(model_tensors(fake_pc,fake_lights)),
+        inventory_digest_stable=inventory_before==tensor_digest(model_tensors(fake_pc,fake_lights)),
+        output_scope=OUTPUT.parent==ROOT/'output' and PROBE_OUTPUT.parent==ROOT/'output/smoke_test',
+        probe_frames_train_only=len(PROBE_FRAMES)==3 and all(int(k)%10 for k in PROBE_FRAMES),
+        loader_paths_whitelisted_before_read=len(camera_input_paths(cfg,json.loads((Path(cfg['source_path'])/'transforms_train.json').read_text())))==135,
         no_optimizer_or_topology_calls=not bool(calls & {'step', 'training_setup', 'densify_and_prune', 'densify_and_split', 'densify_and_clone', 'prune_points', 'reset_opacity'}))
     result=dict(status='PASS_CPU_ONLY' if all(checks.values()) else 'FAILED', checks={k:bool(v) for k,v in checks.items()}, source_count=len(sources), input_count=len(inputs),
         note='仅CPU公式/来源预检，无CUDA初始化；真实135TRAIN梯度分解/显存与科学结论待独立执行。')
@@ -290,7 +344,7 @@ def cpu_check():
     if not all(checks.values()): raise AssertionError('CPU检查失败。')
 
 
-def run(output):
+def run(output, probe_only=False):
     import numpy as np
     import torch
     from scene.static_dl_ambient import render_photometric
@@ -298,19 +352,36 @@ def run(output):
     from scene.static_dl_censored import censored_photometric_loss
     pc, lights, cameras, pipe, visibility, inputs, sources, provenance = initialize()
     params = {n: getattr(pc, '_' + n) for n in PARAMETERS}
-    all_params = {n: getattr(pc, n) for n in ('_xyz', '_rotation', '_scaling', '_opacity', '_albedo_dc', '_albedo_rest', '_roughness', 'feature')}
-    all_params['light_log_intensity'] = lights.log_intensity
-    if pc.optimizer is not None or any(p.grad is not None for p in all_params.values()):
+    all_params = model_tensors(pc, lights)
+    if pc.optimizer is not None or not grad_fields_empty(all_params):
         raise AssertionError('不能存在优化器或遗留参数梯度。')
     before, rng_before = tensor_digest(all_params), rng_snapshot()
     local_rng, remaining, order = random.Random(SEED), list(range(135)), []
     while remaining: order.append(remaining.pop(local_rng.randrange(len(remaining))))
+    if probe_only:
+        from scene.stage2_photometric import frame_key
+        lookup = {frame_key(c.image_name_train_light): i for i, c in enumerate(cameras)}
+        order = [lookup[k] for k in PROBE_FRAMES]
+    else:
+        probe_path = PROBE_OUTPUT / 'summary.json'
+        probe_plan = PROBE_OUTPUT / 'plan.json'
+        if not probe_path.is_file() or not probe_plan.is_file():
+            raise AssertionError('全135诊断前必须完成独立真实native三帧探针。')
+        probe, registered = json.loads(probe_path.read_text()), json.loads(probe_plan.read_text())
+        if (probe['status'] != 'PASS' or not probe.get('probe_only') or probe['frames'] != 3
+                or registered['code_sources'] != sources or registered['inputs_before'] != inputs
+                or registered['gradient_tolerance'] != GRADIENT_TOLERANCE):
+            raise AssertionError('三帧探针未通过或来源/容差已改变，必须独立重审。')
     original_command = json.loads(os.environ['LUMI_PHOTO_PROFILE_COMMAND_JSON'])
     output.mkdir(parents=True, exist_ok=True); (output / 'per_frame').mkdir(exist_ok=False)
     plan=dict(model=str(MODEL), iteration=ITERATION, source=pipe.source_path, snapshot=str(SNAPSHOT), command=original_command, command_shell=shlex.join(original_command),
         inputs_before=inputs, code_sources=sources, native_provenance=provenance, parameter_digest_before=before, rng_before=rng_before,
-        rng_scope='模型初始化完成后、诊断135帧之前至之后；不冒称重放历史RNG/Adam', frames=[cameras[i].image_name_train_light for i in order],
+        rng_scope='模型初始化完成后、诊断所选原TRAIN帧之前至之后；不冒称重放历史RNG/Adam', frames=[cameras[i].image_name_train_light for i in order],
         camera_indices=order, seed=SEED, loss_weights=dict(photo=1., alpha=.1, distortion=1000., normal=.1),
+        probe_only=probe_only, frame_count=len(order), gradient_tolerance=GRADIENT_TOLERANCE,
+        model_tensor_inventory={n:dict(shape=list(v.shape), dtype=str(v.dtype), device=str(v.device), requires_grad=v.requires_grad)
+                                for n,v in all_params.items()},
+        model_tensor_scope='全部GaussianModel直接Tensor属性，灯参数/buffer/全部135方向；原生tracer的重建BVH缓存可变，非模型状态。',
         derivative_coordinates='原可导参数_xyz、log_scaling、未归一化_rotation、opacity_logit；不同参数量纲不混算cos',
         branches=BRANCHES, branch_note='前四项为真实训练总loss；normal_render/normal_depth仅分解normal，不能再次加到总loss',
         low_height_bands=[0., .05, .35], low_height_note='预测点世界Z分组，非GT鞋语义，不选择训练区域',
@@ -353,13 +424,25 @@ def run(output):
         total,_=take_grads(sum(weighted.values()))
         normal_check={p:gradient_match(grads['normal'][p],grads['normal_render'][p]+grads['normal_depth'][p]) for p in PARAMETERS}
         total_check={p:gradient_match(total[p],sum(grads[b][p] for b in BRANCHES[:4])) for p in PARAMETERS}
+        repeated,_=take_grads(weighted['normal'])
+        repeat_check={p:gradient_match(grads['normal'][p],repeated[p]) for p in PARAMETERS}
         checks=dict(normal_vjp_sum=all(v['passed'] for v in normal_check.values()), total_loss_gradient_sum=all(v['passed'] for v in total_check.values()),
+            native_normal_repeated_vjp=all(v['passed'] for v in repeat_check.values()),
+            expected_gradient_paths_present=all(not absent[b][p] for b in BRANCHES for p in PARAMETERS
+                if not (b in ('normal','normal_render','normal_depth') and p=='opacity')),
             normal_opacity_zero=all(np.count_nonzero(grads[b]['opacity'])==0 for b in ('normal','normal_render','normal_depth')),
-            censor_satisfied_derivative_zero=censor_zero, parameter_grad_fields_untouched=all(p.grad is None for p in all_params.values()),
+            censor_satisfied_derivative_zero=censor_zero, parameter_grad_fields_untouched=grad_fields_empty(model_tensors(pc,lights)),
+            all_model_tensors_unchanged=before==tensor_digest(model_tensors(pc,lights)), no_optimizer=pc.optimizer is None,
             forward_unchanged=forward_before==tensor_digest(forward), rng_unchanged=rng_before==rng_snapshot())
         if not all(checks.values()):
-            write(output/f'failed_frame_{index:03d}.json',dict(checks=checks,normal_sum=normal_check,total_sum=total_check))
+            write(output/f'failed_frame_{index:03d}.json',dict(checks=checks,normal_sum=normal_check,total_sum=total_check,normal_repeated_vjp=repeat_check))
+            failure_arrays={f'{b}__{p}__gradient':grads[b][p] for b in BRANCHES for p in PARAMETERS}
+            failure_arrays.update({f'total__{p}__gradient':total[p] for p in PARAMETERS})
+            failure_arrays.update({f'normal_repeat__{p}__gradient':repeated[p] for p in PARAMETERS})
+            np.savez_compressed(output/f'failed_frame_{index:03d}_points.npz',**failure_arrays)
+            np.savez_compressed(output/f'failed_frame_{index:03d}_pixels.npz',**pixels)
             raise AssertionError('真实帧梯度分解/不变性失败，保留现场。')
+        del repeated
         stats=point_statistics(grads)
         for b in BRANCHES:
             for p in PARAMETERS:
@@ -378,53 +461,58 @@ def run(output):
         ip=output/'per_frame'/f'{index:03d}_{camera.image_name_train_light}_pixels.npz'
         np.savez_compressed(gp,**arrays); np.savez_compressed(ip,**pixels)
         row=dict(order=index,camera_index=ci,frame=camera.image_name_train_light,weighted_losses={k:float(v) for k,v in weighted.items()},
-            checks=checks,normal_vjp_reconstruction=normal_check,total_reconstruction=total_check,gradient_absent=absent,pixel_summary=pixel_summary,
+            checks=checks,normal_vjp_reconstruction=normal_check,total_reconstruction=total_check,
+            normal_repeated_vjp=repeat_check,gradient_absent=absent,pixel_summary=pixel_summary,
             point_arrays=str(gp),point_arrays_sha256=digest(gp),pixel_arrays=str(ip),pixel_arrays_sha256=digest(ip),
             position_groups={name:{'point_count':int(mask.sum()),'norms':{k:describe(v[mask]) for k,v in stats.items() if k.endswith('__norm')}} for name,mask in groups.items()})
         rows.append(row)
         with (output/'per_frame.jsonl').open('a') as stream: stream.write(json.dumps(row,ensure_ascii=False,allow_nan=False)+'\n')
         camera.load2device('cpu')
         if index==1: write(output/'runtime_active.json',runtime_evidence(provenance))
-        if index%5==0 or index==1: print(json.dumps(dict(completed=index,total=135,frame=row['frame']),ensure_ascii=False),flush=True)
-        del photo,geometry,losses,weighted,forward,rgb,target,alpha,grads,total,stats,arrays,pixels
+        if index%5==0 or index==1: print(json.dumps(dict(completed=index,total=len(order),frame=row['frame']),ensure_ascii=False),flush=True)
+        del photo,geometry,losses,weighted,forward,rgb,target,alpha,grads,total,stats,arrays,pixels,value
     aggregated={}
     for key in sums:
-        aggregated[key+'__gradient_mean']=sums[key]/135
-        aggregated[key+'__norm_mean']=norm_sums[key]/135
+        aggregated[key+'__gradient_mean']=sums[key]/len(order)
+        aggregated[key+'__norm_mean']=norm_sums[key]/len(order)
         aggregated[key+'__nonzero_views']=support[key]
         aggregated[key+'__directional_coherence']=np.divide(np.linalg.norm(sums[key],axis=1),norm_sums[key],out=np.zeros_like(norm_sums[key]),where=norm_sums[key]>0)
     for key in pair_sums:
-        aggregated[key+'__dot_mean']=pair_sums[key]/135
+        aggregated[key+'__dot_mean']=pair_sums[key]/len(order)
         aggregated[key+'__cos_mean_supported']=np.divide(pair_cos_sums[key],pair_support[key],out=np.zeros_like(pair_cos_sums[key]),where=pair_support[key]>0)
         aggregated[key+'__both_nonzero_views']=pair_support[key]; aggregated[key+'__opposing_views']=pair_negative[key]
-    np.savez_compressed(output/'all135_points.npz',**aggregated)
-    invariants=dict(parameters_unchanged=before==tensor_digest(all_params),inputs_unchanged=all(digest(p)==h for p,h in inputs.items()),sources_unchanged=all(digest(p)==h for p,h in sources.items()),
-        rng_unchanged=rng_before==rng_snapshot(),no_optimizer=pc.optimizer is None,parameter_grad_fields_untouched=all(p.grad is None for p in all_params.values()),
-        frames_135_unique=len(rows)==135 and len({r['frame'] for r in rows})==135,all_frame_checks=all(all(r['checks'].values()) for r in rows))
-    summary=dict(status='PASS' if all(invariants.values()) else 'FAILED',invariants=invariants,model=str(MODEL),iteration=ITERATION,frames=135,point_count=len(z),
+    aggregate_path = output / ('probe_points.npz' if probe_only else 'all135_points.npz')
+    np.savez_compressed(aggregate_path,**aggregated)
+    invariants=dict(parameters_unchanged=before==tensor_digest(model_tensors(pc,lights)),inputs_unchanged=all(digest(p)==h for p,h in inputs.items()),sources_unchanged=all(digest(p)==h for p,h in sources.items()),
+        rng_unchanged=rng_before==rng_snapshot(),no_optimizer=pc.optimizer is None,parameter_grad_fields_untouched=grad_fields_empty(model_tensors(pc,lights)),
+        frames_complete_unique=len(rows)==len(order) and len({r['frame'] for r in rows})==len(order),all_frame_checks=all(all(r['checks'].values()) for r in rows))
+    summary=dict(status='PASS' if all(invariants.values()) else 'FAILED',invariants=invariants,model=str(MODEL),iteration=ITERATION,frames=len(order),point_count=len(z),
+        probe_only=probe_only,gradient_tolerance=GRADIENT_TOLERANCE,parameter_digest_after=tensor_digest(model_tensors(pc,lights)),
         parameter_updates=0,optimizer_created=False,test_images_loaded=False,gt_geometry_or_semantics_loaded=False,new_mae=False,runtime=runtime_evidence(provenance),
-        aggregate_arrays_sha256=digest(output/'all135_points.npz'),position_groups={name:{k:describe(v[mask]) for k,v in aggregated.items() if v.ndim==1} for name,mask in groups.items()},
+        aggregate_arrays=str(aggregate_path),aggregate_arrays_sha256=digest(aggregate_path),position_groups={name:{k:describe(v[mask]) for k,v in aggregated.items() if v.ndim==1} for name,mask in groups.items()},
         interpretation='仅支持/竞争诊断；radii可见不等于无遮挡贡献，低高度非鞋语义，余切不等于Adam实际更新；无自动修改/训练准入结论。')
     write(output/'summary.json',summary)
     previous=(output/'README.md').read_text() if (output/'README.md').exists() else ''
-    (output/'README.md').write_text(previous+'\n\n# 光度支持与几何参数梯度零更新诊断\n\n'+f'模型 `{MODEL}`，iteration16500，source `{pipe.source_path}`，仅原135 TRAIN。完整命令：\n\n```bash\n'+shlex.join(original_command)+'\n```\n\nplan.json保存输入/source/环境范围；runtime_active.json为活跃GPU与运行库来源；logs/profile.log保存日志。per_frame保存原像素与逐点向量、范数、点积；all135_points.npz保存每点跨视角均值/支持。\n\n无新MAE、无优化器更新。四类视觉/代表图片视频不适用，本诊断不渲染测试结果也不验收脚形。\n\n最终执行与无更新核验：**'+summary['status']+'**。机制解释待独立审查，不代表Goal成功。\n')
+    (output/'README.md').write_text(previous+'\n\n# 光度支持与几何参数梯度零更新诊断\n\n'+f'模型 `{MODEL}`，iteration16500，source `{pipe.source_path}`，处理原135 TRAIN中的{len(order)}帧，probe_only={probe_only}。完整命令：\n\n```bash\n'+shlex.join(original_command)+'\n```\n\nplan.json保存输入/source/环境范围；runtime_active.json为活跃GPU与运行库来源；logs/profile.log保存日志。per_frame保存原像素与逐点向量、范数、点积；'+aggregate_path.name+'保存每点跨视角均值/支持。\n\n无新MAE、无优化器更新。四类视觉/代表图片视频不适用，本诊断不渲染测试结果也不验收脚形。\n\n最终执行与无更新核验：**'+summary['status']+'**。机制解释待独立审查，不代表Goal成功。\n')
     if not all(invariants.values()): raise AssertionError('零更新或来源最终门禁失败。')
-    print('光度支持135TRAIN零更新诊断PASS：'+str(output),flush=True)
+    print(f'光度支持{len(order)}TRAIN零更新诊断PASS：'+str(output),flush=True)
 
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--cpu-check',action='store_true')
-    parser.add_argument('--output',type=Path,default=OUTPUT)
+    parser.add_argument('--probe-only',action='store_true',help='固定0001/0071/0149的真实native零更新准入探针。')
+    parser.add_argument('--output',type=Path,default=None)
     parser.add_argument('--bootstrapped',action='store_true',help=argparse.SUPPRESS)
     args=parser.parse_args()
     if socket.gethostname()!='ushas': parser.error('本固定环境只准ushas。')
-    if args.output.resolve()!=OUTPUT: parser.error('输出只准预注册23，失败重试须独立登记。')
+    output = PROBE_OUTPUT if args.probe_only else OUTPUT
+    if args.output is not None and args.output.resolve()!=output: parser.error('输出只准预注册25或smoke23，失败重试须独立登记。')
     if args.cpu_check: cpu_check(); return
-    if any((OUTPUT/p).exists() for p in ('plan.json','per_frame','summary.json')): parser.error('禁止覆盖已有诊断资产。')
+    if any((output/p).exists() for p in ('plan.json','per_frame','summary.json')): parser.error('禁止覆盖已有诊断资产。')
     preflight()
     if not args.bootstrapped: dispatch(args); return
-    run(OUTPUT)
+    run(output, args.probe_only)
 
 
 if __name__=='__main__': main()
