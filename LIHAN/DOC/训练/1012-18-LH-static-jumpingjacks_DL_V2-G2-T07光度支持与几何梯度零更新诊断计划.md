@@ -2,7 +2,7 @@
 
 ## 当前状态
 
-**计划待独立审查与GPU准入，尚未启动。** 本文记录恢复两度目标后的新一轮诊断，不改写历史Goal3-T07的未执行归档，也不代表本实验已运行。
+**三帧probe已启动但在首帧前来源门禁FAILED；完整135帧尚未启动。** 本文记录恢复两度目标后的新一轮诊断，不改写历史Goal3-T07未执行归档。真实失败目录为`output/smoke_test/1012-23-staticDL-G2-T07真实native零更新探针/`，不可覆盖或重启。
 
 本轮只做固定模型上的原训练集机制诊断，不是新训练：不创建优化器、不更新参数或点拓扑、不产生新MAE。用户最新指令恢复`LIHAN/DOC/GOAL/1011-02-PBR法线两度突破迭代.md`的持续迭代目标；历史报告11、训练17及修改19中“停止后续工作”的状态仅保留为当时事实。
 
@@ -59,5 +59,21 @@ cd /home/han.li/reproduce/LumiMotion-stage2-perlight
 - 指定解释器：`/home/han.li/miniconda3/envs/lumimotion-ushas/bin/python`，环境名`lumimotion-ushas`。
 - 本次资源盘点：GPU0有外部进程占用，GPU1也有外部高利用率任务，GPU2/3由外部重训练占用；必须在实际启动前重查，不能沿用旧资源快照。
 - 项目自有G2-T07/T04进程：盘点时未发现运行进程；外部进程未干预。
-- 计划GPU进程：0；正式诊断GPU进程：0；参数更新：0；新MAE：无。
-- 当前结论：**NOT STARTED / 未准入**。
+- 三帧probe child PID 2959605，runner session 2576，实际UTC启动约2026-10-13T02:13:42Z、退出2026-10-13T02:19:19Z，真实return code=1；完整现场及准确时间见smoke目录的command JSON。
+- 失败原因：GPU0 live map中的PBR cache SHA为`ee4a9e00b8aceef8fc9d888d88530eeaea61e24d48a3609357a84962602723d6`，而iteration16500 marker要求`f9514476baec5854c88862404f266242e62b1f828304f541745260fb012d43f3`。tracer SHA吻合。未加载首帧、没有逐帧NPZ、没有更新、没有MAE；不能当作训练科学失败。
+- 隔离缓存调查计划：在总控26/native_cache用旧运行记录中的CXX=`/home/han.li/miniconda3/bin/x86_64-conda-linux-gnu-c++`、CC=`/home/han.li/miniconda3/bin/x86_64-conda-linux-gnu-cc`、CUDA_HOME=`/home/han.li/miniconda3/envs/lumimotion-ushas`、TORCH_CUDA_ARCH_LIST=8.6，独立构建同一冻结PBR source；不得覆盖或引用当前共享cache中的binary作为checkpoint provenance。结果须由evaluation复核后才能安排新日期独立probe。
+- 当前状态：**PROBE FAILED / FULL135 NOT STARTED**；参数更新0；新MAE无。probe目录及cache调查产物保留，重试必须用新的1013 smoke计数与独立输出。
+
+
+## 隔离native构建结果（2026-10-13）
+
+首次probe的失败由PBR `.so` SHA与固定checkpoint marker不一致触发。为避免共享扩展缓存被其他任务改写，已在总控26/native_cache中用旧成功runtime登记的CXX/CC、ushas CUDA_HOME与`TORCH_CUDA_ARCH_LIST=8.6`单次隔离构建；设置`MAX_JOBS=4`仅是本次可复现控制参数，旧runtime未登记该值。构建结束时间为`2026-10-13T04:41:15.482720Z`，`cuda_initialized=false`。实际GCC为14.3.0、nvcc为12.9。
+
+构建结果为`BINARY_MISMATCH_RETAINED`：隔离`.so` SHA256=`9e414f5c7a447d51d28d993903f305c2bb7ab7c45b653b5ea9e72956ee4ef7bd`，期望SHA=`f9514476baec5854c88862404f266242e62b1f828304f541745260fb012d43f3`；build.ninja SHA256=`1f6598e114e416813f388fa4977cc35a97c9e5f02ad66f90c10a6587cc2bc822`。源SHA与冻结manifest一致，但产物SHA不匹配，因此不继续重编、不取消来源门禁，也不启动probe或full135。日志、完整环境、provenance与二进制均保留在`output/1012-26-静态DL-两度目标恢复总控/native_cache/`。下一步由evaluation复核差异并由root决定是否建立兼容验证路径；任何重试使用新日期和新smoke目录。
+
+
+### 2026-10-13最终审计收尾
+
+用户要求停止新增实验并完成收尾。当前实际优化更新为0，无新checkpoint或新GPU评测；科学目标未达成。真实探针／smoke均在渲染前因native二进制身份变化退出1，私有重编译也未恢复历史SHA。所有失败与历史证据原位保留，不启动预留retry或正式训练。原会话现为idle，目标状态库已无本Goal行；本文旧ACTIVE／进行中描述只代表当时历史，不代表现在仍在运行。
+
+运行审计和最终归档见`LIHAN/DOC/报告/1013-05-两个Goal长时低产出审计与最终收尾.md`。审计总控为`output/1013-05-两个Goal运行审计与最终收尾`；原位清单和复核凭据在两个原总控`archive_closeout/manifest.json`、`ARCHIVE_COMPLETED.json`，全分支同步凭据为`shared_sync_selected.json`。归档PASS不等于科学目标PASS。
