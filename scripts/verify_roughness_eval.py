@@ -95,6 +95,50 @@ def verify(directory):
     return result
 
 
+def verify_raw_gt(record, data, provenance):
+    """从原始浮点 GT 独立重建真值，避免仅复算已保存的 GT 数组。"""
+    import cv2
+    path = Path(record['gt_source_path'])
+    assert str(path) in provenance['input_hashes']
+    if path.suffix.lower() == '.npz':
+        with np.load(path, allow_pickle=False) as source:
+            target = source['roughness'].astype(np.float64)
+            alpha = source['alpha'].astype(np.float64)
+            if target.ndim == 3 and target.shape[0] == 1:
+                target = target[0]
+            if alpha.ndim == 3 and alpha.shape[0] == 1:
+                alpha = alpha[0]
+    elif path.suffix.lower() == '.exr':
+        import OpenEXR
+        channels = OpenEXR.File(str(path), separate_channels=True).channels()
+        alpha = channels['A'].pixels.astype(np.float64)
+        if 'roughness' in channels:
+            target = channels['roughness'].pixels.astype(np.float64)
+        else:
+            accumulated = channels['R'].pixels.astype(np.float64)
+            assert np.isfinite(accumulated).all()
+            for name in ('G', 'B'):
+                if name in channels:
+                    np.testing.assert_allclose(accumulated, channels[name].pixels, atol=1e-6, rtol=0)
+            target = np.where(alpha > 1e-6, accumulated / np.maximum(alpha, 1e-6), 0.)
+            assert ((target >= -1e-6) & (target <= 1 + 1e-5)).all()
+            target = np.clip(target, 0., 1.)  # 与严格加载器相同的浮点舍入容差。
+    else:
+        raise AssertionError('独立复算仅接受原始 NPZ/EXR。')
+    assert target.ndim == 2 and target.shape == alpha.shape
+    assert np.isfinite(target).all() and np.isfinite(alpha).all()
+    assert ((target >= 0) & (target <= 1)).all()
+    assert ((alpha >= 0) & (alpha <= 1)).all()
+    size = (record['height'], record['width'])
+    if target.shape != size:
+        method = cv2.INTER_AREA if size[0] <= alpha.shape[0] and size[1] <= alpha.shape[1] else cv2.INTER_LINEAR
+        accumulated = cv2.resize(target * alpha, size[::-1], interpolation=method)
+        alpha = cv2.resize(alpha, size[::-1], interpolation=method)
+        target = np.where(alpha > 1e-6, accumulated / np.maximum(alpha, 1e-6), 0.)
+    np.testing.assert_allclose(data['gt_alpha'], alpha, atol=1e-12, rtol=1e-12)
+    np.testing.assert_allclose(data['gt_roughness'], target, atol=1e-12, rtol=1e-12)
+
+
 def verify_foreground(directory, report, provenance):
     """新协议：任意帧号、分辨率，仅前景，不使用任何标签或材质清单。"""
     from scipy.ndimage import binary_erosion
@@ -103,6 +147,7 @@ def verify_foreground(directory, report, provenance):
     assert len(rows) == len(report['frames']) and len(rows) > 0
     assert [r['frame'] for r in report['frames']] == protocol['frames']
     n_total, k_total, error_total = 0, 0, 0.
+    gt_sources_recomputed = 0
     for record, row in zip(report['frames'], rows):
         assert record['frame'] == row['frame']
         with np.load(directory / 'float' / (record['frame'] + '.npz')) as data:
@@ -118,6 +163,9 @@ def verify_foreground(directory, report, provenance):
                 core = binary_erosion(core, structure=np.ones((3, 3)), iterations=radius)
             np.testing.assert_array_equal(core, data['gt_mask'])
             np.testing.assert_array_equal(core, data['gt_core'])
+            if protocol.get('gt_source_reconstruction') == 'raw_float_source_with_strict_range_checks':
+                verify_raw_gt(record, data, provenance)
+                gt_sources_recomputed += 1
             valid = core & (alpha >= protocol['pred_alpha_threshold'])
             np.testing.assert_array_equal(valid, data['valid_mask'])
             n, k = int(core.sum()), int(valid.sum())
@@ -143,6 +191,7 @@ def verify_foreground(directory, report, provenance):
     assert report['inputs_unchanged'] and (directory / 'COMPLETED').exists()
     assert not (directory / 'FAILED').exists()
     return {'passed': True, 'frames': len(rows), 'protocol': 'generic_foreground',
+            'gt_sources_recomputed': gt_sources_recomputed,
             'input_hashes_verified': len(provenance['input_hashes']),
             'metrics_sha256': digest(directory / 'metrics.json'),
             'float_sha256': {p.name: digest(p) for p in sorted((directory / 'float').glob('*.npz'))}}

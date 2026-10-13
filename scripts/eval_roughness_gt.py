@@ -222,7 +222,8 @@ def evaluate(args, destination):
         valid = core & (pkg['alpha'].astype(np.float64) >= args.pred_alpha_threshold)
         record = {'frame': key, 'time': time_value, 'width': size[1], 'height': size[0],
                   'foreground': evaluate_region(prediction, target, core, pkg['alpha'], args.pred_alpha_threshold),
-                  'gt_info': info, 'world_view_transform': camera.world_view_transform.cpu().tolist()}
+                  'gt_info': info, 'gt_source_path': str(gt_files[key]),
+                  'world_view_transform': camera.world_view_transform.cpu().tolist()}
         records.append(record)
         np.savez_compressed(destination / 'float' / f'{key}.npz',
                             accumulated=pkg['accumulated'], alpha=pkg['alpha'], roughness=prediction,
@@ -251,6 +252,7 @@ def evaluate(args, destination):
                   'parameter': 'r (not r_squared)', 'gt_alpha_threshold': args.gt_alpha_threshold,
                   'gt_erosion_pixels': args.erosion_pixels, 'pred_alpha_threshold': args.pred_alpha_threshold,
                   'aggregation': 'pooled valid foreground pixels',
+                  'gt_source_reconstruction': 'raw_float_source_with_strict_range_checks',
                   'missing_prediction': 'excluded from conditional MAE; included in coverage denominator'},
               'summaries': summaries, 'frames': records, 'renderer_checks': renderer_checks,
               'preview_frames': representative_keys, 'worst_mae_frame': worst,

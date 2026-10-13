@@ -21,13 +21,14 @@ def main():
     parser.add_argument('--transforms', type=Path, required=True,
                         help='对应 split 的 transforms JSON，提供 source_frame、time 和相机。')
     parser.add_argument('--resolution', type=int, default=2, help='原始分辨率除数。')
+    parser.add_argument('--samples', type=int, default=16, help='参数 GT 的固定采样数。')
     parser.add_argument('--alpha_composite', action='store_true',
                         help='允许单一Principled透明度；保持原Alpha，导出透射层alpha加权的有效roughness。')
     parser.add_argument('--engine', choices=['cycles', 'eevee', 'source'], default='cycles',
                         help='默认原有Cycles；透明数据推荐source以保留源引擎Alpha语义。')
     args = parser.parse_args(sys.argv[sys.argv.index('--') + 1:])
-    if args.resolution < 1:
-        parser.error('resolution 必须为正整数。')
+    if args.resolution < 1 or args.samples < 1:
+        parser.error('resolution 和 samples 必须为正整数。')
     args.output_dir = args.output_dir.resolve()
     args.output_dir.mkdir(parents=True, exist_ok=False)
     blend = Path(bpy.data.filepath).resolve()
@@ -42,8 +43,14 @@ def main():
     if args.engine != 'source':
         scene.render.engine = 'CYCLES' if args.engine == 'cycles' else 'BLENDER_EEVEE'
     scene.cycles.device = 'CPU'
-    scene.cycles.samples = 16
+    scene.cycles.samples = args.samples
+    scene.cycles.use_adaptive_sampling = False
     scene.cycles.use_denoising = False
+    # 参数 GT 需要透射率加权的有界标量。轮盘终止的存活权重会给个别
+    # 透明路径放大贡献，使发光 RGB / Alpha 超出材质 r 的物理范围。
+    # 追踪到原有反弹上限，保持透明层和材质参数，不裁剪导出的像素。
+    scene.cycles.min_transparent_bounces = scene.cycles.transparent_max_bounces
+    scene.cycles.min_light_bounces = scene.cycles.max_bounces
     scene.render.resolution_x = round(metadata['w'] / args.resolution)
     scene.render.resolution_y = round(metadata['h'] / args.resolution)
     scene.render.resolution_percentage = 100
@@ -118,6 +125,13 @@ def main():
               'method': 'Principled Roughness input -> emission -> raw float RGBA EXR',
               'alpha_association': 'premultiplied_RGB',
               'render_engine': scene.render.engine,
+              'samples': scene.cycles.samples,
+              'use_adaptive_sampling': scene.cycles.use_adaptive_sampling,
+              'min_transparent_bounces': scene.cycles.min_transparent_bounces,
+              'transparent_max_bounces': scene.cycles.transparent_max_bounces,
+              'min_light_bounces': scene.cycles.min_light_bounces,
+              'max_bounces': scene.cycles.max_bounces,
+              'parameter_transport': 'emission through transparency without roulette reweighting',
               'transparent_parameter_definition': ('transmittance-alpha weighted effective r'
                                                     if args.alpha_composite else 'opaque only'),
               'blender_version': bpy.app.version_string}

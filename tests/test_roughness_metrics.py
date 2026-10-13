@@ -124,6 +124,55 @@ class RoughnessMetricsTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'Lambertian'):
                 validate_model(model, 55000)
 
+    def test_raw_exr_verifier_reconstructs_resize_and_detects_tampering(self):
+        import OpenEXR
+        from scripts.verify_roughness_eval import verify_raw_gt
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'roughness_0010.exr'
+            alpha = np.array([[1., 0.5], [0.8, 1.]], dtype=np.float32)
+            color = alpha * np.array([[0.4, 0.7], [0.9, 0.2]], dtype=np.float32)
+            OpenEXR.File({}, {'R': color, 'G': color, 'B': color, 'A': alpha}).write(str(path))
+            target, actual_alpha, _ = load_target(path, (1, 1))
+            record = dict(gt_source_path=str(path), height=1, width=1)
+            arrays = dict(gt_alpha=actual_alpha, gt_roughness=target.copy())
+            provenance = {'input_hashes': {str(path): '由外层验证文件哈希'}}
+            verify_raw_gt(record, arrays, provenance)
+            arrays['gt_roughness'][0, 0] += 0.1
+            with self.assertRaises(AssertionError):
+                verify_raw_gt(record, arrays, provenance)
+
+    def test_bad_raw_exr_still_fails_in_loader_and_independent_verifier(self):
+        import OpenEXR
+        from scripts.verify_roughness_eval import verify_raw_gt
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'roughness_0030.exr'
+            for opacity, accumulated in [(1., 1.0014025), (0.02, 0.2), (1., np.nan)]:
+                alpha = np.array([[opacity]], dtype=np.float32)
+                color = np.array([[accumulated]], dtype=np.float32)
+                OpenEXR.File({}, {'R': color, 'G': color, 'B': color, 'A': alpha}).write(str(path))
+                with self.assertRaises(ValueError):
+                    load_target(path, (1, 1))
+                with self.assertRaises(AssertionError):
+                    verify_raw_gt(dict(gt_source_path=str(path), height=1, width=1),
+                        dict(gt_alpha=alpha, gt_roughness=np.zeros((1, 1))),
+                        {'input_hashes': {str(path): '由外层验证文件哈希'}})
+
+    def test_raw_npz_verifier_checks_alpha_and_provenance(self):
+        from scripts.verify_roughness_eval import verify_raw_gt
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'gt.npz'
+            alpha, target = np.ones((1, 2)), np.array([[0.2, 0.8]])
+            np.savez(path, roughness=target, alpha=alpha)
+            record = dict(gt_source_path=str(path), height=1, width=2)
+            arrays = dict(gt_alpha=alpha.copy(), gt_roughness=target)
+            provenance = {'input_hashes': {str(path): '由外层验证文件哈希'}}
+            verify_raw_gt(record, arrays, provenance)
+            with self.assertRaises(AssertionError):
+                verify_raw_gt(record, arrays, {'input_hashes': {}})
+            arrays['gt_alpha'][0, 0] = 0.5
+            with self.assertRaises(AssertionError):
+                verify_raw_gt(record, arrays, provenance)
+
 
 if __name__ == '__main__':
     unittest.main()
