@@ -285,12 +285,28 @@ def run(args, out):
     world_indices=selected+validation
     initial_world={i:(initial_geometry['_xyz']+cached[i][0]['d_xyz']).detach().clone() for i in world_indices} if args.geometry_groups=='canonical' else {}
     current_world=dict(initial_world)
+    candidate_audit={}
+    audit_lookup={int(v):j for j,v in enumerate(cache['ids'])} if args.audit_world_candidates else {}
+    def point_support(point_id):
+        j=audit_lookup.get(point_id)
+        if j is None:return dict(sampled=False,scope='未抽样不等于没有渲染梯度')
+        chosen=[]
+        for i in selected:
+            if not bool(cache['valid'][i,j]):continue
+            u,v=map(int,cache['pixels'][i,j].tolist())
+            if bool(cached[i][4][0,v,u]>0):chosen.append(i)
+        return dict(sampled=True,valid_train_count=int(cache['valid'][selected,j].sum()),chosen_train_indices=chosen,scope='默认轨迹像素位于固定最终chosen掩膜；不等于该点独占像素贡献')
     @torch.no_grad()
     def measure_world(previous):
         positions={};step_bound=0.;total_bound=0.
+        candidate_audit.clear()
         for i in world_indices:
             positions[i]=(pc.get_xyz+current_ds(i)['d_xyz']).detach()
-            step_bound=max(step_bound,float((positions[i]-previous[i]).norm(dim=-1).max()))
+            step_norm=(positions[i]-previous[i]).norm(dim=-1)
+            if args.audit_world_candidates and float(step_norm.max())>step_bound:
+                point_id=int(step_norm.argmax())
+                candidate_audit.update(index=i,point_id=point_id,held=i in validation,world_step=float(step_norm[point_id]),dynamic_gate=float(pc.get_binary_feature()[point_id]),canonical_total=float((pc.get_xyz[point_id]-initial_geometry['_xyz'][point_id]).norm()))
+            step_bound=max(step_bound,float(step_norm.max()))
             total_bound=max(total_bound,float((positions[i]-initial_world[i]).norm(dim=-1).max()))
         return positions,step_bound,total_bound
     if args.geometry_groups=='canonical':
@@ -346,6 +362,13 @@ def run(args, out):
                     for k,v in optimized.items():v.copy_(torch.lerp(start[k],proposal[k],fraction))
                     positions,step_bound,total_bound=measure_world(current_world)
                     item=dict(fraction=fraction,world_step=step_bound,world_total=total_bound,accepted=False)
+                    if args.audit_world_candidates:
+                        detail=dict(candidate_audit);pid=detail['point_id']
+                        detail['support']=point_support(pid)
+                        detail['xyz_direction_norm']=float(direction['_xyz'][pid].norm()) if '_xyz' in direction else 0.
+                        detail['canonical_step']=float((pc.get_xyz[pid]-start['_xyz'][pid]).norm()) if '_xyz' in start else 0.
+                        detail['batch_chosen_indices']=[i for i in batch if i in detail['support'].get('chosen_train_indices',[])]
+                        item['candidate_audit']=detail
                     safe=np.isfinite(step_bound) and np.isfinite(total_bound) and step_bound<=1.0002e-4 and total_bound<=.00100002
                     if safe:
                         trial=float(sum(forward(i,head_objective=True)[0] for i in batch)/len(batch));proposal_renders+=len(batch)
@@ -459,6 +482,7 @@ def main():
     p.add_argument('--mode',choices=['joint','frozen'],required=True)
     p.add_argument('--geometry-groups',choices=['head','expanded','canonical'],default='head')
     p.add_argument('--freeze-canonical-xyz',action='store_true')
+    p.add_argument('--audit-world-candidates',action='store_true')
     p.add_argument('--xyz-preconditioner',choices=['none','jacobian'],default='none')
     p.add_argument('--historical-loss',action='store_true')
     p.add_argument('--shading-normal',choices=['depth','gaussian'],default='depth')
