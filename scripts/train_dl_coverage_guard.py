@@ -145,14 +145,20 @@ def run(args, out):
     geom_optimizer=torch.optim.Adam([{'params':[geometry['_xyz']],'lr':1e-5}])
     metrics={'initial':evaluate('initial')};history=[]
     protected={};limits={};guard_renders=0;guard_history=[]
+    guard_cameras={};guard_observed={}
+    guard_cfg=SimpleNamespace(**vars(cfg));guard_cfg.resolution=args.guard_resolution
+    for i in selected:
+        camera=loadCam(guard_cfg,i,infos[i],1.);camera.load2device()
+        assert camera.gt_alpha_mask is not None
+        guard_cameras[i]=camera;guard_observed[i]=camera.gt_alpha_mask.cuda()>.5
     @torch.no_grad()
     def alpha_map(i):
         nonlocal guard_renders
         guard_renders+=1
-        return render(cameras[i],pc,pipe,bg,**cached[i][0],override_color=torch.zeros_like(pc.get_xyz))['rend_alpha']
+        return render(guard_cameras[i],pc,pipe,bg,**cached[i][0],override_color=torch.zeros_like(pc.get_xyz))['rend_alpha']
     with torch.no_grad():
         for i in selected:
-            observed=cached[i][-1]>.5
+            observed=guard_observed[i]
             protected[i]=observed&(alpha_map(i)>=.5)
             limits[i]=int(float(observed.sum())*.001)
     @torch.no_grad()
@@ -161,7 +167,7 @@ def run(args, out):
         for i in selected:
             lost=int((protected[i]&(alpha_map(i)<.5)).sum())
             counts[str(i)]=lost
-            worst=max(worst,lost/max(int((cached[i][-1]>.5).sum()),1))
+            worst=max(worst,lost/max(int(guard_observed[i].sum()),1))
             if lost>limits[i]:
                 failures.append(i)
                 if not full:break
@@ -248,6 +254,7 @@ def main():
     p.add_argument('--geometry-mode',choices=['train'],default='train')
     p.add_argument('--normal-weight',type=float,default=.05)
     p.add_argument('--coverage-guard',choices=['on','off'],required=True)
+    p.add_argument('--guard-resolution',type=int,choices=[2,4],default=4)
     args=p.parse_args();out=Path(args.output);out.mkdir(parents=True,exist_ok=True)
     if (out/'runtime.json').exists() or (out/'failure.json').exists():raise FileExistsError('禁止覆盖运行')
     (out/'command.txt').write_text(shlex.join(sys.argv)+'\n')
