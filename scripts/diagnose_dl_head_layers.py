@@ -23,6 +23,7 @@ def main():
  for key in ['model','source','lights','cache','output']:p.add_argument('--'+key,required=True)
  p.add_argument('--compensated-head-difference',action='store_true')
  p.add_argument('--pixel-audit',action='store_true')
+ p.add_argument('--fixed-coordinates',action='store_true')
  args=p.parse_args();out=Path(args.output);out.mkdir(parents=True,exist_ok=False)
  (out/'command.txt').write_text(shlex.join(sys.argv)+'\n')
  torch.manual_seed(1015)
@@ -120,7 +121,7 @@ def main():
   double_loss,normal64=stable_loss(i,base)
   g64=torch.autograd.grad(double_loss,parameter,retain_graph=True)[0]
   gd64,ga64=torch.autograd.grad(double_loss,[base['surf_depth'],base['render']])
-  coordinate=int(grad.abs().argmax());analytic=float(grad.flatten()[coordinate]);analytic64=float(g64.flatten()[coordinate])
+  coordinate=({0:162,60:196,134:29}[i] if args.fixed_coordinates else int(grad.abs().argmax()));analytic=float(grad.flatten()[coordinate]);analytic64=float(g64.flatten()[coordinate])
   saved_depth=base['surf_depth'].detach().double();saved_rgb=base['render'].detach().double()
   values=[]
   with torch.no_grad():
