@@ -14,6 +14,7 @@ from scripts.audit_dl_visibility_precision import stable_visibility
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     for k in ['run','audit','reference','output']:p.add_argument('--'+k,required=True)
+    p.add_argument('--active-region',choices=['all','dynamic'],default='all')
     a=p.parse_args();torch.set_num_threads(4);out=Path(a.output);out.mkdir(exist_ok=False)
     rt=json.loads((Path(a.run)/'runtime.json').read_text());args=rt['args'];assert not args['gt_direction_reference']
     meta=json.loads((Path(a.audit)/'result.json').read_text());assert not meta['gt_read']
@@ -40,11 +41,17 @@ def main():
     rid=torch.where(d['receiver'])[0]; gaussian_ids=ids[rid]; masks={'sampled':sampled,'full':full}
     reference=Path(a.reference);ck=torch.load(reference/'train/checkpoint.pt',map_location='cpu',weights_only=False)
     occ=torch.where(sampled)[0];assert not torch.isin(occ,gaussian_ids).any()
+    partition_path=Path(next(x for x in sources if 'T57' in x and x.endswith('diagnostics.pt')))
+    partition=torch.load(partition_path,map_location='cpu',weights_only=False)
+    dynamic_ids=ids[partition['dynamic'].cuda()]
+    active=occ if a.active_region=='all' else occ[torch.isin(occ,dynamic_ids)]
+    assert len(active)>0
     xyz0=pc.get_xyz.detach().clone();base_rotation=pc._rotation.detach();base_scale=pc.get_scaling.detach();base_opacity=pc.get_opacity.detach().squeeze(-1);feature=pc.get_binary_feature().detach()
     albedo=ck['albedo'].cuda();mask=d['groups']['all_unsaturated']['mask'][:,rid].cuda();y=d['rgb'][:,rid].cuda();normal_receiver=cache['normals'][:,rid].double().cuda();directions=state['smooth'].double().cuda();train=d['train'];held=d['held'];count=int(mask[train].sum());metric_path=Path(a.run)/'xyz_metric.pt';metric_state=torch.load(metric_path,map_location='cpu',weights_only=False);assert metric_state['indices']==train;metric=metric_state['diagonal'][occ.cpu()].cuda()
-    delta=torch.zeros((len(occ),3),device='cuda');initial_world=[v[0].cuda()+origin for v in ck['geometry']]
+    metric=metric[torch.isin(occ,active)]
+    delta=torch.zeros((len(active),3),device='cuda');initial_world=[v[0].cuda()+origin for v in ck['geometry']]
     def forward(i,change,with_rgb=True):
-        camera=cams[i];camera.load2device();xyz=xyz0.index_copy(0,occ,xyz0[occ]+change)
+        camera=cams[i];camera.load2device();xyz=xyz0.index_copy(0,active,xyz0[active]+change)
         ds=deform.step(xyz,camera.fid.reshape(1,1).expand(len(xyz),1),feature=feature,camera_center=camera.camera_center)
         world=xyz+ds['d_xyz']
         if not with_rgb:return world,None
@@ -95,9 +102,10 @@ def main():
         _,pred=forward(i,delta);predictions.append(pred.cpu());cams[i].load2device('cpu')
     final_pred=torch.stack(predictions);metrics={}
     for name,inds in [('train',train),('held',held)]:metrics[name]=float((final_pred-d['rgb'][:,rid])[inds][mask.cpu()[inds]].square().mean())
-    final_xyz=xyz0.index_copy(0,occ,xyz0[occ]+delta);inputs=dict(rt['inputs']);inputs[str(metric_path.resolve())]=hashlib.sha256(metric_path.read_bytes()).hexdigest()
-    torch.save(dict(protocol='T65_shadow_canonical',geometry={'_xyz':final_xyz.cpu()},deform_state_dict={k:v.cpu() for k,v in deform.deform.state_dict().items()},args=args,active_ids=occ.cpu(),delta=delta.cpu(),prediction=final_pred,receiver_ids=rid,geometry_updates=accepted,material_updates=0),out/'checkpoint.pt')
-    (out/'runtime.json').write_text(json.dumps(dict(inputs=inputs,gt_read=False,protocol='T65_shadow_canonical'),indent=2))
+    final_xyz=xyz0.index_copy(0,active,xyz0[active]+delta);inputs=dict(rt['inputs']);inputs[str(metric_path.resolve())]=hashlib.sha256(metric_path.read_bytes()).hexdigest();inputs[str(partition_path.resolve())]=hashlib.sha256(partition_path.read_bytes()).hexdigest()
+    torch.save(dict(protocol='shadow_canonical_v1',geometry={'_xyz':final_xyz.cpu()},deform_state_dict={k:v.cpu() for k,v in deform.deform.state_dict().items()},args=args,active_region=a.active_region,active_ids=active.cpu(),occluder_ids=occ.cpu(),delta=delta.cpu(),prediction=final_pred,receiver_ids=rid,geometry_updates=accepted,material_updates=0),out/'checkpoint.pt')
+    (out/'runtime.json').write_text(json.dumps(dict(inputs=inputs,gt_read=False,protocol='shadow_canonical_v1'),indent=2))
     result=dict(status='PASS' if accepted else 'FAILED',gt_read=False,geometry_updates=accepted,initial_training_mse=initial_loss,metrics=metrics,canonical_max_displacement=float(delta.norm(dim=-1).max()),max_world_displacement=max(motion),motion=motion,history=history,finite_difference=fd,scope='固定未知T05灯向/材质/光强，对1817个canonical XYZ经完整形变优化投影阴影；位置引起的旋转/尺度输出随完整查询变化，尚未独立几何验收')
+    result.update(active_region=a.active_region,active_points=len(active),occluder_points=len(occ),scope='固定未知光及完整1817点遮挡集合，只改变指定canonical XYZ，经完整形变重新查询；未完成独立几何验收')
     (out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));print(json.dumps(result,ensure_ascii=False),flush=True)
 if __name__=='__main__':main()

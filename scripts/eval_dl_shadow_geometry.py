@@ -41,7 +41,7 @@ def main():
             assert file_sha256(source)==runtime['inputs'][str(source.resolve())]
         state=torch.load(path,map_location='cpu',weights_only=False)
         assert Path(state['args']['model']).resolve()==Path(args.model).resolve()
-        assert state['protocol']=='T65_shadow_canonical' and state['material_updates']==0
+        assert state['protocol'] in ['T65_shadow_canonical','shadow_canonical_v1'] and state['material_updates']==0
         assert 0<=state['geometry_updates']<=3 and set(state['geometry'])=={'_xyz'}
         active=state['active_ids'];untouched=torch.ones(len(initial['_xyz']),dtype=torch.bool);untouched[active]=False
         assert torch.equal(state['geometry']['_xyz'][untouched],initial['_xyz'].cpu()[untouched])

@@ -12,7 +12,7 @@ from scripts.probe_dynamic_dl_selfcal import read_config
 def main():
  p=argparse.ArgumentParser(description=__doc__);p.add_argument('--checkpoint',required=True);p.add_argument('--output',required=True);a=p.parse_args()
  out=Path(a.output);out.mkdir(exist_ok=False);path=Path(a.checkpoint);ck=torch.load(path,map_location='cpu',weights_only=False);args=ck['args'];runtime=json.loads((path.parent/'runtime.json').read_text());result=json.loads((path.parent/'result.json').read_text())
- assert not args['gt_direction_reference'] and ck['protocol']=='T65_shadow_canonical' and set(ck['geometry'])=={'_xyz'}
+ assert not args['gt_direction_reference'] and ck['protocol'] in ['T65_shadow_canonical','shadow_canonical_v1'] and set(ck['geometry'])=={'_xyz'}
  for f in [Path(args['model'])/'cfg_args',Path(args['model'])/'point_cloud/iteration_35000/point_cloud.ply',Path(args['model'])/'deform/iteration_35000/deform.pth',Path(args['source'])/'transforms_train.json']:
   assert hashlib.sha256(f.read_bytes()).hexdigest()==runtime['inputs'][str(f)]
  cfg=read_config(Path(args['model'])/'cfg_args');cfg.resolution=4;cfg.load2gpu_on_the_fly=True
