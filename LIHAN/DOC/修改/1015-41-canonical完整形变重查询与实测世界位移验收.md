@@ -1,0 +1,9 @@
+# canonical完整形变重查询与实测世界位移验收
+
+train_dl_motion_descent新增geometry-groups=canonical。XYZ参与真实梯度，current_ds重新执行MLP的全部输出，不复用依赖旧XYZ的hidden/d_rotation/d_scaling等缓存。初始缓存仅保留支持与基准核对，不作为训练后几何。
+
+候选建立后对135离散时刻完整查询世界位置，分别相对当前合法状态和初始状态测量最大单点位移，满足原世界域及训练前向下降才接受；失败所有开放参数回滚。记录每档实际界、损失和接受，最终motion使用真实世界位置差。保存完整XYZ及形变检查点，现有独立几何评测会按新XYZ完整重查询。
+
+已有head/expanded算法保持；canonical减少旧hidden缓存，不把位置变化下线性预条件当位移保证。编译检查通过，GPU实测结果按T43记录；并未声称原native导数全面通过有限差分。
+
+另新增verify_dl_world_checkpoint.py，独立加载原PLY/MLP与保存后的完整几何/形变，在全部135源时刻重查询世界位置，复核记录的最终位移和XYZ实际变化。无GT读取，不依赖训练缓存的hidden或形变输出，用于确认checkpoint可恢复性。
