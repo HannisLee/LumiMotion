@@ -80,7 +80,7 @@ def run(args, out):
     (out/'runtime.json').write_text(json.dumps(runtime, ensure_ascii=False, indent=2))
     bg = torch.zeros(3, device='cuda')
     pipe = SimpleNamespace(compute_cov3D_python=False, convert_SHs_python=False, depth_ratio=0.)
-    cached = {}; coverage = []; pixel_signs = {}; hidden_bound=0.; hidden_cache={}
+    cached = {}; coverage = []; pixel_signs = {}; hidden_bound=0.; hidden_cache={}; gate_masks={}
     with torch.no_grad():
         for i in selected+validation:
             camera = cameras[i];camera.load2device()
@@ -112,8 +112,14 @@ def run(args, out):
             valid=-F.max_pool2d(-valid.float()[None],3,stride=1,padding=1)[0]>.5
             chosen=chosen*valid
             assert chosen.sum()>0
+            if args.balance_head_groups:
+                gp=render(camera,pc,pipe,bg,**ds,override_color=pc.get_binary_feature().expand(-1,3))
+                gate_masks[i]=gp['render'][:1]/gp['rend_alpha'].clamp_min(1e-6)>.5
+                assert (chosen*gate_masks[i]).sum()>0 and (chosen*(~gate_masks[i])).sum()>0
             interior=-F.max_pool2d(-(mask>.99).float()[None],5,stride=1,padding=2)[0]
             coverage.append(dict(index=i,all_pixels=int(all_mask.sum()),lit_pixels=int(lit_mask.sum()),foreground_pixels=int((mask>.5).sum())))
+            if args.balance_head_groups:
+                coverage[-1].update(dynamic_pixels=int((chosen*gate_masks[i]).sum()),static_pixels=int((chosen*(~gate_masks[i])).sum()))
             cached[i]=(ds,sign,target,saturated,chosen,all_mask,interior,mask)
             if i%20==0: print(json.dumps({'cached_frame':i,'mask_pixels':int(chosen.sum())}),flush=True)
     (out/'support.json').write_text(json.dumps(coverage,indent=2))
@@ -160,10 +166,19 @@ def run(args, out):
         positivity=((args.positive_margin-cosine.double()).clamp_min(0).square()*positive_support).sum()/chosen.sum().clamp_min(1)
         package['diagnostics']['positivity']=float(positivity.detach())
         package['loss_terms']=dict(photo=photo,regularization=regularization,positivity=positivity)
+        balanced_photo=photo
+        if args.balance_head_groups:
+            dynamic=chosen*gate_masks[i];static=chosen*(~gate_masks[i])
+            dynamic_photo=(residual.double().square()*dynamic).sum()/(3*dynamic.sum())
+            static_photo=(residual.double().square()*static).sum()/(3*static.sum())
+            balanced_photo=.5*(dynamic_photo+static_photo)
+            package['loss_terms']['balanced_photo']=balanced_photo
+            package['diagnostics'].update(dynamic_photo=float(dynamic_photo.detach()),static_photo=float(static_photo.detach()))
         objective=photo+regularization
         if head_objective:
             if args.head_objective=='photo':objective=photo
             elif args.head_objective=='regularization':objective=regularization
+            if args.balance_head_groups and args.head_objective!='regularization':objective=objective-photo+balanced_photo
             objective=objective+args.positive_weight*positivity
         return objective,package
     @torch.no_grad()
@@ -260,6 +275,7 @@ def main():
     for name in ['source','model','lights','output','cache']:p.add_argument('--'+name,required=True)
     p.add_argument('--mode',choices=['joint','frozen'],required=True)
     p.add_argument('--gt-direction-reference',action='store_true')
+    p.add_argument('--balance-head-groups',action='store_true')
     p.add_argument('--trust-metric',choices=['parameter','actual'],default='parameter')
     p.add_argument('--positive-weight',type=float,default=0.)
     p.add_argument('--positive-margin',type=float,default=.05)
