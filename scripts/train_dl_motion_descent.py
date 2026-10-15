@@ -64,8 +64,9 @@ def run(args, out):
     frozen = dict(tensors)
     frozen.update({k:geometry[k] for k in ['_scaling','_rotation']})
     frozen.update({'deform.'+k:v for k,v in deform.deform.state_dict().items() if not k.startswith('gaussian_warp.')})
-    if args.geometry_groups=='expanded':
+    if args.geometry_groups in ['expanded','canonical']:
         for k in ['_rotation','_scaling','_opacity']:frozen.pop(k,None)
+    if args.geometry_groups=='canonical':frozen.pop('_xyz',None)
     before = {k:digest_tensor(v) for k,v in frozen.items()}
     cache = torch.load(args.cache, map_location='cpu', weights_only=False)
     assert cache['config']['resolution'] == args.resolution
@@ -89,7 +90,7 @@ def run(args, out):
         for i in selected+validation:
             camera = cameras[i];camera.load2device()
             ds = deform.step(pc.get_xyz, camera.fid.reshape(1,1).expand(len(pc.get_xyz),1), feature=pc.get_binary_feature(), camera_center=camera.camera_center)
-            if args.trust_metric=='actual':hidden_cache[i]=ds['hidden'].detach()
+            if args.trust_metric=='actual' and args.geometry_groups!='canonical':hidden_cache[i]=ds['hidden'].detach()
             hidden_bound=max(hidden_bound,float((torch.sqrt(ds['hidden'].square().sum(-1)+1)*pc.get_binary_feature().flatten()).max()))
             ds = {k:ds[k] for k in ['d_xyz','d_rotation','d_scaling','d_opacity','d_color']}
             normals = build_rotation(pc.get_rotation_bias(ds['d_rotation']))[:,:,2]
@@ -145,6 +146,9 @@ def run(args, out):
         tangent=correction-(correction*directions).sum(-1,keepdim=True)*directions
         return F.normalize(directions+tangent,dim=-1) if args.refine_light else directions
     def current_ds(i):
+        if args.geometry_groups=='canonical':
+            result=deform.step(pc.get_xyz,cameras[i].fid.reshape(1,1).expand(len(pc.get_xyz),1),feature=pc.get_binary_feature(),camera_center=cameras[i].camera_center)
+            return {k:result[k] for k in ['d_xyz','d_rotation','d_scaling','d_opacity','d_color']}
         with torch.no_grad():
             hidden=hidden_cache[i] if i in hidden_cache else deform.step(pc.get_xyz,cameras[i].fid.reshape(1,1).expand(len(pc.get_xyz),1),feature=pc.get_binary_feature(),camera_center=cameras[i].camera_center)['hidden']
         ds=dict(cached[i][0]);ds['d_xyz']=head(hidden)*pc.get_binary_feature()
@@ -268,18 +272,75 @@ def run(args, out):
     metrics['warmup']=evaluate('warmup')
     head.requires_grad_(args.mode=='joint');accepted=0;proposal_renders=0
     optimized=dict(head.named_parameters())
-    if args.geometry_groups=='expanded':
+    if args.geometry_groups in ['expanded','canonical']:
         for k in ['_rotation','_scaling','_opacity']:
             geometry[k].requires_grad_(True);optimized[k]=geometry[k]
+    if args.geometry_groups=='canonical':
+        geometry['_xyz'].requires_grad_(True);optimized['_xyz']=geometry['_xyz']
     initial_optimized={k:v.detach().clone() for k,v in optimized.items()}
     group_step={'_rotation':.001,'_scaling':.001,'_opacity':.005}
     group_total={'_rotation':.02,'_scaling':.02,'_opacity':.1}
+    # canonical改变后隐藏特征和其余形变输出都会变化；实测全部离散时刻的位置。
+    world_indices=selected+validation
+    initial_world={i:(initial_geometry['_xyz']+cached[i][0]['d_xyz']).detach().clone() for i in world_indices} if args.geometry_groups=='canonical' else {}
+    current_world=dict(initial_world)
+    @torch.no_grad()
+    def measure_world(previous):
+        positions={};step_bound=0.;total_bound=0.
+        for i in world_indices:
+            positions[i]=(pc.get_xyz+current_ds(i)['d_xyz']).detach()
+            step_bound=max(step_bound,float((positions[i]-previous[i]).norm(dim=-1).max()))
+            total_bound=max(total_bound,float((positions[i]-initial_world[i]).norm(dim=-1).max()))
+        return positions,step_bound,total_bound
+    if args.geometry_groups=='canonical':
+        measured,step_bound,total_bound=measure_world(initial_world)
+        assert total_bound<1e-6
+        (out/'world_initial_verification.json').write_text(json.dumps(dict(frames=len(measured),max_difference=total_bound,full_deformation_query=True,canonical_input_jacobian=True),indent=2))
+        initial_world=measured;current_world=dict(measured)
     for block in range(args.blocks):
         batch=[selected[(block*3+j)%len(selected)] for j in range(3)]
         for i in batch:
             loss=material_step(i)
         entry=dict(block=block+1,batch=batch,accepted=False,attempts=[],ambient=float(ambient.detach()))
-        if args.mode=='joint':
+        if args.mode=='joint' and args.geometry_groups=='canonical':
+            outputs=[forward(i,head_objective=True) for i in batch]
+            objective=sum(v[0] for v in outputs)/len(batch);proposal_renders+=len(batch)
+            gradients=torch.autograd.grad(objective,tuple(optimized.values()))
+            direction={k:-g.detach() for k,g in zip(optimized,gradients)}
+            assert all(torch.isfinite(g).all() for g in direction.values())
+            start={k:v.detach().clone() for k,v in optimized.items()}
+            baseline=float(objective);entry['baseline']=baseline
+            entry['gradient_norms']={k:float(v.norm()) for k,v in direction.items()}
+            with torch.no_grad():
+                # 此处仅为提议预条件，绝不作为世界位移保证；所有接受须全时刻实测。
+                hn=hidden_bound*float(torch.sqrt(sum(direction[k].square().sum() for k in initial_head)))
+                proposal={k:start[k]+direction[k]*(1e-4/max(hn,1e-30)) for k in initial_head}
+                for k in ['_rotation','_scaling','_opacity','_xyz']:
+                    maxnorm=float(direction[k].reshape(len(direction[k]),-1).norm(dim=-1).max())
+                    step_size=1e-5 if k=='_xyz' else group_step[k]
+                    cap=.001 if k=='_xyz' else group_total[k]
+                    candidate=start[k]+direction[k]*(step_size/max(maxnorm,1e-30))
+                    difference=candidate-initial_optimized[k]
+                    difference=difference*(cap/difference.reshape(len(difference),-1).norm(dim=-1,keepdim=True).clamp_min(1e-30)).clamp_max(1)
+                    proposal[k]=initial_optimized[k]+difference
+                fraction=1.
+                for attempt in range(12):
+                    for k,v in optimized.items():v.copy_(torch.lerp(start[k],proposal[k],fraction))
+                    positions,step_bound,total_bound=measure_world(current_world)
+                    item=dict(fraction=fraction,world_step=step_bound,world_total=total_bound,accepted=False)
+                    safe=np.isfinite(step_bound) and np.isfinite(total_bound) and step_bound<=1.0002e-4 and total_bound<=.00100002
+                    if safe:
+                        trial=float(sum(forward(i,head_objective=True)[0] for i in batch)/len(batch));proposal_renders+=len(batch)
+                        item['loss']=trial
+                        if np.isfinite(trial) and trial<baseline-1e-10:
+                            item['accepted']=True;entry['accepted']=True;accepted+=1;current_world=positions
+                    entry['attempts'].append(item)
+                    if entry['accepted']:break
+                    fraction*=min(.5,.9*1e-4/max(step_bound,1e-30),.9*.001/max(total_bound,1e-30)) if not safe else .5
+                if not entry['accepted']:
+                    for k,v in optimized.items():v.copy_(start[k])
+                entry['world_frames_checked']=len(world_indices)
+        elif args.mode=='joint':
             outputs=[forward(i,head_objective=True) for i in batch]
             objective=sum(v[0] for v in outputs)/len(batch);proposal_renders+=len(batch)
             if block in [0,19,39]:
@@ -354,13 +415,13 @@ def run(args, out):
         history.append(entry);print(json.dumps(entry),flush=True)
     metrics['final']=evaluate('final')
     with torch.no_grad():
-        motion={str(i):float((current_ds(i)['d_xyz']-cached[i][0]['d_xyz']).norm(dim=-1).max()) for i in selected+validation}
+        motion={str(i):float(((pc.get_xyz+current_ds(i)['d_xyz']-initial_world[i]) if args.geometry_groups=='canonical' else (current_ds(i)['d_xyz']-cached[i][0]['d_xyz'])).norm(dim=-1).max()) for i in selected+validation}
     unchanged=before=={k:digest_tensor(v) for k,v in frozen.items()}
     geometry_deltas={k:float((v.detach()-initial_geometry[k]).reshape(len(v),-1).norm(dim=-1).max()) for k,v in geometry.items()}
-    assert args.geometry_groups!='expanded' or all(geometry_deltas[k]<=group_total[k]+1e-6 for k in group_total)
+    assert args.geometry_groups not in ['expanded','canonical'] or all(geometry_deltas[k]<=group_total[k]+1e-6 for k in group_total)
     delta=max(float((v-initial_head[k]).abs().max()) for k,v in head.state_dict().items())
     passed=unchanged and max(motion.values())<=.00101 and all(np.isfinite(v['held']) for v in metrics.values()) and (accepted>0 and delta>0 if args.mode=='joint' else delta==0)
-    torch.save(dict(geometry={k:v.detach().cpu() for k,v in geometry.items()},deform_state_dict={k:v.detach().cpu() for k,v in deform.deform.state_dict().items()},albedo=albedo.detach().cpu(),energy=energy.detach().cpu(),ambient=ambient.detach().cpu(),light_nodes=light_nodes.detach().cpu(),directions=current_directions().detach().cpu(),optimizer=optimizer.state_dict(),args=vars(args),material_updates=args.warmup+args.blocks*3,geometry_updates=accepted if args.geometry_groups=='expanded' else 0,geometry_deltas=geometry_deltas,deformation_updates=accepted),out/'checkpoint.pt')
+    torch.save(dict(geometry={k:v.detach().cpu() for k,v in geometry.items()},deform_state_dict={k:v.detach().cpu() for k,v in deform.deform.state_dict().items()},albedo=albedo.detach().cpu(),energy=energy.detach().cpu(),ambient=ambient.detach().cpu(),light_nodes=light_nodes.detach().cpu(),directions=current_directions().detach().cpu(),optimizer=optimizer.state_dict(),args=vars(args),material_updates=args.warmup+args.blocks*3,geometry_updates=accepted if args.geometry_groups in ['expanded','canonical'] else 0,geometry_deltas=geometry_deltas,deformation_updates=accepted),out/'checkpoint.pt')
     with torch.no_grad():
         inferred=current_directions()
         drift=torch.rad2deg(torch.atan2(torch.cross(directions,inferred,dim=-1).norm(dim=-1),(directions*inferred).sum(-1)))
@@ -368,7 +429,7 @@ def run(args, out):
         inferred_light={k:light[k] for k in ['frames','times','train_indices','held_indices','cache_sha256']}
         inferred_light.update(directions=inferred.cpu().tolist(),gt_read=args.gt_direction_reference,protocol='9个均匀时间控制点的共享残差；节点范数<=0.1，逐时刻投影到初始灯向切平面后归一化；无GT细化' if args.refine_light else '固定输入灯向',source_runtime=str(out/'runtime.json'))
         (out/'inferred_light.json').write_text(json.dumps(inferred_light,ensure_ascii=False,indent=2))
-    result=dict(status='PASS' if passed else 'FAILED',scope='真实下降和冻结边界工程验收；梯度审计失败未改判，几何质量需独立评测',gt_read=args.gt_direction_reference,ambient=float(ambient.detach()),light_drift_deg=drift.cpu().tolist(),light_nodes=light_nodes.detach().cpu().tolist(),light_updates=sum(x['accepted'] for x in light_history) if guard else (args.warmup+args.blocks*3 if args.refine_light else 0),light_proposals=len(light_history),light_history=light_history,light_guard_renders=light_guard_renders,shadow_guard_final_cost=guard_cost,metrics=metrics,history=history,material_updates=args.warmup+args.blocks*3,geometry_updates=accepted if args.geometry_groups=='expanded' else 0,geometry_deltas=geometry_deltas,deformation_updates=accepted,proposal_renders=proposal_renders,frozen_unchanged=unchanged,head_delta=delta,hidden_bound=hidden_bound,motion=motion,max_memory_bytes=torch.cuda.max_memory_allocated())
+    result=dict(status='PASS' if passed else 'FAILED',scope='真实下降和冻结边界工程验收；梯度审计失败未改判，几何质量需独立评测',gt_read=args.gt_direction_reference,ambient=float(ambient.detach()),light_drift_deg=drift.cpu().tolist(),light_nodes=light_nodes.detach().cpu().tolist(),light_updates=sum(x['accepted'] for x in light_history) if guard else (args.warmup+args.blocks*3 if args.refine_light else 0),light_proposals=len(light_history),light_history=light_history,light_guard_renders=light_guard_renders,shadow_guard_final_cost=guard_cost,metrics=metrics,history=history,material_updates=args.warmup+args.blocks*3,geometry_updates=accepted if args.geometry_groups in ['expanded','canonical'] else 0,geometry_deltas=geometry_deltas,deformation_updates=accepted,proposal_renders=proposal_renders,frozen_unchanged=unchanged,head_delta=delta,hidden_bound=hidden_bound,motion=motion,max_memory_bytes=torch.cuda.max_memory_allocated())
     (out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
     print(json.dumps({k:v for k,v in result.items() if k not in ['metrics','history','motion','light_history']},ensure_ascii=False),flush=True)
     if not passed:raise RuntimeError('工程验收FAILED，保留checkpoint及所有输出')
@@ -378,7 +439,7 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for name in ['source','model','lights','output','cache']:p.add_argument('--'+name,required=True)
     p.add_argument('--mode',choices=['joint','frozen'],required=True)
-    p.add_argument('--geometry-groups',choices=['head','expanded'],default='head')
+    p.add_argument('--geometry-groups',choices=['head','expanded','canonical'],default='head')
     p.add_argument('--historical-loss',action='store_true')
     p.add_argument('--shading-normal',choices=['depth','gaussian'],default='depth')
     p.add_argument('--gt-direction-reference',action='store_true')
@@ -396,7 +457,7 @@ def main():
     args.alpha_weight=.1 if args.historical_loss else .01
     args.distortion_weight=1000. if args.historical_loss else 0.
     if args.historical_loss:args.normal_weight=.1
-    assert args.geometry_groups!='expanded' or (args.mode=='joint' and not args.refine_light)
+    assert args.geometry_groups not in ['expanded','canonical'] or (args.mode=='joint' and not args.refine_light)
     assert not args.shadow_state or args.refine_light, '投影约束仅用于未知灯向细化'
     assert not args.refine_light or (args.mode=='frozen' and not args.gt_direction_reference), '首次灯向细化只允许未知光固定几何'
     assert 0<=args.ambient_max<=.1, '亮度底项上界限制为平均DL归一尺度的0.1'
