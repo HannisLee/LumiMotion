@@ -132,6 +132,14 @@ def run(args, out):
     def energy_values():
         values=F.softplus(energy);values=values/values.mean()
         return torch.lerp(values[left],values[right],weight)
+    light_nodes=torch.nn.Parameter(torch.zeros((9,3),device='cuda'),requires_grad=args.refine_light)
+    node_times=torch.linspace(float(train_times[0]),float(train_times[-1]),9,device='cuda')
+    node_right=torch.searchsorted(node_times,times).clamp(1,8);node_left=node_right-1
+    node_weight=((times-node_times[node_left])/(node_times[node_right]-node_times[node_left])).clamp(0,1)
+    def current_directions():
+        correction=torch.lerp(light_nodes[node_left],light_nodes[node_right],node_weight[:,None])
+        tangent=correction-(correction*directions).sum(-1,keepdim=True)*directions
+        return F.normalize(directions+tangent,dim=-1) if args.refine_light else directions
     def current_ds(i):
         with torch.no_grad():
             hidden=hidden_cache[i] if i in hidden_cache else deform.step(pc.get_xyz,cameras[i].fid.reshape(1,1).expand(len(pc.get_xyz),1),feature=pc.get_binary_feature(),camera_center=cameras[i].camera_center)['hidden']
@@ -149,7 +157,7 @@ def run(args, out):
         colors=F.softplus(albedo)*energy_values()[i]
         package=render(cameras[i],pc,pipe,bg,**ds,override_color=colors)
         surface_normal=F.normalize(package['surf_normal'],dim=0)*pixel_signs[i]
-        cosine=(surface_normal*directions[i,:,None,None]).sum(0,keepdim=True)
+        cosine=(surface_normal*current_directions()[i,:,None,None]).sum(0,keepdim=True)
         shading=cosine.clamp_min(0)+ambient
         if args.normal_gradient=='stop' and not audit_full:shading=shading.detach()
         package['render']=package['render']*shading
@@ -200,9 +208,12 @@ def run(args, out):
         return dict(diagnostics=diagnostics,per_frame=losses,train=float(np.mean([losses[str(i)] for i in selected])),held=float(np.mean([losses[str(i)] for i in validation])))
     groups=[{'params':[albedo],'lr':.02},{'params':[energy],'lr':.01}]
     if args.ambient_max>0:groups.append({'params':[ambient],'lr':.001})
+    if args.refine_light:groups.append({'params':[light_nodes],'lr':.001})
     optimizer=torch.optim.Adam(groups)
     @torch.no_grad()
-    def clamp_ambient():ambient.clamp_(0,args.ambient_max)
+    def clamp_ambient():
+        ambient.clamp_(0,args.ambient_max)
+        if args.refine_light:light_nodes.mul_((.1/light_nodes.norm(dim=-1,keepdim=True).clamp_min(1e-30)).clamp_max(1))
     history=[];metrics={'initial':evaluate('initial')}
     for step in range(args.warmup):
         optimizer.zero_grad(set_to_none=True);loss,_=forward(selected[step%len(selected)]);loss.backward();optimizer.step();clamp_ambient()
@@ -268,8 +279,15 @@ def run(args, out):
     unchanged=before=={k:digest_tensor(v) for k,v in frozen.items()}
     delta=max(float((v-initial_head[k]).abs().max()) for k,v in head.state_dict().items())
     passed=unchanged and max(motion.values())<=.00101 and all(np.isfinite(v['held']) for v in metrics.values()) and (accepted>0 and delta>0 if args.mode=='joint' else delta==0)
-    torch.save(dict(geometry={k:v.detach().cpu() for k,v in geometry.items()},deform_state_dict={k:v.detach().cpu() for k,v in deform.deform.state_dict().items()},albedo=albedo.detach().cpu(),energy=energy.detach().cpu(),ambient=ambient.detach().cpu(),optimizer=optimizer.state_dict(),args=vars(args),material_updates=args.warmup+args.blocks*3,geometry_updates=0,deformation_updates=accepted),out/'checkpoint.pt')
-    result=dict(status='PASS' if passed else 'FAILED',scope='真实下降和冻结边界工程验收；梯度审计失败未改判，几何质量需独立评测',gt_read=args.gt_direction_reference,ambient=float(ambient.detach()),metrics=metrics,history=history,material_updates=args.warmup+args.blocks*3,geometry_updates=0,deformation_updates=accepted,proposal_renders=proposal_renders,frozen_unchanged=unchanged,head_delta=delta,hidden_bound=hidden_bound,motion=motion,max_memory_bytes=torch.cuda.max_memory_allocated())
+    torch.save(dict(geometry={k:v.detach().cpu() for k,v in geometry.items()},deform_state_dict={k:v.detach().cpu() for k,v in deform.deform.state_dict().items()},albedo=albedo.detach().cpu(),energy=energy.detach().cpu(),ambient=ambient.detach().cpu(),light_nodes=light_nodes.detach().cpu(),directions=current_directions().detach().cpu(),optimizer=optimizer.state_dict(),args=vars(args),material_updates=args.warmup+args.blocks*3,geometry_updates=0,deformation_updates=accepted),out/'checkpoint.pt')
+    with torch.no_grad():
+        inferred=current_directions()
+        drift=torch.rad2deg(torch.atan2(torch.cross(directions,inferred,dim=-1).norm(dim=-1),(directions*inferred).sum(-1)))
+        assert not args.refine_light or float(drift.max())<=math.degrees(math.atan(.1))+1e-4
+        inferred_light={k:light[k] for k in ['frames','times','train_indices','held_indices','cache_sha256']}
+        inferred_light.update(directions=inferred.cpu().tolist(),gt_read=args.gt_direction_reference,protocol='9个均匀时间控制点的共享残差；节点范数<=0.1，逐时刻投影到初始灯向切平面后归一化；无GT细化' if args.refine_light else '固定输入灯向',source_runtime=str(out/'runtime.json'))
+        (out/'inferred_light.json').write_text(json.dumps(inferred_light,ensure_ascii=False,indent=2))
+    result=dict(status='PASS' if passed else 'FAILED',scope='真实下降和冻结边界工程验收；梯度审计失败未改判，几何质量需独立评测',gt_read=args.gt_direction_reference,ambient=float(ambient.detach()),light_drift_deg=drift.cpu().tolist(),light_nodes=light_nodes.detach().cpu().tolist(),light_updates=args.warmup+args.blocks*3 if args.refine_light else 0,metrics=metrics,history=history,material_updates=args.warmup+args.blocks*3,geometry_updates=0,deformation_updates=accepted,proposal_renders=proposal_renders,frozen_unchanged=unchanged,head_delta=delta,hidden_bound=hidden_bound,motion=motion,max_memory_bytes=torch.cuda.max_memory_allocated())
     (out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
     print(json.dumps({k:v for k,v in result.items() if k not in ['metrics','history','motion']},ensure_ascii=False),flush=True)
     if not passed:raise RuntimeError('工程验收FAILED，保留checkpoint及所有输出')
@@ -280,6 +298,7 @@ def main():
     for name in ['source','model','lights','output','cache']:p.add_argument('--'+name,required=True)
     p.add_argument('--mode',choices=['joint','frozen'],required=True)
     p.add_argument('--gt-direction-reference',action='store_true')
+    p.add_argument('--refine-light',action='store_true')
     p.add_argument('--ambient-max',type=float,default=0.)
     p.add_argument('--balance-head-groups',action='store_true')
     p.add_argument('--trust-metric',choices=['parameter','actual'],default='parameter')
@@ -289,6 +308,7 @@ def main():
     p.add_argument('--iteration',type=int,default=35000);p.add_argument('--seed',type=int,default=1015)
     p.add_argument('--warmup',type=int,default=240);p.add_argument('--blocks',type=int,default=40)
     args=p.parse_args();args.resolution=4;args.frames=0;args.observations='lit';args.normal_gradient='full';args.normal_weight=.05
+    assert not args.refine_light or (args.mode=='frozen' and not args.gt_direction_reference), '首次灯向细化只允许未知光固定几何'
     assert 0<=args.ambient_max<=.1, '亮度底项上界限制为平均DL归一尺度的0.1'
     out=Path(args.output);out.mkdir(parents=True,exist_ok=False)
     (out/'command.txt').write_text(shlex.join(sys.argv)+'\n');run(args,out)
