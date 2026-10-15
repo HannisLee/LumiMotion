@@ -318,7 +318,7 @@ def run(args, out):
     if args.xyz_preconditioner=='jacobian':
         from scripts.dl_xyz_metric import diagonal_metric,affine_check
         check=affine_check('cuda')
-        metric_indices=[0,1,2,64,65,66,132,133,134]
+        metric_indices=selected if args.xyz_metric_times=='train' else [0,1,2,64,65,66,132,133,134]
         assert set(metric_indices)<=set(selected)
         xyz_metric=torch.zeros_like(pc.get_xyz)
         for i in metric_indices:
@@ -483,6 +483,7 @@ def main():
     p.add_argument('--geometry-groups',choices=['head','expanded','canonical'],default='head')
     p.add_argument('--freeze-canonical-xyz',action='store_true')
     p.add_argument('--audit-world-candidates',action='store_true')
+    p.add_argument('--xyz-metric-times',choices=['nine','train'],default='nine')
     p.add_argument('--xyz-preconditioner',choices=['none','jacobian'],default='none')
     p.add_argument('--historical-loss',action='store_true')
     p.add_argument('--shading-normal',choices=['depth','gaussian'],default='depth')
@@ -499,6 +500,7 @@ def main():
     p.add_argument('--warmup',type=int,default=240);p.add_argument('--blocks',type=int,default=40)
     args=p.parse_args();args.resolution=4;args.frames=0;args.observations='lit';args.normal_gradient='full';args.normal_weight=.05
     assert not args.freeze_canonical_xyz or args.geometry_groups=='canonical'
+    assert args.xyz_metric_times=='nine' or args.xyz_preconditioner=='jacobian'
     assert args.xyz_preconditioner=='none' or (args.geometry_groups=='canonical' and not args.freeze_canonical_xyz)
     args.alpha_weight=.1 if args.historical_loss else .01
     args.distortion_weight=1000. if args.historical_loss else 0.
