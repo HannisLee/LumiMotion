@@ -10,7 +10,7 @@ from scripts.probe_dynamic_dl_selfcal import read_config
 
 @torch.no_grad()
 def main():
- p=argparse.ArgumentParser();p.add_argument('--output',required=True);p.add_argument('--group',choices=['photo','joint'],required=True);a=p.parse_args();out=Path(a.output);out.mkdir(parents=True,exist_ok=False);(out/'command.txt').write_text(shlex.join(sys.argv)+'\n');torch.set_num_threads(4)
+ p=argparse.ArgumentParser();p.add_argument('--output',required=True);p.add_argument('--material-fit',default='output/smoke_test/1015-75-LH-dynamic-DL-T83共享材质/fit');p.add_argument('--group',choices=['photo','joint'],required=True);a=p.parse_args();out=Path(a.output);out.mkdir(parents=True,exist_ok=False);(out/'command.txt').write_text(shlex.join(sys.argv)+'\n');torch.set_num_threads(4)
  run=Path('output/smoke_test/1015-41-LH-dynamic-DL-T49全训练时刻预条件/preconditioned');rt=json.loads((run/'runtime.json').read_text());args=rt['args'];assert not args['gt_direction_reference'];inputs={}
  for f in [Path(args['model'])/'cfg_args',Path(args['model'])/'point_cloud/iteration_35000/point_cloud.ply',Path(args['model'])/'deform/iteration_35000/deform.pth',Path(args['source'])/'transforms_train.json']:
   sha=hashlib.sha256(f.read_bytes()).hexdigest();assert sha==rt['inputs'][str(f)];inputs[str(f.resolve())]=sha
@@ -55,11 +55,12 @@ def main():
  import torch.nn.functional as F
  from gaussian_renderer import render
  from scripts.probe_dynamic_dl_selfcal import save_image
- fit=Path('output/smoke_test/1015-75-LH-dynamic-DL-T83共享材质/fit')
- material=torch.load(fit/'checkpoint.pt',map_location='cpu',weights_only=False);cache=torch.load(fit/'frame_cache.pt',map_location='cpu',weights_only=False);mr=json.loads((fit/'result.json').read_text())
+ fit=Path(a.material_fit)
+ material=torch.load(fit/'checkpoint.pt',map_location='cpu',weights_only=False);cache_path=Path(material.get('cache_source',str(fit/'frame_cache.pt')));cache=torch.load(cache_path,map_location='cpu',weights_only=False);mr=json.loads((fit/'result.json').read_text())
  for f,h in mr['inputs'].items():assert hashlib.sha256(Path(f).read_bytes()).hexdigest()==h,f
  assert torch.equal(active.cpu(),material['active_ids'])
- extra.extend([fit/'checkpoint.pt',fit/'frame_cache.pt',fit/'result.json'])
+ extra.extend([fit/'checkpoint.pt',cache_path,fit/'result.json'])
+ assert material['protocol'] in ['world_shared_material_v1','world_shared_material_projected_v1']
  for v in vars(pc).values():
   if isinstance(v,torch.Tensor):v.requires_grad_(False)
  albedo=material['albedo'].cuda();directions=material['directions'].cuda();energy=material['energy'].cuda();train_frames=material['train_frames'];held_frames=material['held_frames']
