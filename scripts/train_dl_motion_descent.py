@@ -159,12 +159,16 @@ def run(args, out):
         ds=current_ds(i)
         # albedo图已预乘Alpha；法线Lambert项不可再次乘Alpha。
         colors=F.softplus(albedo)*energy_values()[i]
+        if args.shading_normal=='gaussian':
+            gaussian_normal=build_rotation(pc.get_rotation_bias(ds['d_rotation']))[:,:,2]*sign
+            gaussian_cosine=(gaussian_normal*current_directions()[i]).sum(-1,keepdim=True)
+            colors=colors*(gaussian_cosine.clamp_min(0)+ambient)
         package=render(cameras[i],pc,pipe,bg,**ds,override_color=colors)
         surface_normal=F.normalize(package['surf_normal'],dim=0)*pixel_signs[i]
         cosine=(surface_normal*current_directions()[i,:,None,None]).sum(0,keepdim=True)
         shading=cosine.clamp_min(0)+ambient
         if args.normal_gradient=='stop' and not audit_full:shading=shading.detach()
-        package['render']=package['render']*shading
+        if args.shading_normal=='depth':package['render']=package['render']*shading
         residual=package['render']-target
         residual=torch.where(saturated,residual.clamp_max(0),residual)
         photo=(residual.double().square()*chosen).sum()/(3*chosen.sum()).clamp_min(1)
@@ -314,6 +318,19 @@ def run(args, out):
                     entry['step_fraction_after_projection']=step_fraction
                     entry['proposal_step_bound']=displacement_bound({k:v-start[k] for k,v in proposal.items()})
                     entry['proposal_cumulative_bound']=displacement_bound({k:v-initial_head[k] for k,v in proposal.items()})
+                    entry['bound_before_numerical_backoff']=[entry['proposal_step_bound'],entry['proposal_cumulative_bound']]
+                    entry['numerical_backoffs']=0
+                    for _ in range(8):
+                        if entry['proposal_step_bound']<=1.0002e-4 and entry['proposal_cumulative_bound']<=.00100002:break
+                        proposal={k:torch.lerp(start[k],v,.99) for k,v in proposal.items()}
+                        entry['numerical_backoffs']+=1
+                        entry['proposal_step_bound']=displacement_bound({k:v-start[k] for k,v in proposal.items()})
+                        entry['proposal_cumulative_bound']=displacement_bound({k:v-initial_head[k] for k,v in proposal.items()})
+                    if entry['proposal_step_bound']>1.0002e-4 or entry['proposal_cumulative_bound']>.00100002:
+                        proposal={k:v.clone() for k,v in start.items()}
+                        entry['head_proposal_cancelled']=True
+                        entry['proposal_step_bound']=0.
+                        entry['proposal_cumulative_bound']=displacement_bound({k:v-initial_head[k] for k,v in proposal.items()})
                     assert entry['proposal_step_bound']<=1.0002e-4 and entry['proposal_cumulative_bound']<=.00100002
                 # 额外几何组按各自参数单位限幅，同一回溯比例联合验收。
                 for k in group_step:
@@ -363,6 +380,7 @@ def main():
     p.add_argument('--mode',choices=['joint','frozen'],required=True)
     p.add_argument('--geometry-groups',choices=['head','expanded'],default='head')
     p.add_argument('--historical-loss',action='store_true')
+    p.add_argument('--shading-normal',choices=['depth','gaussian'],default='depth')
     p.add_argument('--gt-direction-reference',action='store_true')
     p.add_argument('--shadow-state',default=None)
     p.add_argument('--refine-light',action='store_true')
