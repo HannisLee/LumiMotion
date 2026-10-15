@@ -41,11 +41,19 @@ def main():
             assert file_sha256(source)==runtime['inputs'][str(source.resolve())]
         state=torch.load(path,map_location='cpu',weights_only=False)
         assert Path(state['args']['model']).resolve()==Path(args.model).resolve()
-        assert state['protocol'] in ['T65_shadow_canonical','shadow_canonical_v1','correspondence_canonical_v1'] and state['material_updates']==0
+        assert state['protocol'] in ['T65_shadow_canonical','shadow_canonical_v1','correspondence_canonical_v1','correspondence_world_shared_v1'] and state['material_updates']==0
         assert 0<=state['geometry_updates']<=3 and set(state['geometry'])=={'_xyz'}
         active=state['active_ids'];untouched=torch.ones(len(initial['_xyz']),dtype=torch.bool);untouched[active]=False
         assert torch.equal(state['geometry']['_xyz'][untouched],initial['_xyz'].cpu()[untouched])
         assert all(torch.equal(v,initial_deform[k].cpu()) for k,v in state['deform_state_dict'].items())
+        if state['protocol']=='correspondence_world_shared_v1':
+            assert torch.equal(state['geometry']['_xyz'],initial['_xyz'].cpu())
+            residual=state['world_residual']
+            assert residual.shape==(len(active),3) and torch.isfinite(residual).all()
+            assert len(active.unique())==len(active)
+            assert residual.norm(dim=-1).max()<=.00100002
+            if state['geometry_updates']==0:assert torch.count_nonzero(residual)==0
+
         assert sys.modules['diff_surfel_rasterization'].provenance['source_sha256']=='c05cfed061e8a018682cac401e071ce9b407257813b13fc6f00cc17d8e118892'
         assert 'deform_state_dict' in state
         checkpoint_states[name]=state;sources[str(path.resolve())]=file_sha256(path)
@@ -92,6 +100,7 @@ def main():
         for camera,ds,c2w,intrinsics,normal,valid,gt,masks,number in cached:
             query=deform.step(pc.get_xyz,camera.fid.reshape(1,1).expand(len(pc.get_xyz),1),feature=pc.get_binary_feature(),camera_center=camera.camera_center)
             ds={k:query[k] for k in ['d_xyz','d_rotation','d_scaling','d_opacity','d_color']}
+            if state.get('protocol')=='correspondence_world_shared_v1':ds['d_xyz']=ds['d_xyz'].index_add(0,state['active_ids'].cuda(),state['world_residual'].cuda())
             pipe.depth_ratio=0.;package=render(camera,pc,pipe,bg,**ds,override_color=torch.zeros_like(pc.get_xyz))
             expected=package['surf_depth'][0].cpu().numpy();alpha=package['rend_alpha'][0].cpu().numpy()
             if number in [4,67,130]:
