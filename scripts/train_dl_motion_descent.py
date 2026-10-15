@@ -80,11 +80,12 @@ def run(args, out):
     (out/'runtime.json').write_text(json.dumps(runtime, ensure_ascii=False, indent=2))
     bg = torch.zeros(3, device='cuda')
     pipe = SimpleNamespace(compute_cov3D_python=False, convert_SHs_python=False, depth_ratio=0.)
-    cached = {}; coverage = []; pixel_signs = {}; hidden_bound=0.
+    cached = {}; coverage = []; pixel_signs = {}; hidden_bound=0.; hidden_cache={}
     with torch.no_grad():
         for i in selected+validation:
             camera = cameras[i];camera.load2device()
             ds = deform.step(pc.get_xyz, camera.fid.reshape(1,1).expand(len(pc.get_xyz),1), feature=pc.get_binary_feature(), camera_center=camera.camera_center)
+            if args.trust_metric=='actual':hidden_cache[i]=ds['hidden'].detach()
             hidden_bound=max(hidden_bound,float((torch.sqrt(ds['hidden'].square().sum(-1)+1)*pc.get_binary_feature().flatten()).max()))
             ds = {k:ds[k] for k in ['d_xyz','d_rotation','d_scaling','d_opacity','d_color']}
             normals = build_rotation(pc.get_rotation_bias(ds['d_rotation']))[:,:,2]
@@ -126,9 +127,14 @@ def run(args, out):
         return torch.lerp(values[left],values[right],weight)
     def current_ds(i):
         with torch.no_grad():
-            hidden=deform.step(pc.get_xyz,cameras[i].fid.reshape(1,1).expand(len(pc.get_xyz),1),feature=pc.get_binary_feature(),camera_center=cameras[i].camera_center)['hidden']
+            hidden=hidden_cache[i] if i in hidden_cache else deform.step(pc.get_xyz,cameras[i].fid.reshape(1,1).expand(len(pc.get_xyz),1),feature=pc.get_binary_feature(),camera_center=cameras[i].camera_center)['hidden']
         ds=dict(cached[i][0]);ds['d_xyz']=head(hidden)*pc.get_binary_feature()
         return ds
+    @torch.no_grad()
+    def displacement_bound(delta):
+        if args.trust_metric=='parameter':
+            return hidden_bound*float(torch.sqrt(sum(v.square().sum() for v in delta.values())))
+        return max(float((F.linear(h,delta['weight'],delta['bias'])*pc.get_binary_feature()).norm(dim=-1).max()) for h in hidden_cache.values())
     def forward(i, audit_full=False, head_objective=False):
         ds,sign,target,saturated,chosen,all_mask,interior,mask = cached[i]
         ds=current_ds(i)
@@ -207,13 +213,26 @@ def run(args, out):
             start={k:v.detach().clone() for k,v in head.state_dict().items()}
             baseline=float(objective);entry['baseline']=baseline
             with torch.no_grad():
-                # 全135离散时间的隐藏特征上界给出保守位移信赖域。
-                scale=1e-4/(hidden_bound*float(direction_norm))
+                # 两种度量均限制同一离散时间世界位移上限；actual显式遍历固定隐藏特征。
+                direction_bound=displacement_bound(direction)
+                scale=1e-4/max(direction_bound,1e-30)
+                entry['direction_bound']=direction_bound
+                entry['parameter_bound']=hidden_bound*float(direction_norm)
                 proposal={k:v+scale*direction[k] for k,v in start.items()}
                 norm=float(torch.sqrt(sum((v-initial_head[k]).square().sum() for k,v in proposal.items())))
-                fraction=min(1.,.001/(hidden_bound*max(norm,1e-12)))
+                cumulative_bound=displacement_bound({k:v-initial_head[k] for k,v in proposal.items()})
+                fraction=min(1.,.001/max(cumulative_bound,1e-30))
+                entry['cumulative_bound_before_projection']=cumulative_bound
                 proposal={k:torch.lerp(initial_head[k],v,fraction) for k,v in proposal.items()}
                 entry['bound_fraction']=fraction
+                if args.trust_metric=='actual':
+                    step_bound=displacement_bound({k:v-start[k] for k,v in proposal.items()})
+                    step_fraction=min(1.,1e-4/max(step_bound,1e-30))
+                    proposal={k:torch.lerp(start[k],v,step_fraction) for k,v in proposal.items()}
+                    entry['step_fraction_after_projection']=step_fraction
+                    entry['proposal_step_bound']=displacement_bound({k:v-start[k] for k,v in proposal.items()})
+                    entry['proposal_cumulative_bound']=displacement_bound({k:v-initial_head[k] for k,v in proposal.items()})
+                    assert entry['proposal_step_bound']<=1.0002e-4 and entry['proposal_cumulative_bound']<=.00100002
                 for fraction_step in [1.,.5,.25,.125,.0625,.03125]:
                     for k,v in head.state_dict().items():v.copy_(torch.lerp(start[k],proposal[k],fraction_step))
                     trial=float(sum(forward(i,head_objective=True)[0] for i in batch)/len(batch));proposal_renders+=len(batch)
@@ -241,6 +260,7 @@ def main():
     for name in ['source','model','lights','output','cache']:p.add_argument('--'+name,required=True)
     p.add_argument('--mode',choices=['joint','frozen'],required=True)
     p.add_argument('--gt-direction-reference',action='store_true')
+    p.add_argument('--trust-metric',choices=['parameter','actual'],default='parameter')
     p.add_argument('--positive-weight',type=float,default=0.)
     p.add_argument('--positive-margin',type=float,default=.05)
     p.add_argument('--head-objective',choices=['full','photo','regularization'],default='full')
