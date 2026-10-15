@@ -24,6 +24,7 @@ def main():
  p.add_argument('--compensated-head-difference',action='store_true')
  p.add_argument('--pixel-audit',action='store_true')
  p.add_argument('--fixed-coordinates',action='store_true')
+ p.add_argument('--extended-scales',action='store_true')
  args=p.parse_args();out=Path(args.output);out.mkdir(parents=True,exist_ok=False)
  (out/'command.txt').write_text(shlex.join(sys.argv)+'\n')
  torch.manual_seed(1015)
@@ -126,7 +127,7 @@ def main():
   values=[]
   with torch.no_grad():
    flat=parameter.flatten();original=float(flat[coordinate])
-   for eps in [1e-5,3e-6,1e-6,3e-7,1e-7]:
+   for eps in ([3e-4,1e-4,3e-5] if args.extended_scales else [])+[1e-5,3e-6,1e-6,3e-7,1e-7]:
     observations=[]
     for sign_delta in [1,-1]:
      flat[coordinate]=original+sign_delta*eps;actual=float(flat[coordinate])
@@ -134,16 +135,20 @@ def main():
      dd=pkg['surf_depth'].double()-saved_depth;da=pkg['render'].double()-saved_rgb
      linear=float((gd.double()*dd).sum()+(ga.double()*da).sum())
      linear64=float((gd64.double()*dd).sum()+(ga64.double()*da).sum())
-     observations.append((actual,float(v),float(v64),linear,linear64))
+     motion=float((head(hidden_cache[i])*pc.get_binary_feature()-cached[i][1]['d_xyz']).norm(dim=-1).max())
+     observations.append((actual,float(v),float(v64),linear,linear64,motion))
     flat[coordinate]=original
     span=observations[0][0]-observations[1][0]
     numeric=[(observations[0][k]-observations[1][k])/span for k in range(1,5)]
-    values.append(dict(epsilon=eps,native=numeric[0],stable=numeric[1],native_linear=numeric[2],stable_linear=numeric[3],native_error=rel(numeric[0],analytic),stable_error=rel(numeric[1],analytic64),native_linear_error=rel(numeric[2],analytic),stable_linear_error=rel(numeric[3],analytic64)))
+    values.append(dict(epsilon=eps,max_motion=max(observations[0][5],observations[1][5]),native=numeric[0],stable=numeric[1],native_linear=numeric[2],stable_linear=numeric[3],native_error=rel(numeric[0],analytic),stable_error=rel(numeric[1],analytic64),native_linear_error=rel(numeric[2],analytic),stable_linear_error=rel(numeric[3],analytic64)))
    valid=cached[i][3].bool().expand_as(normal64)
    normal_error=float((normal64-F.normalize(base['surf_normal'],dim=0)*cached[i][2]).abs()[valid].max())
   row=dict(frame=i,coordinate=coordinate,analytic=analytic,analytic64=analytic64,loss=float(loss),loss64=float(double_loss),normal_max_difference=normal_error,differences=values)
   for kind in ['native','stable','native_linear','stable_linear']:
-   row[kind+'_passed']=any(values[j][kind+'_error']<.2 and values[j+1][kind+'_error']<.2 for j in range(4))
+   original_values=values[-5:]
+   row[kind+'_passed']=any(original_values[j][kind+'_error']<.2 and original_values[j+1][kind+'_error']<.2 for j in range(4))
+   if args.extended_scales:
+    row[kind+'_extended_passed']=any(values[j][kind+'_error']<.2 and values[j+1][kind+'_error']<.2 for j in range(3))
   if args.pixel_audit and i==0:
    # 固定原先失败的1e-6步长，按深度VJP数值贡献选择16个像素，仅用于诊断。
    fresh_loss,fresh,_,_=forward(i)
