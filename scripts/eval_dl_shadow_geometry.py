@@ -43,7 +43,9 @@ def main():
         state=torch.load(path,map_location='cpu',weights_only=False)
         assert Path(state['args']['model']).resolve()==Path(args.model).resolve()
         assert state['protocol'] in ['T65_shadow_canonical','shadow_canonical_v1','correspondence_canonical_v1','correspondence_world_shared_v1',PROTOCOL] and state['material_updates']==0
-        assert 0<=state['geometry_updates']<=3 and set(state['geometry'])=={'_xyz'}
+        budget=state.get('requested_steps',3)
+        assert budget in [3,30] and (budget==3 or state['protocol']==PROTOCOL)
+        assert 0<=state['geometry_updates']<=budget and set(state['geometry'])=={'_xyz'}
         active=state['active_ids'];untouched=torch.ones(len(initial['_xyz']),dtype=torch.bool);untouched[active]=False
         assert torch.equal(state['geometry']['_xyz'][untouched],initial['_xyz'].cpu()[untouched])
         assert all(torch.equal(v,initial_deform[k].cpu()) for k,v in state['deform_state_dict'].items())
