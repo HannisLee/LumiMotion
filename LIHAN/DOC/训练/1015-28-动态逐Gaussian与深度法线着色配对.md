@@ -1,0 +1,11 @@
+# 动态逐Gaussian与深度法线着色配对
+
+T40，ushas/lumimotion-ushas，GPU0单个自有任务顺序执行两组。共同1011-03@35000、T05未知灯向、T02亮面对应支持、seed1015、expanded参数组、历史损失、底项0.1、240warmup+120材质更新和40几何提议，与T39相同约束。输出output/smoke_test/1015-32-LH-dynamic-DL-T40着色法线配对。
+
+depth控制：原先渲染材质图后乘深度法线Lambert；gaussian候选：变形后每点旋转法线乘相同固定初始朝向符号，计算Lambert后再光栅化。法线来源及着色位置是本次共同变更的机制，不声称仅改变算子交换顺序。无新增阴影模型。旋转采用实际renderer的get_rotation_bias，不声称已验证逆转置Jacobian法线运输。保留两组相同的深度法线positivity辅助项，避免同时更改该约束；normal一致性、Alpha、distortion、采样与材质参数化相同。
+
+两组重新执行，不复用T39终点。检查初始几何资产、支持与配置差异，actual世界位移/额外参数组限幅及接受回滚保持。每个checkpoint独立加载完整几何含opacity。GT仅在全部训练后独立15帧400评测。
+
+预注册主要门槛：候选主体expected/median相对默认和depth控制有一致改善，覆盖及足部expected/median不恶化；保留原始差值，未新增事后容差。Depth Normal与缺失惩罚同时报告。默认/frozen逐值重合。若只有RGB/法线改善而真实depth退化则科学FAILED。Mesh、动态对应增量及三种子缺项时不能判完整Goal完成。早期T06/T07已有逐Gaussian路线负结果；本次为当前后端/真实位移头/expanded参数组上的受控复核，不当成全新方法。
+
+首次depth控制exit0；gaussian在第33提议位移域断言exit1，32已接受块/339材质更新，无终点checkpoint，initial/warmup渲染与日志保留。具体超限值未记录，不预设误差来源。修正为原界下的实测回缩，depth_retry1/gaussian_retry1均从原起点同预算重跑。新快照retry1_snapshot.py；旧source_snapshot.py不覆盖。新实现不放宽位移上限，失败部分训练不用于正式指标比较。
