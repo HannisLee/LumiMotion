@@ -42,7 +42,7 @@ def main():
     record = dict(stats=stats, frames=result['frames'], angle_degrees=errors.tolist(),
                   result_sha256=hashlib.sha256(Path(args.result).read_bytes()).hexdigest(),
                   gt_sha256=hashlib.sha256(Path(args.gt).read_bytes()).hexdigest(),
-                  gt_path=str(Path(args.gt).resolve()), protocol='最终固定600步结果独立评测，不回灌训练',
+                  gt_path=str(Path(args.gt).resolve()), protocol='已保存结果的独立离线评测，不回灌训练；优化预算以源结果和运行日志为准',
                   energy_evaluation='未执行：当前只评方向，不把Blender能量直接当辐射标定')
     out.write_text(json.dumps(record, ensure_ascii=False, indent=2))
     print(json.dumps(stats), flush=True)
