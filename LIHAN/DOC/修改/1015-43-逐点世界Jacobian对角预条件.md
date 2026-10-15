@@ -1,0 +1,5 @@
+# 逐点世界Jacobian对角预条件
+
+新增dl_xyz_metric.py，求逐点世界位置Jacobian的列平方和（diag JᵀJ），带已知仿射解析检查。train_dl_motion_descent可选xyz-preconditioner=jacobian，仅canonical开放XYZ可用；固定九个训练时间构造最大对角度量与阻尼1，保存原矩阵、分位数、来源SHA及训练参数。只修改XYZ提议方向，默认none原算法保持，全135时间真实位移/损失回溯仍为接受依据。
+
+前向源码utils/time_utils.py为逐点操作，故求和VJP的逐行解释成立；不把此检查当作native渲染梯度全面可靠，也不将对角度量称为完整Gauss-Newton。编译后冒烟验证再决定正式短训练。
