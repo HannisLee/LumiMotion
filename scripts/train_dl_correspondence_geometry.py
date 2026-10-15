@@ -10,7 +10,7 @@ from scripts.probe_dynamic_dl_selfcal import read_config
 
 @torch.no_grad()
 def main():
- p=argparse.ArgumentParser();p.add_argument('--output',required=True);a=p.parse_args();out=Path(a.output);out.mkdir(parents=True,exist_ok=False);(out/'command.txt').write_text(shlex.join(sys.argv)+'\n');torch.set_num_threads(4)
+ p=argparse.ArgumentParser();p.add_argument('--output',required=True);p.add_argument('--preconditioner',choices=['t49','none'],default='t49');a=p.parse_args();out=Path(a.output);out.mkdir(parents=True,exist_ok=False);(out/'command.txt').write_text(shlex.join(sys.argv)+'\n');torch.set_num_threads(4)
  run=Path('output/smoke_test/1015-41-LH-dynamic-DL-T49全训练时刻预条件/preconditioned');rt=json.loads((run/'runtime.json').read_text());args=rt['args'];assert not args['gt_direction_reference'];inputs={}
  for f in [Path(args['model'])/'cfg_args',Path(args['model'])/'point_cloud/iteration_35000/point_cloud.ply',Path(args['model'])/'deform/iteration_35000/deform.pth',Path(args['source'])/'transforms_train.json']:
   sha=hashlib.sha256(f.read_bytes()).hexdigest();assert sha==rt['inputs'][str(f)];inputs[str(f.resolve())]=sha
@@ -58,7 +58,7 @@ def main():
    if not e['train']:continue
    with torch.enable_grad():v=edge_loss(e,variable);g,=torch.autograd.grad(v,variable)
    gradient+=g;objective+=float(v);cams[e['a']].load2device('cpu');cams[e['b']].load2device('cpu')
-  assert torch.isfinite(gradient).all();direction=-gradient/(1+metric);direction/=direction.norm(dim=-1).max().clamp_min(1e-20)
+  assert torch.isfinite(gradient).all();direction=-gradient/(1+metric) if a.preconditioner=='t49' else -gradient;direction/=direction.norm(dim=-1).max().clamp_min(1e-20)
   if step==0:
    analytic=float((gradient*direction).sum())
    for eps in [1e-4,1e-5,1e-6]:
@@ -77,6 +77,6 @@ def main():
   assert torch.count_nonzero(g)==0;control-=1e-5*g;control_history.append(float(v))
  assert torch.equal(control,xyz0[active])
  for name,change,num in [('control',torch.zeros_like(delta),0),('train',delta,accepted)]:
-  folder=out/name;folder.mkdir();xyz=xyz0.index_copy(0,active,xyz0[active]+change);torch.save(dict(protocol='correspondence_canonical_v1',geometry={'_xyz':xyz.cpu()},deform_state_dict={k:v.cpu() for k,v in deform.deform.state_dict().items()},args=args,active_ids=active.cpu(),delta=change.cpu(),geometry_updates=num,material_updates=0),folder/'checkpoint.pt');(folder/'runtime.json').write_text(json.dumps(dict(inputs=inputs,gt_read=False,protocol='correspondence_canonical_v1'),indent=2))
- final_metrics=metrics(delta);result=dict(gt_read=False,protocol='correspondence_canonical_v1',geometry_updates=accepted,active_points=len(active),training_edges=sum(e['train'] for e in edges),held_edges=sum(not e['train'] for e in edges),initial_loss=initial_loss,final_loss=loss(delta),initial_metrics=initial_metrics,final_metrics=final_metrics,max_world_displacement=max_total,history=history,finite_difference=fd,control_history=control_history,scope='仅对应几何机制探针；无光度优化，不是新增DL几何收益；未离线几何验收');(out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));print(json.dumps(result,ensure_ascii=False),flush=True)
+  folder=out/name;folder.mkdir();xyz=xyz0.index_copy(0,active,xyz0[active]+change);torch.save(dict(protocol='correspondence_canonical_v1',preconditioner=a.preconditioner,geometry={'_xyz':xyz.cpu()},deform_state_dict={k:v.cpu() for k,v in deform.deform.state_dict().items()},args=args,active_ids=active.cpu(),delta=change.cpu(),geometry_updates=num,material_updates=0),folder/'checkpoint.pt');(folder/'runtime.json').write_text(json.dumps(dict(inputs=inputs,gt_read=False,protocol='correspondence_canonical_v1'),indent=2))
+ final_metrics=metrics(delta);result=dict(preconditioner=a.preconditioner,gt_read=False,protocol='correspondence_canonical_v1',geometry_updates=accepted,active_points=len(active),training_edges=sum(e['train'] for e in edges),held_edges=sum(not e['train'] for e in edges),initial_loss=initial_loss,final_loss=loss(delta),initial_metrics=initial_metrics,final_metrics=final_metrics,max_world_displacement=max_total,history=history,finite_difference=fd,control_history=control_history,scope='仅对应几何机制探针；无光度优化，不是新增DL几何收益；未离线几何验收');(out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));print(json.dumps(result,ensure_ascii=False),flush=True)
 if __name__=='__main__':main()
