@@ -78,6 +78,7 @@ def run(args, out):
     reference = torch.nanquantile(torch.where(cache['valid'][train],lum[train],torch.nan),.9,dim=0)
     bright = (lum/reference.clamp_min(.05)[None] >= .65) & torch.isfinite(reference)[None] & (reference[None]>.05)
     inputs = [Path(args.cache),ply, deform_path, Path(args.model)/'cfg_args', Path(args.source)/'transforms_train.json', Path(args.lights), Path(__file__)]
+    if args.xyz_preconditioner=='jacobian':inputs.extend([Path(__file__).with_name('dl_xyz_metric.py'),Path('utils/time_utils.py').resolve()])
     if args.shadow_state:inputs.extend([Path(args.shadow_state),Path(__file__).with_name('dl_projection_guard.py')])
     runtime = dict(args=vars(args), inputs={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs},
                    native=sys.modules['diff_surfel_rasterization'].provenance, selected=selected, validation=validation,
@@ -297,6 +298,19 @@ def run(args, out):
         assert total_bound<1e-6
         (out/'world_initial_verification.json').write_text(json.dumps(dict(frames=len(measured),max_difference=total_bound,full_deformation_query=True,canonical_input_jacobian=True),indent=2))
         initial_world=measured;current_world=dict(measured)
+    xyz_metric=None
+    if args.xyz_preconditioner=='jacobian':
+        from scripts.dl_xyz_metric import diagonal_metric,affine_check
+        check=affine_check('cuda')
+        metric_indices=[0,1,2,64,65,66,132,133,134]
+        assert set(metric_indices)<=set(selected)
+        xyz_metric=torch.zeros_like(pc.get_xyz)
+        for i in metric_indices:
+            metric=diagonal_metric(pc.get_xyz,pc.get_xyz+current_ds(i)['d_xyz'])
+            xyz_metric=torch.maximum(xyz_metric,metric)
+        torch.save(dict(diagonal=xyz_metric.cpu(),indices=metric_indices,definition='max_t diag(J_t^T J_t), J=d(x+deform(x,t))/dx',damping=1.),out/'xyz_metric.pt')
+        quantiles=torch.quantile(xyz_metric.flatten(),torch.tensor([0.,.5,.9,.99,1.],device='cuda')).tolist()
+        (out/'xyz_metric_verification.json').write_text(json.dumps(dict(affine=check,indices=metric_indices,quantiles=quantiles,gt_read=False,parameters_changed=False),indent=2))
     for block in range(args.blocks):
         batch=[selected[(block*3+j)%len(selected)] for j in range(3)]
         for i in batch:
@@ -311,6 +325,9 @@ def run(args, out):
             start={k:v.detach().clone() for k,v in optimized.items()}
             baseline=float(objective);entry['baseline']=baseline
             entry['gradient_norms']={k:float(v.norm()) for k,v in direction.items()}
+            if xyz_metric is not None:
+                direction['_xyz']=direction['_xyz']/(1.+xyz_metric)
+                entry['preconditioned_xyz_norm']=float(direction['_xyz'].norm())
             with torch.no_grad():
                 # 此处仅为提议预条件，绝不作为世界位移保证；所有接受须全时刻实测。
                 hn=hidden_bound*float(torch.sqrt(sum(direction[k].square().sum() for k in initial_head)))
@@ -442,6 +459,7 @@ def main():
     p.add_argument('--mode',choices=['joint','frozen'],required=True)
     p.add_argument('--geometry-groups',choices=['head','expanded','canonical'],default='head')
     p.add_argument('--freeze-canonical-xyz',action='store_true')
+    p.add_argument('--xyz-preconditioner',choices=['none','jacobian'],default='none')
     p.add_argument('--historical-loss',action='store_true')
     p.add_argument('--shading-normal',choices=['depth','gaussian'],default='depth')
     p.add_argument('--gt-direction-reference',action='store_true')
@@ -457,6 +475,7 @@ def main():
     p.add_argument('--warmup',type=int,default=240);p.add_argument('--blocks',type=int,default=40)
     args=p.parse_args();args.resolution=4;args.frames=0;args.observations='lit';args.normal_gradient='full';args.normal_weight=.05
     assert not args.freeze_canonical_xyz or args.geometry_groups=='canonical'
+    assert args.xyz_preconditioner=='none' or (args.geometry_groups=='canonical' and not args.freeze_canonical_xyz)
     args.alpha_weight=.1 if args.historical_loss else .01
     args.distortion_weight=1000. if args.historical_loss else 0.
     if args.historical_loss:args.normal_weight=.1
