@@ -10,7 +10,7 @@ from scripts.probe_dynamic_dl_selfcal import read_config
 
 @torch.no_grad()
 def main():
- p=argparse.ArgumentParser();p.add_argument('--output',required=True);p.add_argument('--material-fit',default='output/smoke_test/1015-75-LH-dynamic-DL-T83共享材质/fit');p.add_argument('--group',choices=['photo','joint'],required=True);a=p.parse_args();out=Path(a.output);out.mkdir(parents=True,exist_ok=False);(out/'command.txt').write_text(shlex.join(sys.argv)+'\n');torch.set_num_threads(4)
+ p=argparse.ArgumentParser();p.add_argument('--output',required=True);p.add_argument('--geometry-support');p.add_argument('--material-fit',default='output/smoke_test/1015-75-LH-dynamic-DL-T83共享材质/fit');p.add_argument('--group',choices=['photo','joint'],required=True);a=p.parse_args();out=Path(a.output);out.mkdir(parents=True,exist_ok=False);(out/'command.txt').write_text(shlex.join(sys.argv)+'\n');torch.set_num_threads(4)
  run=Path('output/smoke_test/1015-41-LH-dynamic-DL-T49全训练时刻预条件/preconditioned');rt=json.loads((run/'runtime.json').read_text());args=rt['args'];assert not args['gt_direction_reference'];inputs={}
  for f in [Path(args['model'])/'cfg_args',Path(args['model'])/'point_cloud/iteration_35000/point_cloud.ply',Path(args['model'])/'deform/iteration_35000/deform.pth',Path(args['source'])/'transforms_train.json']:
   sha=hashlib.sha256(f.read_bytes()).hexdigest();assert sha==rt['inputs'][str(f)];inputs[str(f.resolve())]=sha
@@ -24,6 +24,14 @@ def main():
   aa,bb=map(int,d['indices']);edges.append(dict(a=aa,b=bb,ids=torch.tensor(d['source_ids'][m],device='cuda'),flow=torch.tensor(d['pb'][m]-d['pa'][m],device='cuda'),train=aa not in held and bb not in held))
  assert sum(len(e['ids']) for e in edges)==449
  active=torch.unique(torch.cat([e['ids'] for e in edges if e['train']]));assert len(active)>0
+ correspondence_active=active.clone()
+ if a.geometry_support:
+  support_path=Path(a.geometry_support);support=torch.load(support_path,map_location='cpu',weights_only=False)
+  assert torch.equal(support['original_ids'],correspondence_active.cpu())
+  active=support['ids'].cuda();assert active.ndim==1 and len(active.unique())==len(active) and torch.isin(correspondence_active,active).all()
+  assert int(active.min())>=0 and int(active.max())<len(pc.get_xyz)
+  extra.append(support_path)
+
  xyz0=pc.get_xyz.detach().clone();features=pc.get_binary_feature().detach();metric=torch.load(run/'xyz_metric.pt',map_location='cpu',weights_only=False)['diagonal'][active.cpu()].cuda();delta=torch.zeros((len(active),3),device='cuda')
  def forward(i,change):
   camera=cams[i];camera.load2device();xyz=xyz0;ds=deform.step(xyz,camera.fid.reshape(1,1).expand(len(xyz),1),feature=features,camera_center=camera.camera_center);world=xyz+ds['d_xyz'].index_add(0,active,change);clip=torch.cat([world,torch.ones_like(world[:,:1])],-1)@camera.full_proj_transform;uv=(clip[:,:2]/clip[:,3:].clamp_min(1e-8)+1)*200-.5
@@ -58,7 +66,7 @@ def main():
  fit=Path(a.material_fit)
  material=torch.load(fit/'checkpoint.pt',map_location='cpu',weights_only=False);cache_path=Path(material.get('cache_source',str(fit/'frame_cache.pt')));cache=torch.load(cache_path,map_location='cpu',weights_only=False);mr=json.loads((fit/'result.json').read_text())
  for f,h in mr['inputs'].items():assert hashlib.sha256(Path(f).read_bytes()).hexdigest()==h,f
- assert torch.equal(active.cpu(),material['active_ids'])
+ assert torch.equal(correspondence_active.cpu(),material['active_ids'])
  extra.extend([fit/'checkpoint.pt',cache_path,fit/'result.json'])
  assert material['protocol'] in ['world_shared_material_v1','world_shared_material_projected_v1']
  for v in vars(pc).values():
@@ -107,13 +115,13 @@ def main():
   if not ok:break
  for f in extra:inputs[str(f.resolve())]=hashlib.sha256(f.read_bytes()).hexdigest()
  folder=out/a.group;folder.mkdir()
- torch.save(dict(protocol='correspondence_world_shared_v1',world_residual=delta.cpu(),geometry={'_xyz':xyz0.cpu()},deform_state_dict={k:v.cpu() for k,v in deform.deform.state_dict().items()},args=args,active_ids=active.cpu(),delta=delta.cpu(),geometry_updates=accepted,material_updates=0,fixed_material_source=str((fit/'checkpoint.pt').resolve()),fixed_material_sha256=inputs[str((fit/'checkpoint.pt').resolve())],objective_group=a.group),folder/'checkpoint.pt')
+ torch.save(dict(protocol='correspondence_world_shared_v1',world_residual=delta.cpu(),geometry={'_xyz':xyz0.cpu()},deform_state_dict={k:v.cpu() for k,v in deform.deform.state_dict().items()},args=args,active_ids=active.cpu(),delta=delta.cpu(),geometry_updates=accepted,material_updates=0,fixed_material_source=str((fit/'checkpoint.pt').resolve()),fixed_material_sha256=inputs[str((fit/'checkpoint.pt').resolve())],objective_group=a.group,correspondence_active_ids=correspondence_active.cpu()),folder/'checkpoint.pt')
  (folder/'runtime.json').write_text(json.dumps(dict(inputs=inputs,gt_read=False,protocol='correspondence_world_shared_v1'),indent=2))
  final_photo=photo_metrics(delta);final_correspondence=metrics(delta)
  viz=[train_frames[0],train_frames[len(train_frames)//2],train_frames[-1],held_frames[len(held_frames)//2]]
  for i in viz:
   l,pack,pred=photo(i,delta);save_image(out/f'{i:03d}_rgb.png',pred);save_image(out/f'{i:03d}_alpha.png',pack['rend_alpha'].expand(3,-1,-1));save_image(out/f'{i:03d}_normal.png',(F.normalize(pack['surf_normal'],dim=0)*cache[i]['sign']+1)/2)
   ds=dict(cache[i]['ds']);ds['d_xyz']=ds['d_xyz'].index_add(0,active,delta);gate=render(cams[i],pc,pipe,bg,**ds,override_color=features.expand(-1,3))['render'];save_image(out/f'{i:03d}_dynamic_gate.png',gate);cams[i].load2device('cpu')
- result=dict(group=a.group,gt_read=False,geometry_updates=accepted,material_updates=0,calibrated_weight=weight,used_weight=used_weight,initial_photo=initial_photo,final_photo=final_photo,initial_correspondence=initial_correspondence,final_correspondence=final_correspondence,history=history,max_world_displacement=max_total,visualized_frames=viz,scope='固定未知灯光与共同材质的光度/对应几何配对；不是灯光联合优化或完整多种子A/B/C')
+ result=dict(group=a.group,active_points=len(active),correspondence_active_points=len(correspondence_active),gt_read=False,geometry_updates=accepted,material_updates=0,calibrated_weight=weight,used_weight=used_weight,initial_photo=initial_photo,final_photo=final_photo,initial_correspondence=initial_correspondence,final_correspondence=final_correspondence,history=history,max_world_displacement=max_total,visualized_frames=viz,scope='固定未知灯光与共同材质的光度/对应几何配对；不是灯光联合优化或完整多种子A/B/C')
  (out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
 if __name__=='__main__':main()
