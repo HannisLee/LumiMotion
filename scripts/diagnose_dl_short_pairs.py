@@ -6,7 +6,7 @@ from PIL import Image
 from torchvision.models.optical_flow import raft_small,Raft_Small_Weights
 
 def main():
- p=argparse.ArgumentParser();p.add_argument('--output',required=True);p.add_argument('--camera-roll',action='store_true');a=p.parse_args();out=Path(a.output);out.mkdir(parents=True,exist_ok=False)
+ p=argparse.ArgumentParser();p.add_argument('--output',required=True);p.add_argument('--camera-roll',action='store_true');p.add_argument('--source-anchors',action='store_true');a=p.parse_args();out=Path(a.output);out.mkdir(parents=True,exist_ok=False)
  (out/'command.txt').write_text(shlex.join(sys.argv)+'\n');torch.set_num_threads(4);cv2.setNumThreads(4)
  root=Path(__file__).resolve().parents[1];src=root/'output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段/data_view'
  prior=root/'output/smoke_test/1015-65-LH-dynamic-DL-T73短间隔对应/short_pair_inventory.json'
@@ -54,10 +54,12 @@ def main():
  yy,xx=np.mgrid[2:400:4,2:400:4];pa=np.c_[xx.ravel(),yy.ravel()].astype(np.float32);rows=[];observations=[]
  for ordinal,(aa,b,gap,angle) in enumerate(pairs):
   assert aa%9!=4 and b%9!=4 and 0<gap<=3 and angle<=25
+  if a.source_anchors:pa=uv[aa,np.where(valid[aa])[0]].astype(np.float32)
   ab=flow(aa,b);ba=flow(b,aa);pb=pa+sample(ab,pa);fb=np.linalg.norm(pb+sample(ba,pb)-pa,axis=1)
   base=sample(masks[aa],pa)[:,0]>.99;support=base&inside(pb)&(sample(masks[b],pb)[:,0]>.99)
   source_unsat=sample(sats[aa],pa)[:,0]<.01;unsat=source_unsat&(sample(sats[b],pb)[:,0]<.01)
   ia=np.where(valid[aa])[0];ib=np.where(valid[b])[0];da,ka=cKDTree(uv[aa,ia]).query(pa);db,kb=cKDTree(uv[b,ib]).query(pb)
+  if a.source_anchors:assert np.array_equal(ia[ka],np.where(valid[aa])[0]) and np.max(da)==0
   source_off=base&(da<=4)&(heights[aa,ia[ka]]>.1);target_off=(db<=4)&(heights[b,ib[kb]]>.1)
   flags=dict(source=base,source_unsaturated=base&source_unsat,support=support,fb=support&(fb<2),final=support&(fb<2)&unsat)
   groups=dict(all=base,source_off=source_off,both_off=source_off&target_off)
@@ -75,6 +77,6 @@ def main():
  totals={g:{k:sum(r['counts'][g][k] for r in rows) for k in rows[0]['counts'][g]} for g in rows[0]['counts']}
  weightfile=Path(torch.hub.get_dir())/'checkpoints'/Path(weights.url).name
  for path in [Path(__file__),prior,src/'transforms_train.json',weightfile,cache,plane]:hashes[str(path.resolve())]=hashlib.sha256(path.read_bytes()).hexdigest()
- result=dict(status='DIAGNOSTIC_ONLY',gt_read=False,optimizer_updates=0,external_pretrained_prior=True,camera_roll=a.camera_roll,weights=str(weights),weight_url=weights.url,torch=torch.__version__,torchvision=torchvision.__version__,rows=rows,totals=totals,alignment=alignment,inputs=hashes,limitation='离面源/目标分区均来自粗几何，不是语义真值；不按目标重投影残差筛选')
+ result=dict(source_anchors=a.source_anchors,status='DIAGNOSTIC_ONLY',gt_read=False,optimizer_updates=0,external_pretrained_prior=True,camera_roll=a.camera_roll,weights=str(weights),weight_url=weights.url,torch=torch.__version__,torchvision=torchvision.__version__,rows=rows,totals=totals,alignment=alignment,inputs=hashes,limitation='离面源/目标分区均来自粗几何，不是语义真值；不按目标重投影残差筛选')
  (out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));(out/'observations.json').write_text(json.dumps(observations,ensure_ascii=False,indent=2));print(json.dumps(totals),flush=True)
 if __name__=='__main__':main()
