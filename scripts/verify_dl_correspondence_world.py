@@ -7,12 +7,13 @@ from scene.deform_model import DeformModel
 from scene.dataset_readers import readCamerasFromTransforms
 from utils.camera_utils import loadCam
 from scripts.probe_dynamic_dl_selfcal import read_config
+from scripts.dl_linear_world_residual import PROTOCOL,residual_for_state,validate_linear
 
 @torch.no_grad()
 def main():
  p=argparse.ArgumentParser(description=__doc__);p.add_argument('--checkpoint',required=True);p.add_argument('--output',required=True);a=p.parse_args()
  out=Path(a.output);out.mkdir(exist_ok=False);path=Path(a.checkpoint);ck=torch.load(path,map_location='cpu',weights_only=False);args=ck['args'];runtime=json.loads((path.parent/'runtime.json').read_text());result=json.loads((path.parent.parent/'result.json').read_text())
- assert not args['gt_direction_reference'] and ck['protocol'] in ['correspondence_canonical_v1','correspondence_world_shared_v1'] and set(ck['geometry'])=={'_xyz'}
+ assert not args['gt_direction_reference'] and ck['protocol'] in ['correspondence_canonical_v1','correspondence_world_shared_v1',PROTOCOL] and set(ck['geometry'])=={'_xyz'}
  for f in [Path(args['model'])/'cfg_args',Path(args['model'])/'point_cloud/iteration_35000/point_cloud.ply',Path(args['model'])/'deform/iteration_35000/deform.pth',Path(args['source'])/'transforms_train.json']:
   assert hashlib.sha256(f.read_bytes()).hexdigest()==runtime['inputs'][str(f)]
  cfg=read_config(Path(args['model'])/'cfg_args');cfg.resolution=4;cfg.load2gpu_on_the_fly=True
@@ -23,13 +24,14 @@ def main():
  residual_enabled=False
  def positions(c):
   c.load2device();ds=deform.step(pc.get_xyz,c.fid.reshape(1,1).expand(len(pc.get_xyz),1),feature=pc.get_binary_feature(),camera_center=c.camera_center);displacement=ds['d_xyz']
-  if residual_enabled:displacement=displacement.index_add(0,ck['active_ids'].cuda(),ck['world_residual'].cuda())
+  if residual_enabled:displacement=displacement.index_add(0,ck['active_ids'].cuda(),residual_for_state(ck,c.fid))
   pos=(pc.get_xyz+displacement).clone();c.load2device('cpu');return pos
  original=[positions(c) for c in cameras];initial_xyz=pc.get_xyz.clone()
  for k,v in ck['geometry'].items():getattr(pc,k).copy_(v.cuda())
  deform.deform.load_state_dict(ck['deform_state_dict'],strict=True)
- if ck['protocol']=='correspondence_world_shared_v1':
+ if ck['protocol'] in ['correspondence_world_shared_v1',PROTOCOL]:
   assert torch.equal(pc.get_xyz,initial_xyz)
+  if ck['protocol']==PROTOCOL:validate_linear(ck)
   residual_enabled=True
  measured={str(i):float((positions(c)-original[i]).norm(dim=-1).max()) for i,c in enumerate(cameras)}
  error=abs(max(measured.values())-result['max_world_displacement']);xyz=float((pc.get_xyz-initial_xyz).norm(dim=-1).max());passed=error<1e-7 and max(measured.values())<=.00101 and ((float(ck['world_residual'].norm())>0 if ck['geometry_updates'] else torch.count_nonzero(ck['world_residual'])==0) if residual_enabled else (xyz>0 if ck['geometry_updates'] else xyz==0))
