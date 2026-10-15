@@ -125,7 +125,7 @@ def run(args, out):
             hidden=deform.step(pc.get_xyz,cameras[i].fid.reshape(1,1).expand(len(pc.get_xyz),1),feature=pc.get_binary_feature(),camera_center=cameras[i].camera_center)['hidden']
         ds=dict(cached[i][0]);ds['d_xyz']=head(hidden)*pc.get_binary_feature()
         return ds
-    def forward(i, audit_full=False):
+    def forward(i, audit_full=False, head_objective=False):
         ds,sign,target,saturated,chosen,all_mask,interior,mask = cached[i]
         ds=current_ds(i)
         # albedo图已预乘Alpha；法线Lambert项不可再次乘Alpha。
@@ -144,7 +144,13 @@ def run(args, out):
         alpha_loss=F.binary_cross_entropy(package['rend_alpha'].double().clamp(1e-6,1-1e-6),mask.double())
         package['diagnostics']=dict(photo=float(photo.detach()),normal=float(consistency.detach()),alpha=float(alpha_loss.detach()),
             full_mse=float(residual.square().mean().detach()),all_support_mse=float(((residual.square()*all_mask).sum()/(3*all_mask.sum()).clamp_min(1)).detach()))
-        return photo+args.normal_weight*consistency+.01*alpha_loss,package
+        regularization=args.normal_weight*consistency+.01*alpha_loss
+        package['loss_terms']=dict(photo=photo,regularization=regularization)
+        objective=photo+regularization
+        if head_objective:
+            if args.head_objective=='photo':objective=photo
+            elif args.head_objective=='regularization':objective=regularization
+        return objective,package
     @torch.no_grad()
     def evaluate(label):
         losses={}; diagnostics={};folder=out/label;folder.mkdir()
@@ -174,7 +180,13 @@ def run(args, out):
             optimizer.zero_grad(set_to_none=True);loss,_=forward(i);loss.backward();optimizer.step()
         entry=dict(block=block+1,batch=batch,accepted=False,attempts=[])
         if args.mode=='joint':
-            objective=sum(forward(i)[0] for i in batch)/len(batch);proposal_renders+=len(batch)
+            outputs=[forward(i,head_objective=True) for i in batch]
+            objective=sum(v[0] for v in outputs)/len(batch);proposal_renders+=len(batch)
+            if block in [0,19,39]:
+                components={name:sum(v[1]['loss_terms'][name] for v in outputs)/len(batch) for name in ['photo','regularization']}
+                component_gradients={name:torch.cat([g.detach().flatten() for g in torch.autograd.grad(value,tuple(head.parameters()),retain_graph=True)]) for name,value in components.items()}
+                gp=component_gradients['photo'];gr=component_gradients['regularization']
+                entry['gradient_components']=dict(photo_norm=float(gp.norm()),regularization_norm=float(gr.norm()),cosine=float(F.cosine_similarity(gp,gr,dim=0)))
             gradients=torch.autograd.grad(objective,tuple(head.parameters()))
             direction={k:-g.detach() for (k,_),g in zip(head.named_parameters(),gradients)}
             direction_norm=torch.sqrt(sum(v.square().sum() for v in direction.values()))
@@ -191,7 +203,7 @@ def run(args, out):
                 entry['bound_fraction']=fraction
                 for fraction_step in [1.,.5,.25,.125,.0625,.03125]:
                     for k,v in head.state_dict().items():v.copy_(torch.lerp(start[k],proposal[k],fraction_step))
-                    trial=float(sum(forward(i)[0] for i in batch)/len(batch));proposal_renders+=len(batch)
+                    trial=float(sum(forward(i,head_objective=True)[0] for i in batch)/len(batch));proposal_renders+=len(batch)
                     ok=np.isfinite(trial) and trial<baseline-1e-10
                     entry['attempts'].append(dict(fraction=fraction_step,loss=trial,accepted=bool(ok)))
                     if ok:entry['accepted']=True;accepted+=1;break
@@ -215,6 +227,7 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for name in ['source','model','lights','output','cache']:p.add_argument('--'+name,required=True)
     p.add_argument('--mode',choices=['joint','frozen'],required=True)
+    p.add_argument('--head-objective',choices=['full','photo','regularization'],default='full')
     p.add_argument('--iteration',type=int,default=35000);p.add_argument('--seed',type=int,default=1015)
     p.add_argument('--warmup',type=int,default=240);p.add_argument('--blocks',type=int,default=40)
     args=p.parse_args();args.resolution=4;args.frames=0;args.observations='lit';args.normal_gradient='full';args.normal_weight=.05
