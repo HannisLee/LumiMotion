@@ -10,7 +10,7 @@ from scripts.probe_dynamic_dl_selfcal import read_config
 
 @torch.no_grad()
 def main():
- p=argparse.ArgumentParser();p.add_argument('--output',required=True);a=p.parse_args();out=Path(a.output);out.mkdir(parents=True,exist_ok=False);(out/'command.txt').write_text(shlex.join(sys.argv)+'\n');torch.set_num_threads(4)
+ p=argparse.ArgumentParser();p.add_argument('--output',required=True);p.add_argument('--derivative-mode',choices=['actual','detach_input'],default='actual');a=p.parse_args();out=Path(a.output);out.mkdir(parents=True,exist_ok=False);(out/'command.txt').write_text(shlex.join(sys.argv)+'\n');torch.set_num_threads(4)
  run=Path('output/smoke_test/1015-41-LH-dynamic-DL-T49全训练时刻预条件/preconditioned');rt=json.loads((run/'runtime.json').read_text());args=rt['args'];assert not args['gt_direction_reference'];inputs={}
  for f in [Path(args['model'])/'cfg_args',Path(args['model'])/'point_cloud/iteration_35000/point_cloud.ply',Path(args['model'])/'deform/iteration_35000/deform.pth',Path(args['source'])/'transforms_train.json']:
   sha=hashlib.sha256(f.read_bytes()).hexdigest();assert sha==rt['inputs'][str(f)];inputs[str(f.resolve())]=sha
@@ -26,7 +26,7 @@ def main():
  active=torch.unique(torch.cat([e['ids'] for e in edges if e['train']]));assert len(active)>0
  xyz0=pc.get_xyz.detach().clone();features=pc.get_binary_feature().detach();metric=torch.load(run/'xyz_metric.pt',map_location='cpu',weights_only=False)['diagonal'][active.cpu()].cuda();delta=torch.zeros((len(active),3),device='cuda')
  def forward(i,change):
-  camera=cams[i];camera.load2device();xyz=xyz0.index_copy(0,active,xyz0[active]+change);ds=deform.step(xyz,camera.fid.reshape(1,1).expand(len(xyz),1),feature=features,camera_center=camera.camera_center);world=xyz+ds['d_xyz'];clip=torch.cat([world,torch.ones_like(world[:,:1])],-1)@camera.full_proj_transform;uv=(clip[:,:2]/clip[:,3:].clamp_min(1e-8)+1)*200-.5
+  camera=cams[i];camera.load2device();xyz=xyz0.index_copy(0,active,xyz0[active]+change);ds=deform.step(xyz if a.derivative_mode=='actual' else xyz.detach(),camera.fid.reshape(1,1).expand(len(xyz),1),feature=features,camera_center=camera.camera_center);world=xyz+ds['d_xyz'];clip=torch.cat([world,torch.ones_like(world[:,:1])],-1)@camera.full_proj_transform;uv=(clip[:,:2]/clip[:,3:].clamp_min(1e-8)+1)*200-.5
   return world,uv
  initial_world=[];initial_uv=[]
  for i in range(135):
@@ -81,5 +81,5 @@ def main():
  wt=white[train_edge].sum(0);wh=white[~train_edge].sum(0);joint=(wt*wh).sum(-1);supported=(wt.norm(dim=-1)>1e-12)&(wh.norm(dim=-1)>1e-12)
  overlap=dict(identities=int(supported.sum()),negative=int((joint[supported]<0).sum()),train_held_dot=float(joint.sum()),held_actual_change=sum(r['actual_change'] for r in rows if not r['train']),held_linear_change=sum(r['linear_change'] for r in rows if not r['train']))
  extra.extend([baseline_run/'result.json',baseline_run/'train/checkpoint.pt']);inputs.update({str(f.resolve()):hashlib.sha256(f.read_bytes()).hexdigest() for f in extra})
- torch.save(dict(active_ids=active.cpu(),edge_gradients=G,whitened_gradients=white,actual_delta=actual.cpu()),out/'gradients.pt');(out/'observations.json').write_text(json.dumps(records,indent=2));(out/'gradient_pairs.json').write_text(json.dumps(pair_rows,indent=2));result=dict(gt_read=False,geometry_updates=0,initial_loss_reproduction=initial_total,final_loss_reproduction=final_total,pairwise=summary,groups=groups,overlap=overlap,edges=rows,inputs=inputs,scope='局部目标兼容性与既有T77更新重放；非对应真值/非解冻形变收益证明');(out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));print(json.dumps(dict(pairwise=summary,groups=groups,overlap=overlap)),flush=True)
+ torch.save(dict(active_ids=active.cpu(),edge_gradients=G,whitened_gradients=white,actual_delta=actual.cpu()),out/'gradients.pt');(out/'observations.json').write_text(json.dumps(records,indent=2));(out/'gradient_pairs.json').write_text(json.dumps(pair_rows,indent=2));result=dict(derivative_mode=a.derivative_mode,linear_change_is_true_derivative=a.derivative_mode=='actual',gt_read=False,geometry_updates=0,initial_loss_reproduction=initial_total,final_loss_reproduction=final_total,pairwise=summary,groups=groups,overlap=overlap,edges=rows,inputs=inputs,scope='局部目标兼容性与既有T77更新重放；detach_input仅同前向代理导数，不可作为原模型一阶预测或几何收益证明');(out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));print(json.dumps(dict(pairwise=summary,groups=groups,overlap=overlap)),flush=True)
 if __name__=='__main__':main()
