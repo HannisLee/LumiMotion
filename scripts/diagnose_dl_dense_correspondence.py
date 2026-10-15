@@ -6,7 +6,7 @@ from PIL import Image
 from torchvision.models.optical_flow import raft_small,Raft_Small_Weights
 
 def main():
- p=argparse.ArgumentParser();p.add_argument('--output',required=True);p.add_argument('--camera-roll',action='store_true');a=p.parse_args();out=Path(a.output);out.mkdir(parents=True,exist_ok=False)
+ p=argparse.ArgumentParser();p.add_argument('--output',required=True);p.add_argument('--camera-roll',action='store_true');p.add_argument('--save-stages',action='store_true');a=p.parse_args();out=Path(a.output);out.mkdir(parents=True,exist_ok=False)
  (out/'command.txt').write_text(shlex.join(sys.argv)+'\n');torch.set_num_threads(4);cv2.setNumThreads(4)
  root=Path(__file__).resolve().parents[1];src=root/'output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段/data_view'
  prior=root/'output/1015-24-LH-dynamic-DL-T16图像对应/view_compatible/result.json'
@@ -54,6 +54,11 @@ def main():
   fb=np.linalg.norm(pb+sample(ba,pb)-pa,axis=1);fc=np.linalg.norm(pc+sample(ca,pc)-pa,axis=1);fbc=np.linalg.norm(via+sample(cb,via)-pb,axis=1);cycle=np.linalg.norm(via-pc,axis=1)
   base=(sample(masks[aa],pa)[:,0]>.99);support=base&inside(pb)&inside(pc)&inside(via)&(sample(masks[b],pb)[:,0]>.99)&(sample(masks[c],pc)[:,0]>.99)&(sample(masks[c],via)[:,0]>.99)
   unsat=(sample(sats[aa],pa)[:,0]<.01)&(sample(sats[b],pb)[:,0]<.01)&(sample(sats[c],pc)[:,0]<.01)
+  if a.save_stages:
+   pair_support=base&inside(pb)&(sample(masks[b],pb)[:,0]>.99)
+   source_unsat=sample(sats[aa],pa)[:,0]<.01
+   pair_unsat=source_unsat&(sample(sats[b],pb)[:,0]<.01)
+   np.savez_compressed(out/f'stages_{ordinal:02d}.npz',indices=[aa,b,c],pa=pa,pb=pb,pc=pc,base=base,support=support,unsat=unsat,pair_support=pair_support,source_unsat=source_unsat,pair_unsat=pair_unsat,fb=fb,fc=fc,fbc=fbc,cycle=cycle)
   row=dict(triplet_index=idx,indices=[aa,b,c],source_foreground=int(base.sum()),target_supported=int(support.sum()),unsaturated_supported=int((support&unsat).sum()),residual_medians={k:float(np.median(v[support])) if support.any() else None for k,v in [('fb',fb),('fc',fc),('fbc',fbc),('cycle',cycle)]},thresholds={})
   for th in [1.,2.,4.]:
    ok=support&unsat&(fb<th)&(fc<th)&(fbc<th)&(cycle<th)
