@@ -37,3 +37,27 @@ Stage1渲染目录：model_mlp/renders_stage1_insights/ours_35000；Stage2材质
 旧中断结果已整体归档，准确路径见references/archive.json；原目录由本次重建。最终阶段前定量结果、代表图片/视频和四类目检结论均为待生成/待检查。
 
 启动：`bash /home/han.li/reproduce/LumiMotion-stage2-perlight/output/1015-01-jumpingjacks150_v5_spec32-原版LumiMotion两阶段/commands/run_pipeline.sh`。准确完整环境和命令见实验README。
+
+
+## 已有结果与代表帧目检（2026-10-15 Asia/Tokyo）
+
+Stage1与Stage2均exit=0，55000步模型、deform和envmap已保存。Stage1用时49分43秒，Stage2用时47分13秒（均含初始化/保存）。静态材质评测：Albedo PSNR=34.88827006、SSIM=0.9840739131、LPIPS=0.0219776845；roughness MSE=0.00790291696，指标文件model_mlp/results_material_static.json。
+
+代表图：inspection/four_classes.png、inspection/materials.png。RGB/Alpha/Normal/Separation及Albedo/Roughness六个视频均报告150帧，抽取并成功解码索引0、75、149；不声称逐帧人工目检全部视频。
+
+- RGB：人物和圆盘在三张代表帧中完整，姿态变化合理，服装与棋盘格可辨；画面上方绿色字为原版视频注释。
+- Alpha：人物、四肢、圆盘轮廓完整，背景黑；未见大面积空洞或漂浮条带。
+- Normal：圆盘整体平滑，人物轮廓对齐；头部、抬起的手臂等细节存在颗粒噪声。
+- 基色/动静分离：人物主要红色动态、圆盘主要绿色静态；足部邻近圆盘有少量混合。Stage2 Albedo保留衣服颜色和棋盘纹理，代表帧地面没有明显大片阴影。
+- 材质限制：roughness图出现明显棋盘纹理/凹凸状变化；目前没有据此认定材质完全恢复。
+
+Stage1代表帧四类检查PASS（仅限所述抽样范围，包含法线细节噪声）。全流程最终结论待重光照、NVS等剩余评测完成；原静态重光照因CUDA编译缺头文件FAILED，补跑记录见evaluation_retry_01，不能把训练完成等同于整套评测通过。
+
+补跑只调整编译子进程环境：CPATH指向Conda targets/x86_64-linux/include，并设置对应CC/CXX与实验私有扩展缓存。原失败日志、初始状态、已有模型和结果保留。
+
+
+## 扩展加载兼容的补充修复
+
+头文件路径补齐后CUDA扩展编译成功，但原版ops.py丢弃cpp_extension.load的返回值再import同名模块，在本环境PyTorch2.11下触发ModuleNotFoundError。仅修改实验私有source/scene/renderutils/ops.py：把load返回值直接存为_cached_plugin，删除重复import。CUDA源文件、训练代码、模型权重和渲染计算均未改动。补丁与修改后哈希在实验references/renderutils_compatibility.patch及.json；训练时source_identity.json保留原值，不追改训练来源记录。
+
+前两次失败日志和状态均保留，第二次恢复目录为evaluation_retry_02，根status.json镜像当前恢复状态。新增代表帧检查仅抽样0/75/149，不声称完整视频人工逐帧检查。
