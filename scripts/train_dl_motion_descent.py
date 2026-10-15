@@ -1,5 +1,6 @@
 """共享材质与受限位移头真实下降短对照；未知光默认禁止GT，参考组显式标记。"""
 import argparse
+import copy
 import hashlib
 import json
 import math
@@ -74,6 +75,7 @@ def run(args, out):
     reference = torch.nanquantile(torch.where(cache['valid'][train],lum[train],torch.nan),.9,dim=0)
     bright = (lum/reference.clamp_min(.05)[None] >= .65) & torch.isfinite(reference)[None] & (reference[None]>.05)
     inputs = [Path(args.cache),ply, deform_path, Path(args.model)/'cfg_args', Path(args.source)/'transforms_train.json', Path(args.lights), Path(__file__)]
+    if args.shadow_state:inputs.extend([Path(args.shadow_state),Path(__file__).with_name('dl_projection_guard.py')])
     runtime = dict(args=vars(args), inputs={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs},
                    native=sys.modules['diff_surfel_rasterization'].provenance, selected=selected, validation=validation,
                    gt_read=args.gt_direction_reference, scope=('已知训练光向隔离参考；实际下降接受' if args.gt_direction_reference else '未知光共享材质与位移头短对照；实际下降接受，无GT') )
@@ -214,16 +216,53 @@ def run(args, out):
     def clamp_ambient():
         ambient.clamp_(0,args.ambient_max)
         if args.refine_light:light_nodes.mul_((.1/light_nodes.norm(dim=-1,keepdim=True).clamp_min(1e-30)).clamp_max(1))
+    guard=None;guard_cost=None;light_history=[];light_guard_renders=0
+    if args.shadow_state:
+        from scripts.dl_projection_guard import ProjectionGuard
+        assert runtime['inputs'][str(Path(args.cache))]==light['cache_sha256']
+        guard=ProjectionGuard(cache,torch.load(args.shadow_state,map_location='cpu',weights_only=False),light)
+        verification=guard.verify(current_directions())
+        guard_cost=verification['cost']
+        (out/'shadow_guard_verification.json').write_text(json.dumps(verification,indent=2))
+    def material_step(i):
+        nonlocal guard_cost,light_guard_renders
+        old_nodes=light_nodes.detach().clone() if guard else None
+        old_state=copy.deepcopy(optimizer.state.get(light_nodes)) if guard else None
+        optimizer.zero_grad(set_to_none=True);loss,_=forward(i);loss.backward();optimizer.step();clamp_ambient()
+        if guard:
+            entry=dict(step=len(light_history)+1,frame=i,shadow_before=guard_cost,accepted=False,attempts=[])
+            with torch.no_grad():
+                proposal=light_nodes.detach().clone();old_rgb=None
+                for fraction in [1.,.5,.25,.125,.0625,.03125]:
+                    candidate=torch.lerp(old_nodes,proposal,fraction)
+                    light_nodes.copy_(candidate)
+                    proxy=guard.cost(current_directions())
+                    attempt=dict(fraction=fraction,shadow_cost=proxy,accepted=False)
+                    if proxy<=guard_cost+1e-9:
+                        if old_rgb is None:
+                            light_nodes.copy_(old_nodes);old_rgb=float(forward(i)[0]);light_guard_renders+=1
+                        light_nodes.copy_(candidate);new_rgb=float(forward(i)[0]);light_guard_renders+=1
+                        attempt.update(old_rgb=old_rgb,new_rgb=new_rgb)
+                        if np.isfinite(new_rgb) and new_rgb<old_rgb-1e-10:
+                            attempt['accepted']=True;entry['accepted']=True;guard_cost=proxy
+                    entry['attempts'].append(attempt)
+                    if entry['accepted']:break
+                if not entry['accepted']:
+                    light_nodes.copy_(old_nodes)
+                    if old_state is None:optimizer.state.pop(light_nodes,None)
+                    else:optimizer.state[light_nodes]=old_state
+            light_history.append(entry)
+        return loss
     history=[];metrics={'initial':evaluate('initial')}
     for step in range(args.warmup):
-        optimizer.zero_grad(set_to_none=True);loss,_=forward(selected[step%len(selected)]);loss.backward();optimizer.step();clamp_ambient()
+        loss=material_step(selected[step%len(selected)])
         if step%30==0:print(json.dumps(dict(material_step=step+1,loss=float(loss))),flush=True)
     metrics['warmup']=evaluate('warmup')
     head.requires_grad_(args.mode=='joint');accepted=0;proposal_renders=0
     for block in range(args.blocks):
         batch=[selected[(block*3+j)%len(selected)] for j in range(3)]
         for i in batch:
-            optimizer.zero_grad(set_to_none=True);loss,_=forward(i);loss.backward();optimizer.step();clamp_ambient()
+            loss=material_step(i)
         entry=dict(block=block+1,batch=batch,accepted=False,attempts=[],ambient=float(ambient.detach()))
         if args.mode=='joint':
             outputs=[forward(i,head_objective=True) for i in batch]
@@ -287,9 +326,9 @@ def run(args, out):
         inferred_light={k:light[k] for k in ['frames','times','train_indices','held_indices','cache_sha256']}
         inferred_light.update(directions=inferred.cpu().tolist(),gt_read=args.gt_direction_reference,protocol='9个均匀时间控制点的共享残差；节点范数<=0.1，逐时刻投影到初始灯向切平面后归一化；无GT细化' if args.refine_light else '固定输入灯向',source_runtime=str(out/'runtime.json'))
         (out/'inferred_light.json').write_text(json.dumps(inferred_light,ensure_ascii=False,indent=2))
-    result=dict(status='PASS' if passed else 'FAILED',scope='真实下降和冻结边界工程验收；梯度审计失败未改判，几何质量需独立评测',gt_read=args.gt_direction_reference,ambient=float(ambient.detach()),light_drift_deg=drift.cpu().tolist(),light_nodes=light_nodes.detach().cpu().tolist(),light_updates=args.warmup+args.blocks*3 if args.refine_light else 0,metrics=metrics,history=history,material_updates=args.warmup+args.blocks*3,geometry_updates=0,deformation_updates=accepted,proposal_renders=proposal_renders,frozen_unchanged=unchanged,head_delta=delta,hidden_bound=hidden_bound,motion=motion,max_memory_bytes=torch.cuda.max_memory_allocated())
+    result=dict(status='PASS' if passed else 'FAILED',scope='真实下降和冻结边界工程验收；梯度审计失败未改判，几何质量需独立评测',gt_read=args.gt_direction_reference,ambient=float(ambient.detach()),light_drift_deg=drift.cpu().tolist(),light_nodes=light_nodes.detach().cpu().tolist(),light_updates=sum(x['accepted'] for x in light_history) if guard else (args.warmup+args.blocks*3 if args.refine_light else 0),light_proposals=len(light_history),light_history=light_history,light_guard_renders=light_guard_renders,shadow_guard_final_cost=guard_cost,metrics=metrics,history=history,material_updates=args.warmup+args.blocks*3,geometry_updates=0,deformation_updates=accepted,proposal_renders=proposal_renders,frozen_unchanged=unchanged,head_delta=delta,hidden_bound=hidden_bound,motion=motion,max_memory_bytes=torch.cuda.max_memory_allocated())
     (out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
-    print(json.dumps({k:v for k,v in result.items() if k not in ['metrics','history','motion']},ensure_ascii=False),flush=True)
+    print(json.dumps({k:v for k,v in result.items() if k not in ['metrics','history','motion','light_history']},ensure_ascii=False),flush=True)
     if not passed:raise RuntimeError('工程验收FAILED，保留checkpoint及所有输出')
 
 
@@ -298,6 +337,7 @@ def main():
     for name in ['source','model','lights','output','cache']:p.add_argument('--'+name,required=True)
     p.add_argument('--mode',choices=['joint','frozen'],required=True)
     p.add_argument('--gt-direction-reference',action='store_true')
+    p.add_argument('--shadow-state',default=None)
     p.add_argument('--refine-light',action='store_true')
     p.add_argument('--ambient-max',type=float,default=0.)
     p.add_argument('--balance-head-groups',action='store_true')
@@ -308,6 +348,7 @@ def main():
     p.add_argument('--iteration',type=int,default=35000);p.add_argument('--seed',type=int,default=1015)
     p.add_argument('--warmup',type=int,default=240);p.add_argument('--blocks',type=int,default=40)
     args=p.parse_args();args.resolution=4;args.frames=0;args.observations='lit';args.normal_gradient='full';args.normal_weight=.05
+    assert not args.shadow_state or args.refine_light, '投影约束仅用于未知灯向细化'
     assert not args.refine_light or (args.mode=='frozen' and not args.gt_direction_reference), '首次灯向细化只允许未知光固定几何'
     assert 0<=args.ambient_max<=.1, '亮度底项上界限制为平均DL归一尺度的0.1'
     out=Path(args.output);out.mkdir(parents=True,exist_ok=False)
