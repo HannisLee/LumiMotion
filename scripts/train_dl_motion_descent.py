@@ -66,7 +66,7 @@ def run(args, out):
     frozen.update({'deform.'+k:v for k,v in deform.deform.state_dict().items() if not k.startswith('gaussian_warp.')})
     if args.geometry_groups in ['expanded','canonical']:
         for k in ['_rotation','_scaling','_opacity']:frozen.pop(k,None)
-    if args.geometry_groups=='canonical':frozen.pop('_xyz',None)
+    if args.geometry_groups=='canonical' and not args.freeze_canonical_xyz:frozen.pop('_xyz',None)
     before = {k:digest_tensor(v) for k,v in frozen.items()}
     cache = torch.load(args.cache, map_location='cpu', weights_only=False)
     assert cache['config']['resolution'] == args.resolution
@@ -275,7 +275,7 @@ def run(args, out):
     if args.geometry_groups in ['expanded','canonical']:
         for k in ['_rotation','_scaling','_opacity']:
             geometry[k].requires_grad_(True);optimized[k]=geometry[k]
-    if args.geometry_groups=='canonical':
+    if args.geometry_groups=='canonical' and not args.freeze_canonical_xyz:
         geometry['_xyz'].requires_grad_(True);optimized['_xyz']=geometry['_xyz']
     initial_optimized={k:v.detach().clone() for k,v in optimized.items()}
     group_step={'_rotation':.001,'_scaling':.001,'_opacity':.005}
@@ -316,6 +316,7 @@ def run(args, out):
                 hn=hidden_bound*float(torch.sqrt(sum(direction[k].square().sum() for k in initial_head)))
                 proposal={k:start[k]+direction[k]*(1e-4/max(hn,1e-30)) for k in initial_head}
                 for k in ['_rotation','_scaling','_opacity','_xyz']:
+                    if k not in optimized:continue
                     maxnorm=float(direction[k].reshape(len(direction[k]),-1).norm(dim=-1).max())
                     step_size=1e-5 if k=='_xyz' else group_step[k]
                     cap=.001 if k=='_xyz' else group_total[k]
@@ -440,6 +441,7 @@ def main():
     for name in ['source','model','lights','output','cache']:p.add_argument('--'+name,required=True)
     p.add_argument('--mode',choices=['joint','frozen'],required=True)
     p.add_argument('--geometry-groups',choices=['head','expanded','canonical'],default='head')
+    p.add_argument('--freeze-canonical-xyz',action='store_true')
     p.add_argument('--historical-loss',action='store_true')
     p.add_argument('--shading-normal',choices=['depth','gaussian'],default='depth')
     p.add_argument('--gt-direction-reference',action='store_true')
@@ -454,6 +456,7 @@ def main():
     p.add_argument('--iteration',type=int,default=35000);p.add_argument('--seed',type=int,default=1015)
     p.add_argument('--warmup',type=int,default=240);p.add_argument('--blocks',type=int,default=40)
     args=p.parse_args();args.resolution=4;args.frames=0;args.observations='lit';args.normal_gradient='full';args.normal_weight=.05
+    assert not args.freeze_canonical_xyz or args.geometry_groups=='canonical'
     args.alpha_weight=.1 if args.historical_loss else .01
     args.distortion_weight=1000. if args.historical_loss else 0.
     if args.historical_loss:args.normal_weight=.1

@@ -26,7 +26,7 @@ def main():
  for k,v in ck['geometry'].items():getattr(pc,k).copy_(v.cuda())
  deform.deform.load_state_dict(ck['deform_state_dict'],strict=True)
  measured={str(i):float((positions(c)-original[i]).norm(dim=-1).max()) for i,c in enumerate(cameras)}
- error=max(abs(v-result['motion'][i]) for i,v in measured.items());xyz=float((pc.get_xyz-initial_xyz).norm(dim=-1).max());passed=error<1e-7 and max(measured.values())<=.00101 and xyz>0
+ error=max(abs(v-result['motion'][i]) for i,v in measured.items());xyz=float((pc.get_xyz-initial_xyz).norm(dim=-1).max());passed=error<1e-7 and max(measured.values())<=.00101 and (xyz==0 if args.get('freeze_canonical_xyz',False) else xyz>0)
  data=dict(status='PASS' if passed else 'FAILED',gt_read=False,frames=len(cameras),checkpoint_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),canonical_xyz_delta=xyz,max_world_displacement=max(measured.values()),max_difference_to_training=error,per_time=measured)
  (out/'result.json').write_text(json.dumps(data,ensure_ascii=False,indent=2));print(json.dumps({k:v for k,v in data.items() if k!='per_time'},ensure_ascii=False));assert passed
 if __name__=='__main__':main()
