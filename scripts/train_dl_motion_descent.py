@@ -123,6 +123,7 @@ def run(args, out):
             cached[i]=(ds,sign,target,saturated,chosen,all_mask,interior,mask)
             if i%20==0: print(json.dumps({'cached_frame':i,'mask_pixels':int(chosen.sum())}),flush=True)
     (out/'support.json').write_text(json.dumps(coverage,indent=2))
+    ambient=torch.nn.Parameter(torch.tensor(0.,device='cuda'),requires_grad=args.ambient_max>0)
     albedo = torch.nn.Parameter(torch.full_like(pc.get_xyz, math.log(math.expm1(.5))))
     energy = torch.nn.Parameter(torch.full((len(train),), math.log(math.expm1(1.)), device='cuda'))
     train_times = times[train]
@@ -149,7 +150,7 @@ def run(args, out):
         package=render(cameras[i],pc,pipe,bg,**ds,override_color=colors)
         surface_normal=F.normalize(package['surf_normal'],dim=0)*pixel_signs[i]
         cosine=(surface_normal*directions[i,:,None,None]).sum(0,keepdim=True)
-        shading=cosine.clamp_min(0)
+        shading=cosine.clamp_min(0)+ambient
         if args.normal_gradient=='stop' and not audit_full:shading=shading.detach()
         package['render']=package['render']*shading
         residual=package['render']-target
@@ -197,18 +198,22 @@ def run(args, out):
                 save_image(folder/f'{name}_separation.png',sep['render'])
                 torch.save({k:package[k].cpu() for k in ['surf_depth','rend_alpha','rend_normal','surf_normal']},folder/f'{name}_depth.pt')
         return dict(diagnostics=diagnostics,per_frame=losses,train=float(np.mean([losses[str(i)] for i in selected])),held=float(np.mean([losses[str(i)] for i in validation])))
-    optimizer=torch.optim.Adam([{'params':[albedo],'lr':.02},{'params':[energy],'lr':.01}])
+    groups=[{'params':[albedo],'lr':.02},{'params':[energy],'lr':.01}]
+    if args.ambient_max>0:groups.append({'params':[ambient],'lr':.001})
+    optimizer=torch.optim.Adam(groups)
+    @torch.no_grad()
+    def clamp_ambient():ambient.clamp_(0,args.ambient_max)
     history=[];metrics={'initial':evaluate('initial')}
     for step in range(args.warmup):
-        optimizer.zero_grad(set_to_none=True);loss,_=forward(selected[step%len(selected)]);loss.backward();optimizer.step()
+        optimizer.zero_grad(set_to_none=True);loss,_=forward(selected[step%len(selected)]);loss.backward();optimizer.step();clamp_ambient()
         if step%30==0:print(json.dumps(dict(material_step=step+1,loss=float(loss))),flush=True)
     metrics['warmup']=evaluate('warmup')
     head.requires_grad_(args.mode=='joint');accepted=0;proposal_renders=0
     for block in range(args.blocks):
         batch=[selected[(block*3+j)%len(selected)] for j in range(3)]
         for i in batch:
-            optimizer.zero_grad(set_to_none=True);loss,_=forward(i);loss.backward();optimizer.step()
-        entry=dict(block=block+1,batch=batch,accepted=False,attempts=[])
+            optimizer.zero_grad(set_to_none=True);loss,_=forward(i);loss.backward();optimizer.step();clamp_ambient()
+        entry=dict(block=block+1,batch=batch,accepted=False,attempts=[],ambient=float(ambient.detach()))
         if args.mode=='joint':
             outputs=[forward(i,head_objective=True) for i in batch]
             objective=sum(v[0] for v in outputs)/len(batch);proposal_renders+=len(batch)
@@ -263,8 +268,8 @@ def run(args, out):
     unchanged=before=={k:digest_tensor(v) for k,v in frozen.items()}
     delta=max(float((v-initial_head[k]).abs().max()) for k,v in head.state_dict().items())
     passed=unchanged and max(motion.values())<=.00101 and all(np.isfinite(v['held']) for v in metrics.values()) and (accepted>0 and delta>0 if args.mode=='joint' else delta==0)
-    torch.save(dict(geometry={k:v.detach().cpu() for k,v in geometry.items()},deform_state_dict={k:v.detach().cpu() for k,v in deform.deform.state_dict().items()},albedo=albedo.detach().cpu(),energy=energy.detach().cpu(),optimizer=optimizer.state_dict(),args=vars(args),material_updates=args.warmup+args.blocks*3,geometry_updates=0,deformation_updates=accepted),out/'checkpoint.pt')
-    result=dict(status='PASS' if passed else 'FAILED',scope='真实下降和冻结边界工程验收；梯度审计失败未改判，几何质量需独立评测',gt_read=args.gt_direction_reference,metrics=metrics,history=history,material_updates=args.warmup+args.blocks*3,geometry_updates=0,deformation_updates=accepted,proposal_renders=proposal_renders,frozen_unchanged=unchanged,head_delta=delta,hidden_bound=hidden_bound,motion=motion,max_memory_bytes=torch.cuda.max_memory_allocated())
+    torch.save(dict(geometry={k:v.detach().cpu() for k,v in geometry.items()},deform_state_dict={k:v.detach().cpu() for k,v in deform.deform.state_dict().items()},albedo=albedo.detach().cpu(),energy=energy.detach().cpu(),ambient=ambient.detach().cpu(),optimizer=optimizer.state_dict(),args=vars(args),material_updates=args.warmup+args.blocks*3,geometry_updates=0,deformation_updates=accepted),out/'checkpoint.pt')
+    result=dict(status='PASS' if passed else 'FAILED',scope='真实下降和冻结边界工程验收；梯度审计失败未改判，几何质量需独立评测',gt_read=args.gt_direction_reference,ambient=float(ambient.detach()),metrics=metrics,history=history,material_updates=args.warmup+args.blocks*3,geometry_updates=0,deformation_updates=accepted,proposal_renders=proposal_renders,frozen_unchanged=unchanged,head_delta=delta,hidden_bound=hidden_bound,motion=motion,max_memory_bytes=torch.cuda.max_memory_allocated())
     (out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
     print(json.dumps({k:v for k,v in result.items() if k not in ['metrics','history','motion']},ensure_ascii=False),flush=True)
     if not passed:raise RuntimeError('工程验收FAILED，保留checkpoint及所有输出')
@@ -275,6 +280,7 @@ def main():
     for name in ['source','model','lights','output','cache']:p.add_argument('--'+name,required=True)
     p.add_argument('--mode',choices=['joint','frozen'],required=True)
     p.add_argument('--gt-direction-reference',action='store_true')
+    p.add_argument('--ambient-max',type=float,default=0.)
     p.add_argument('--balance-head-groups',action='store_true')
     p.add_argument('--trust-metric',choices=['parameter','actual'],default='parameter')
     p.add_argument('--positive-weight',type=float,default=0.)
@@ -283,6 +289,7 @@ def main():
     p.add_argument('--iteration',type=int,default=35000);p.add_argument('--seed',type=int,default=1015)
     p.add_argument('--warmup',type=int,default=240);p.add_argument('--blocks',type=int,default=40)
     args=p.parse_args();args.resolution=4;args.frames=0;args.observations='lit';args.normal_gradient='full';args.normal_weight=.05
+    assert 0<=args.ambient_max<=.1, '亮度底项上界限制为平均DL归一尺度的0.1'
     out=Path(args.output);out.mkdir(parents=True,exist_ok=False)
     (out/'command.txt').write_text(shlex.join(sys.argv)+'\n');run(args,out)
 
