@@ -14,7 +14,7 @@ def main():
  ray=fit_axis(y);alpha=(y*ray[None]).sum(-1).clamp_min(0);oracle=alpha[...,None]*ray[None]
  # 此处强度alpha读取被评估观测，仅为任意标量照明可达到的颜色残差下界，不是保留RGB预测。
  energy=F.softplus(ck['energy'].double());energy/=energy.mean();trtime=times[train];right=torch.searchsorted(trtime,times).clamp(1,len(train)-1);left=right-1;w=((times-trtime[left])/(trtime[right]-trtime[left])).clamp(0,1);E=torch.lerp(energy[left],energy[right],w)
- dirs=torch.tensor(light['directions'],dtype=torch.float64);cosine=(d['normals'].double()*dirs[:,None]).sum(-1).clamp_min(0);shading=E[:,None]*cosine+float(ck['ambient']);aa=(y[train]*shading[train,:,None]*mask[train,:,None]).sum(0)/(shading[train].square()*mask[train]).sum(0).clamp_min(1e-12)[:,None];pred=aa[None]*shading[...,None]
+ dirs=torch.tensor(light['directions'],dtype=torch.float64);cosine=(d['normals'].double()*dirs[:,None]).sum(-1).clamp_min(0);shading=E[:,None]*(cosine+float(ck['ambient']));aa=(y[train]*shading[train,:,None]*mask[train,:,None]).sum(0)/(shading[train].square()*mask[train]).sum(0).clamp_min(1e-12)[:,None];pred=aa[None]*shading[...,None]
  # 固定未知灯向+既有训练能量下的点观测LS代理；非逐Gaussian光栅渲染损失。
  chroma=y/y.sum(-1,keepdim=True).clamp_min(1e-12);ray_chroma=ray/ray.sum(-1,keepdim=True).clamp_min(1e-12);normalized_angle=torch.rad2deg(torch.acos((F.normalize(y,dim=-1)*ray[None]).sum(-1).clamp(-1,1)))
  errors=dict(fixed_light=(pred-y).square().sum(-1),free_scalar_color_floor=(oracle-y).square().sum(-1),chroma_l1=(chroma-ray_chroma[None]).abs().sum(-1),color_axis_deg=normalized_angle)
@@ -27,6 +27,6 @@ def main():
  counts=mask[train].sum(0);perpoint=(errors['free_scalar_color_floor'][train]*mask[train]).sum(0)/counts.clamp_min(1);candidates=torch.where(supported&dynamic)[0];worst=candidates[torch.argsort(perpoint[candidates],descending=True)[:6]]
  torch.save(dict(ids=d['ids'],dynamic=dynamic,mask=mask,train=train,held=held,axis=ray,albedo=aa,energy=E,errors=errors,rgb=y,oracle_color=oracle,prediction=pred,worst_train_ids=worst),out/'diagnostics.pt')
  sources={str(Path(f).resolve()):hashlib.sha256(Path(f).read_bytes()).hexdigest() for f in [a.cache,a.lights,str(r/'checkpoint.pt'),str(Path(a.reference)/'measurements.pt'),__file__]}
- result=dict(status='PASS',gt_read=False,gradient_updates=0,fit='训练观测闭式颜色主轴与固定照明albedo',source_hashes=sources,statistics=stats,held_rgb_isolation_max_difference=isolation,ambient=float(ck['ambient']),worst_dynamic_gaussian_ids=d['ids'][worst].tolist(),scope='颜色下界允许逐观测读取RGB求最优标量，非完整保留预测；默认Stage1与既有能量见过相关训练数据，非全管线泛化；误差不能唯一归因于对应')
+ result=dict(status='PASS',gt_read=False,gradient_updates=0,ambient_mode='energy_scaled',fit='训练观测闭式颜色主轴与固定照明albedo',source_hashes=sources,statistics=stats,held_rgb_isolation_max_difference=isolation,ambient=float(ck['ambient']),worst_dynamic_gaussian_ids=d['ids'][worst].tolist(),scope='颜色下界允许逐观测读取RGB求最优标量，非完整保留预测；默认Stage1与既有能量见过相关训练数据，非全管线泛化；误差不能唯一归因于对应')
  (out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));print(json.dumps(result,ensure_ascii=False),flush=True)
 if __name__=='__main__':main()
