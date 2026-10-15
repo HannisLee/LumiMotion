@@ -6,12 +6,13 @@ from PIL import Image
 from torchvision.models.optical_flow import raft_small,Raft_Small_Weights
 
 def main():
- p=argparse.ArgumentParser();p.add_argument('--output',required=True);p.add_argument('--camera-roll',action='store_true');p.add_argument('--save-stages',action='store_true');a=p.parse_args();out=Path(a.output);out.mkdir(parents=True,exist_ok=False)
+ p=argparse.ArgumentParser();p.add_argument('--output',required=True);p.add_argument('--camera-roll',action='store_true');p.add_argument('--save-stages',action='store_true');p.add_argument('--triplet-selection',choices=['sample12','short'],default='sample12');a=p.parse_args();out=Path(a.output);out.mkdir(parents=True,exist_ok=False)
  (out/'command.txt').write_text(shlex.join(sys.argv)+'\n');torch.set_num_threads(4);cv2.setNumThreads(4)
  root=Path(__file__).resolve().parents[1];src=root/'output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段/data_view'
  prior=root/'output/1015-24-LH-dynamic-DL-T16图像对应/view_compatible/result.json'
  frames=json.loads((src/'transforms_train.json').read_text())['frames'];triplets=json.loads(prior.read_text())['triplets']
- selected=np.linspace(0,len(triplets)-1,12,dtype=int).tolist()
+ selected=np.linspace(0,len(triplets)-1,12,dtype=int).tolist() if a.triplet_selection=='sample12' else [i for i,r in enumerate(triplets) if r['source_frames'][-1]-r['source_frames'][0]<=3]
+ assert selected
  weights=Raft_Small_Weights.C_T_V2;model=raft_small(weights=weights,progress=False).cuda().eval();pre=weights.transforms()
  hashes={};images={};masks={};sats={};flows={};alignment=[]
  def read(i):
@@ -73,6 +74,6 @@ def main():
  torch.save(saved,out/'matches.pt')
  weightfile=Path(torch.hub.get_dir())/'checkpoints'/Path(weights.url).name
  for path in [Path(__file__),prior,src/'transforms_train.json',weightfile]:hashes[str(path.resolve())]=hashlib.sha256(path.read_bytes()).hexdigest()
- result=dict(camera_roll=a.camera_roll,alignment=alignment,status='DIAGNOSTIC_ONLY',gt_read=False,optimizer_updates=0,external_pretrained_prior=True,weights=str(weights),weight_url=weights.url,torch=torch.__version__,torchvision=torchvision.__version__,selected_triplets=selected,total_available_triplets=len(triplets),rows=rows,inputs=hashes,limitation='双向及循环自洽不证明物质对应正确；未用默认目标投影筛选，未区分动静区域，不能直接用于主线训练')
+ result=dict(triplet_selection=a.triplet_selection,camera_roll=a.camera_roll,alignment=alignment,status='DIAGNOSTIC_ONLY',gt_read=False,optimizer_updates=0,external_pretrained_prior=True,weights=str(weights),weight_url=weights.url,torch=torch.__version__,torchvision=torchvision.__version__,selected_triplets=selected,total_available_triplets=len(triplets),rows=rows,inputs=hashes,limitation='双向及循环自洽不证明物质对应正确；未用默认目标投影筛选，未区分动静区域，不能直接用于主线训练')
  (out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
 if __name__=='__main__':main()
