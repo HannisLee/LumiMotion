@@ -136,7 +136,8 @@ def run(args, out):
         colors=F.softplus(albedo)*energy_values()[i]
         package=render(cameras[i],pc,pipe,bg,**ds,override_color=colors)
         surface_normal=F.normalize(package['surf_normal'],dim=0)*pixel_signs[i]
-        shading=(surface_normal*directions[i,:,None,None]).sum(0,keepdim=True).clamp_min(0)
+        cosine=(surface_normal*directions[i,:,None,None]).sum(0,keepdim=True)
+        shading=cosine.clamp_min(0)
         if args.normal_gradient=='stop' and not audit_full:shading=shading.detach()
         package['render']=package['render']*shading
         residual=package['render']-target
@@ -149,11 +150,15 @@ def run(args, out):
         package['diagnostics']=dict(photo=float(photo.detach()),normal=float(consistency.detach()),alpha=float(alpha_loss.detach()),
             full_mse=float(residual.square().mean().detach()),all_support_mse=float(((residual.square()*all_mask).sum()/(3*all_mask.sum()).clamp_min(1)).detach()))
         regularization=args.normal_weight*consistency+.01*alpha_loss
-        package['loss_terms']=dict(photo=photo,regularization=regularization)
+        positive_support=chosen*(target.mean(0,keepdim=True)>.05)
+        positivity=((args.positive_margin-cosine.double()).clamp_min(0).square()*positive_support).sum()/chosen.sum().clamp_min(1)
+        package['diagnostics']['positivity']=float(positivity.detach())
+        package['loss_terms']=dict(photo=photo,regularization=regularization,positivity=positivity)
         objective=photo+regularization
         if head_objective:
             if args.head_objective=='photo':objective=photo
             elif args.head_objective=='regularization':objective=regularization
+            objective=objective+args.positive_weight*positivity
         return objective,package
     @torch.no_grad()
     def evaluate(label):
@@ -191,6 +196,10 @@ def run(args, out):
                 component_gradients={name:torch.cat([g.detach().flatten() for g in torch.autograd.grad(value,tuple(head.parameters()),retain_graph=True)]) for name,value in components.items()}
                 gp=component_gradients['photo'];gr=component_gradients['regularization']
                 entry['gradient_components']=dict(photo_norm=float(gp.norm()),regularization_norm=float(gr.norm()),cosine=float(F.cosine_similarity(gp,gr,dim=0)))
+                if args.positive_weight>0:
+                    positive=sum(v[1]['loss_terms']['positivity'] for v in outputs)/len(batch)
+                    gpos=torch.cat([g.detach().flatten() for g in torch.autograd.grad(args.positive_weight*positive,tuple(head.parameters()),retain_graph=True)])
+                    entry['gradient_components'].update(positive_norm=float(gpos.norm()),positive_photo_cosine=float(F.cosine_similarity(gpos,gp,dim=0)))
             gradients=torch.autograd.grad(objective,tuple(head.parameters()))
             direction={k:-g.detach() for (k,_),g in zip(head.named_parameters(),gradients)}
             direction_norm=torch.sqrt(sum(v.square().sum() for v in direction.values()))
@@ -232,6 +241,8 @@ def main():
     for name in ['source','model','lights','output','cache']:p.add_argument('--'+name,required=True)
     p.add_argument('--mode',choices=['joint','frozen'],required=True)
     p.add_argument('--gt-direction-reference',action='store_true')
+    p.add_argument('--positive-weight',type=float,default=0.)
+    p.add_argument('--positive-margin',type=float,default=.05)
     p.add_argument('--head-objective',choices=['full','photo','regularization'],default='full')
     p.add_argument('--iteration',type=int,default=35000);p.add_argument('--seed',type=int,default=1015)
     p.add_argument('--warmup',type=int,default=240);p.add_argument('--blocks',type=int,default=40)
