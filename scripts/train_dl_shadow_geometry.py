@@ -15,6 +15,8 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for k in ['run','audit','reference','output']:p.add_argument('--'+k,required=True)
     p.add_argument('--active-region',choices=['all','dynamic'],default='all')
+    p.add_argument('--receiver-normal',choices=['head','plane'],default='head')
+    p.add_argument('--receiver-fit')
     a=p.parse_args();torch.set_num_threads(4);out=Path(a.output);out.mkdir(exist_ok=False)
     rt=json.loads((Path(a.run)/'runtime.json').read_text());args=rt['args'];assert not args['gt_direction_reference']
     meta=json.loads((Path(a.audit)/'result.json').read_text());assert not meta['gt_read']
@@ -49,6 +51,17 @@ def main():
     xyz0=pc.get_xyz.detach().clone();base_rotation=pc._rotation.detach();base_scale=pc.get_scaling.detach();base_opacity=pc.get_opacity.detach().squeeze(-1);feature=pc.get_binary_feature().detach()
     albedo=ck['albedo'].cuda();mask=d['groups']['all_unsaturated']['mask'][:,rid].cuda();y=d['rgb'][:,rid].cuda();normal_receiver=cache['normals'][:,rid].double().cuda();directions=state['smooth'].double().cuda();train=d['train'];held=d['held'];count=int(mask[train].sum());metric_path=Path(a.run)/'xyz_metric.pt';metric_state=torch.load(metric_path,map_location='cpu',weights_only=False);assert metric_state['indices']==train;metric=metric_state['diagonal'][occ.cpu()].cuda()
     metric=metric[torch.isin(occ,active)]
+    receiver_sources={}
+    if a.receiver_normal=='plane':
+        assert a.receiver_fit, '平面法线必须绑定无GT固定光强的材质拟合'
+        fit_root=Path(a.receiver_fit);fit_meta=json.loads((fit_root/'result.json').read_text());assert not fit_meta['gt_read']
+        assert fit_meta['source_hashes'][str((reference/'train/checkpoint.pt').resolve())]==hashlib.sha256((reference/'train/checkpoint.pt').read_bytes()).hexdigest()
+        fit_state=torch.load(fit_root/'checkpoint.pt',map_location='cpu',weights_only=False)
+        assert torch.equal(fit_state['receiver_ids'],rid) and torch.equal(fit_state['groups']['plane/fixed']['energy'],energy)
+        albedo=fit_state['groups']['plane/fixed']['albedo'].cuda()
+        normal_receiver=normal.double()[None,None].expand_as(normal_receiver)
+        receiver_sources={str((fit_root/f).resolve()):hashlib.sha256((fit_root/f).read_bytes()).hexdigest() for f in ['checkpoint.pt','result.json']}
+    else:assert a.receiver_fit is None
     delta=torch.zeros((len(active),3),device='cuda');initial_world=[v[0].cuda()+origin for v in ck['geometry']]
     def forward(i,change,with_rgb=True):
         camera=cams[i];camera.load2device();xyz=xyz0.index_copy(0,active,xyz0[active]+change)
@@ -71,6 +84,7 @@ def main():
             cams[i].load2device('cpu')
         return total,motion,step_motion
     initial_loss,initial_motion,_=scan(delta);assert max(initial_motion)<1e-6
+    if a.receiver_normal=='plane':assert abs(initial_loss-fit_meta['statistics']['plane/fixed']['metrics']['train_plane']['mse'])<1e-10
     history=[];fd=[];accepted=0
     for step in range(3):
         variable=delta.detach().requires_grad_(True);gradient=torch.zeros_like(delta);objective=0.
@@ -103,9 +117,10 @@ def main():
     final_pred=torch.stack(predictions);metrics={}
     for name,inds in [('train',train),('held',held)]:metrics[name]=float((final_pred-d['rgb'][:,rid])[inds][mask.cpu()[inds]].square().mean())
     final_xyz=xyz0.index_copy(0,active,xyz0[active]+delta);inputs=dict(rt['inputs']);inputs[str(metric_path.resolve())]=hashlib.sha256(metric_path.read_bytes()).hexdigest();inputs[str(partition_path.resolve())]=hashlib.sha256(partition_path.read_bytes()).hexdigest()
-    torch.save(dict(protocol='shadow_canonical_v1',geometry={'_xyz':final_xyz.cpu()},deform_state_dict={k:v.cpu() for k,v in deform.deform.state_dict().items()},args=args,active_region=a.active_region,active_ids=active.cpu(),occluder_ids=occ.cpu(),delta=delta.cpu(),prediction=final_pred,receiver_ids=rid,geometry_updates=accepted,material_updates=0),out/'checkpoint.pt')
+    inputs.update(receiver_sources)
+    torch.save(dict(protocol='shadow_canonical_v1',geometry={'_xyz':final_xyz.cpu()},deform_state_dict={k:v.cpu() for k,v in deform.deform.state_dict().items()},args=args,receiver_normal=a.receiver_normal,receiver_fit=a.receiver_fit,active_region=a.active_region,active_ids=active.cpu(),occluder_ids=occ.cpu(),delta=delta.cpu(),prediction=final_pred,receiver_ids=rid,geometry_updates=accepted,material_updates=0),out/'checkpoint.pt')
     (out/'runtime.json').write_text(json.dumps(dict(inputs=inputs,gt_read=False,protocol='shadow_canonical_v1'),indent=2))
     result=dict(status='PASS' if accepted else 'FAILED',gt_read=False,geometry_updates=accepted,initial_training_mse=initial_loss,metrics=metrics,canonical_max_displacement=float(delta.norm(dim=-1).max()),max_world_displacement=max(motion),motion=motion,history=history,finite_difference=fd,scope='固定未知T05灯向/材质/光强，对1817个canonical XYZ经完整形变优化投影阴影；位置引起的旋转/尺度输出随完整查询变化，尚未独立几何验收')
-    result.update(active_region=a.active_region,active_points=len(active),occluder_points=len(occ),scope='固定未知光及完整1817点遮挡集合，只改变指定canonical XYZ，经完整形变重新查询；未完成独立几何验收')
+    result.update(receiver_normal=a.receiver_normal,active_region=a.active_region,active_points=len(active),occluder_points=len(occ),scope='固定未知光及完整1817点遮挡集合，只改变指定canonical XYZ，经完整形变重新查询；未完成独立几何验收')
     (out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));print(json.dumps(result,ensure_ascii=False),flush=True)
 if __name__=='__main__':main()
