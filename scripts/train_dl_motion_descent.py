@@ -57,13 +57,15 @@ def run(args, out):
     deform.deform.eval().requires_grad_(False)
     tensors = {k:v for k,v in vars(pc).items() if isinstance(v, torch.Tensor)}
     for v in tensors.values():v.requires_grad_(False)
-    geometry = {k:tensors[k] for k in ['_xyz','_scaling','_rotation']}
+    geometry = {k:tensors[k] for k in ['_xyz','_scaling','_rotation','_opacity']}
     initial_geometry = {k:v.detach().clone() for k,v in geometry.items()}
     head=deform.deform.gaussian_warp
     initial_head={k:v.detach().clone() for k,v in head.state_dict().items()}
     frozen = dict(tensors)
     frozen.update({k:geometry[k] for k in ['_scaling','_rotation']})
     frozen.update({'deform.'+k:v for k,v in deform.deform.state_dict().items() if not k.startswith('gaussian_warp.')})
+    if args.geometry_groups=='expanded':
+        for k in ['_rotation','_scaling','_opacity']:frozen.pop(k,None)
     before = {k:digest_tensor(v) for k,v in frozen.items()}
     cache = torch.load(args.cache, map_location='cpu', weights_only=False)
     assert cache['config']['resolution'] == args.resolution
@@ -172,7 +174,9 @@ def run(args, out):
         alpha_loss=F.binary_cross_entropy(package['rend_alpha'].double().clamp(1e-6,1-1e-6),mask.double())
         package['diagnostics']=dict(photo=float(photo.detach()),normal=float(consistency.detach()),alpha=float(alpha_loss.detach()),
             full_mse=float(residual.square().mean().detach()),all_support_mse=float(((residual.square()*all_mask).sum()/(3*all_mask.sum()).clamp_min(1)).detach()))
-        regularization=args.normal_weight*consistency+.01*alpha_loss
+        distortion=package['rend_dist'].mean()
+        regularization=args.normal_weight*consistency+args.alpha_weight*alpha_loss+args.distortion_weight*distortion
+        package['diagnostics']['distortion']=float(distortion.detach())
         positive_support=chosen*(target.mean(0,keepdim=True)>.05)
         positivity=((args.positive_margin-cosine.double()).clamp_min(0).square()*positive_support).sum()/chosen.sum().clamp_min(1)
         package['diagnostics']['positivity']=float(positivity.detach())
@@ -259,6 +263,13 @@ def run(args, out):
         if step%30==0:print(json.dumps(dict(material_step=step+1,loss=float(loss))),flush=True)
     metrics['warmup']=evaluate('warmup')
     head.requires_grad_(args.mode=='joint');accepted=0;proposal_renders=0
+    optimized=dict(head.named_parameters())
+    if args.geometry_groups=='expanded':
+        for k in ['_rotation','_scaling','_opacity']:
+            geometry[k].requires_grad_(True);optimized[k]=geometry[k]
+    initial_optimized={k:v.detach().clone() for k,v in optimized.items()}
+    group_step={'_rotation':.001,'_scaling':.001,'_opacity':.005}
+    group_total={'_rotation':.02,'_scaling':.02,'_opacity':.1}
     for block in range(args.blocks):
         batch=[selected[(block*3+j)%len(selected)] for j in range(3)]
         for i in batch:
@@ -276,8 +287,9 @@ def run(args, out):
                     positive=sum(v[1]['loss_terms']['positivity'] for v in outputs)/len(batch)
                     gpos=torch.cat([g.detach().flatten() for g in torch.autograd.grad(args.positive_weight*positive,tuple(head.parameters()),retain_graph=True)])
                     entry['gradient_components'].update(positive_norm=float(gpos.norm()),positive_photo_cosine=float(F.cosine_similarity(gpos,gp,dim=0)))
-            gradients=torch.autograd.grad(objective,tuple(head.parameters()))
-            direction={k:-g.detach() for (k,_),g in zip(head.named_parameters(),gradients)}
+            gradients=torch.autograd.grad(objective,tuple(optimized.values()))
+            all_direction={k:-g.detach() for k,g in zip(optimized,gradients)}
+            direction={k:all_direction[k] for k in initial_head}
             direction_norm=torch.sqrt(sum(v.square().sum() for v in direction.values()))
             assert torch.isfinite(direction_norm) and direction_norm>0
             start={k:v.detach().clone() for k,v in head.state_dict().items()}
@@ -303,22 +315,35 @@ def run(args, out):
                     entry['proposal_step_bound']=displacement_bound({k:v-start[k] for k,v in proposal.items()})
                     entry['proposal_cumulative_bound']=displacement_bound({k:v-initial_head[k] for k,v in proposal.items()})
                     assert entry['proposal_step_bound']<=1.0002e-4 and entry['proposal_cumulative_bound']<=.00100002
+                # 额外几何组按各自参数单位限幅，同一回溯比例联合验收。
+                for k in group_step:
+                    if k not in optimized:continue
+                    start[k]=optimized[k].detach().clone()
+                    g=all_direction[k]
+                    maxnorm=float(g.reshape(len(g),-1).norm(dim=-1).max())
+                    step=g*(group_step[k]/max(maxnorm,1e-30))
+                    delta=start[k]+step-initial_optimized[k]
+                    dn=delta.reshape(len(delta),-1).norm(dim=-1,keepdim=True)
+                    delta=delta*(group_total[k]/dn.clamp_min(1e-30)).clamp_max(1)
+                    proposal[k]=initial_optimized[k]+delta
                 for fraction_step in [1.,.5,.25,.125,.0625,.03125]:
-                    for k,v in head.state_dict().items():v.copy_(torch.lerp(start[k],proposal[k],fraction_step))
+                    for k,v in optimized.items():v.copy_(torch.lerp(start[k],proposal[k],fraction_step))
                     trial=float(sum(forward(i,head_objective=True)[0] for i in batch)/len(batch));proposal_renders+=len(batch)
                     ok=np.isfinite(trial) and trial<baseline-1e-10
                     entry['attempts'].append(dict(fraction=fraction_step,loss=trial,accepted=bool(ok)))
                     if ok:entry['accepted']=True;accepted+=1;break
                 if not entry['accepted']:
-                    for k,v in head.state_dict().items():v.copy_(start[k])
+                    for k,v in optimized.items():v.copy_(start[k])
         history.append(entry);print(json.dumps(entry),flush=True)
     metrics['final']=evaluate('final')
     with torch.no_grad():
         motion={str(i):float((current_ds(i)['d_xyz']-cached[i][0]['d_xyz']).norm(dim=-1).max()) for i in selected+validation}
     unchanged=before=={k:digest_tensor(v) for k,v in frozen.items()}
+    geometry_deltas={k:float((v.detach()-initial_geometry[k]).reshape(len(v),-1).norm(dim=-1).max()) for k,v in geometry.items()}
+    assert args.geometry_groups!='expanded' or all(geometry_deltas[k]<=group_total[k]+1e-6 for k in group_total)
     delta=max(float((v-initial_head[k]).abs().max()) for k,v in head.state_dict().items())
     passed=unchanged and max(motion.values())<=.00101 and all(np.isfinite(v['held']) for v in metrics.values()) and (accepted>0 and delta>0 if args.mode=='joint' else delta==0)
-    torch.save(dict(geometry={k:v.detach().cpu() for k,v in geometry.items()},deform_state_dict={k:v.detach().cpu() for k,v in deform.deform.state_dict().items()},albedo=albedo.detach().cpu(),energy=energy.detach().cpu(),ambient=ambient.detach().cpu(),light_nodes=light_nodes.detach().cpu(),directions=current_directions().detach().cpu(),optimizer=optimizer.state_dict(),args=vars(args),material_updates=args.warmup+args.blocks*3,geometry_updates=0,deformation_updates=accepted),out/'checkpoint.pt')
+    torch.save(dict(geometry={k:v.detach().cpu() for k,v in geometry.items()},deform_state_dict={k:v.detach().cpu() for k,v in deform.deform.state_dict().items()},albedo=albedo.detach().cpu(),energy=energy.detach().cpu(),ambient=ambient.detach().cpu(),light_nodes=light_nodes.detach().cpu(),directions=current_directions().detach().cpu(),optimizer=optimizer.state_dict(),args=vars(args),material_updates=args.warmup+args.blocks*3,geometry_updates=accepted if args.geometry_groups=='expanded' else 0,geometry_deltas=geometry_deltas,deformation_updates=accepted),out/'checkpoint.pt')
     with torch.no_grad():
         inferred=current_directions()
         drift=torch.rad2deg(torch.atan2(torch.cross(directions,inferred,dim=-1).norm(dim=-1),(directions*inferred).sum(-1)))
@@ -326,7 +351,7 @@ def run(args, out):
         inferred_light={k:light[k] for k in ['frames','times','train_indices','held_indices','cache_sha256']}
         inferred_light.update(directions=inferred.cpu().tolist(),gt_read=args.gt_direction_reference,protocol='9个均匀时间控制点的共享残差；节点范数<=0.1，逐时刻投影到初始灯向切平面后归一化；无GT细化' if args.refine_light else '固定输入灯向',source_runtime=str(out/'runtime.json'))
         (out/'inferred_light.json').write_text(json.dumps(inferred_light,ensure_ascii=False,indent=2))
-    result=dict(status='PASS' if passed else 'FAILED',scope='真实下降和冻结边界工程验收；梯度审计失败未改判，几何质量需独立评测',gt_read=args.gt_direction_reference,ambient=float(ambient.detach()),light_drift_deg=drift.cpu().tolist(),light_nodes=light_nodes.detach().cpu().tolist(),light_updates=sum(x['accepted'] for x in light_history) if guard else (args.warmup+args.blocks*3 if args.refine_light else 0),light_proposals=len(light_history),light_history=light_history,light_guard_renders=light_guard_renders,shadow_guard_final_cost=guard_cost,metrics=metrics,history=history,material_updates=args.warmup+args.blocks*3,geometry_updates=0,deformation_updates=accepted,proposal_renders=proposal_renders,frozen_unchanged=unchanged,head_delta=delta,hidden_bound=hidden_bound,motion=motion,max_memory_bytes=torch.cuda.max_memory_allocated())
+    result=dict(status='PASS' if passed else 'FAILED',scope='真实下降和冻结边界工程验收；梯度审计失败未改判，几何质量需独立评测',gt_read=args.gt_direction_reference,ambient=float(ambient.detach()),light_drift_deg=drift.cpu().tolist(),light_nodes=light_nodes.detach().cpu().tolist(),light_updates=sum(x['accepted'] for x in light_history) if guard else (args.warmup+args.blocks*3 if args.refine_light else 0),light_proposals=len(light_history),light_history=light_history,light_guard_renders=light_guard_renders,shadow_guard_final_cost=guard_cost,metrics=metrics,history=history,material_updates=args.warmup+args.blocks*3,geometry_updates=accepted if args.geometry_groups=='expanded' else 0,geometry_deltas=geometry_deltas,deformation_updates=accepted,proposal_renders=proposal_renders,frozen_unchanged=unchanged,head_delta=delta,hidden_bound=hidden_bound,motion=motion,max_memory_bytes=torch.cuda.max_memory_allocated())
     (out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
     print(json.dumps({k:v for k,v in result.items() if k not in ['metrics','history','motion','light_history']},ensure_ascii=False),flush=True)
     if not passed:raise RuntimeError('工程验收FAILED，保留checkpoint及所有输出')
@@ -336,6 +361,8 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for name in ['source','model','lights','output','cache']:p.add_argument('--'+name,required=True)
     p.add_argument('--mode',choices=['joint','frozen'],required=True)
+    p.add_argument('--geometry-groups',choices=['head','expanded'],default='head')
+    p.add_argument('--historical-loss',action='store_true')
     p.add_argument('--gt-direction-reference',action='store_true')
     p.add_argument('--shadow-state',default=None)
     p.add_argument('--refine-light',action='store_true')
@@ -348,6 +375,10 @@ def main():
     p.add_argument('--iteration',type=int,default=35000);p.add_argument('--seed',type=int,default=1015)
     p.add_argument('--warmup',type=int,default=240);p.add_argument('--blocks',type=int,default=40)
     args=p.parse_args();args.resolution=4;args.frames=0;args.observations='lit';args.normal_gradient='full';args.normal_weight=.05
+    args.alpha_weight=.1 if args.historical_loss else .01
+    args.distortion_weight=1000. if args.historical_loss else 0.
+    if args.historical_loss:args.normal_weight=.1
+    assert args.geometry_groups!='expanded' or (args.mode=='joint' and not args.refine_light)
     assert not args.shadow_state or args.refine_light, '投影约束仅用于未知灯向细化'
     assert not args.refine_light or (args.mode=='frozen' and not args.gt_direction_reference), '首次灯向细化只允许未知光固定几何'
     assert 0<=args.ambient_max<=.1, '亮度底项上界限制为平均DL归一尺度的0.1'

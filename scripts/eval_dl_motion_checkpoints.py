@@ -30,7 +30,7 @@ def main():
     ply=Path(args.model)/'point_cloud/iteration_35000/point_cloud.ply';pc.load_ply(str(ply))
     deform=DeformModel(deform_type=cfg.deform_type,is_blender=cfg.is_blender,hyper_dim=cfg.hyper_dim,pred_color=cfg.pred_color)
     assert deform.load_weights(args.model,35000);deform.deform.eval().requires_grad_(False)
-    initial={k:getattr(pc,k).detach().clone() for k in ['_xyz','_scaling','_rotation']}
+    initial={k:getattr(pc,k).detach().clone() for k in ['_xyz','_scaling','_rotation','_opacity']}
     initial_deform={k:v.detach().clone() for k,v in deform.deform.state_dict().items()}
     checkpoint_states={};sources={str(ply):file_sha256(ply)}
     for filename in args.checkpoints:
@@ -81,6 +81,8 @@ def main():
     summary={}
     for group,state in [('default',dict(geometry=initial,deform_state_dict=initial_deform)),*checkpoint_states.items()]:
         deform.deform.load_state_dict(state['deform_state_dict'],strict=True)
+        # 旧checkpoint不含opacity时恢复默认值，禁止跨组继承候选透明度。
+        for key,value in initial.items():getattr(pc,key).copy_(value)
         for key,value in state['geometry'].items():getattr(pc,key).copy_(value.to('cuda'))
         folder=out/group;folder.mkdir();rows=[]
         for camera,ds,c2w,intrinsics,normal,valid,gt,masks,number in cached:
