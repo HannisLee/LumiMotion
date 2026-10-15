@@ -1,4 +1,4 @@
-"""共享材质与受限位移头真实下降短对照；不读取GT。"""
+"""共享材质与受限位移头真实下降短对照；未知光默认禁止GT，参考组显式标记。"""
 import argparse
 import hashlib
 import json
@@ -28,7 +28,11 @@ def run(args, out):
     assert not cfg.white_background
     cfg.resolution = args.resolution; cfg.load2gpu_on_the_fly = True
     light = json.loads(Path(args.lights).read_text())
-    assert not light.get('gt_direction_reference', False) and not light.get('gt_read', False)
+    if args.gt_direction_reference:
+        assert light.get('gt_direction_reference') is True and light.get('gt_read') is True and light.get('control')=='oracle'
+    else:
+        assert not light.get('gt_direction_reference', False) and not light.get('gt_read', False)
+    (out/'used_light.json').write_text(json.dumps(light,ensure_ascii=False,indent=2))
     infos = readCamerasFromTransforms(args.source, 'transforms_train.json', cfg.train_light_folder, False)
     cameras = [loadCam(cfg, i, info, 1.) for i, info in enumerate(infos)]
     assert [c.image_name_train_light for c in cameras] == light['frames']
@@ -72,7 +76,7 @@ def run(args, out):
     inputs = [Path(args.cache),ply, deform_path, Path(args.model)/'cfg_args', Path(args.source)/'transforms_train.json', Path(args.lights), Path(__file__)]
     runtime = dict(args=vars(args), inputs={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs},
                    native=sys.modules['diff_surfel_rasterization'].provenance, selected=selected, validation=validation,
-                   gt_read=False, scope='共享材质与位移头短对照；实际下降接受，无GT' )
+                   gt_read=args.gt_direction_reference, scope=('已知训练光向隔离参考；实际下降接受' if args.gt_direction_reference else '未知光共享材质与位移头短对照；实际下降接受，无GT') )
     (out/'runtime.json').write_text(json.dumps(runtime, ensure_ascii=False, indent=2))
     bg = torch.zeros(3, device='cuda')
     pipe = SimpleNamespace(compute_cov3D_python=False, convert_SHs_python=False, depth_ratio=0.)
@@ -217,7 +221,7 @@ def run(args, out):
     delta=max(float((v-initial_head[k]).abs().max()) for k,v in head.state_dict().items())
     passed=unchanged and max(motion.values())<=.00101 and all(np.isfinite(v['held']) for v in metrics.values()) and (accepted>0 and delta>0 if args.mode=='joint' else delta==0)
     torch.save(dict(geometry={k:v.detach().cpu() for k,v in geometry.items()},deform_state_dict={k:v.detach().cpu() for k,v in deform.deform.state_dict().items()},albedo=albedo.detach().cpu(),energy=energy.detach().cpu(),optimizer=optimizer.state_dict(),args=vars(args),material_updates=args.warmup+args.blocks*3,geometry_updates=0,deformation_updates=accepted),out/'checkpoint.pt')
-    result=dict(status='PASS' if passed else 'FAILED',scope='真实下降和冻结边界工程验收；梯度审计失败未改判，几何质量需独立评测',gt_read=False,metrics=metrics,history=history,material_updates=args.warmup+args.blocks*3,geometry_updates=0,deformation_updates=accepted,proposal_renders=proposal_renders,frozen_unchanged=unchanged,head_delta=delta,hidden_bound=hidden_bound,motion=motion,max_memory_bytes=torch.cuda.max_memory_allocated())
+    result=dict(status='PASS' if passed else 'FAILED',scope='真实下降和冻结边界工程验收；梯度审计失败未改判，几何质量需独立评测',gt_read=args.gt_direction_reference,metrics=metrics,history=history,material_updates=args.warmup+args.blocks*3,geometry_updates=0,deformation_updates=accepted,proposal_renders=proposal_renders,frozen_unchanged=unchanged,head_delta=delta,hidden_bound=hidden_bound,motion=motion,max_memory_bytes=torch.cuda.max_memory_allocated())
     (out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
     print(json.dumps({k:v for k,v in result.items() if k not in ['metrics','history','motion']},ensure_ascii=False),flush=True)
     if not passed:raise RuntimeError('工程验收FAILED，保留checkpoint及所有输出')
@@ -227,6 +231,7 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for name in ['source','model','lights','output','cache']:p.add_argument('--'+name,required=True)
     p.add_argument('--mode',choices=['joint','frozen'],required=True)
+    p.add_argument('--gt-direction-reference',action='store_true')
     p.add_argument('--head-objective',choices=['full','photo','regularization'],default='full')
     p.add_argument('--iteration',type=int,default=35000);p.add_argument('--seed',type=int,default=1015)
     p.add_argument('--warmup',type=int,default=240);p.add_argument('--blocks',type=int,default=40)
