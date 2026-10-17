@@ -529,7 +529,10 @@ class GaussianModel:
 
         self.xyz_gradient_accum = torch.zeros((self.get_xyz.shape[0], 1), device="cuda")
         self.denom = torch.zeros((self.get_xyz.shape[0], 1), device="cuda")
-        self.max_radii2D = torch.zeros((self.get_xyz.shape[0]), device="cuda")
+        if getattr(self,'_screen_radius_event_active',False):
+            self.max_radii2D = torch.cat((self.max_radii2D,self.max_radii2D.new_zeros(new_xyz.shape[0])))
+        else:
+            self.max_radii2D = torch.zeros((self.get_xyz.shape[0]), device="cuda")
 
     def densify_and_split(self, grads=None, grad_threshold=None, scene_extent=None, N=2, selected_pts_mask=None, without_prune=False):
         if selected_pts_mask is None:
@@ -588,20 +591,46 @@ class GaussianModel:
                                    new_albedo_dc, new_albedo_rest, new_opacities, new_roughness, new_scaling, new_rotation, new_feature)
 
     def densify_and_prune(self, max_grad, min_opacity, extent, max_screen_size):
-        grads = self.xyz_gradient_accum / self.denom
-        grads[grads.isnan()] = 0.0
+        preserve_radius = bool(getattr(self,'preserve_screen_radii_event',False))
+        self._screen_radius_event_active = preserve_radius
+        try:
+            grads = self.xyz_gradient_accum / self.denom
+            grads[grads.isnan()] = 0.0
 
-        self.densify_and_clone(grads, max_grad, extent)
-        self.densify_and_split(grads, max_grad, extent)
+            if preserve_radius:
+                before_count = len(self.get_xyz)
+                before_over_screen = int((self.max_radii2D > max_screen_size).sum()) if max_screen_size else 0
+            self.densify_and_clone(grads, max_grad, extent)
+            if preserve_radius:
+                after_clone_count = len(self.get_xyz)
+            self.densify_and_split(grads, max_grad, extent)
 
-        prune_mask = (self.get_opacity < min_opacity).squeeze()
-        if max_screen_size:
-            big_points_vs = self.max_radii2D > max_screen_size
-            big_points_ws = self.get_scaling.max(dim=1).values > 0.1 * extent
-            prune_mask = torch.logical_or(torch.logical_or(prune_mask, big_points_vs), big_points_ws)
-        self.prune_points(prune_mask)
+            prune_mask = (self.get_opacity < min_opacity).squeeze()
+            if max_screen_size:
+                big_points_vs = self.max_radii2D > max_screen_size
+                big_points_ws = self.get_scaling.max(dim=1).values > 0.1 * extent
+                prune_mask = torch.logical_or(torch.logical_or(prune_mask, big_points_vs), big_points_ws)
+            if preserve_radius:
+                after_split_count = len(self.get_xyz)
+                screen_mask = (self.max_radii2D > max_screen_size) if max_screen_size else torch.zeros_like(prune_mask)
+                opacity_mask = (self.get_opacity < min_opacity).squeeze()
+                world_mask = (self.get_scaling.max(dim=1).values > 0.1 * extent) if max_screen_size else torch.zeros_like(prune_mask)
+                event = dict(before_count=before_count,clone_children=after_clone_count-before_count,
+                             split_net_change=after_split_count-after_clone_count,after_split_count=after_split_count,
+                             max_screen_size=max_screen_size,before_over_screen=before_over_screen,
+                             screen_count=int(screen_mask.sum()),opacity_count=int(opacity_mask.sum()),world_count=int(world_mask.sum()),
+                             screen_only_count=int((screen_mask & ~opacity_mask & ~world_mask).sum()),
+                             union_pruned_count=int(prune_mask.sum()))
+            self.prune_points(prune_mask)
+            if preserve_radius:
+                self.max_radii2D = torch.zeros_like(self.max_radii2D)
+                event.update(after_count=len(self.get_xyz),after_nonzero_radii=int(torch.count_nonzero(self.max_radii2D)),
+                             statistics_window_reset=True)
+                self._last_screen_radius_event = event
 
-        torch.cuda.empty_cache()
+            torch.cuda.empty_cache()
+        finally:
+            self._screen_radius_event_active = False
 
     def add_densification_stats(self, viewspace_point_tensor, update_filter):
         self.xyz_gradient_accum[update_filter] += torch.norm(viewspace_point_tensor.grad[update_filter, :2], dim=-1, keepdim=True)

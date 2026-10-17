@@ -38,6 +38,8 @@ def main():
                         help='detach只阻断dist对opacity参数的梯度，保留几何与屏幕余切。')
     parser.add_argument('--plane_normal_weight',type=float,choices=[0.,.005],default=0.)
     parser.add_argument('--plane_start',type=int,default=8000)
+    parser.add_argument('--preserve_screen_radii_event',action='store_true',
+                        help='仅在一次增密剪枝事件内传递父点屏幕半径，联合剪枝后清零。')
     args = parser.parse_args()
     if args.skip_opacity_reset_at < 0 or (not args.smoke_schedule and args.skip_opacity_reset_at not in (0,15000)):
         parser.error('正式实验只允许关闭开关或仅跳过15000 reset。')

@@ -20,6 +20,16 @@ def regularization_schedule(iteration,normal_start,dist_start):
 class UnknownLightTrainer(StaticDLTrainer):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
+        self.gaussians.preserve_screen_radii_event = bool(getattr(self.args,'preserve_screen_radii_event',False))
+        if self.gaussians.preserve_screen_radii_event:
+            original_densify = self.gaussians.densify_and_prune
+            def audited_radius_event(*args,**kwargs):
+                result = original_densify(*args,**kwargs)
+                record = dict(self.gaussians._last_screen_radius_event,iteration=self.iteration)
+                with (Path(self.args.model_path)/'screen_radius_events.jsonl').open('a') as stream:
+                    stream.write(json.dumps(record,ensure_ascii=False)+'\n')
+                return result
+            self.gaussians.densify_and_prune = audited_radius_event
         expected = {str(i).zfill(4) for i in range(1,151) if i%10}
         if len(self.scene.getTrainCameras())!=135 or set(self.physical_lights.directions)!=expected:
             raise AssertionError('Stage1只允许原135训练相机与方向。')
@@ -34,7 +44,8 @@ class UnknownLightTrainer(StaticDLTrainer):
         (model/'static_dl_training.json').write_text(json.dumps(static,ensure_ascii=False,indent=2)+'\n')
         root = Path(__file__).resolve().parents[1]
         sources = ('scripts/train_static_unknown_light.py','scene/static_unknown_light.py',
-                   'scripts/train_static_dl.py','scene/static_dl_censored.py','scene/static_dl_photometric.py')
+                   'scripts/train_static_dl.py','scene/static_dl_censored.py','scene/static_dl_photometric.py',
+                   'scene/gaussian_model.py')
         if self.receiver_plane is not None:
             sources += ('scene/static_receiver_plane.py',)
         record = {'actual_entrypoint':static['actual_entrypoint'],'args':vars(self.args),
@@ -42,6 +53,7 @@ class UnknownLightTrainer(StaticDLTrainer):
                   'loss_model':'censored','normal_depth_statistic':'expected','photo_depth_ratio':1.,
                   'normal_start':self.opt.start_normal_reg,'dist_start':self.args.dist_start,
                   'initial_point_count':len(self.gaussians.get_xyz),'densification':True,
+                  'preserve_screen_radii_event':self.gaussians.preserve_screen_radii_event,
                   'densification_screen_gradient':'photo_and_dist_proxy_plus_expected_normal_proxy_then_one_norm_and_one_denom',
                   'initial_point_cloud_sha256':hashlib.sha256((Path(self.args.source_path)/'points3d.ply').read_bytes()).hexdigest(),
                   'smoke_schedule':self.args.smoke_schedule, 'gt_supervision':False,
