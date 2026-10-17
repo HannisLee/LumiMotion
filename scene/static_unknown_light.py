@@ -41,7 +41,8 @@ class UnknownLightTrainer(StaticDLTrainer):
                   'smoke_schedule':self.args.smoke_schedule, 'gt_supervision':False,
                   'initialization':'原135训练RGB、Alpha和相机之外仅确定性随机点云，无模型权重',
                   'optimizer_order':'backward→optimizer→非终点拓扑/reset→save',
-                  'normal_detach_start':self.args.normal_detach_start}
+                  'normal_detach_start':self.args.normal_detach_start,
+                  'dist_opacity_route':self.args.dist_opacity_route}
         (model/'unknown_light_training.json').write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n')
 
     def _save_physical(self):
@@ -52,7 +53,7 @@ class UnknownLightTrainer(StaticDLTrainer):
                      normal_start=self.opt.start_normal_reg,dist_start=self.args.dist_start,
                      smoke_schedule=self.args.smoke_schedule,actual_entrypoint='scripts/train_static_unknown_light.py')
         value.update(normal_opacity_route='detach_opacity' if self.iteration >= self.args.normal_detach_start else 'full',
-                     gt_supervision=False)
+                     dist_opacity_route=self.args.dist_opacity_route,gt_supervision=False)
         path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
         torch.save({'iteration':self.iteration,'gaussian_optimizer':self.gaussians.optimizer.state_dict(),
                     'light_optimizer':self.light_optimizer.state_dict(),
@@ -66,6 +67,50 @@ class UnknownLightTrainer(StaticDLTrainer):
                     'checkpoint_state_version':2,
                     'note':'保存增密累计、NumPy及原优化器/RNG；尚需经验证的显式恢复入口，不声称已支持无缝续训'},
                    Path(self.args.model_path)/f'optimizer_{self.iteration}.pt')
+
+    def _audit_dist_opacity(self, base_loss, package, geometry):
+        """同图同参数核对dist支路；恢复retain_grad缓存，不影响增密累计。"""
+        params=[self.gaussians._xyz,self.gaussians._rotation,self.gaussians._scaling,self.gaussians._opacity]
+        screens=[package['viewspace_points'],geometry['viewspace_points']]
+        saved=[None if x.grad is None else x.grad.detach().clone() for x in screens]
+        versions=[x._version for x in params]
+        rng=torch.get_rng_state().clone();cuda_rng=torch.cuda.get_rng_state().clone()
+        full=self.opt.lambda_dist*package['rend_dist'].mean()
+        isolated=self.opt.lambda_dist*geometry['rend_dist'].mean()
+        record={'iteration':self.iteration,'forward_exact':torch.equal(package['rend_dist'],geometry['rend_dist']),
+                'scope':'只断开opacity参数；不等同CUDA DETACH_WEIGHT=1，权重对XYZ/scale的导数保留'}
+        def compare(a,b):
+            if a is None or b is None:
+                return {'passed':a is None and b is None,'both_unused':a is None and b is None}
+            difference=a-b
+            relative=float(difference.norm()/torch.maximum(a.norm(),b.norm()).clamp_min(1e-12))
+            return {'passed':bool(torch.isfinite(a).all() and torch.isfinite(b).all()) and relative<1e-3,
+                    'relative_l2':relative,'max_abs':float(difference.abs().max()),'reference_norm':float(a.norm())}
+        try:
+            old=torch.autograd.grad(full,params+[screens[0]],retain_graph=True,allow_unused=True)
+            new=torch.autograd.grad(isolated,params+[screens[1]],retain_graph=True,allow_unused=True)
+            record['opacity_control_norm']=None if old[3] is None else float(old[3].norm())
+            record['opacity_isolated_absent']=new[3] is None or bool(torch.count_nonzero(new[3])==0)
+            record['geometry_and_screen_vjp']={name:compare(old[i],new[i]) for name,i in [('xyz',0),('rotation',1),('scaling',2),('screen',4)]}
+            old_total=torch.autograd.grad(base_loss+full,params+screens,retain_graph=True,allow_unused=True)
+            new_total=torch.autograd.grad(base_loss+isolated,params+screens,retain_graph=True,allow_unused=True)
+            record['total_opacity_difference']=compare(old_total[3]-new_total[3],old[3])
+            record['merged_total_screen_vjp']=compare(old_total[4]+old_total[5],new_total[4]+new_total[5])
+        finally:
+            for x,v in zip(screens,saved):
+                x.grad=v
+        record['screen_grad_cache_restored']=True
+        record['parameter_versions_unchanged']=versions==[x._version for x in params]
+        record['rng_unchanged']=torch.equal(rng,torch.get_rng_state()) and torch.equal(cuda_rng,torch.cuda.get_rng_state())
+        record['passed']=(record['forward_exact'] and record['opacity_isolated_absent'] and
+                          record['opacity_control_norm'] is not None and record['opacity_control_norm']>0 and
+                          all(v['passed'] for v in record['geometry_and_screen_vjp'].values()) and
+                          record['total_opacity_difference']['passed'] and record['merged_total_screen_vjp']['passed'] and
+                          record['parameter_versions_unchanged'] and record['rng_unchanged'])
+        (Path(self.args.model_path)/'dist_opacity_audit.json').write_text(json.dumps(record,ensure_ascii=False,indent=2))
+        if not record['passed']:
+            raise RuntimeError('dist opacity隔离的真实前向/余切审计失败；现场保留。')
+        self.gradient_audited.add('dist_opacity_detached')
 
     def train_step(self):
         if self.args.static_dl_mode == 'sh' or self.iteration <= self.args.static_dl_physical_start:
@@ -115,7 +160,14 @@ class UnknownLightTrainer(StaticDLTrainer):
             normal_loss = ((1-(normal*depth_normal).sum(0, keepdim=True))*mask).sum()/mask.sum().clamp_min(1)
             loss = loss+self.args.static_dl_normal_weight*normal_loss
         if dist_active:
-            dist_loss = package['rend_dist'].mean()
+            if self.args.dist_opacity_route == 'detach':
+                if not normal_active or self.iteration < self.args.normal_detach_start:
+                    raise RuntimeError('dist隔离缺少已detach的几何副本。')
+                if 'dist_opacity_detached' not in self.gradient_audited:
+                    self._audit_dist_opacity(loss,package,geometry)
+                dist_loss = geometry['rend_dist'].mean()
+            else:
+                dist_loss = package['rend_dist'].mean()
             loss = loss+self.opt.lambda_dist*dist_loss
         if not torch.isfinite(loss):
             raise FloatingPointError(f'静态物理loss非有限，iteration={self.iteration}。')
@@ -161,6 +213,7 @@ class UnknownLightTrainer(StaticDLTrainer):
                 values = dict(iteration=self.iteration,camera=camera.image_name_train_light,
                               normal_active=normal_active,dist_active=dist_active,
                               normal_opacity_route='detach_opacity' if self.iteration>=self.args.normal_detach_start else 'full',
+                              dist_opacity_route=self.args.dist_opacity_route,
                               photo=float(photo), alpha=float(alpha_loss),
                               normal=float(normal_loss), distortion=float(dist_loss),
                               visibility=float(package['mean_visibility']), points=len(self.gaussians.get_xyz),

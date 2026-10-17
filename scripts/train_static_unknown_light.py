@@ -30,7 +30,11 @@ def main():
     parser.add_argument('--normal_depth_statistic',choices=['expected'],default='expected')
     parser.add_argument('--smoke_schedule',action='store_true',help='仅output/smoke_test内短程物理分支测试，禁止用作正式日程。')
     parser.add_argument('--normal_detach_start',type=int,default=15001)
+    parser.add_argument('--dist_opacity_route',choices=['full','detach'],default='full',
+                        help='detach只阻断dist对opacity参数的梯度，保留几何与屏幕余切。')
     args = parser.parse_args()
+    if args.dist_opacity_route == 'detach' and args.normal_detach_start > args.dist_start+1:
+        parser.error('dist隔离要求启用dist时已有detach_opacity几何副本。')
     if not args.eval:
         parser.error('必须指定--eval以保持135训练帧和15测试帧分开。')
     if args.depth_ratio != 1 or args.static_dl_mode != 'lambertian_visibility':
