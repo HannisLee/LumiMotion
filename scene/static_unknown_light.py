@@ -24,6 +24,10 @@ class UnknownLightTrainer(StaticDLTrainer):
         if len(self.scene.getTrainCameras())!=135 or set(self.physical_lights.directions)!=expected:
             raise AssertionError('Stage1只允许原135训练相机与方向。')
         model = Path(self.args.model_path)
+        self.receiver_plane = None
+        if self.args.plane_normal_weight:
+            from scene.static_receiver_plane import FixedReceiverPlane
+            self.receiver_plane = FixedReceiverPlane(self.args.source_path)
         static = json.loads((model/'static_dl_training.json').read_text())
         static.update(actual_entrypoint='scripts/train_static_unknown_light.py',loss_model='censored',
                       normal_depth_statistic='expected',normal_start=self.opt.start_normal_reg,dist_start=self.args.dist_start)
@@ -31,6 +35,8 @@ class UnknownLightTrainer(StaticDLTrainer):
         root = Path(__file__).resolve().parents[1]
         sources = ('scripts/train_static_unknown_light.py','scene/static_unknown_light.py',
                    'scripts/train_static_dl.py','scene/static_dl_censored.py','scene/static_dl_photometric.py')
+        if self.receiver_plane is not None:
+            sources += ('scene/static_receiver_plane.py',)
         record = {'actual_entrypoint':static['actual_entrypoint'],'args':vars(self.args),
                   'new_sources':{str(root/p):hashlib.sha256((root/p).read_bytes()).hexdigest() for p in sources},
                   'loss_model':'censored','normal_depth_statistic':'expected','photo_depth_ratio':1.,
@@ -42,7 +48,9 @@ class UnknownLightTrainer(StaticDLTrainer):
                   'initialization':'原135训练RGB、Alpha和相机之外仅确定性随机点云，无模型权重',
                   'optimizer_order':'backward→optimizer→非终点拓扑/reset→save',
                   'normal_detach_start':self.args.normal_detach_start,
-                  'dist_opacity_route':self.args.dist_opacity_route}
+                  'dist_opacity_route':self.args.dist_opacity_route,
+                  'plane_normal_weight':self.args.plane_normal_weight,'plane_start':self.args.plane_start,
+                  'receiver_plane':None if self.receiver_plane is None else self.receiver_plane.metadata}
         (model/'unknown_light_training.json').write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n')
 
     def _save_physical(self):
@@ -53,7 +61,8 @@ class UnknownLightTrainer(StaticDLTrainer):
                      normal_start=self.opt.start_normal_reg,dist_start=self.args.dist_start,
                      smoke_schedule=self.args.smoke_schedule,actual_entrypoint='scripts/train_static_unknown_light.py')
         value.update(normal_opacity_route='detach_opacity' if self.iteration >= self.args.normal_detach_start else 'full',
-                     dist_opacity_route=self.args.dist_opacity_route,gt_supervision=False)
+                     dist_opacity_route=self.args.dist_opacity_route,
+                     plane_normal_weight=self.args.plane_normal_weight,plane_start=self.args.plane_start,gt_supervision=False)
         path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
         torch.save({'iteration':self.iteration,'gaussian_optimizer':self.gaussians.optimizer.state_dict(),
                     'light_optimizer':self.light_optimizer.state_dict(),
@@ -141,6 +150,8 @@ class UnknownLightTrainer(StaticDLTrainer):
         loss = photo+self.opt.lambda_alpha_loss*alpha_loss
         normal_loss = loss.new_zeros(())
         dist_loss = loss.new_zeros(())
+        plane_loss = loss.new_zeros(())
+        plane_details = {}
         normal_active, dist_active = regularization_schedule(self.iteration,self.opt.start_normal_reg,self.args.dist_start)
         if normal_active:
             # RGB保持原pipe；仅独立真实几何副本采用expected。Stage1仍允许scale/opacity梯度。
@@ -169,6 +180,19 @@ class UnknownLightTrainer(StaticDLTrainer):
             else:
                 dist_loss = package['rend_dist'].mean()
             loss = loss+self.opt.lambda_dist*dist_loss
+        if self.receiver_plane is not None and self.iteration > self.args.plane_start:
+            if not normal_active or self.iteration < self.args.normal_detach_start:
+                raise RuntimeError('接收面先验缺少已detach的expected几何副本。')
+            plane_loss,plane_details = self.receiver_plane(camera,geometry)
+            weighted_plane = self.args.plane_normal_weight*plane_loss
+            if 'receiver_plane' not in self.gradient_audited:
+                from scene.static_receiver_plane import audit_plane_gradient
+                audit_plane_gradient(weighted_plane,self.args.static_dl_normal_weight*normal_loss,
+                                     self.gaussians,self.physical_lights,
+                                     [package['viewspace_points'],geometry['viewspace_points']],
+                                     Path(self.args.model_path)/'receiver_plane_gradient_audit.json',self.iteration)
+                self.gradient_audited.add('receiver_plane')
+            loss = loss+weighted_plane
         if not torch.isfinite(loss):
             raise FloatingPointError(f'静态物理loss非有限，iteration={self.iteration}。')
         if normal_active and self.iteration >= self.args.normal_detach_start and 'detach_opacity' not in self.gradient_audited:
@@ -216,6 +240,8 @@ class UnknownLightTrainer(StaticDLTrainer):
                               dist_opacity_route=self.args.dist_opacity_route,
                               photo=float(photo), alpha=float(alpha_loss),
                               normal=float(normal_loss), distortion=float(dist_loss),
+                              plane_normal=float(plane_loss),plane_normal_weight=self.args.plane_normal_weight,
+                              **plane_details,
                               visibility=float(package['mean_visibility']), points=len(self.gaussians.get_xyz),
                               light=package['light_intensity'].cpu().tolist(),
                               **{k: float(v) for k, v in diagnostics.items()})

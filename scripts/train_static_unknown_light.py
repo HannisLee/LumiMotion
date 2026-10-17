@@ -32,9 +32,13 @@ def main():
     parser.add_argument('--normal_detach_start',type=int,default=15001)
     parser.add_argument('--dist_opacity_route',choices=['full','detach'],default='full',
                         help='detach只阻断dist对opacity参数的梯度，保留几何与屏幕余切。')
+    parser.add_argument('--plane_normal_weight',type=float,choices=[0.,.005],default=0.)
+    parser.add_argument('--plane_start',type=int,default=8000)
     args = parser.parse_args()
     if args.dist_opacity_route == 'detach' and args.normal_detach_start > args.dist_start+1:
         parser.error('dist隔离要求启用dist时已有detach_opacity几何副本。')
+    if args.plane_normal_weight and args.normal_detach_start > args.plane_start+1:
+        parser.error('接收面先验启用时必须已有detach_opacity几何副本。')
     if not args.eval:
         parser.error('必须指定--eval以保持135训练帧和15测试帧分开。')
     if args.depth_ratio != 1 or args.static_dl_mode != 'lambertian_visibility':
@@ -46,6 +50,8 @@ def main():
           or args.static_dl_physical_start!=1000 or args.static_dl_visibility_start!=5000
           or args.iterations<10000 or args.densify_until_iter!=20000):
         parser.error('正式日程至少10k、增密截至20k、normal2000/8000、dist8000、physical1000、V5000。')
+    if args.plane_normal_weight and not args.smoke_schedule and args.plane_start != 8000:
+        parser.error('当前正式接收面先验固定8001启用，不按GT调整起点。')
     if args.deform_type != 'mlp':
         parser.error('该入口仅支持mlp格式，以保持标准评测加载一致。')
     if not args.model_path:
