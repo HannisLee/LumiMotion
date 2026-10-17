@@ -53,8 +53,9 @@ class UnknownLightTrainer(StaticDLTrainer):
                   'loss_model':'censored','normal_depth_statistic':'expected','photo_depth_ratio':1.,
                   'normal_start':self.opt.start_normal_reg,'dist_start':self.args.dist_start,
                   'initial_point_count':len(self.gaussians.get_xyz),'densification':True,
+                  'normal_screen_exclude_from':getattr(self.args,'normal_screen_exclude_from',0),
                   'preserve_screen_radii_event':self.gaussians.preserve_screen_radii_event,
-                  'densification_screen_gradient':'photo_and_dist_proxy_plus_expected_normal_proxy_then_one_norm_and_one_denom',
+                  'densification_screen_gradient':('photo_and_dist_proxy_only_from_normal_screen_exclude_from; original_combined_before' if getattr(self.args,'normal_screen_exclude_from',0) else 'photo_and_dist_proxy_plus_expected_normal_proxy_then_one_norm_and_one_denom'),
                   'initial_point_cloud_sha256':hashlib.sha256((Path(self.args.source_path)/'points3d.ply').read_bytes()).hexdigest(),
                   'smoke_schedule':self.args.smoke_schedule, 'gt_supervision':False,
                   'initialization':'原135训练RGB、Alpha和相机之外仅确定性随机点云，无模型权重',
@@ -339,7 +340,8 @@ class UnknownLightTrainer(StaticDLTrainer):
                         raise FloatingPointError('expected几何screen余切缺失或非有限。')
                     # 合并同一屏幕变量的向量余切后只统计一次，不能相加范数或重复denom。
                     # 屏幕代理不被optimizer更新；不改已经累计的pc._xyz.grad。
-                    package['viewspace_points'].grad.add_(screen_gradient)
+                    if not (0 < getattr(self.args,'normal_screen_exclude_from',0) <= self.iteration):
+                        package['viewspace_points'].grad.add_(screen_gradient)
                 self.gaussians.add_densification_stats(package['viewspace_points'], visibility)
                 if self.iteration > self.opt.densify_from_iter and self.iteration % self.opt.densification_interval == 0:
                     limit = 20 if self.iteration > self.opt.opacity_reset_interval else None

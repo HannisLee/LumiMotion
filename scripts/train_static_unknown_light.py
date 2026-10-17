@@ -40,6 +40,8 @@ def main():
     parser.add_argument('--plane_start',type=int,default=8000)
     parser.add_argument('--preserve_screen_radii_event',action='store_true',
                         help='仅在一次增密剪枝事件内传递父点屏幕半径，联合剪枝后清零。')
+    parser.add_argument('--normal_screen_exclude_from',type=int,default=0,
+                        help='仅从指定步起移除normal增密屏幕代理，保留真实参数全部梯度；0关闭。')
     args = parser.parse_args()
     if args.skip_opacity_reset_at < 0 or (not args.smoke_schedule and args.skip_opacity_reset_at not in (0,15000)):
         parser.error('正式实验只允许关闭开关或仅跳过15000 reset。')
@@ -56,6 +58,8 @@ def main():
         parser.error('dist隔离要求启用dist时已有detach_opacity几何副本。')
     if args.plane_normal_weight and args.normal_detach_start > args.plane_start+1:
         parser.error('接收面先验启用时必须已有detach_opacity几何副本。')
+    if args.normal_screen_exclude_from < 0 or (not args.smoke_schedule and args.normal_screen_exclude_from not in (0,8001)):
+        parser.error('正式normal-screen隔离仅允许关闭或8001起，不按GT扫描时程。')
     if not args.eval:
         parser.error('必须指定--eval以保持135训练帧和15测试帧分开。')
     if args.depth_ratio != 1 or args.static_dl_mode != 'lambertian_visibility':
