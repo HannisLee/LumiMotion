@@ -58,7 +58,13 @@ class UnknownLightTrainer(StaticDLTrainer):
                     'light_optimizer':self.light_optimizer.state_dict(),
                     'python_rng':__import__('random').getstate(),'torch_rng':torch.get_rng_state(),
                     'cuda_rng':torch.cuda.get_rng_state(),'camera_stack':[c.image_name_train_light for c in (self.viewpoint_stack or [])],
-                    'note':'PLY/deform/lighting与优化器、RNG配套保留；下一轮需显式恢复入口'},
+                    'numpy_rng':__import__('numpy').random.get_state(),
+                    'densification':{name:getattr(self.gaussians,name).detach().clone()
+                                      for name in ('xyz_gradient_accum','denom','max_radii2D')},
+                    'active_sh_degree':self.gaussians.active_sh_degree,
+                    'spatial_lr_scale':self.gaussians.spatial_lr_scale,
+                    'checkpoint_state_version':2,
+                    'note':'保存增密累计、NumPy及原优化器/RNG；尚需经验证的显式恢复入口，不声称已支持无缝续训'},
                    Path(self.args.model_path)/f'optimizer_{self.iteration}.pt')
 
     def train_step(self):
