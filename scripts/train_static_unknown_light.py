@@ -42,6 +42,8 @@ def main():
                         help='仅在一次增密剪枝事件内传递父点屏幕半径，联合剪枝后清零。')
     parser.add_argument('--normal_screen_exclude_from',type=int,default=0,
                         help='仅从指定步起移除normal增密屏幕代理，保留真实参数全部梯度；0关闭。')
+    parser.add_argument('--train_alpha_hull',action='store_true',
+                        help='仅接纳唯一已冻结135 TRAIN Alpha保守外壳位置初始化产物。')
     args = parser.parse_args()
     if args.skip_opacity_reset_at < 0 or (not args.smoke_schedule and args.skip_opacity_reset_at not in (0,15000)):
         parser.error('正式实验只允许关闭开关或仅跳过15000 reset。')
@@ -95,8 +97,19 @@ def main():
     for relative,expected in manifest['files'].items():
         if hashlib.sha256((source/relative).read_bytes()).hexdigest()!=expected:
             raise RuntimeError('训练输入SHA变化：'+relative)
-    if manifest['gt_read'] or manifest['initial_point_cloud_sha256']!='f9a2601f8b96bb7381e8b9086c70d97790c4d93026932e332838e0e9e256c971':
-        parser.error('无GT来源或历史随机点云身份不符。')
+    if args.train_alpha_hull:
+        if hashlib.sha256((source/'no_gt_manifest.json').read_bytes()).hexdigest()!='63932d954a464c4e4096100432329bfc15298a73bfc478bc58617b3d6b241008':
+            parser.error('训练Alpha外壳来源manifest不是唯一冻结产物。')
+        if (manifest['gt_read'] or manifest.get('init_weights_loaded',True)
+                or manifest['initial_point_cloud_sha256']!='74265105275727e58008fd3b829adc38b715292f2624af6075596332bb0f9add'
+                or manifest['files'].get('points3d.ply')!='74265105275727e58008fd3b829adc38b715292f2624af6075596332bb0f9add'
+                or len(manifest['files'])!=138
+                or manifest['initialization']['method']!='train_alpha_conservative_visual_hull_v1'
+                or manifest['initialization']['generator_sha256']!='33305ac330cd6c3d07d5a5e6ee777e596599a9a1d099f9f87437085a261a20d9'):
+            parser.error('训练Alpha外壳来源、点云或构造器身份不符。')
+    else:
+        if manifest['gt_read'] or manifest['initial_point_cloud_sha256']!='f9a2601f8b96bb7381e8b9086c70d97790c4d93026932e332838e0e9e256c971':
+            parser.error('无GT来源或历史随机点云身份不符。')
     # 拒绝本训练进程打开训练源、当前输出之外的实验数据与模型文件。
     import sys, os
     output=Path(args.model_path).resolve()
