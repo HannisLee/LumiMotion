@@ -48,6 +48,7 @@ class UnknownLightTrainer(StaticDLTrainer):
                   'initialization':'原135训练RGB、Alpha和相机之外仅确定性随机点云，无模型权重',
                   'optimizer_order':'backward→optimizer→非终点拓扑/reset→save',
                   'normal_detach_start':self.args.normal_detach_start,
+                  'skip_opacity_reset_at':self.args.skip_opacity_reset_at,
                   'dist_opacity_route':self.args.dist_opacity_route,
                   'plane_normal_weight':self.args.plane_normal_weight,'plane_start':self.args.plane_start,
                   'receiver_plane':None if self.receiver_plane is None else self.receiver_plane.metadata}
@@ -61,6 +62,7 @@ class UnknownLightTrainer(StaticDLTrainer):
                      normal_start=self.opt.start_normal_reg,dist_start=self.args.dist_start,
                      smoke_schedule=self.args.smoke_schedule,actual_entrypoint='scripts/train_static_unknown_light.py')
         value.update(normal_opacity_route='detach_opacity' if self.iteration >= self.args.normal_detach_start else 'full',
+                     skip_opacity_reset_at=self.args.skip_opacity_reset_at,
                      dist_opacity_route=self.args.dist_opacity_route,
                      plane_normal_weight=self.args.plane_normal_weight,plane_start=self.args.plane_start,gt_supervision=False)
         path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
@@ -76,6 +78,62 @@ class UnknownLightTrainer(StaticDLTrainer):
                     'checkpoint_state_version':2,
                     'note':'保存增密累计、NumPy及原优化器/RNG；尚需经验证的显式恢复入口，不声称已支持无缝续训'},
                    Path(self.args.model_path)/f'optimizer_{self.iteration}.pt')
+
+    def _opacity_reset_boundary(self):
+        """只改变预定reset调用；完整保留同一步优化与拓扑，审计其参数及Adam效应。"""
+        policy = self.args.skip_opacity_reset_at
+        if not policy:
+            self.gaussians.reset_opacity()
+            self.visibility.invalidate()
+            return
+        import random
+        import numpy as np
+        optimizer = self.gaussians.optimizer
+        opacity = self.gaussians._opacity
+        before = opacity.detach().clone()
+        old_state = optimizer.state.get(opacity, {})
+        moments = {key: value.detach().clone() for key,value in old_state.items() if torch.is_tensor(value)}
+        others = [(parameter,parameter._version,parameter.detach().clone(),
+                   {key:value.detach().clone() for key,value in optimizer.state.get(parameter,{}).items()
+                    if torch.is_tensor(value)})
+                  for group in optimizer.param_groups if group['name'] != 'opacity' for parameter in group['params']]
+        rng = (repr(random.getstate()),repr(np.random.get_state()),torch.get_rng_state(),torch.cuda.get_rng_state())
+        skip = self.iteration == policy
+        if not skip:
+            self.gaussians.reset_opacity()
+            self.visibility.invalidate()
+        after = self.gaussians._opacity
+        new_state = optimizer.state.get(after,{})
+        other_unchanged = all(parameter._version == version and torch.equal(parameter,value)
+                              and all(key in optimizer.state.get(parameter,{})
+                                      and torch.equal(optimizer.state[parameter][key],moment)
+                                      for key,moment in states.items())
+                              for parameter,version,value,states in others)
+        rng_unchanged = (repr(random.getstate()) == rng[0] and repr(np.random.get_state()) == rng[1]
+                         and torch.equal(torch.get_rng_state(),rng[2]) and torch.equal(torch.cuda.get_rng_state(),rng[3]))
+        expected = before.sigmoid().clamp_max(.01)
+        if skip:
+            opacity_ok = after is opacity and torch.equal(after,before)
+            adam_ok = all(key in new_state and torch.equal(new_state[key],value) for key,value in moments.items())
+        else:
+            opacity_ok = bool(torch.allclose(after.sigmoid(),expected,atol=1e-7,rtol=1e-5))
+            adam_ok = all(key in new_state and torch.count_nonzero(new_state[key]) == 0
+                          for key in ('exp_avg','exp_avg_sq'))
+            if 'step' in moments:
+                adam_ok = adam_ok and torch.equal(new_state['step'],moments['step'])
+        record = dict(iteration=self.iteration,action='SKIPPED' if skip else 'EXECUTED',
+                      skip_opacity_reset_at=policy,after_optimizer_and_topology=True,
+                      point_count=len(after),opacity_value_check=bool(opacity_ok),
+                      opacity_adam_check=bool(adam_ok),other_parameters_and_adam_unchanged=other_unchanged,
+                      rng_unchanged=rng_unchanged,before_max=float(before.sigmoid().max()),
+                      after_max=float(after.sigmoid().max()),before_mean=float(before.sigmoid().mean()),
+                      after_mean=float(after.sigmoid().mean()))
+        record['passed'] = bool(opacity_ok and adam_ok and other_unchanged and rng_unchanged)
+        with (Path(self.args.model_path)/'opacity_reset_events.jsonl').open('a') as stream:
+            stream.write(json.dumps(record,ensure_ascii=False)+'\n')
+        print('[透明度重置边界] '+json.dumps(record,ensure_ascii=False),flush=True)
+        if not record['passed']:
+            raise RuntimeError('opacity reset边界参数/Adam/RNG审计失败，保留现场。')
 
     def _audit_dist_opacity(self, base_loss, package, geometry):
         """同图同参数核对dist支路；恢复retain_grad缓存，不影响增密累计。"""
@@ -272,8 +330,7 @@ class UnknownLightTrainer(StaticDLTrainer):
                                                      self.scene.cameras_extent, limit)
                     self.visibility.invalidate()
                 if self.iteration % self.opt.opacity_reset_interval == 0:
-                    self.gaussians.reset_opacity()
-                    self.visibility.invalidate()
+                    self._opacity_reset_boundary()
             if self.iteration in self.saving_iterations:
                 self._save_physical()
             self.gaussians.optimizer.zero_grad(set_to_none=True)

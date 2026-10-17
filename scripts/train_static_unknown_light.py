@@ -30,11 +30,18 @@ def main():
     parser.add_argument('--normal_depth_statistic',choices=['expected'],default='expected')
     parser.add_argument('--smoke_schedule',action='store_true',help='仅output/smoke_test内短程物理分支测试，禁止用作正式日程。')
     parser.add_argument('--normal_detach_start',type=int,default=15001)
+    parser.add_argument('--skip_opacity_reset_at',type=int,default=0,
+                        help='仅跳过指定一步的opacity值截断及其Adam动量清零，0保持原流程。')
     parser.add_argument('--dist_opacity_route',choices=['full','detach'],default='full',
                         help='detach只阻断dist对opacity参数的梯度，保留几何与屏幕余切。')
     parser.add_argument('--plane_normal_weight',type=float,choices=[0.,.005],default=0.)
     parser.add_argument('--plane_start',type=int,default=8000)
     args = parser.parse_args()
+    if args.skip_opacity_reset_at < 0 or (not args.smoke_schedule and args.skip_opacity_reset_at not in (0,15000)):
+        parser.error('正式实验只允许关闭开关或仅跳过15000 reset。')
+    if args.skip_opacity_reset_at and (args.skip_opacity_reset_at % args.opacity_reset_interval
+                                     or args.skip_opacity_reset_at >= min(args.iterations,args.densify_until_iter)):
+        parser.error('跳过点必须是非终点、实际会触发的opacity reset边界。')
     if args.dist_opacity_route == 'detach' and args.normal_detach_start > args.dist_start+1:
         parser.error('dist隔离要求启用dist时已有detach_opacity几何副本。')
     if args.plane_normal_weight and args.normal_detach_start > args.plane_start+1:
