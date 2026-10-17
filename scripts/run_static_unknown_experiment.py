@@ -41,7 +41,9 @@ def main():
                     state['runtime_modules'] = {p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
                                                 for p in modules if Path(p).is_file()}
                     state['captured_while_alive'] = True
-                state['actual_cmdline'] = Path(f'/proc/{child.pid}/cmdline').read_bytes().decode().split('\0')[:-1]
+                command = Path(f'/proc/{child.pid}/cmdline').read_bytes().decode().split('\0')[:-1]
+                if command:
+                    state['actual_cmdline'] = command
             except (OSError, ProcessLookupError):
                 pass
             write(out/'state.json',state)

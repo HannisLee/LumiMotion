@@ -34,6 +34,7 @@ def main():
     times, train, usable = data['times'], checkpoint['train'], checkpoint['usable']
     origin, normal, basis = (checkpoint[k] for k in ('plane_origin','plane_normal','basis'))
     positive, negative, occluder = (checkpoint[k] for k in ('positive','negative','occluder'))
+    fixed_occluders = checkpoint.get('occluder_positions_override')
     # 原栅格边界来自亮度过滤之前的接收点，严格复现，不能直接用最终receiver。
     support = valid[train].sum(0) >= 10
     extent = float((xyz[support].amax(0)-xyz[support].amin(0)).norm())
@@ -44,7 +45,8 @@ def main():
     lower, span = lower-.05*span, span*1.1
 
     def score(index, directions):
-        grid = project_shadow(positions[index,occluder], directions, origin, normal, basis, lower, span)
+        blockers = positions[index,occluder] if fixed_occluders is None else fixed_occluders
+        grid = project_shadow(blockers, directions, origin, normal, basis, lower, span)
         pred, inside = sample_shadow(grid, positions[index], origin, basis, lower, span)
         assert not (positive[index] & ~inside).any() and not (negative[index] & ~inside).any()
         pos, neg = positive[index], negative[index]
