@@ -1,0 +1,7 @@
+# 未知光静态checkpoint补存增密与随机状态
+
+2026-10-17，scene/static_unknown_light.py的_save_physical补存NumPy RNG、xyz_gradient_accum/denom/max_radii2D、active_sh_degree与spatial_lr_scale，checkpoint_state_version=2。只读取/克隆状态，训练损失、更新、拓扑及日程不改；尚未实现恢复入口，不宣称精确恢复。
+
+同GPU2的旧/新保存版本及原版本重复各20步均exit0；Python/Torch/CUDA RNG、相机余栈完全相同，字段形状有限性正确。排除_save_physical后AST完全一致。参数逐位对照FAILED保留，原版本重复同样有最大约3mm XYZ差异，首次保存前即有差别，不能把非确定性归为保存字段效果。详见总控/checkpoint_v2_smoke_verification.json及output/smoke_test/1017-05/06/07实际完整目录。
+
+已知影响：在T03完整可视化运行时修改root来源触发门禁FAILED；未放宽门禁、未删旧失败。使用真实fixed_T05_v1训练来源冻结独立bundle，在新目录evaluation_16000_visual_retry1重渲并通过，600图与原逐字节一致。后续代码与评测来源先隔离。
