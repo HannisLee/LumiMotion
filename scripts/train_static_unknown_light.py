@@ -32,6 +32,8 @@ def main():
     parser.add_argument('--normal_detach_start',type=int,default=15001)
     parser.add_argument('--skip_opacity_reset_at',type=int,default=0,
                         help='仅跳过指定一步的opacity值截断及其Adam动量清零，0保持原流程。')
+    parser.add_argument('--skip_additional_opacity_reset_at',type=int,default=0,
+                        help='在已有末次跳过策略上再跳一次；正式仅允许12000与原15000组合。')
     parser.add_argument('--dist_opacity_route',choices=['full','detach'],default='full',
                         help='detach只阻断dist对opacity参数的梯度，保留几何与屏幕余切。')
     parser.add_argument('--plane_normal_weight',type=float,choices=[0.,.005],default=0.)
@@ -39,9 +41,15 @@ def main():
     args = parser.parse_args()
     if args.skip_opacity_reset_at < 0 or (not args.smoke_schedule and args.skip_opacity_reset_at not in (0,15000)):
         parser.error('正式实验只允许关闭开关或仅跳过15000 reset。')
-    if args.skip_opacity_reset_at and (args.skip_opacity_reset_at % args.opacity_reset_interval
-                                     or args.skip_opacity_reset_at >= min(args.iterations,args.densify_until_iter)):
-        parser.error('跳过点必须是非终点、实际会触发的opacity reset边界。')
+    extra = args.skip_additional_opacity_reset_at
+    if extra < 0 or (extra and (not args.skip_opacity_reset_at or extra >= args.skip_opacity_reset_at)):
+        parser.error('新增跳过点须为已有末次跳过点之前的正整数。')
+    if not args.smoke_schedule and extra not in (0,12000):
+        parser.error('正式新增跳过点仅允许12000，与15000组成固定集合。')
+    for skipped in (args.skip_opacity_reset_at, extra):
+        if skipped and (skipped % args.opacity_reset_interval
+                        or skipped >= min(args.iterations,args.densify_until_iter)):
+            parser.error('跳过点必须是非终点、实际会触发的opacity reset边界。')
     if args.dist_opacity_route == 'detach' and args.normal_detach_start > args.dist_start+1:
         parser.error('dist隔离要求启用dist时已有detach_opacity几何副本。')
     if args.plane_normal_weight and args.normal_detach_start > args.plane_start+1:

@@ -49,6 +49,7 @@ class UnknownLightTrainer(StaticDLTrainer):
                   'optimizer_order':'backward→optimizer→非终点拓扑/reset→save',
                   'normal_detach_start':self.args.normal_detach_start,
                   'skip_opacity_reset_at':self.args.skip_opacity_reset_at,
+                  'skip_additional_opacity_reset_at':getattr(self.args,'skip_additional_opacity_reset_at',0),
                   'dist_opacity_route':self.args.dist_opacity_route,
                   'plane_normal_weight':self.args.plane_normal_weight,'plane_start':self.args.plane_start,
                   'receiver_plane':None if self.receiver_plane is None else self.receiver_plane.metadata}
@@ -63,6 +64,7 @@ class UnknownLightTrainer(StaticDLTrainer):
                      smoke_schedule=self.args.smoke_schedule,actual_entrypoint='scripts/train_static_unknown_light.py')
         value.update(normal_opacity_route='detach_opacity' if self.iteration >= self.args.normal_detach_start else 'full',
                      skip_opacity_reset_at=self.args.skip_opacity_reset_at,
+                     skip_additional_opacity_reset_at=getattr(self.args,'skip_additional_opacity_reset_at',0),
                      dist_opacity_route=self.args.dist_opacity_route,
                      plane_normal_weight=self.args.plane_normal_weight,plane_start=self.args.plane_start,gt_supervision=False)
         path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
@@ -82,6 +84,8 @@ class UnknownLightTrainer(StaticDLTrainer):
     def _opacity_reset_boundary(self):
         """只改变预定reset调用；完整保留同一步优化与拓扑，审计其参数及Adam效应。"""
         policy = self.args.skip_opacity_reset_at
+        extra = getattr(self.args,'skip_additional_opacity_reset_at',0)
+        skipped_steps = {step for step in (policy,extra) if step}
         if not policy:
             self.gaussians.reset_opacity()
             self.visibility.invalidate()
@@ -98,7 +102,7 @@ class UnknownLightTrainer(StaticDLTrainer):
                     if torch.is_tensor(value)})
                   for group in optimizer.param_groups if group['name'] != 'opacity' for parameter in group['params']]
         rng = (repr(random.getstate()),repr(np.random.get_state()),torch.get_rng_state(),torch.cuda.get_rng_state())
-        skip = self.iteration == policy
+        skip = self.iteration in skipped_steps
         if not skip:
             self.gaussians.reset_opacity()
             self.visibility.invalidate()
@@ -123,6 +127,7 @@ class UnknownLightTrainer(StaticDLTrainer):
                 adam_ok = adam_ok and torch.equal(new_state['step'],moments['step'])
         record = dict(iteration=self.iteration,action='SKIPPED' if skip else 'EXECUTED',
                       skip_opacity_reset_at=policy,after_optimizer_and_topology=True,
+                      skip_additional_opacity_reset_at=extra,skip_opacity_reset_steps=sorted(skipped_steps),
                       point_count=len(after),opacity_value_check=bool(opacity_ok),
                       opacity_adam_check=bool(adam_ok),other_parameters_and_adam_unchanged=other_unchanged,
                       rng_unchanged=rng_unchanged,before_max=float(before.sigmoid().max()),
