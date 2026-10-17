@@ -31,6 +31,9 @@ def main():
     checkpoint = torch.load(args.initial/'checkpoint.pt', map_location='cuda', weights_only=False)
     data = torch.load(args.cache, map_location='cuda', weights_only=False)
     assert not result['gt_read'] and result['cache_sha256'] == sha(args.cache) == checkpoint['cache_sha256']
+    coarse_weight=checkpoint.get('transition_weight',result.get('temporal_weight'))
+    if coarse_weight is not None and coarse_weight != args.transition_weight:
+        raise ValueError('粗细两阶段必须使用相同固定时间权重。')
     xyz, positions, valid = data['canonical_xyz'], data['positions'], data['valid']
     times, train, usable = data['times'], checkpoint['train'], checkpoint['usable']
     origin, normal, basis = (checkpoint[k] for k in ('plane_origin','plane_normal','basis'))
@@ -114,6 +117,7 @@ def main():
     errors = torch.stack(frame_errors)
     metrics = {split:float(errors[mask&usable].mean()) for split,mask in [('fit',train),('held_time',~train)]}
     config = {'radius_deg':radius,'step_deg':1,'transition_weight':args.transition_weight,
+              'initial':str(args.initial.resolve()),'output':str(args.output.resolve()),
               'selection':'120拟合时刻选路径，内部15仅插值；外层用这15帧调参，不再是独立泛化证据',
               'geometry_labels_grid_frozen':True,'gt_read':False}
     output = dict(result,directions=refined.tolist(),method='local_spherical_grid_dp',
@@ -124,6 +128,8 @@ def main():
                   initial_result_sha256=sha(args.initial/'result.json'),
                   initial_checkpoint_sha256=sha(args.initial/'checkpoint.pt'),
                   script_sha256=sha(__file__),seconds=time.monotonic()-started)
+    output.pop('cross_geometry_metrics',None)
+    output.pop('cross_geometry_scope',None)
     (args.output/'result.json').write_text(json.dumps(output,ensure_ascii=False,indent=2)+'\n')
     torch.save({'directions':refined.cpu(),'train':train.cpu(),'candidate_offsets_rad':offsets.cpu(),
                 'path':path,'costs':all_costs,'candidates':all_candidates,'config':config},args.output/'checkpoint.pt')

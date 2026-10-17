@@ -25,6 +25,8 @@ def main():
     p.add_argument('--model', type=Path, required=True)
     p.add_argument('--iteration', type=int, default=16000)
     p.add_argument('--output', type=Path, required=True)
+    p.add_argument('--transition-weight',type=float,choices=[.05,.80],default=.05,
+                   help='显式固定粗DP时间权重；本接口不选择或扫描权重。')
     args = p.parse_args()
     args.output.mkdir(parents=True, exist_ok=False)
     started = time.monotonic()
@@ -89,7 +91,7 @@ def main():
             print(json.dumps({'frame':index,'minimum_cost':float(error.min()),'new_occluders':len(blockers)}),flush=True)
     costs=torch.stack(costs)
     fit_cost=costs[train].cpu().numpy(); c=candidates.cpu().numpy()
-    transition=.05*(1-np.clip(c@c.T,-1,1))
+    transition=args.transition_weight*(1-np.clip(c@c.T,-1,1))
     current=fit_cost[0].copy();parents=[]
     for row in fit_cost[1:]:
         total=current[:,None]+transition;parent=total.argmin(0)
@@ -113,8 +115,10 @@ def main():
     source_paths=[marker_path,ply_path,deform_path,args.baseline_result,args.initial/'checkpoint.pt',Path(__file__)]
     sources={str(path.resolve()):sha(path) for path in source_paths}
     output=dict(initial,directions=smooth.tolist(),method='fixed_observation_new_static_occluder',
+                temporal_weight=args.transition_weight,
                 config={k:str(v) if isinstance(v,Path) else v for k,v in vars(args).items()},
                 metrics=cross['new_geometry/new_coarse'],cross_geometry_metrics=cross,
+                cross_geometry_scope='old_geometry为原缓存轨迹遮挡点；不是T03/T08静态几何四格对照。',
                 occluders=len(blockers),original_occluders=int(old_occluder.sum()),
                 new_geometry_total_points=len(new_xyz),new_geometry_representatives=len(selected),
                 all_observations_plane_labels_grid_frozen=True,gt_read=False,
@@ -123,7 +127,8 @@ def main():
     (args.output/'result.json').write_text(json.dumps(output,ensure_ascii=False,indent=2)+'\n')
     checkpoint={k:v.cpu() if torch.is_tensor(v) else v for k,v in old.items()}
     checkpoint.update(costs=costs.cpu(),smooth=smooth.cpu(),predicted=predicted,
-                      occluder_positions_override=blockers.cpu(),geometry_sources=sources)
+                      occluder_positions_override=blockers.cpu(),geometry_sources=sources,
+                      transition_weight=args.transition_weight)
     torch.save(checkpoint,args.output/'checkpoint.pt')
     print(json.dumps(cross),flush=True)
 
