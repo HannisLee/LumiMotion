@@ -44,7 +44,16 @@ def main():
                         help='仅从指定步起移除normal增密屏幕代理，保留真实参数全部梯度；0关闭。')
     parser.add_argument('--train_alpha_hull',action='store_true',
                         help='仅接纳唯一已冻结135 TRAIN Alpha保守外壳位置初始化产物。')
+    parser.add_argument('--sparse_rgb_surface_weight',type=float,default=0.)
+    parser.add_argument('--sparse_rgb_surface_file',default='')
     args = parser.parse_args()
+    if args.sparse_rgb_surface_weight not in (0.,.1):
+        parser.error('稀疏Median表面项只允许关闭或预登记0.1，不扫描系数。')
+    if bool(args.sparse_rgb_surface_weight)!=bool(args.sparse_rgb_surface_file):
+        parser.error('稀疏Median开关和锁定资产必须同时给出或同时关闭。')
+    if args.sparse_rgb_surface_weight:
+        from scene.static_sparse_rgb_surface import validate_asset
+        validate_asset(args.sparse_rgb_surface_file)
     if args.skip_opacity_reset_at < 0 or (not args.smoke_schedule and args.skip_opacity_reset_at not in (0,15000)):
         parser.error('正式实验只允许关闭开关或仅跳过15000 reset。')
     extra = args.skip_additional_opacity_reset_at

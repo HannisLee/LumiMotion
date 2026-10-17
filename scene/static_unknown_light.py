@@ -33,6 +33,11 @@ class UnknownLightTrainer(StaticDLTrainer):
         expected = {str(i).zfill(4) for i in range(1,151) if i%10}
         if len(self.scene.getTrainCameras())!=135 or set(self.physical_lights.directions)!=expected:
             raise AssertionError('Stage1只允许原135训练相机与方向。')
+        self.sparse_rgb_surface = None
+        if getattr(self.args,'sparse_rgb_surface_weight',0.):
+            from scene.static_sparse_rgb_surface import FixedSparseRGBSurface
+            self.sparse_rgb_surface = FixedSparseRGBSurface(
+                self.args.sparse_rgb_surface_file,self.scene.cameras_extent)
         model = Path(self.args.model_path)
         self.receiver_plane = None
         if self.args.plane_normal_weight:
@@ -67,6 +72,12 @@ class UnknownLightTrainer(StaticDLTrainer):
                   'dist_opacity_route':self.args.dist_opacity_route,
                   'plane_normal_weight':self.args.plane_normal_weight,'plane_start':self.args.plane_start,
                   'receiver_plane':None if self.receiver_plane is None else self.receiver_plane.metadata}
+        if self.sparse_rgb_surface is not None:
+            record['sparse_rgb_surface'] = self.sparse_rgb_surface.metadata()
+            record['sparse_rgb_surface']['start'] = self.opt.start_normal_reg+1
+            record['densification_screen_gradient'] = 'photo_dist_and_Median_anchor_proxy_plus_expected_normal_proxy_then_one_norm_and_one_denom'
+            module = root/'scene/static_sparse_rgb_surface.py'
+            record['new_sources'][str(module)] = hashlib.sha256(module.read_bytes()).hexdigest()
         (model/'unknown_light_training.json').write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n')
 
     def _save_physical(self):
@@ -81,6 +92,9 @@ class UnknownLightTrainer(StaticDLTrainer):
                      skip_additional_opacity_reset_at=getattr(self.args,'skip_additional_opacity_reset_at',0),
                      dist_opacity_route=self.args.dist_opacity_route,
                      plane_normal_weight=self.args.plane_normal_weight,plane_start=self.args.plane_start,gt_supervision=False)
+        if getattr(self,'sparse_rgb_surface',None) is not None:
+            value['sparse_rgb_surface'] = self.sparse_rgb_surface.metadata()
+            value['sparse_rgb_surface']['start'] = self.opt.start_normal_reg+1
         path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
         torch.save({'iteration':self.iteration,'gaussian_optimizer':self.gaussians.optimizer.state_dict(),
                     'light_optimizer':self.light_optimizer.state_dict(),
@@ -270,6 +284,14 @@ class UnknownLightTrainer(StaticDLTrainer):
                                      Path(self.args.model_path)/'receiver_plane_gradient_audit.json',self.iteration)
                 self.gradient_audited.add('receiver_plane')
             loss = loss+weighted_plane
+        sparse_surface_loss = loss.new_zeros(())
+        sparse_surface_diagnostics = {}
+        if normal_active and self.sparse_rgb_surface is not None:
+            if self.pipe.depth_ratio != 1.:
+                raise AssertionError('固定像素三维表面项必须直接使用原photo native Median。')
+            sparse_surface_loss,sparse_surface_diagnostics = self.sparse_rgb_surface(
+                camera,package['surf_depth'])
+            loss = loss+self.args.sparse_rgb_surface_weight*sparse_surface_loss
         if not torch.isfinite(loss):
             raise FloatingPointError(f'静态物理loss非有限，iteration={self.iteration}。')
         if normal_active and self.iteration >= self.args.normal_detach_start and 'detach_opacity' not in self.gradient_audited:
@@ -322,6 +344,10 @@ class UnknownLightTrainer(StaticDLTrainer):
                               visibility=float(package['mean_visibility']), points=len(self.gaussians.get_xyz),
                               light=package['light_intensity'].cpu().tolist(),
                               **{k: float(v) for k, v in diagnostics.items()})
+                if self.sparse_rgb_surface is not None:
+                    values['sparse_surface_loss'] = float(sparse_surface_loss.detach())
+                    values['sparse_surface_weighted'] = self.args.sparse_rgb_surface_weight*float(sparse_surface_loss.detach())
+                    values['sparse_surface_diagnostics'] = {k:float(v) for k,v in sparse_surface_diagnostics.items()}
                 print('[静态物理] '+json.dumps(values, ensure_ascii=False), flush=True)
                 with (Path(self.args.model_path)/'unknown_light_metrics.jsonl').open('a') as stream:
                     stream.write(json.dumps(values, ensure_ascii=False)+'\n')
