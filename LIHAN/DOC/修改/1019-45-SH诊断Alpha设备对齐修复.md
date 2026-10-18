@@ -1,0 +1,5 @@
+# SH诊断Alpha设备对齐修复
+
+P00完成16000后，固定六端点TRAIN诊断v1在第一帧BCE处工程失败：Camera.load2device迁移图像/相机矩阵但不迁移gt_alpha_mask，预测为CUDA，Alpha仍CPU。该失败没有生成端点统计，不是数值/几何精度失败。原e8169fd脚本、冻结协议、READY计划、环境、日志和FAILED_ENGINEERING.json全部留在P00/train_diagnostic_v1，不覆盖。
+
+只修改 `scripts/diagnose_eldl_v3_sh_warmup.py` 中objective的target/Alpha和后续统计的Alpha，显式搬至相应预测device，保持值、dtype、公式、mask和统计协议不变，与原训练显式.cuda一致。主Agent独立核对diff并通过；CPU自检通过。修复源码SHA b2943cf92bd72d550e46c8f92b1a455893f5243647e659e085c14a74343475bd，协议45 SHA保持7d615d9f49731554dfb6c9763470b6ac41a6ead69bf3e2978b6df1de089c540f。新READY后GPU0在train_diagnostic_v2独立执行，完整结果及实际目检由报告48归档。不修改共享Camera或训练源码快照。
