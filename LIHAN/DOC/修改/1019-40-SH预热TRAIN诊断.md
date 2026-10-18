@@ -19,3 +19,17 @@ AST、signed反向180°/固定缺失分母、深度/法线支持独立、零共�
 按根审查建议，在nan_to_num前显式保留raw expected-Z finite mask，NaN/正负Inf统一0但不能转成有效支持，并记录原Alpha内非有限数；仅新独立脚本修订，无科学阈值变化。报告45同步明确该存储/有效性区别。旧v1/v2计划保留，最终准备plan_v3仍PENDING缺22项，SHA `90fc2c881afd9f541023850f36a74cb263bc20624d90a332c7d90966b77d9099`。
 
 CPU直接构造与DeformModel相同DeformNetwork参数（is_blender/hyper_dim/pred_color），严格加载真实1000端点32张量，missing/unexpected均空，三个几何头全零，torch.cuda.is_initialized=False。与有限性修订后自检均PASS，更新既有CPU receipt；完整GPU仍未运行。当前源码SHA `e8169fd332c38fbcdac8b789879bd4175dfcd9daeb95166a0b992488fd9a6a8a`，报告45 SHA `7d615d9f49731554dfb6c9763470b6ac41a6ead69bf3e2978b6df1de089c540f`。后续启动后不再改绑定源码/协议。
+
+
+## 首次GPU失败保留与设备修复
+
+v1首个端点首帧BCE发现预测CUDA而Alpha仍CPU，exit1，无完整端点统计。Camera.load2device不移动Alpha；原训练显式.cuda。v1输出已冻结原e8169fd脚本、报告45、plan/环境/完整日志及FAILED_ENGINEERING.json。仅在独立脚本objective和统计两处将Alpha .to(预测device)，target也显式同render设备；值/dtype/阈值/目标与科学协议不变，公共Camera与旧文件未改。
+
+根审查允许后CPU自检PASS，新READY v2 plan SHA `0c90f89a46c75cf59ab72dfe5d136116b9b8bcdc6050370c9a50ee0573a16e2d`（零PENDING）；报告45原SHA不变，源码SHA `b2943cf92bd72d550e46c8f92b1a455893f5243647e659e085c14a74343475bd`。新train_diagnostic_v2由supervisor_v2运行GPU0，完整数值/72图及实际目检仍PENDING，结束后报告48回填。
+
+
+## 正式v2运行与实际查看完成
+
+根任务审核父几何工程PASS与全落盘READY后，GPU0完整六端点×135已见TRAIN运行exit0（UTC19:33:03—19:34:01，session4268回收）；GPU0释放。72张RGB/Alpha/世界Normal/binary gate代表PNG完整，通过6张原分辨率联系图查看全部72面板，并绑定manual_review.json。原Alpha固定分母4884194、187输入SHA/全部mask/PLY↔geometry/严格零几何输出/实际native二进制均通过。
+
+summary SHA `ed2a0be1ddffdf622c33fd651dd8fcf2f00d7f580056b67ff70c8fc4257b7c00`、manual SHA `ba367342f86564ff6bd71e00fa5ad1373d4b5f9c534d58f16c85e0ed241fb775`。数值原版另存numeric_summary_before_manual_review.json。结果与限制见报告48，完整命令/日志/环境/定量/四类实际结论见train_diagnostic_v2/README.md。16k外观较1k清楚、轮廓连续，平台normal仍起伏；12k/15k真实reset低覆盖不删。最终PASS仅TRAIN-only诊断与实际查看，无GT/TEST/准确性结论、不选择初始化、不导出灯。报告45与已启动源码SHA均未再改。
