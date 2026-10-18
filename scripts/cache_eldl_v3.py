@@ -27,7 +27,11 @@ def main():
     p.add_argument('--model',type=Path,required=True)
     p.add_argument('--iteration',type=int,default=16000)
     p.add_argument('--output',type=Path,required=True)
+    p.add_argument('--receiver',choices=('plane','surfel'),default='plane')
+    p.add_argument('--shadow-bias-fraction',type=float,default=.003)
     a=p.parse_args();out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
+    if not math.isfinite(a.shadow_bias_fraction) or a.shadow_bias_fraction<=0:
+        raise ValueError('射线偏移比例必须有限且严格为正')
     source,model=a.source.resolve(),a.model.resolve()
     from utils.no_gt_guard import install_no_gt_guard
     install_no_gt_guard([source,model,out])
@@ -64,10 +68,33 @@ def main():
     yy,xx=torch.meshgrid(torch.linspace(0,1,64,device='cuda'),torch.linspace(0,1,64,device='cuda'),indexing='ij')
     plane_uv=lower+torch.stack([xx.flatten(),yy.flatten()],-1)*(upper-lower)
     points=origin+plane_uv@basis
+    receiver_normals=normal[None].expand(len(points),-1).clone()
+    receiver_ids=torch.full((len(points),),-1,device='cuda',dtype=torch.long)
+    candidate_support=torch.ones(len(points),device='cuda',dtype=torch.bool)
+    matching_distance=torch.zeros(len(points),device='cuda')
+    if a.receiver=='surfel':
+        from utils.general_utils import build_rotation
+        all_normals=build_rotation(pc.get_rotation)[:,:,2]
+        agreement=(all_normals@normal).abs()
+        near=((pc.get_xyz-origin)@normal).abs()<extent*.005
+        pool=torch.where(near&(agreement>math.cos(math.radians(10)))&(pc.get_opacity[:,0]>.5))[0]
+        assert len(pool)>=100,'真实接收surfel支持不足'
+        distance=torch.cdist(plane_uv,(pc.get_xyz[pool]-origin)@basis.T)
+        matching_distance,nearest=distance.min(1);receiver_ids=pool[nearest]
+        candidate_support=matching_distance<=float(((upper-lower)/63).max())
+        # 同一个真实surfel只保留一个原格点位置，保持64×64图的可追溯索引。
+        seen=set()
+        for i,identity in enumerate(receiver_ids.tolist()):
+            if not bool(candidate_support[i]):continue
+            if identity in seen:candidate_support[i]=False
+            else:seen.add(identity)
+        points=pc.get_xyz[receiver_ids].detach().clone()
+        receiver_normals=all_normals[receiver_ids].detach().clone()
+        receiver_normals*=torch.where((receiver_normals@normal)[:,None]>=0,1.,-1.)
     k=torch.arange(512,device='cuda');z=.05+.95*(k+.5)/512;phi=k*math.pi*(3-math.sqrt(5));rad=(1-z*z).sqrt()
     directions=(rad*phi.cos())[:,None]*basis[0]+(rad*phi.sin())[:,None]*basis[1]+z[:,None]*normal
     pipe=SimpleNamespace(compute_cov3D_python=False,convert_SHs_python=False,depth_ratio=0.)
-    bg=torch.zeros(3,device='cuda');records=[];frames=[]
+    bg=torch.zeros(3,device='cuda');records=[];frames=[];facing_disagreements=0
     infos=readCamerasFromTransforms(str(source),'transforms_train.json','images',False)
     assert len(infos)==135
     homogeneous=torch.cat([points,torch.ones_like(points[:,:1])],-1)
@@ -83,7 +110,7 @@ def main():
         depth_error=(zc-package['surf_depth'][0,vv,uu]).abs()
         alpha=camera.gt_alpha_mask.cuda()[0]
         interior=-F.max_pool2d(-alpha[None,None],3,stride=1,padding=1)[0,0]
-        valid=inside&(interior[vv,uu]>.99)&(package['rend_alpha'][0,vv,uu]>.9)&(depth_error<extent*.01)
+        valid=inside&candidate_support&(interior[vv,uu]>.99)&(package['rend_alpha'][0,vv,uu]>.9)&(depth_error<extent*.01)
         # 每像素只保留一个固定平面点，选择与预测深度最接近者。
         ids=torch.where(valid)[0].cpu().numpy();order=ids[np.argsort(depth_error[ids].cpu().numpy(),kind='stable')]
         pixels=(vv*w+uu).cpu().numpy();_,first=np.unique(pixels[order],return_index=True)
@@ -91,6 +118,8 @@ def main():
         rgb=srgb_to_linear(camera.original_image_train_light[:,vv,uu].T)
         sat=camera.observed_saturation_mask[:,vv.cpu(),uu.cpu()].T
         frame=int(camera.image_name_train_light.split('_')[-1]);fit=frame in sm['internal_fit_frames']
+        if fit:
+            facing_disagreements+=int((valid&((receiver_normals*(camera.camera_center-points)).sum(-1)<0)).sum())
         records.append(dict(rgb=rgb.cpu(),saturated=sat.cpu(),valid=valid.cpu(),pixels=torch.stack([uu,vv],-1).cpu()))
         frames.append(dict(frame=frame,time=float(camera.fid.item()),fit=fit,valid=int(valid.sum())))
         if fit and frame in (1,21,41,81,101,121,141):
@@ -101,9 +130,10 @@ def main():
     data={key:torch.stack([r[key] for r in records]) for key in records[0]}
     fit=torch.tensor([f['fit'] for f in frames]);support=data['valid'][fit].sum(0)>=10
     assert int(support.sum())>=100,'fit跨视角接收点支持不足'
+    if a.receiver=='surfel':assert facing_disagreements==0,'接收法线与生产view-facing语义不一致，禁止静默接受'
     data['valid'] &= support[None]
     # 用相同预测Gaussian BVH在所有候选上计算连续透射率，完全不使用黑暗标签。
-    bias=extent*.003
+    bias=extent*a.shadow_bias_fraction
     visibility=StaticVisibility(bias=bias,update_interval=1)
     visibility(pc,directions[:1],a.iteration)
     vis=[]
@@ -117,6 +147,9 @@ def main():
     data.update(visibility=torch.cat(vis),directions=directions.cpu(),normal=normal.cpu(),origin=origin.cpu(),
                 basis=basis.cpu(),points=points.cpu(),fit=fit,times=torch.tensor([f['time'] for f in frames]),
                 frames=frames,extent=extent,shadow_bias=bias)
+    if a.receiver=='surfel':
+        data.update(receiver_normals=receiver_normals.cpu(),receiver_ids=receiver_ids.cpu(),
+                    receiver_matching_distance=matching_distance.cpu(),receiver_candidate_support=candidate_support.cpu())
     torch.save(data,out/'cache.pt')
     hashes={str(p):sha(p) for p in (ply,deform,model/'eldl_v3_training.json',source/'no_gt_manifest.json',Path(__file__).resolve())}
     manifest=dict(status='PASS_CACHE_ENGINEERING',gt_read=False,source_split='TRAIN',
@@ -124,6 +157,8 @@ def main():
                   cache_sha256=sha(out/'cache.pt'),fit_frames=sm['internal_fit_frames'],held_frames=sm['internal_held_frames'],
                   plane_inliers=int(inliers.sum()),plane_points=int(support.sum()),extent=extent,shadow_bias=bias,
                   valid_fit_observations=int(data['valid'][fit].sum()),valid_held_observations=int(data['valid'][~fit].sum()),
+                  receiver_representation=a.receiver,fit_facing_disagreements=facing_disagreements,
+                  shadow_bias_fraction=a.shadow_bias_fraction,
                   scope='几何由fit117训练；点集合/支持只由fit决定；held仅生成冻结预测评测缓存，不拟合',
                   visibility='真实预测Gaussian BVH连续透射率；共享4096×512缓存，无黑暗标签')
     (out/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2));print(json.dumps(manifest,ensure_ascii=False),flush=True)

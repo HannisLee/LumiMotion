@@ -19,6 +19,8 @@ class ELDLTrainer(UnknownLightTrainer):
         model=Path(self.args.model_path);root=Path(__file__).resolve().parents[1]
         record=json.loads((model/'unknown_light_training.json').read_text())
         record.update(actual_entrypoint='scripts/train_eldl_v3.py',lighting_frozen=True,
+                      exact_gradient_check='FAILED_NATIVE_GEOMETRY_FINITE_DIFFERENCE',
+                      gradient_policy='NATIVE_PIECEWISE_APPROXIMATE',
                       environment='空间与时间共享非负RGB，独立于DL可见度',
                       loss_model='逐通道缩小前满码删失，其余对称Charbonnier；无DL黑暗标签',
                       lighting_sha256=self.physical_lights.sha256)

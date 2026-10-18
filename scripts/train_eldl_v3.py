@@ -81,8 +81,8 @@ def main():
             parser.error('smoke_schedule仅允许独立smoke_test中最多50步。')
     elif (args.start_normal_reg not in (2000,8000) or args.dist_start!=8000
           or args.static_dl_physical_start!=1000 or args.static_dl_visibility_start!=5000
-          or args.iterations<10000 or args.densify_until_iter!=20000):
-        parser.error('正式日程至少10k、增密截至20k、normal2000/8000、dist8000、physical1000、V5000。')
+          or args.iterations<16000 or args.densify_until_iter!=20000):
+        parser.error('正式日程至少16k、增密截至20k、normal2000/8000、dist8000、physical1000、V5000。')
     if args.plane_normal_weight and not args.smoke_schedule and args.plane_start != 8000:
         parser.error('当前正式接收面先验固定8001启用，不按GT调整起点。')
     if args.deform_type != 'mlp':
@@ -118,6 +118,8 @@ def main():
         parser.error('必须先完成TRAIN内部估光验证。')
     if asset.get('engineering_only',False) and not args.smoke_schedule:
         parser.error('合成工程灯光禁止正式训练。')
+    if not args.smoke_schedule and abs(args.static_dl_shadow_bias-asset.get('shadow_bias',float('inf')))>1e-9:
+        parser.error('正式全BVH射线偏移必须与已验证灯光资产数值一致。')
     # 拒绝本训练进程打开训练源、当前输出之外的实验数据与模型文件。
     import sys, os
     output=Path(args.model_path).resolve()

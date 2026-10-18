@@ -44,6 +44,7 @@ def interpolate(times,known_times,known):
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--cache',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
+    p.add_argument('--initial-direction',choices=('vertical','data_dp'),default='vertical')
     a=p.parse_args();out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
     from utils.no_gt_guard import install_no_gt_guard
     install_no_gt_guard([a.cache.resolve(),a.cache.parent/'manifest.json',out])
@@ -53,7 +54,10 @@ def main():
     device='cuda';fit=data['fit'].to(device);times=data['times'].to(device)
     y=data['rgb'].to(device);sat=data['saturated'].to(device);valid=data['valid'].to(device)
     directions=data['directions'].to(device);normal=data['normal'].to(device)
-    vis=data['visibility'].to(device);q=vis*(directions@normal).clamp_min(0)[:,None]
+    vis=data['visibility'].to(device)
+    cosine=((directions@data['receiver_normals'].to(device).T).clamp_min(0)
+            if 'receiver_normals' in data else (directions@normal).clamp_min(0)[:,None])
+    q=vis*cosine
     active=valid[fit].sum(0)>=10
     valid &= active[None]
     yf,sf,vf=y[fit],sat[fit],valid[fit]
@@ -69,6 +73,20 @@ def main():
         albedo_logits=torch.nn.Parameter(torch.logit(initial.clamp(.001,.95)))
         log_environment=torch.nn.Parameter(torch.full((3,),math.log(math.pi*ratio),device=device))
         optimizer=torch.optim.Adam([albedo_logits,log_environment],lr=.03)
+        initialization=dict(mode=a.initial_direction,path_before=path.tolist(),extra_dp_passes=0,
+                            adam_updates=1200)
+        if a.initial_direction=='data_dp':
+            with torch.no_grad():
+                candidate=albedo_logits.sigmoid()[None]*(log_environment.exp()[None,None]/math.pi+q[...,None])
+                initial_cost=torch.stack([(residual(candidate,yf[t][None],sf[t][None]).square()*vf[t][None,:,None]).sum((1,2))/(vf[t].sum().clamp_min(1)*3) for t in range(len(yf))])
+                before=path.clone();path=temporal_path(initial_cost,directions,times[fit])
+                span=torch.quantile(initial_cost,.9,dim=1)-initial_cost.min(1).values
+                initialization.update(extra_dp_passes=1,path_after=path.tolist(),
+                    nonvertical_frames=int((path!=before).sum()),raw_cost_span=span.tolist(),
+                    raw_before_mean=float(initial_cost.gather(1,before[:,None]).mean()),
+                    raw_after_mean=float(initial_cost.gather(1,path[:,None]).mean()))
+                torch.save(dict(cost=initial_cost.cpu(),path_before=before.cpu(),path_after=path.cpu()),directory/'initial_direction.pt')
+        (directory/'initialization.json').write_text(json.dumps(initialization,ensure_ascii=False,indent=2))
         rounds=[]
         for outer in range(5):
             for step in range(200):
@@ -123,6 +141,7 @@ def main():
             null_per=(residual(constant[None],y,sat).square()*valid[...,None]).sum((1,2))/(valid.sum(1).clamp_min(1)*3)
             metrics.update({f'constant_{name}':float(null_per[mask&enough].mean()) for name,mask in [('fit',fit),('held',~fit)]})
             result=dict(gt_read=False,initial_ratio=ratio,metrics=metrics,rounds=rounds,
+                        initialization=initialization,
                         ambient_rgb=environment.tolist(),direct_intensity=math.pi,directions=smooth.tolist(),
                         fit_directions=directions[path].tolist(),held_supported_frames=int(((~fit)&enough).sum()),
                         bound_active=bool(((environment/math.pi<.0101)|(environment/math.pi>29.9)).any()),
