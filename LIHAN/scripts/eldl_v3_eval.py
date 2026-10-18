@@ -193,7 +193,9 @@ def model_record(model, iteration, split, smoke=False):
     model = Path(model).resolve()
     marker = model / 'eldl_v3_training.json'
     record = read(marker)
-    if record.get('actual_entrypoint') == 'scripts/train_eldl_v3.py':
+    from LIHAN.scripts.eldl_v3_model_record import fixed_eldl_record_files
+    extra_record_files = fixed_eldl_record_files(model, record)
+    if extra_record_files is not None:
         # 混合模型使用另一种训练记录；训练白名单决定实际相机，不能假定135。
         manifest = read(Path(record['args']['source_path']) / 'no_gt_manifest.json')
         if manifest.get('gt_read') is not False or manifest.get('init_weights_loaded') is not False:
@@ -213,6 +215,7 @@ def model_record(model, iteration, split, smoke=False):
         raise ValueError('冒烟模型只允许action=smoke，不可进入正式精度表。')
     files = [model / 'point_cloud' / f'iteration_{iteration}' / 'point_cloud.ply',
              model / 'deform' / f'iteration_{iteration}' / 'deform.pth', model / 'cfg_args']
+    files += extra_record_files or []
     if record['baseline']=='eldl_fixed':
         files += [model/'static_dl_training.json',model/f'static_dl_lighting/iteration_{iteration}/lighting.json']
     return record, {str(p): sha(p) for p in files}
