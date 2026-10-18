@@ -195,17 +195,19 @@ def model_record(model, iteration, split, smoke=False):
     record = read(marker)
     from LIHAN.scripts.eldl_v3_model_record import fixed_eldl_record_files
     extra_record_files = fixed_eldl_record_files(model, record)
+    approved_geometry_parent = (extra_record_files is not None and
+        record.get('actual_entrypoint') == 'scripts/train_eldl_v3_geometry_warmstart.py')
     if extra_record_files is not None:
         # 混合模型使用另一种训练记录；训练白名单决定实际相机，不能假定135。
         manifest = read(Path(record['args']['source_path']) / 'no_gt_manifest.json')
         if manifest.get('gt_read') is not False or manifest.get('init_weights_loaded') is not False:
             raise ValueError('混合模型训练输入未通过无GT/无历史初始化声明。')
         static = read(model / 'static_dl_training.json')
-        record = dict(record, baseline='eldl_fixed', init_weights_loaded=False,
+        record = dict(record, baseline='eldl_fixed', init_weights_loaded=approved_geometry_parent,
             train_frames=manifest['train_frames'], rasterizer_provenance=static['rasterizer_provenance'],
             source_code_root=str(Path(next(iter(record['new_sources']))).parents[1]))
-    if record.get('gt_supervision') is not False or record.get('init_weights_loaded') is not False:
-        raise ValueError('需要V3无GT/无历史初始化训练记录。')
+    if record.get('gt_supervision') is not False or (record.get('init_weights_loaded') is not False and not approved_geometry_parent):
+        raise ValueError('需要V3无GT记录；仅单独验收的新纯几何入口允许登记父权重。')
     if record['baseline'] not in ('native', 'static_sh', 'eldl_fixed'):
         raise ValueError('尚未登记该模型adapter，禁止猜测渲染语义。')
     expected = FIT if split == 'held' else TRAIN
