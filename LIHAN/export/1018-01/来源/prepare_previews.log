@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1018-01-LH-static-jumpingjacks_EL_V2-正面真实材质导出/prepare_previews.py", line 54, in <module>
+    font=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',26)
+  File "/home/han.li/miniconda3/envs/lumimotion-ushas/lib/python3.10/site-packages/PIL/ImageFont.py", line 996, in truetype
+    return freetype(font)
+  File "/home/han.li/miniconda3/envs/lumimotion-ushas/lib/python3.10/site-packages/PIL/ImageFont.py", line 993, in freetype
+    return FreeTypeFont(font, size, index, encoding, layout_engine)
+  File "/home/han.li/miniconda3/envs/lumimotion-ushas/lib/python3.10/site-packages/PIL/ImageFont.py", line 248, in __init__
+    self.font = core.getfont(
+OSError: cannot open resource
