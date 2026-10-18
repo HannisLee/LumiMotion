@@ -4,11 +4,13 @@ import hashlib
 import json
 import math
 from pathlib import Path
+import sys
 
 import numpy as np
 import torch
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.append(str(ROOT))
 FRAMES = [i for i in range(1, 151) if i % 10]
 
 
@@ -36,13 +38,49 @@ def main():
     expected_steps = [3, 20] if args.smoke else [1000, 16000]
     steps = 20 if args.smoke else 4050
     saves = [0, 10, 20] if args.smoke else [0, 1350, 2700, 3375, 4050]
-    rows, hashes, orders = [], {}, []
+    rows, hashes, orders, common = [], {}, [], []
     for experiment, parent_step in zip(args.experiments, expected_steps):
         experiment = experiment.resolve()
         require(experiment.is_relative_to(ROOT / 'output') and ('smoke_test' in experiment.parts) == args.smoke, '正式/冒烟输出混用。')
         fit = experiment / 'material_fit'
         paths = [experiment / 'plan.json', experiment / 'state.json', fit / 'material_manifest.json', fit / 'configuration.json', fit / 'training_finished.json', fit / 'training.jsonl']
         state, manifest, cfg, finish = map(read, paths[1:5])
+        control = ROOT / 'output/1019-01-LH-static-jumpingjacks-ELDL-V3-总控'
+        source = control / 'data_train_eldl_raster_v1'
+        names = ['1019-18-ELDL-V3-短SH纯几何物理转换', '1019-19-ELDL-V3-长SH纯几何物理转换'] if args.smoke else ['1019-12-LH-static-jumpingjacks-ELDL-V3-M06短SH几何初始化24k', '1019-13-LH-static-jumpingjacks-ELDL-V3-M07长SH几何初始化24k']
+        model = ROOT / ('output/smoke_test' if args.smoke else 'output') / names[len(rows)] / 'model_mlp'
+        require(cfg['source'] == str(source) and cfg['initial_model'] == str(model), '来源不是对应登记控制。')
+        original = read(model / 'eldl_v3_training.json')
+        from LIHAN.scripts.eldl_v3_geometry_record import fixed_geometry_record_files
+        approved = set(fixed_geometry_record_files(model, original))
+        approved.update(model / name for name in ('eldl_v3_training.json', 'static_dl_training.json', 'cfg_args', 'point_cloud/iteration_0/point_cloud.ply', 'optimizer_0.pt'))
+        binding = original['geometry_initialization']['geometry_binding']
+        require(cfg['geometry_binding'] == binding and cfg['points'] == original['initial_point_count'] and original['args']['geometry_step'] == parent_step and original['args']['smoke_schedule'] == args.smoke, '实际父几何或点数不符。')
+        source_manifest = read(source / 'no_gt_manifest.json')
+        approved.add(source / 'no_gt_manifest.json')
+        for name in source_manifest['files']:
+            path = (source / name).resolve()
+            require(path.is_relative_to(source), '源清单路径逃逸。')
+            approved.add(path)
+        require(sha(source / 'estimated_eldl_train.json') == original['lighting_sha256'], '原固定光资产改变。')
+        common.append((cfg['source'], original['lighting_sha256'], binding['parent_manifest'], binding['parent_manifest_sha256']))
+        plan = read(experiment / 'plan.json')
+        require(state['actual_cmdline'] == plan['argv'] and plan['argv'][3] == 'scripts.preadapt_eldl_v3_material', '实际执行命令不符。')
+        snapshot = Path(plan['argv'][2]).resolve()
+        require(snapshot.is_relative_to(control / 'code_snapshots') and snapshot.name.startswith('material_preadapt_'), '未知源码快照。')
+        entry = 'scripts/preadapt_eldl_v3_material.py'
+        require(sha(snapshot / entry) == sha(ROOT / entry), '预适配入口不是已审查实现。')
+        approved.add(snapshot / entry)
+        original_code = Path(next(iter(original['new_sources']))).parents[1]
+        for relative in ('scene/eldl_v3_photometric.py', 'scene/stage2_photometric.py', 'scene/gaussian_model.py', 'gaussian_renderer/__init__.py', 'scene/dataset_readers.py', 'scene/cameras.py', 'utils/camera_utils.py', 'utils/rgba16.py'):
+            approved.update((snapshot / relative, original_code / relative))
+            require(sha(snapshot / relative) == sha(original_code / relative), '核心前向与原控制不同。')
+        backend = read(model / 'static_dl_training.json')['rasterizer_provenance']
+        native = Path(backend['extension_path']).resolve()
+        require(native.is_relative_to(control / 'native_cache') and sha(native) == backend['extension_sha256'], 'native不是已登记控制。')
+        approved.add(native)
+        # 先严格比较允许的完整路径集合，再读取任何输入清单文件，禁止借SHA审计读取GT。
+        require(set(cfg['input_sha256']) == {str(p.resolve()) for p in approved}, '输入清单不等于固定只读白名单。')
         require(state['exit_code'] == 0 and finish['actual_updates'] == steps, '训练没有完成登记预算。')
         require(manifest['actual_entrypoint'] == cfg['actual_entrypoint'] == 'scripts/preadapt_eldl_v3_material.py', '未知预适配入口。')
         require(manifest['smoke'] == cfg['smoke'] == args.smoke and manifest['parent_geometry_step'] == cfg['parent_geometry_step'] == parent_step, '父几何/正式身份不同。')
@@ -87,8 +125,15 @@ def main():
             terminal_dc = dc['_albedo_dc']
             opt = torch.load(opt_path, map_location='cpu', weights_only=False)
             require(opt['step'] == step and len(opt['optimizer']['param_groups']) == 1, '优化器不是单一DC。')
+            group = opt['optimizer']['param_groups'][0]
+            actual_lr = .01 if step == 0 else [.01, .001, .0001][min((step - 1) // (7 if args.smoke else 1350), 2)]
+            require(len(group['params']) == 1 and group['eps'] == 1e-15 and group['lr'] == actual_lr, '实际DC参数组/eps/lr不符。')
             states = opt['optimizer']['state']
             require((not states) if step == 0 else (len(states) == 1 and int(next(iter(states.values()))['step']) == step), 'Adam真实步数不符。')
+            if step:
+                require(set(states) == set(group['params']), 'Adam状态不属于唯一DC参数。')
+                state_dc = states[group['params'][0]]
+                require(set(state_dc) == {'step', 'exp_avg', 'exp_avg_sq'} and all(state_dc[k].shape == terminal_dc.shape and torch.isfinite(state_dc[k]).all() for k in ('exp_avg', 'exp_avg_sq')), 'Adam矩schema或有限性不符。')
         zero = torch.load(fit / 'dc_step_0.pt', map_location='cpu', weights_only=True)['_albedo_dc']
         require(not torch.equal(zero, terminal_dc), '终点DC未改变。')
         c0 = .28209479177387814
@@ -101,12 +146,14 @@ def main():
             reload_path = fit / 'material_reload_audit.json'
             reload = read(reload_path)
             require(reload['status'] == 'PASS' and [r['frame'] for r in reload['rows']] == [1, 81, 149] and reload['extra_forward_calls'] == 6, '缺少真实材质重载。')
+            require(all(set(r['max_abs']) == {'render', 'rend_alpha', 'rend_normal', 'surf_depth'} for r in reload['rows']), '重载结果缺少四种输出。')
             require(all(math.isfinite(v) and v < 1e-5 for r in reload['rows'] for v in r['max_abs'].values()), '生产重载不一致。')
             paths.append(reload_path)
         for path in paths:
             hashes[str(path)] = sha(path)
         rows.append(dict(experiment=str(experiment), fit=str(fit), manifest=str(fit / 'material_manifest.json'), manifest_sha256=sha(fit / 'material_manifest.json'), material=manifest['material'], material_sha256=manifest['material_sha256'], parent_geometry_step=parent_step, geometry_sha256=manifest['geometry_binding']['geometry_sha256'], scores=scores, terminal_absolute_relative_change=change, budget_eligible=eligible))
     require(orders[0] == orders[1], '两个父起点实际相机顺序不同。')
+    require(common[0] == common[1], '两端原始源、固定光或共同SH父轨迹不同。')
     eligible = all(r['budget_eligible'] for r in rows)
     status = 'PASS_MATERIAL_PREADAPT_SMOKE_ENGINEERING' if args.smoke else ('PASS_MATERIAL_PREADAPT_PAIR_BUDGET' if eligible else 'FAILED_MATERIAL_PREADAPT_PAIR_BUDGET')
     hashes[str(Path(__file__).resolve())] = sha(Path(__file__).resolve())
