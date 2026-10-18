@@ -184,24 +184,28 @@ def readCamerasFromTransforms(path, transformsfile, train_light, white_backgroun
 
             image_path_train_light = os.path.join(path, cam_name_train_light)
             image_name_train_light = Path(cam_name_train_light).stem
-            image_train_light = Image.open(image_path_train_light)
+            if contents.get("rgba16", False):
+                from utils.rgba16 import FloatRGBA
+                image_train_light = FloatRGBA(image_path_train_light, white_background, no_bg)
+            else:
+                image_train_light = Image.open(image_path_train_light)
 
-            ### im train light preprocessing
-            im_data_train_light = np.array(image_train_light.convert("RGBA"))
+                ### im train light preprocessing
+                im_data_train_light = np.array(image_train_light.convert("RGBA"))
 
-            bg = np.array(
-                [1, 1, 1]) if white_background else np.array([0, 0, 0])
+                bg = np.array(
+                    [1, 1, 1]) if white_background else np.array([0, 0, 0])
 
-            norm_data_train_light = im_data_train_light / 255.0
-            mask = norm_data_train_light[..., 3:4]
+                norm_data_train_light = im_data_train_light / 255.0
+                mask = norm_data_train_light[..., 3:4]
 
-            arr_train_light = norm_data_train_light[:, :, :3] 
-            if no_bg:
-                norm_data_train_light[:, :, :3] = norm_data_train_light[:, :, 3:4] * norm_data_train_light[:, :, :3] + bg * (1 - norm_data_train_light[:, :, 3:4])
+                arr_train_light = norm_data_train_light[:, :, :3] 
+                if no_bg:
+                    norm_data_train_light[:, :, :3] = norm_data_train_light[:, :, 3:4] * norm_data_train_light[:, :, :3] + bg * (1 - norm_data_train_light[:, :, 3:4])
             
-            arr_train_light = np.concatenate([arr_train_light, mask], axis=-1)
+                arr_train_light = np.concatenate([arr_train_light, mask], axis=-1)
 
-            image_train_light = Image.fromarray(np.array(arr_train_light * 255.0, dtype=np.uint8), "RGBA" if arr_train_light.shape[-1] == 4 else "RGB")
+                image_train_light = Image.fromarray(np.array(arr_train_light * 255.0, dtype=np.uint8), "RGBA" if arr_train_light.shape[-1] == 4 else "RGB")
 
             frame_fovx = frame.get("camera_angle_x", contents.get("camera_angle_x"))
             frame_fovy = frame.get("camera_angle_y", contents.get("camera_angle_y"))

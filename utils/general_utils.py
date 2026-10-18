@@ -29,6 +29,8 @@ def inverse_sigmoid(x):
 
 
 def PILtoTorch(pil_image, resolution):
+    if hasattr(pil_image, "to_tensor"):
+        return pil_image.to_tensor(resolution)
     if np.asarray(pil_image).shape[-1] == 4:
         # Process rgb and alpha respectively to avoid mask rgb with alpha
         rgb = Image.fromarray(np.asarray(pil_image)[..., :3])

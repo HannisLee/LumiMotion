@@ -212,11 +212,19 @@ class UnknownLightTrainer(StaticDLTrainer):
             raise RuntimeError('dist opacity隔离的真实前向/余切审计失败；现场保留。')
         self.gradient_audited.add('dist_opacity_detached')
 
+    def _render_photometric(self,camera,use_visibility):
+        from scene.static_dl_photometric import render_photometric
+        return render_photometric(camera,self.gaussians,self.pipe,self.background,
+                                  self.physical_lights,self.visibility if use_visibility else None,self.iteration)
+
+    def _photo_loss(self,package,target,gt_alpha,camera):
+        from scene.static_dl_censored import censored_photometric_loss
+        return censored_photometric_loss(package['render'],target,gt_alpha,self.args.static_dl_shadow_weight,
+                                         self.args.static_dl_highlight_weight,self.args.static_dl_residual_threshold)
+
     def train_step(self):
         if self.args.static_dl_mode == 'sh' or self.iteration <= self.args.static_dl_physical_start:
             return super().train_step()
-        from scene.static_dl_photometric import render_photometric
-        from scene.static_dl_censored import censored_photometric_loss
         if not self.physical_initialized:
             self._begin_physical()
         if not self.viewpoint_stack:
@@ -226,16 +234,12 @@ class UnknownLightTrainer(StaticDLTrainer):
             camera.load2device()
         use_visibility = (self.args.static_dl_mode == 'lambertian_visibility' and
                           self.iteration >= self.args.static_dl_visibility_start)
-        package = render_photometric(camera, self.gaussians, self.pipe, self.background,
-                                     self.physical_lights, self.visibility if use_visibility else None,
-                                     self.iteration)
+        package = self._render_photometric(camera,use_visibility)
         target = camera.original_image_train_light.cuda()
         gt_alpha = camera.gt_alpha_mask.cuda()
         if self.dataset.white_background:
             target = gt_alpha*target+(1-gt_alpha)*self.background[:, None, None]
-        photo, diagnostics = censored_photometric_loss(
-            package['render'], target, gt_alpha, self.args.static_dl_shadow_weight,
-            self.args.static_dl_highlight_weight, self.args.static_dl_residual_threshold)
+        photo, diagnostics = self._photo_loss(package,target,gt_alpha,camera)
         alpha = package['rend_alpha'].clamp(1e-6, 1-1e-6)
         alpha_loss = F.binary_cross_entropy(alpha, gt_alpha)
         loss = photo+self.opt.lambda_alpha_loss*alpha_loss
@@ -313,6 +317,11 @@ class UnknownLightTrainer(StaticDLTrainer):
             for name, param in (('xyz', self.gaussians._xyz), ('rotation', self.gaussians._rotation),
                                 ('albedo_dc', self.gaussians._albedo_dc),
                                 ('log_intensity', self.physical_lights.log_intensity)):
+                if not param.requires_grad:
+                    audit['gradients'][name] = {'frozen':True,'gradient_absent':param.grad is None}
+                    if param.grad is not None:
+                        raise AssertionError('固定光照不应有梯度')
+                    continue
                 grad = param.grad
                 if grad is None or not torch.isfinite(grad).all() or grad.norm() <= 0:
                     raise FloatingPointError(f'静态物理{name}梯度缺失、非有限或全零。')

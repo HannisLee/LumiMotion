@@ -49,7 +49,7 @@ def loadCam(args, id, cam_info, resolution_scale):
     if resized_image_rgb_train_light.shape[0] == 4:
         loaded_mask = resized_image_rgb_train_light[3:4, ...]
 
-    return Camera(colmap_id=cam_info.uid, R=cam_info.R, T=cam_info.T,
+    camera = Camera(colmap_id=cam_info.uid, R=cam_info.R, T=cam_info.T,
                   FoVx=cam_info.FovX, FoVy=cam_info.FovY,
                   gt_alpha_mask=loaded_mask,
                   image_train_light=gt_image_train_light, 
@@ -58,6 +58,9 @@ def loadCam(args, id, cam_info, resolution_scale):
                   uid=id,
                   data_device=args.data_device if not args.load2gpu_on_the_fly else 'cpu', fid=cam_info.fid,
                   depth=cam_info.depth, proj_matrix= cam_info.proj_matrix)
+    if hasattr(cam_info.image_train_light, 'saturation_tensor'):
+        camera.observed_saturation_mask = cam_info.image_train_light.saturation_tensor(resolution)
+    return camera
 
 
 def cameraList_from_camInfos(cam_infos, resolution_scale, args):
