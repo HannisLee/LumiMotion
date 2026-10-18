@@ -50,9 +50,15 @@ def audit(experiment,output):
         same(row['applied_lrs'],expected(k));same(post['next_lrs'],expected(k+1))
         require(all(x==0 for x in row['light_lrs']),'光照学习率非零。')
     files=[experiment/'state.json',experiment/'plan.json',model/'eldl_v3_training.json',model/'late_lr_events.jsonl',*extra,Path(__file__).resolve()]
-    saved=[]
+    saved=[];sh_saved=[]
     for k in sorted(set(args['save_iterations'])):
         if k>budget:continue
+        if k<=args['static_dl_physical_start']:
+            # 原SH阶段只有更新前PLY/MLP，没有物理optimizer/lighting快照。
+            ply=model/f'point_cloud/iteration_{k}/point_cloud.ply'
+            deform=model/f'deform/iteration_{k}/deform.pth'
+            require(ply.is_file() and deform.is_file(),'原SH保存缺失。')
+            files.extend([ply,deform]);sh_saved.append(k);continue
         opt=model/f'optimizer_{k}.pt';meta_path=model/f'static_dl_lighting/iteration_{k}/lighting.json'
         data=torch.load(opt,map_location='cpu',weights_only=False);meta=read(meta_path)
         require(data['iteration']==meta['iteration']==k,'保存步数不符。')
@@ -64,7 +70,8 @@ def audit(experiment,output):
         files.extend([opt,meta_path]);saved.append(k)
     require(budget in saved,'缺少真实预算终点。')
     receipt=dict(status='PASS_COMPLETED_LR_EXECUTION_AUDIT',case=late['case'],budget=budget,
-                 event_steps=steps,saved_iterations=saved,gt_read=False,external_test_read=False,
+                 event_steps=steps,saved_iterations=saved,sh_preupdate_geometry_only=sh_saved,
+                 gt_read=False,external_test_read=False,
                  accuracy_claim=False,input_sha256={str(p):sha(p) for p in files})
     output.write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
     print(json.dumps({k:v for k,v in receipt.items() if k!='input_sha256'},ensure_ascii=False))
