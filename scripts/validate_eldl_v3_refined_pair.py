@@ -206,8 +206,13 @@ def run(a):
         material[case]=dict(ply_sha256=v.sha(path),roundtrip_max_error=error,encoding=encoding,
             lower_bound_fraction=[float((rho[:,c]<=lo+1e-6).float().mean()) for c in range(3)],
             upper_bound_fraction=[float((rho[:,c]>=hi-1e-6).float().mean()) for c in range(3)],environment_over_pi=(environment/math.pi).tolist())
-    loaded_paths={str(Path(getattr(module,'__file__','')).resolve()) for module in sys.modules.values() if getattr(module,'__file__',None)}
-    require(all(path in loaded_paths for path in runtime),'实际加载native/tracer模块路径与训练收据不同。')
+    # torch JIT扩展对象不保证列入sys.modules；直接审计真实调用对象，
+    # 仍严格比对两份实际.so身份与训练runtime，不以磁盘存在代替加载。
+    from surfel_tracer.raytracer import _C as tracer_extension
+    loaded_extensions=(native_module()._C,tracer_extension)
+    loaded_native={str(Path(extension.__file__).resolve()):v.sha(extension.__file__) for extension in loaded_extensions}
+    registered_native={str(Path(path).resolve()):expected for path,expected in runtime.items()}
+    require(loaded_native==registered_native,'实际调用的native/tracer扩展路径或SHA与训练收据不同。')
     cameras=[]
     for i,info in enumerate(readCamerasFromTransforms(str(a.source),'transforms_train.json','images',False)):
         camera=loadCam(loaded,i,info,1.);camera.load2device()
@@ -281,7 +286,8 @@ def run(a):
         rules=RULES,metrics=metrics,constant=constant_metrics,checks=checks,relative_held_degradation=relative,
         refined_center_strictly_beats_old=cross,material=material,fit_restore=fit_restore,
         checkpoint_reload_production_parity=parity,additivity_checks=additive,geometry_checks=geometry_checks,
-        runtime_modules=runtime,pair_receipt_sha256=v.sha(a.pair/'fit_pair_receipt.json'),input_sha256=hashes,
+        runtime_modules=runtime,actual_extension_objects=loaded_native,
+        pair_receipt_sha256=v.sha(a.pair/'fit_pair_receipt.json'),input_sha256=hashes,
         constant_interpretation='constant累计90是既有自由辐亮度参照，方向收益只由old/new累计120同预算对照',
         manual_review='PENDING_ACTUAL_VIEW',direction_profile='NOT_PERFORMED_NO_UNIQUENESS_CLAIM'))
     with (a.output/'README.md').open('a') as stream:stream.write('\n最终'+status+'。summary/per_frame与真实PLY/全部三bias四类保存；实际目检PENDING，不导出。\n')
