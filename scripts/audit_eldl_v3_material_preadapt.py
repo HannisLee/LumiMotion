@@ -55,7 +55,7 @@ def main():
         approved = set(fixed_geometry_record_files(model, original))
         approved.update(model / name for name in ('eldl_v3_training.json', 'static_dl_training.json', 'cfg_args', 'point_cloud/iteration_0/point_cloud.ply', 'optimizer_0.pt'))
         binding = original['geometry_initialization']['geometry_binding']
-        require(cfg['geometry_binding'] == binding and cfg['points'] == original['initial_point_count'] and original['args']['geometry_step'] == parent_step and original['args']['smoke_schedule'] == args.smoke, '实际父几何或点数不符。')
+        require(cfg['geometry_binding'] == binding and manifest['points'] == cfg['points'] == original['initial_point_count'] and original['args']['geometry_step'] == parent_step and original['args']['smoke_schedule'] == args.smoke, '实际父几何或点数不符。')
         source_manifest = read(source / 'no_gt_manifest.json')
         approved.add(source / 'no_gt_manifest.json')
         for name in source_manifest['files']:
@@ -121,7 +121,9 @@ def main():
                 base_maps = maps
             require(maps == base_maps, '保存点几何渲染不是逐位不变。')
             dc = torch.load(dc_path, map_location='cpu', weights_only=True)
-            require(set(dc) == {'_albedo_dc'} and dc['_albedo_dc'].shape == (manifest['points'], 1, 3) and torch.isfinite(dc['_albedo_dc']).all(), 'DC导出schema不符。')
+            require(set(dc) == {'_albedo_dc'} and dc['_albedo_dc'].dtype == torch.float32 and dc['_albedo_dc'].shape == (manifest['points'], 1, 3) and torch.isfinite(dc['_albedo_dc']).all(), 'DC导出schema不符。')
+            if step == 0:
+                require(torch.count_nonzero(dc['_albedo_dc']) == 0, '零步DC不是对应原始灰色起点。')
             terminal_dc = dc['_albedo_dc']
             opt = torch.load(opt_path, map_location='cpu', weights_only=False)
             require(opt['step'] == step and len(opt['optimizer']['param_groups']) == 1, '优化器不是单一DC。')
