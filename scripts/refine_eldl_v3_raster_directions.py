@@ -143,10 +143,21 @@ def main():
             command=shlex.join([sys.executable,str(Path(__file__).resolve()),*sys.argv[1:]])))
         print('PASS：CPU输入/来源/固定mask/117fit18开发划分核验；未运行GPU或优化。')
         return
-    pc, cameras, pipe, data, state, hashes = f.load(a)
+    # 公共loader会再安装窄护栏；将已核验的精确输入文件同时登记，
+    # 否则末尾重新读取checkpoint做SHA会被第二层护栏错误拒绝。
+    original_install_guard = v.install_guard
+    def install_registered_guard(args):
+        install_no_gt_guard([args.cache.parent, args.fit, args.model,
+                             args.source, args.output, *binding_files])
+    v.install_guard = install_registered_guard
+    try:
+        pc, cameras, pipe, data, state, hashes = f.load(a)
+    finally:
+        v.install_guard = original_install_guard
     shared = set(hashes).intersection(meta['input_sha256'])
     assert shared and all(hashes[path] == meta['input_sha256'][path] for path in shared)
     hashes.update(bindings)
+    v.check_hashes(hashes)  # 首个前向前先验证全部来源确实可重读。
     assert torch.equal(saved['directions'], state['directions'])
     assert torch.equal(torch.stack([(camera.gt_alpha_mask>.5).cpu() for camera in cameras]),fixed_masks['foreground'])
     from scene.static_dl_photometric import StaticVisibility
