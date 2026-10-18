@@ -250,7 +250,8 @@ def objective(package, delta, camera, pc, cfg, step):
     import torch
     from utils.loss_utils import l1_loss, ssim
     import torch.nn.functional as F
-    target, alpha = camera.original_image_train_light, camera.gt_alpha_mask
+    target = camera.original_image_train_light.to(package['render'].device)
+    alpha = camera.gt_alpha_mask.to(package['rend_alpha'].device)
     l1 = l1_loss(package['render'], target)
     structural = 1 - ssim(package['render'], target)
     image = (1 - cfg['lambda_dssim']) * l1 + cfg['lambda_dssim'] * structural
@@ -361,7 +362,7 @@ def run(a, inputs):
                     torch.manual_seed(step * 1000 + frame)
                     package, depth, delta, expected_finite = render_native(camera, pc, deform, cfg, step)
                     row = objective(package, delta, camera, pc, cfg, step)
-                alpha = camera.gt_alpha_mask
+                alpha = camera.gt_alpha_mask.to(package['rend_alpha'].device)
                 support = (alpha >= .5)[0]
                 pred_mask = (package['rend_alpha'] >= .5)[0]
                 z = depth[0]
