@@ -48,7 +48,12 @@ def main():
     optimizer=torch.optim.Adam([rho] if a.constant else [rho,log_e],lr=.03)
     fit_indices=[i for i,n in enumerate(v.TRAIN) if n in v.FIT]
     gen=np.random.default_rng(1019);history=[]
-    counts=torch.tensor([int((c.gt_alpha_mask>.5).sum()) for c in cameras],dtype=torch.float64)
+    masks=torch.stack([(c.gt_alpha_mask>.5).cpu() for c in cameras])
+    counts=masks.flatten(1).sum(1).double()
+    if not a.resume and not a.evaluate_only:
+        torch.save(dict(frames=v.TRAIN,foreground=masks),a.output/'fixed_foreground.pt')
+    from scene.pbr_rasterizer import native_module
+    backend_provenance=native_module().provenance
     fit_mean=float(counts[fit_indices].mean())
     start=0
     if a.resume or a.evaluate_only:
@@ -66,7 +71,7 @@ def main():
     configuration=dict(gt_read=False,external_test_read=False,geometry_fit_frames=v.FIT,held_frames=v.HELD,
         geometry_frozen=True,directions_frozen=True,initial_ratio=a.initial_ratio,constant=a.constant,epochs=a.epochs,updates=a.epochs*117,
         rho_initial=.5,rho_linear_bounds=[lo,hi],environment_over_pi_bounds=[.01,30],constant_color_bounds=[0,30],
-        loss='linear_censored_mse_original_alpha_gt_0p5_fixed_denominator',optimizer='Adam',lr=.03,seed=1019,input_sha256=hashes,
+        loss='linear_censored_mse_original_alpha_gt_0p5_fixed_denominator',foreground_sha256=v.sha(a.output/'fixed_foreground.pt'),backend_provenance=backend_provenance,optimizer='Adam',lr=.03,seed=1019,input_sha256=hashes,
         selection='固定末次；不得按held选迭代',internal_validation_passed=False)
     if start==0:v.write(a.output/'configuration.json',configuration)
     else:
