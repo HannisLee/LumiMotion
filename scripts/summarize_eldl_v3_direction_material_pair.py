@@ -53,7 +53,7 @@ def inspect_pair(pair):
         for epoch,row in enumerate(ck['history'],1):
             lr=.003 if epoch<=10 else .001 if epoch<=20 else .0001
             assert row['epoch']==epoch and row['updates']==117*epoch and row['lr']==lr
-            assert row['param_group_lrs']==[lr,lr]
+            assert row['param_group_lrs']==[lr]*len(parent['optimizer']['param_groups'])
         scores={}
         for epoch in (0,10,20,25,30):
             score=v.read(d/f'fit_epoch_{epoch}.json')
