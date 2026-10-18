@@ -30,6 +30,7 @@ def main():
     assert not original['gt_read'] and original['geometry_frozen'] and original['directions_frozen']
     saved=torch.load(a.checkpoint,map_location='cpu',weights_only=False);assert saved['epoch']==60
     parent_hash=v.sha(a.checkpoint)
+    parent_score=v.read(a.checkpoint.parent/'fit_epoch_60.json')
     cachemeta=v.read(a.raster_cache.parent/'summary.json');assert v.sha(a.raster_cache)==cachemeta['cache_sha256']
     assert cachemeta['gt_read'] is False and cachemeta['status']=='PASS_FORWARD_CACHE_NOT_LIGHT_ACCEPTANCE'
     packed=torch.load(a.raster_cache,map_location='cpu',weights_only=False)
@@ -64,8 +65,12 @@ def main():
             return dict(frame_mean=sum(values)/117,pixel_mean=sum(x*float(counts[i]) for x,i in zip(values,fit_indices))/float(counts[fit_indices].sum()),per_frame=values)
     def save(epoch):
         v.write(a.output/f'fit_epoch_{epoch}.json',score())
-        torch.save(dict(rho=rho.detach().cpu(),environment=loge.detach().exp().cpu(),epoch=epoch,cumulative_epoch=60+epoch,constant=constant,initial_ratio=saved['initial_ratio'],directions=state['directions'],optimizer=optimizer.state_dict(),rng=gen.bit_generator.state,history=history),a.output/f'checkpoint_epoch_{epoch}.pt')
+        torch.save(dict(rho=rho.detach().cpu(),environment=loge.detach().exp().cpu(),log_e=loge.detach().cpu(),epoch=epoch,cumulative_epoch=60+epoch,constant=constant,initial_ratio=saved['initial_ratio'],directions=state['directions'],optimizer=optimizer.state_dict(),rng=gen.bit_generator.state,history=history),a.output/f'checkpoint_epoch_{epoch}.pt')
     save(0)
+    restart_score=v.read(a.output/'fit_epoch_0.json')
+    delta=max(abs(x-y) for x,y in zip(parent_score['per_frame'],restart_score['per_frame']))
+    assert delta<1e-6,delta
+    v.write(a.output/'restart_parity.json',dict(status='PASS_FIT_FORWARD_RESTART',max_per_frame_mse_difference=delta,environment_log_roundtrip=True,geometry_unchanged=True))
     for epoch in range(1,31):
         lr=.003 if epoch<=10 else (.001 if epoch<=20 else .0001)
         for group in optimizer.param_groups:group['lr']=lr

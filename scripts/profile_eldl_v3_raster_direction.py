@@ -25,7 +25,7 @@ def main():
     assert socket.gethostname()=='ushas' and Path(sys.executable).resolve()==v.PYTHON.resolve()
     a.output.mkdir(parents=True,exist_ok=False)
     # checkpoint是校准无GT产物，核验父配置再读取；不得将任意外部模型传入。
-    assert a.checkpoint.is_relative_to(a.cache.parent.parent/'raster_calibration_v1')
+    assert any(a.checkpoint.is_relative_to(a.cache.parent.parent/name) for name in ('raster_calibration_v1','raster_calibration_v2_anneal'))
     meta=v.read(a.checkpoint.parent/'configuration.json')
     assert not meta['gt_read'] and meta['geometry_frozen'] and meta['directions_frozen'] and not meta['constant']
     from utils.no_gt_guard import install_no_gt_guard
@@ -54,7 +54,7 @@ def main():
             vis=trace(pc,direction[i:i+1],0)
             facing=torch.where((normal*(cameras[i].camera_center-pc.get_xyz)).sum(-1,keepdim=True)>=0,1.,-1.)
             q[i]=(((normal*facing)@direction[i:i+1].T).clamp_min(0)*vis).detach()
-    rho=torch.nn.Parameter(saved['rho'].cuda().clone());loge=torch.nn.Parameter(saved['environment'].cuda().log())
+    rho=torch.nn.Parameter(saved['rho'].cuda().clone());loge=torch.nn.Parameter(saved.get('log_e',saved['environment'].log()).cuda().clone())
     optimizer=torch.optim.Adam([rho,loge],lr=.03);optimizer.load_state_dict(saved['optimizer'])
     gen=np.random.default_rng();gen.bit_generator.state=copy.deepcopy(saved['rng'])
     lo=float(srgb_to_linear(torch.tensor(.03)));hi=float(srgb_to_linear(torch.tensor(.97)))
