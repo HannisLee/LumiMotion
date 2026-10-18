@@ -21,6 +21,8 @@ def main():
     parser.add_argument('--control', required=True)
     parser.add_argument('--message', default='1011：静态DL目标实验与共享资料更新')
     parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--path', action='append', default=[],
+                        help='仅暂存指定LIHAN路径；保留其他会话未提交改动。省略时沿用全目录暂存。')
     args = parser.parse_args()
     control = Path(args.control).resolve()
     if not control.is_relative_to(ROOT / 'output'):
@@ -62,7 +64,11 @@ def main():
         if args.dry_run:
             print(json.dumps(dict(status='READY', branches=list(parents)), ensure_ascii=False))
             return
-        git('add', '--', 'LIHAN', 'LIHAN.md')
+        staged_paths = args.path or ['LIHAN', 'LIHAN.md']
+        if any(not (p == 'LIHAN' or p.startswith('LIHAN/') or p == 'LIHAN.md')
+               or '..' in Path(p).parts or Path(p).is_absolute() for p in staged_paths):
+            raise ValueError('只允许仓库相对LIHAN路径。')
+        git('add', '--', *staged_paths)
         if git('diff', '--cached', '--name-only'):
             git('commit', '-m', args.message)
         source = git('rev-parse', 'HEAD')
