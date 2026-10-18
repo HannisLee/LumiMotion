@@ -11,6 +11,9 @@ def fixed_eldl_record_files(model,record):
     """返回附加来源文件；None表示不是已登记混合入口。"""
     entry=record.get('actual_entrypoint')
     if entry==OLD_ENTRY:return []
+    if entry=='scripts/train_eldl_v3_geometry_warmstart.py':
+        from LIHAN.scripts.eldl_v3_geometry_record import fixed_geometry_record_files
+        return fixed_geometry_record_files(model,record)
     if entry!=LATE_ENTRY:return None
     path=Path(model)/'late_lr_training.json'
     late=json.loads(path.read_text())
