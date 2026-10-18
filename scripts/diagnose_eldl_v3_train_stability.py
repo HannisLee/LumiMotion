@@ -34,15 +34,18 @@ def main():
     from scene.static_dl_photometric import StaticVisibility
     from scene.eldl_v3_photometric import FixedELDLLights, render_photometric, censored_symmetric_loss
     marker = read(a.model / 'eldl_v3_training.json')
+    from LIHAN.scripts.eldl_v3_model_record import fixed_eldl_record_files
+    extra_record_files = fixed_eldl_record_files(a.model, marker)
     source = read(a.source / 'no_gt_manifest.json')
     frames = [i for i in range(1, 151) if i % 10]
     require(marker['gt_supervision'] is False and marker['lighting_frozen'] and
-            marker['actual_entrypoint'] == 'scripts/train_eldl_v3.py', '必须冻结混合光无GT模型')
+            extra_record_files is not None, '必须冻结混合光无GT模型')
     require(source['gt_read'] is False and source['init_weights_loaded'] is False and
             source['train_frames'] == frames, '需要原135 TRAIN')
     require(Path(marker['args']['source_path']).resolve() == a.source, '模型源不匹配')
     hashes = {str(a.source / 'no_gt_manifest.json'): sha(a.source / 'no_gt_manifest.json'),
               str(Path(__file__).resolve()): sha(__file__)}
+    hashes.update({str(path): sha(path) for path in extra_record_files})
     for relative, expected in source['files'].items():
         path = (a.source / relative).resolve()
         require(path.is_relative_to(a.source) and sha(path) == expected, 'TRAIN源SHA变化')
