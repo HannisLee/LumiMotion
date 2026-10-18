@@ -1,0 +1,7 @@
+00:01.866  blend            | Read blend: "/home/han.li/reproduce/LumiMotion-stage2-perlight/data/LH-data/static/LH-static-jumpingjacks_EL_V2/scene_snapshot.blend"
+scripts/export_roughness_gt.py:71: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  if not material.use_nodes:
+00:03.601  render           | Saved: '/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1018-01-LH-static-jumpingjacks_EL_V2-正面真实材质导出/roughness/roughness_0006.exr'
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
