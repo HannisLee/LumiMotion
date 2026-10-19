@@ -270,7 +270,9 @@ def render_ir(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
     photo_ray_cost = photo_pixel_cap = None
     if training:
         if opt.train_ray:
-            mask_alpha = render_alpha[0] > 0.9  # 0.0 originally
+            mask_alpha = render_alpha[0] > getattr(opt, 'pbr_sampling_alpha_threshold', 0.9)
+            if getattr(opt, 'pbr_sample_original_foreground', False):
+                mask_alpha = mask_alpha & (viewpoint_camera.gt_alpha_mask[0].to(mask_alpha.device) > .5)
             mask_sum = mask_alpha.sum()
 
             from scene.pbr_ray_budget import photo_pixel_budget
@@ -337,6 +339,9 @@ def render_ir(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
 
     results = {
         "render": final_image,
+        # 保留原生PBR辐射度，供三阶段管线在线性域合成小幅Lambertian残差。
+        "render_linear": (rendered_diffuse + rendered_specular) * render_alpha,
+        "render_linear_unpremultiplied": rendered_diffuse + rendered_specular,
         "env_only": env_only,
         "render_sh": final_image_sh,
         "diffuse": rgb_to_srgb(rendered_diffuse),
