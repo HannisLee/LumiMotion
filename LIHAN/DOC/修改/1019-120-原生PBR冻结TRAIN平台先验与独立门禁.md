@@ -1,0 +1,13 @@
+# 原生PBR冻结TRAIN平台先验与独立门禁
+
+2026-10-19，ushas／lumimotion-ushas。依据已冻结训练计划1019-40，新增scripts/train_three_stage_plane.py及scripts/audit_three_stage_plane.py，监督入口scripts/run_three_stage_job.py只增加显式白名单。没有修改旧训练入口、scene或gaussian_renderer物理核心。
+
+A47与已归档A46均从A45@4050继承全部8组Adam、actual/initial lr及Python/NumPy/CPU/CUDA RNG，新增8100预算一致。唯一新优化项为0.5乘冻结TRAIN可见平台rendered GS法线cosine先验；原Expected先验0.5及其原函数保持，PBR前向/深度混合/遮挡/EL与DL系数不变。该计划在读取A46离线结果之后登记，来源和时序如实记录，方法设置只依据此前冻结完整TRAIN研究和公平控制原则。
+
+原output56的参考及135个visible_band复制至子模型training_plane目录；源文件SHA固定，掩膜5像素内缩且图外补0，保存原件/内缩件/相对路径和SHA。训练资产准备及GPU缓存均在恢复父RNG前结束。原TRAIN读取守卫维持，推理factory不加载平台资产。目标法向来自TRAIN拟合平面，逐帧朝向相机，不用硬编码+Z或GT。使用当前effective几何的独立Expected光栅渲染GS世界法线，不直接约束canonical旋转轴。
+
+固定掩膜分母保持；当前Alpha>.5且有限非零法线才计算cosine，缺失像素计单位损失1；记录固定/有效/缺失像素及比率。几何分支分别记录Expected、平台、photo/Alpha梯度。normal→opacity恢复期规则沿用parent_geometry_updates+local_step，不重放旧恢复期。无新增优化参数、增密、裁剪或重置。
+
+独立审计保留原8组状态/全部相机顺序/32MLP与光照冻结/累计步数/Expected重算及opacity保护检查，增加135帧OpenCV内缩逐值比较、目标朝向、固定分母独立重算和四组几何梯度。CPU只读门禁位于总控audit_visible_plane_cpu_v1.py及visible_plane_cpu_audit_v1.json：135帧原1984727像素内缩到1637468，独立内缩完全一致；人造部分缺失loss=.75、全部缺失loss=1、梯度有限；真实父8组Adam步数/lr/有限性通过，旧photo主体与checkpoint函数一致，旧物理核心同SHA。CPU检查不替代实际GPU工程和目检。
+
+V16从V15构造，只新增两个入口及监督白名单。新训练、冒烟、完整渲染与日志按计划独立输出；失败产物保留。此文记录实现及CPU结果，尚未宣称GPU门禁或最终精度PASS。
