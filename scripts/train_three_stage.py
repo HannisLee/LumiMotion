@@ -113,6 +113,8 @@ def main(model_class=None, actual_entrypoint='scripts/train_three_stage.py', ext
     parser.add_argument('--parent', type=Path)
     parser.add_argument('--parent_iteration', type=int)
     parser.add_argument('--direction_lr', type=float, choices=[0., 1e-6], default=0.)
+    parser.add_argument('--lambda_mix', type=float, choices=[.25, .5], default=.25,
+                        help='仅Stage2混合权重；Stage3自动继承父Stage2记录。')
     parser.add_argument('--lambda_residual', type=float, choices=[0., .1], default=0.)
     parser.add_argument('--pbr_samples', type=int, choices=[16, 128, 256], default=16)
     parser.add_argument('--smoke', action='store_true')
@@ -137,10 +139,13 @@ def main(model_class=None, actual_entrypoint='scripts/train_three_stage.py', ext
         record = json.loads((parent/'three_stage_training.json').read_text())
         assert record['stage'] == 2
         assert args.smoke or not record['smoke'], '工程冒烟父模型不能进入正式训练。'
+        if args.lambda_mix != .25:
+            raise ValueError('Stage3不新设Stage2混合权重，必须继承父记录。')
     install_guard(binding['source'], output, parent, binding)
     random.seed(0); np.random.seed(0); torch.manual_seed(0); torch.cuda.manual_seed_all(0)
     torch.set_num_threads(4)
-    config = dict(direction_lr=args.direction_lr, lambda_mix=.25, lambda_residual=args.lambda_residual,
+    inherited_mix = args.lambda_mix if args.stage == 2 else record['config']['lambda_mix']
+    config = dict(direction_lr=args.direction_lr, lambda_mix=inherited_mix, lambda_residual=args.lambda_residual,
         shadow_bias=.009978598594665527, pbr_samples=args.pbr_samples, pbr_pixels=2048,
         base_end=4 if args.smoke else 540, residual_end=8 if args.smoke else 1080,
         protect_end=12 if args.smoke else 1280, iterations=20 if args.smoke else (8100 if args.stage == 2 else 4050))
