@@ -1,5 +1,7 @@
 """动态A/B共用当前surfel、全场景光源可见度和线性域物理着色。"""
 import math
+import hashlib
+import json
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -40,11 +42,16 @@ class EffectiveSurface:
 
 
 def load_train_cameras(source,frame_ids=None):
-    """先逆sRGB再AREA缩小原始黑背景观测；不再次乘物体Alpha。"""
+    """先移除TRAIN核验的固定背景透射项，再AREA；保留物体环境照明。"""
     import cv2
     import numpy as np
     from scene.dataset_readers import readCamerasFromTransforms
     from utils.camera_utils import loadCam
+    from LIHAN.scripts.dynamic_v3_radiometry import black_observation
+    radiometry_path=Path(source).parent/'input_audit_v1/radiometry_v1.json'
+    radiometry=json.loads(radiometry_path.read_text())
+    assert radiometry['status']=='PASS_TRAIN_FIXED_BACKGROUND' and not radiometry['gt_read']
+    assert hashlib.sha256((Path(source)/'no_gt_manifest.json').read_bytes()).hexdigest()==radiometry['input_manifest_sha256']
     infos=readCamerasFromTransforms(str(source),'transforms_train.json','images',False,no_bg=False)
     config=SimpleNamespace(resolution=2,data_device='cpu',load2gpu_on_the_fly=True)
     cameras=[]
@@ -53,9 +60,10 @@ def load_train_cameras(source,frame_ids=None):
         camera=loadCam(config,i,info,1.)
         assert hasattr(info.image_train_light,'array'),'Stage2只接受登记的16位输入'
         rgb=info.image_train_light.array[...,:3]
-        linear=np.where(rgb<=.04045,rgb/12.92,((rgb+.055)/1.055)**2.4)
+        alpha=info.image_train_light.array[...,3]
+        linear=black_observation(rgb,alpha,radiometry['background_linear'])
         resized=cv2.resize(linear,(camera.image_width,camera.image_height),interpolation=cv2.INTER_AREA)
-        camera.observed_linear=torch.from_numpy(resized.copy()).permute(2,0,1)
+        camera.observed_linear=torch.from_numpy(resized.astype(np.float32)).permute(2,0,1)
         cameras.append(camera)
     return cameras
 
@@ -184,7 +192,7 @@ class DynamicSurfaceModel:
         for value in vars(self.pc).values():
             if isinstance(value,torch.Tensor):value.requires_grad_(False)
         self.deform.deform.requires_grad_(False)
-        self.pipe=SimpleNamespace(compute_cov3D_python=False,convert_SHs_python=False,depth_ratio=1.)
+        self.pipe=SimpleNamespace(compute_cov3D_python=False,convert_SHs_python=False,depth_ratio=0.)
         self.radiance=SharedRadiance(len(self.pc.get_xyz),lighting['times'],lighting['directions'],
             lighting['intensity'],math.pi*min(stats['mean_linear_luminance'],stats['q_base'])/.5)
         self.normal_sign=torch.ones(len(self.pc.get_xyz),1,device='cuda')
@@ -192,6 +200,62 @@ class DynamicSurfaceModel:
         with torch.no_grad():
             extent=(torch.quantile(self.pc.get_xyz,.99,dim=0)-torch.quantile(self.pc.get_xyz,.01,dim=0)).norm()
         self.visibility=FullDynamicVisibility(float(extent)*.003)
+
+    def checkpoint(self,folder,step,optimizer=None,config=None,ps_reference=None):
+        """真实更新后保存完整推理状态；重载不依赖祖先模型或训练图像。"""
+        import random
+        import numpy as np
+        folder=Path(folder)
+        ply=folder/f'point_cloud/iteration_{step}/point_cloud.ply'
+        deform=folder/f'deform/iteration_{step}/deform.pth'
+        state_dir=folder/f'dynamic_v3/iteration_{step}'
+        assert not ply.exists() and not deform.exists() and not state_dir.exists(),'禁止覆盖检查点'
+        self.pc.save_ply(str(ply));self.deform.save_weights(str(folder),step)
+        state_dir.mkdir(parents=True,exist_ok=False)
+        state=dict(format_version=1,path=self.path,parent_iteration=self.iteration,completed_updates=step,
+            cumulative_actual_updates=self.iteration-1+step,radiance=self.radiance.state_dict(),
+            normal_sign=self.normal_sign,normal_sign_valid=self.normal_sign_valid,
+            bias=self.visibility.bias,config=config,ps_reference=ps_reference,
+            optimizer=None if optimizer is None else optimizer.state_dict(),
+            torch_rng=torch.get_rng_state(),cuda_rng=torch.cuda.get_rng_state(),
+            python_rng=random.getstate(),numpy_rng=np.random.get_state())
+        torch.save(state,state_dir/'state.pt')
+        receipt=dict(path=self.path,step=step,completed_updates=step,cumulative_actual_updates=self.iteration-1+step,
+            parent_iteration=self.iteration,normal_sign_query_independent=True,
+            checkpoint_sha256={str(p.relative_to(folder)):hashlib.sha256(p.read_bytes()).hexdigest()
+                for p in (ply,deform,state_dir/'state.pt')},gt_read=False)
+        (state_dir/'receipt.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
+        return receipt
+
+    @classmethod
+    def load(cls,folder,step):
+        """只读取当前目录的原生PLY/deform、配置与独立物理状态。"""
+        folder=Path(folder)
+        receipt=json.loads((folder/f'dynamic_v3/iteration_{step}/receipt.json').read_text())
+        for relative,expected in receipt['checkpoint_sha256'].items():
+            assert hashlib.sha256((folder/relative).read_bytes()).hexdigest()==expected,relative
+        state=torch.load(folder/f'dynamic_v3/iteration_{step}/state.pt',map_location='cpu',weights_only=False)
+        assert state['format_version']==1 and state['completed_updates']==step
+        obj=cls.__new__(cls)
+        obj.parent=folder;obj.iteration=state['parent_iteration'];obj.path=state['path']
+        obj.cfg=read_config(folder/'cfg_args')
+        obj.pc=GaussianModel(obj.cfg.sh_degree,no_binary_separation=obj.cfg.no_binary_separation,fea_dim=obj.cfg.hyper_dim)
+        obj.pc.load_ply(str(folder/f'point_cloud/iteration_{step}/point_cloud.ply'))
+        obj.pc.active_sh_degree=obj.cfg.sh_degree
+        obj.deform=DeformModel(deform_type=obj.cfg.deform_type,is_blender=obj.cfg.is_blender,
+            hyper_dim=obj.cfg.hyper_dim,pred_color=obj.cfg.pred_color)
+        assert obj.deform.load_weights(str(folder),step)
+        obj.deform.deform.eval().requires_grad_(False)
+        obj.pipe=SimpleNamespace(compute_cov3D_python=False,convert_SHs_python=False,depth_ratio=0.)
+        lights=state['radiance']
+        obj.radiance=SharedRadiance(len(obj.pc.get_xyz),lights['lights.times'],lights['lights.raw_directions'],
+            math.pi,float(lights['environment_scale']))
+        obj.radiance.load_state_dict(lights)
+        obj.radiance.requires_grad_(False)
+        obj.normal_sign=state['normal_sign'].cuda();obj.normal_sign_valid=state['normal_sign_valid'].cuda()
+        obj.visibility=FullDynamicVisibility(state['bias'])
+        obj.config=state['config'];obj.loaded_step=step
+        return obj
 
     def effective(self,camera):
         values=self.deform.step(self.pc.get_xyz,camera.fid.reshape(1,1).expand(len(self.pc.get_xyz),1),
@@ -240,9 +304,10 @@ class DynamicSurfaceModel:
         normal=build_rotation(geometry.get_rotation)[:,:,2]*self.normal_sign
         direction=self.radiance.lights(camera.fid)[None]
         visibility=self.visibility(geometry,direction)
-        direct=self.radiance.rho/math.pi*self.radiance.intensity*visibility*(normal@direction.T).clamp_min(0)
+        rho=self.radiance.rho
+        direct=rho/math.pi*self.radiance.intensity*visibility*(normal@direction.T).clamp_min(0)
         if self.path=='A':
-            environment=self.radiance.rho/math.pi*self.radiance.environment(normal)
+            environment=rho/math.pi*self.radiance.environment(normal)
             color=environment+direct_weight*direct
         else:
             environment=torch.zeros_like(direct)
