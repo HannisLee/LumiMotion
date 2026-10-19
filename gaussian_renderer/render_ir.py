@@ -468,6 +468,13 @@ def rendering_equation(base_color, roughness, normals, position, viewdirs, pc, p
             skip_tracer=kwargs.get('skip_tracer', False))
     # print(pipe.diffuse_sample_num)
     B = base_color.shape[0]
+    # Optional origin protection for explicitly versioned Stage3 models.
+    # A zero offset preserves the native path exactly. Geometry/depth stay unchanged.
+    origin_normal_offset = float(getattr(pipe, "pbr_origin_normal_offset", 0.0))
+    if not math.isfinite(origin_normal_offset) or origin_normal_offset < 0:
+        raise ValueError("Invalid PBR normal-origin offset")
+    if origin_normal_offset:
+        position = position + normals * origin_normal_offset
 
     if pipe.diffuse_sample_num > 0 and pipe.light_sample_num == 0:
         incident_dirs, incident_areas = sample_incident_rays(normals, training, pipe.diffuse_sample_num)

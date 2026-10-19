@@ -39,7 +39,34 @@ def main():
             assert native_depth_error < 2e-5, native_depth_error
         # 推理相机的RGB与Alpha都替换，不应改变推理输出或混合权重。
         camera.original_image_train_light.zero_(); camera.gt_alpha_mask.zero_()
-        after = model.render(camera, a.iteration, components=True)
+        origin_check = None
+        if model.stage == 3:
+            mask = before['mask']
+            surface = before['surf_depth'].permute(1, 2, 0)*camera.rays_d_hw_unnormalized+camera.camera_center
+            normals = torch.nn.functional.normalize(before['rend_normal'].permute(1, 2, 0), dim=-1)
+            surface, normals = surface[mask], normals[mask]
+            offset = float(getattr(model.pipe, 'pbr_origin_normal_offset', 0.))
+            assert offset == float(model.config.get('pbr_origin_normal_offset', 0.))
+            original_trace = model.pc.trace
+            origin_check = dict(points=0, maximum_error=0., offset=offset)
+
+            def audit_trace(origins, directions, **kwargs):
+                if kwargs.get('shs') is not None:
+                    start = origin_check['points']; end = start+len(origins)
+                    expected_origin = (surface[start:end]+normals[start:end]*offset)[:, None]+directions*model.pipe.light_t_min
+                    origin_check['maximum_error'] = max(origin_check['maximum_error'], float((origins-expected_origin).abs().max()))
+                    origin_check['points'] = end
+                return original_trace(origins, directions, **kwargs)
+
+            try:
+                model.pc.trace = audit_trace
+                after = model.render(camera, a.iteration, components=True)
+            finally:
+                model.pc.trace = original_trace
+            assert origin_check['points'] == len(surface)
+            assert origin_check['maximum_error'] < 2e-5, origin_check
+        else:
+            after = model.render(camera, a.iteration, components=True)
         target_difference = max(float((before[k]-after[k]).abs().max()) for k in ('render', 'base_linear', 'residual_linear', 'rend_alpha'))
         assert target_difference == 0, target_difference
         from gaussian_renderer import render
@@ -73,6 +100,7 @@ def main():
         target_rgb_and_alpha_replacement_max_error=target_difference, direction_max_deviation_deg=maximum_angle,
         pbr_surface_depth_mode=model.config.get('pbr_surface_depth_mode', 'legacy_expected'),
         native_half_depth_max_abs=native_depth_error, audit_source_sha256=sha(__file__),
+        pbr_origin_mode=model.config.get('pbr_origin_mode', 'ray_only'), actual_origin_check=origin_check,
         normal_opacity=gradient, separation=str(a.output/'separation.png'),
         gt_read=False, test_read=False, scientific_accuracy_pass=False)
     write(a.output/'receipt.json', receipt)
