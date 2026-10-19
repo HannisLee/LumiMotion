@@ -17,6 +17,25 @@ def effective_light(inverse_transpose, directions):
     return torch.einsum('tnij,tni->tnj', inverse_transpose, directions)
 
 
+def local_response_design(normal, transport, directions, visibility, observation_valid, intensity):
+    """实际运输在单位法线切向的两列导数，加共享rho的幅度列。
+
+    法线仅有两自由度，第三列表示未知光度尺度。刚性、无遮挡截断时，
+    该矩阵与传统三列灯向矩阵相差正交基变换。非线性运输不能沿用LS初值矩阵。
+    """
+    normal=normal.detach()
+    reference=F.one_hot(normal.abs().argmin(-1),3).to(normal.dtype)
+    first=F.normalize(torch.cross(normal,reference,dim=-1),dim=-1)
+    second=torch.cross(normal,first,dim=-1)
+    def response(candidate):
+        return (transport(F.normalize(candidate,dim=-1))*directions).sum(-1).clamp_min(0)
+    with torch.enable_grad():
+        cosine,derivative_a=torch.autograd.functional.jvp(response,normal,first,create_graph=False)
+        _,derivative_b=torch.autograd.functional.jvp(response,normal,second,create_graph=False)
+    scale=visibility*observation_valid*(float(intensity)/math.pi)
+    return torch.stack([derivative_a,derivative_b,cosine],-1).detach()*scale[...,None]
+
+
 def estimate_normals(observed, directions, inverse_transpose, visibility, valid, saturated,
                      intensity, steps=200, minimum_observations=6, minimum_singular_ratio=.05,
                      normal_operator=None):
@@ -88,9 +107,22 @@ def estimate_normals(observed, directions, inverse_transpose, visibility, valid,
         prediction=rho[None]*visibility[...,None]*cosine[...,None]*(float(intensity)/math.pi)
         relative_error=(((prediction-colors).abs()*mask).sum((0,2))/
                         (colors.abs()*mask).sum((0,2)).clamp_min(.01))
-        singular=torch.linalg.svdvals(design.permute(1,0,2))
-        ratio=singular[:,-1]/singular[:,0].clamp_min(1e-8)
-        number=observation_valid.sum(0)
+        actual_design=local_response_design(normal,transport,directions,visibility,observation_valid,intensity)
+        # 每个RGB通道有各自未知rho；不能把来自不同通道的不足观测拼成假秩。
+        # 保守要求至少一个完整通道自身满足帧数与三列秩，其他通道仍参与稳健拟合。
+        informative=channel_valid&(cosine[...,None]>1e-6)
+        per_channel=actual_design[:,:,None,:]*informative[...,None]
+        channel_singular=torch.linalg.svdvals(per_channel.permute(1,2,0,3))
+        channel_ratio=channel_singular[:,:,-1]/channel_singular[:,:,0].clamp_min(1e-8)
+        channel_number=informative.sum(0)
+        eligible=channel_number>=minimum_observations
+        score=channel_ratio*eligible
+        best=score.argmax(-1)
+        row=torch.arange(count,device=normal.device)
+        singular=channel_singular[row,best]
+        ratio=score[row,best]
+        initial_singular=torch.linalg.svdvals(design.permute(1,0,2))
+        number=channel_number[row,best]
         reliable=(number>=minimum_observations)&(ratio>=minimum_singular_ratio)
         reliable &= (normal.norm(dim=-1)>.9)&torch.isfinite(normal).all(-1)&(relative_error<=.5)
         confidence=torch.exp(-(relative_error/.25)**2)*ratio.clamp(max=.25)/.25
@@ -98,6 +130,10 @@ def estimate_normals(observed, directions, inverse_transpose, visibility, valid,
         return dict(normal=normal.detach(),albedo=rho.detach(),confidence=confidence.detach(),
                     reliable=reliable.detach(),valid_observations=number.detach(),
                     effective_singular_values=singular.detach(),effective_singular_ratio=ratio.detach(),
+                    channel_singular_ratios=channel_ratio.detach(),channel_valid_observations=channel_number.detach(),
+                    selected_confidence_channel=best.detach(),
+                    initial_linear_singular_ratio=(initial_singular[:,-1]/initial_singular[:,0].clamp_min(1e-8)).detach(),
+                    confidence_design='逐RGB通道实际运输两切向导数及未知rho幅度；至少单通道独立满足帧数/秩；背光不计帧',
                     relative_photometric_error=relative_error.detach(),initial_normal=initial,
                     loss_history=history,targets_stopped_gradient=True,
                     transport='normalized_inverse_transpose' if normal_operator is None else 'explicit_native_surface_operator',
