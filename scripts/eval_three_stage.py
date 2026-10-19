@@ -28,16 +28,20 @@ def model_record(model, iteration, split, smoke=False):
             raise ValueError('冻结训练源码被改动，需要显式新版本adapter：'+filename)
         relative = Path(filename).parts[-2:]
         current = Path(__file__).resolve().parents[1]/Path(*relative)
-        if legacy.sha(current) != digest:
+        # 评测不执行优化入口；原训练入口仍必须由上面的冻结SHA核验。
+        # CLI扩展不应迫使旧Stage2重训；三个实际前向模块仍严格逐字匹配。
+        optimization_entry = Path(filename).parent.name == 'scripts' and Path(filename).name.startswith('train_three_stage')
+        if not optimization_entry and legacy.sha(current) != digest:
             raise ValueError('当前接口与冻结训练源码不同：'+str(current))
-    record = dict(record, baseline='three_stage', args=dict(source_path=record['binding']['source'], depth_ratio=0.))
+    recorded_ratio = 1. if record['config'].get('pbr_surface_depth_mode') == 'native_half' else 0.
+    record = dict(record, baseline='three_stage', args=dict(source_path=record['binding']['source'], depth_ratio=recorded_ratio))
     return record, {str(path): legacy.sha(path) for path in files}
 
 
 def adapter(model, iteration, source, split, smoke=False):
     import torch
     import diff_surfel_rasterization as backend
-    from scene.three_stage_pipeline import ThreeStageModel
+    from scene.three_stage_native_pbr import load_three_stage_model
     from scene.cameras import Camera
     from scene.dataset_readers import blender_c2w_to_camera_extrinsics
     from scripts.eval_geometry_gt import GeometryRun
@@ -49,7 +53,7 @@ def adapter(model, iteration, source, split, smoke=False):
 
     class Run(GeometryRun):
         def __init__(self):
-            self.pipeline = ThreeStageModel.load(model, iteration)
+            self.pipeline = load_three_stage_model(model, iteration)
             self.pc, self.deform = self.pipeline.pc, self.pipeline.deform
             self.model, self.iteration, self.source = Path(model), iteration, Path(source)
             self.context = None
@@ -57,7 +61,7 @@ def adapter(model, iteration, source, split, smoke=False):
             self.config = dict(vars(self.pipeline.pipe), train_light_folder='images')
             self.source_manifest = legacy.read(self.source/'manifest.json')
             self.files[str(self.source/'manifest.json')] = legacy.sha(self.source/'manifest.json')
-            self.training_core_comparison = {name: True for name in record['sources']}
+            self.training_core_comparison = {name: True for name in record['sources'] if not (Path(name).parent.name == 'scripts' and Path(name).name.startswith('train_three_stage'))}
             self.light_prediction_provenance = dict(method='checkpoint TRAIN-only nlerp and nearest endpoint hold',
                 gt_light_read=False, checkpoint_asset=True, inference_target_read=False)
 
@@ -100,9 +104,11 @@ def adapter(model, iteration, source, split, smoke=False):
             package = self.rgb(camera)
             normal, valid = unit_normal(package['rend_normal'].permute(1, 2, 0).cpu().numpy())
             visible = prediction['alpha'] >= .5
+            depth_mix = min(.5, self.pipeline.pipe.depth_ratio) if self.pipeline.stage == 3 else self.pipeline.pipe.depth_ratio
+            shading_depth = (1-depth_mix)*prediction['expected']+depth_mix*prediction['median']
             parity = dict(normal_max_abs=float(np.max(np.abs(normal[valid]-prediction['normal'][valid]))) if valid.any() else 0.,
                 alpha_max_abs=float(np.max(np.abs(package['rend_alpha'][0].cpu().numpy()-prediction['alpha']))),
-                surf_depth_max_abs=float(np.max(np.abs(package['surf_depth'][0].cpu().numpy()[visible]-prediction['expected'][visible]))) if visible.any() else 0.,
+                surf_depth_max_abs=float(np.max(np.abs(package['surf_depth'][0].cpu().numpy()[visible]-shading_depth[visible]))) if visible.any() else 0.,
                 component_add_max_error=float(package['component_add_max_error']))
             if any(v > 2e-5 for v in parity.values()):
                 raise AssertionError('完整RGB与独立几何／分量加和不同：'+str(parity))
@@ -120,6 +126,8 @@ def main():
             command = item['command']
             command = ['scripts.eval_three_stage' if v == 'LIHAN.scripts.eldl_v3_eval' else
                        str(Path(__file__).resolve()) if v == str(Path(legacy.__file__).resolve()) else v for v in command]
+            if len(command) > 3 and Path(command[1]).name == 'bootstrap_1011.py':
+                command[2] = str(Path(__file__).resolve().parents[1])
             import shlex
             item.update(command=command, shell=shlex.join(command))
         protocol = legacy.read(args.output/'protocol.json')

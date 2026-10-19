@@ -10,6 +10,7 @@ import torch
 import torch.nn.functional as F
 
 from scene.three_stage_pipeline import ThreeStageModel, sha, write
+from scene.three_stage_native_pbr import load_three_stage_model
 from scene.three_stage_lighting import brightness_weights, censored_error
 from scene.stage2_photometric import srgb_to_linear
 from scripts.train_three_stage import load_cameras, install_guard, preview
@@ -48,7 +49,7 @@ def main():
     first_geometry = None
     with torch.no_grad():
         for iteration in a.iterations:
-            model = ThreeStageModel.load(a.model, iteration)
+            model = load_three_stage_model(a.model, iteration)
             geometry = {k: getattr(model.pc, k).detach().cpu().clone() for k in ('_xyz', '_rotation', '_scaling', '_opacity')}
             if first_geometry is None:
                 first_geometry = geometry
@@ -65,7 +66,7 @@ def main():
                 target = camera.original_image_train_light.cuda()
                 alpha = camera.gt_alpha_mask.cuda()
                 observed = srgb_to_linear(target)
-                y, _, _ = brightness_weights(observed, model.stats)
+                y, base_soft, bright_soft = brightness_weights(observed, model.stats)
                 fg = alpha > .5
                 residual = package['render_linear']-observed
                 censored = censored_error(package['render_linear'], observed, camera.observed_saturation_mask.cuda())
@@ -73,6 +74,35 @@ def main():
                     alpha_bce=float(F.binary_cross_entropy(package['rend_alpha'].clamp(1e-6, 1-1e-6), alpha)),
                     psnr_srgb_black=-10*math.log10(max(float((package['render'].clamp(0, 1)-target).square().mean()), 1e-20)),
                     visibility_mean=float(package['visibility_mean']))
+                predicted_fg = package['rend_alpha'] > .5
+                row['alpha_iou'] = float((fg & predicted_fg).sum()/(fg | predicted_fg).sum().clamp_min(1))
+                # 内部一致性不是GT法线精度；固定原Alpha内缩分母，缺失另报。
+                eligible = -F.max_pool2d(-(alpha > .99).float()[None], 5, stride=1, padding=2)[0] > .5
+                geometry = package
+                if model.config.get('pbr_surface_depth_mode') == 'native_half':
+                    from copy import copy
+                    from gaussian_renderer import render as render_geometry
+                    geometry_pipe = copy(model.pipe); geometry_pipe.depth_ratio = 0.
+                    effective = model.effective(camera)
+                    geometry = render_geometry(camera, effective, geometry_pipe, effective.get_xyz.new_zeros(3),
+                                               0., 0., 0., override_color=torch.zeros_like(effective.get_xyz))
+                valid = eligible & predicted_fg & (geometry['rend_normal'].norm(dim=0, keepdim=True) > 1e-6) & (geometry['surf_normal'].norm(dim=0, keepdim=True) > 1e-6)
+                cosine = (F.normalize(geometry['rend_normal'], dim=0)*F.normalize(geometry['surf_normal'], dim=0)).sum(0, keepdim=True).clamp(-1, 1)
+                angles = torch.rad2deg(torch.acos(cosine))
+                eligible_count, valid_count = int(eligible.sum()), int(valid.sum())
+                row['normal_consistency'] = dict(eligible_pixels=eligible_count, valid_pixels=valid_count,
+                    coverage=valid_count/max(eligible_count, 1),
+                    valid_angle_mean_deg=float(angles[valid].mean()) if valid_count else None,
+                    missing180_mean_deg=float((angles[valid].sum()+180*(eligible_count-valid_count))/max(eligible_count, 1)))
+                high = fg & (y >= model.stats['q_bright_value'])
+                positive = (observed-package['base_linear']).clamp_min(0)
+                residual_fit = censored_error(package['residual_linear'], positive, camera.observed_saturation_mask.cuda())*bright_soft
+                row['priority_weights'] = dict(base_soft_mean=float(base_soft[fg].mean()),
+                    bright_soft_mean=float(bright_soft[fg].mean()),
+                    hard_high_fraction=float(high.sum()/fg.sum().clamp_min(1)),
+                    bright_weight_mass_in_hard_high=float((bright_soft*high).sum()/(bright_soft*fg).sum().clamp_min(1e-12)),
+                    residual_loss_mass_in_hard_high=float((residual_fit*high).sum()/(residual_fit*fg).sum().clamp_min(1e-12)),
+                    positive_residual_mean=float((positive*fg).sum()/(3*fg.sum()).clamp_min(1)))
                 for name, mask in [('foreground', fg), ('dark', fg & (y < model.stats['q50'])),
                                    ('body', fg & (y <= model.stats['q_base_value'])),
                                    ('bright', fg & (y >= model.stats['q_bright_value']))]:
@@ -85,11 +115,20 @@ def main():
                 if row['frame'] in (1, 75, 149):
                     preview(a.output/f'iteration_{iteration}/{camera.image_name_train_light}', package)
                 camera.load2device('cpu')
-            summary = {k: float(np.mean([r[k] for r in rows])) for k in ('alpha_bce', 'psnr_srgb_black', 'visibility_mean')}
+            summary = {k: float(np.mean([r[k] for r in rows])) for k in ('alpha_bce', 'alpha_iou', 'psnr_srgb_black', 'visibility_mean')}
+            summary['normal_consistency'] = {key: float(np.mean([r['normal_consistency'][key] for r in rows if r['normal_consistency'][key] is not None]))
+                for key in ('coverage', 'valid_angle_mean_deg', 'missing180_mean_deg')}
+            summary['priority_weights'] = {key: float(np.mean([r['priority_weights'][key] for r in rows]))
+                for key in rows[0]['priority_weights']}
             for segment in ('foreground', 'dark', 'body', 'bright'):
                 summary[segment] = {field: float(np.mean([r[segment][field] for r in rows if r[segment][field] is not None]))
                     for field in ('linear_observed_mae', 'linear_censored_charbonnier', 'base_mean', 'residual_mean')}
             endpoint = dict(iteration=iteration, rows=rows, summary=summary,
+                diagnostic_version=2, normal_metric_scope='预测GS与Expected深度法线内部一致性；不是GT法线精度',
+                lighting_parameters=dict(reference=float(model.lights.reference), lambda_mix=model.config['lambda_mix'],
+                    shared_normal_sh_raw=model.lights.sh.detach().cpu().tolist(),
+                    shared_normal_sh_coeff=(.25/math.sqrt(3)*model.lights.sh.tanh()).detach().cpu().tolist(),
+                    surfel_count=len(model.pc.get_xyz), mean_linear_albedo=float(srgb_to_linear(model.pc.get_albedo).mean())),
                 xyz_drift_from_first_endpoint=summarize(xyz_delta), direction_deviation_deg=summarize(angle),
                 checkpoint_sha256=sha(a.model/f'three_stage/iteration_{iteration}/state.pt'))
             endpoints.append(endpoint)

@@ -105,7 +105,7 @@ def audit_initial(model, cameras, output):
     del parent
 
 
-def main():
+def main(model_class=None, actual_entrypoint='scripts/train_three_stage.py', extra_sources=()):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--binding', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
@@ -114,6 +114,7 @@ def main():
     parser.add_argument('--parent_iteration', type=int)
     parser.add_argument('--direction_lr', type=float, choices=[0., 1e-6], default=0.)
     parser.add_argument('--lambda_residual', type=float, choices=[0., .1], default=0.)
+    parser.add_argument('--pbr_samples', type=int, choices=[16, 128, 256], default=16)
     parser.add_argument('--smoke', action='store_true')
     args = parser.parse_args()
     code_root = Path(__file__).resolve().parents[1]
@@ -134,28 +135,29 @@ def main():
         assert parent.resolve() == Path(binding['parent']) and parent_iteration == 35000
     else:
         record = json.loads((parent/'three_stage_training.json').read_text())
-        assert record['stage'] == 2 and record['smoke'] == args.smoke
+        assert record['stage'] == 2
+        assert args.smoke or not record['smoke'], '工程冒烟父模型不能进入正式训练。'
     install_guard(binding['source'], output, parent, binding)
     random.seed(0); np.random.seed(0); torch.manual_seed(0); torch.cuda.manual_seed_all(0)
     torch.set_num_threads(4)
     config = dict(direction_lr=args.direction_lr, lambda_mix=.25, lambda_residual=args.lambda_residual,
-        shadow_bias=.009978598594665527, pbr_samples=16, pbr_pixels=2048,
+        shadow_bias=.009978598594665527, pbr_samples=args.pbr_samples, pbr_pixels=2048,
         base_end=4 if args.smoke else 540, residual_end=8 if args.smoke else 1080,
         protect_end=12 if args.smoke else 1280, iterations=20 if args.smoke else (8100 if args.stage == 2 else 4050))
     saves = [0, 4, 8, 20] if args.smoke else ([0, 540, 1080, 4050, 8100] if args.stage == 2 else [0, 1350, 2700, 4050])
     model_dir = output/'model_mlp'; model_dir.mkdir()
-    model = ThreeStageModel(parent, parent_iteration, binding, args.stage, config)
+    model = (model_class or ThreeStageModel)(parent, parent_iteration, binding, args.stage, config)
     cameras = load_cameras(binding['source'])
     import diff_surfel_rasterization as backend
     assert backend.provenance['method'] == 'repository_lumimotion_cuda_rasterizer'
     marker = dict(stage=args.stage, smoke=args.smoke, config=config, binding=binding,
         binding_sha256=sha(args.binding), parent=str(parent), parent_iteration=parent_iteration,
-        actual_entrypoint='scripts/train_three_stage.py', gt_supervision=False, external_test_read=False,
+        actual_entrypoint=actual_entrypoint, gt_supervision=False, external_test_read=False,
         train_frames=[n for n in range(1, 151) if n % 10],
         rasterizer_provenance=backend.provenance,
         assets_sha256={str(Path(binding[k])): sha(binding[k]) for k in ('directions', 'stats')},
         sources={str(code_root/name): sha(code_root/name) for name in ['scripts/train_three_stage.py', 'scene/three_stage_pipeline.py',
-            'scene/three_stage_lighting.py', 'gaussian_renderer/render_ir.py']})
+            'scene/three_stage_lighting.py', 'gaussian_renderer/render_ir.py', *extra_sources]})
     write(model_dir/'three_stage_training.json', marker)
     # 原始cfg作为可查看的相机和模型结构记录；新光照语义只由three_stage记录决定。
     (model_dir/'cfg_args').write_text((parent/'cfg_args').read_text())

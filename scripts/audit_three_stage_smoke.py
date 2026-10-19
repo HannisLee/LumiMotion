@@ -7,7 +7,8 @@ import cv2
 import numpy as np
 import torch
 
-from scene.three_stage_pipeline import ThreeStageModel, write, sha
+from scene.three_stage_pipeline import write, sha
+from scene.three_stage_native_pbr import load_three_stage_model
 from scripts.train_three_stage import load_cameras, geometry_loss
 
 
@@ -17,10 +18,25 @@ def main():
     p.add_argument('--iteration', type=int, required=True)
     p.add_argument('--output', type=Path, required=True)
     a = p.parse_args(); a.output.mkdir(parents=True, exist_ok=False)
-    model = ThreeStageModel.load(a.model, a.iteration)
+    model = load_three_stage_model(a.model, a.iteration)
     camera = load_cameras(model.binding['source'])[0]; camera.load2device()
     with torch.no_grad():
         before = model.render(camera, a.iteration, components=True)
+        native_depth_error = None
+        if model.config.get('pbr_surface_depth_mode') == 'native_half':
+            from copy import copy
+            from gaussian_renderer import render as render_geometry
+            assert model.pipe.depth_ratio == 1.
+            effective = model.effective(camera); geometry_pipe = copy(model.pipe)
+            geometry_pipe.depth_ratio = 0.
+            expected = render_geometry(camera, effective, geometry_pipe, torch.zeros(3, device='cuda'),
+                                       0., 0., 0., override_color=torch.zeros_like(effective.get_xyz))
+            geometry_pipe.depth_ratio = 1.
+            median = render_geometry(camera, effective, geometry_pipe, torch.zeros(3, device='cuda'),
+                                     0., 0., 0., override_color=torch.zeros_like(effective.get_xyz))
+            visible = before['rend_alpha'] > .5
+            native_depth_error = float((before['surf_depth']-(.5*expected['surf_depth']+.5*median['surf_depth']))[visible].abs().max())
+            assert native_depth_error < 2e-5, native_depth_error
         # 推理相机的RGB与Alpha都替换，不应改变推理输出或混合权重。
         camera.original_image_train_light.zero_(); camera.gt_alpha_mask.zero_()
         after = model.render(camera, a.iteration, components=True)
@@ -55,6 +71,8 @@ def main():
     receipt = dict(status='PASS_SELF_CONTAINED_RELOAD_TARGET_FREE_INFERENCE', stage=model.stage,
         model=str(a.model), iteration=a.iteration, checkpoint_sha256=sha(a.model/f'three_stage/iteration_{a.iteration}/state.pt'),
         target_rgb_and_alpha_replacement_max_error=target_difference, direction_max_deviation_deg=maximum_angle,
+        pbr_surface_depth_mode=model.config.get('pbr_surface_depth_mode', 'legacy_expected'),
+        native_half_depth_max_abs=native_depth_error, audit_source_sha256=sha(__file__),
         normal_opacity=gradient, separation=str(a.output/'separation.png'),
         gt_read=False, test_read=False, scientific_accuracy_pass=False)
     write(a.output/'receipt.json', receipt)

@@ -14,6 +14,7 @@ def main():
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--gpu', type=int, required=True)
     p.add_argument('--snapshot', type=Path)
+    p.add_argument('--entry', choices=['scripts.train_three_stage', 'scripts.train_three_stage_native_pbr'], default='scripts.train_three_stage')
     p.add_argument('training_args', nargs=argparse.REMAINDER)
     a = p.parse_args()
     root = Path(__file__).resolve().parents[1]
@@ -27,7 +28,7 @@ def main():
             index = tail.index(option)+1
             tail[index] = str(Path(tail[index]).resolve())
     command = [python, str(root/'LIHAN/scripts/bootstrap_1011.py'), str(a.snapshot or root),
-               'scripts.train_three_stage', '--output', str(output), *tail]
+               a.entry, '--output', str(output), *tail]
     env = os.environ.copy()
     env.update(CUDA_VISIBLE_DEVICES=str(a.gpu), OMP_NUM_THREADS='4', OPENBLAS_NUM_THREADS='4', MKL_NUM_THREADS='4',
         TORCH_EXTENSIONS_DIR=str(root/'output/1019-01-LH-static-jumpingjacks-ELDL-V3-总控/native_cache'),
