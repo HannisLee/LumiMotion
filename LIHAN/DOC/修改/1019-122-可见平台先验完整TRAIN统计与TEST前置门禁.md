@@ -1,0 +1,13 @@
+# 可见平台先验完整TRAIN统计与TEST前置门禁
+
+2026-10-19，ushas／lumimotion-ushas。复核计划1019-40的终点覆盖发现：既有完整135TRAIN四节点入口报告光度/Alpha/GS-Expected一致性，新增平台先验的独立GPU数值重算仅覆盖单帧；不能将单帧机制检查描述为完整TRAIN平台先验统计。
+
+总控新增diagnose_visible_plane_complete_train_v1.py：固定8100正常退出后，对A47的0/2700/5400/8100及同父同预算A46@8100，使用同一已冻结1637468像素平台mask和TRAIN拟合平面，135帧逐帧独立计算cosine loss，并与原训练函数逐帧比较。分别报告等帧和像素加权loss、固定/有效/缺失支持、GS/Expected相对平面有向角度（CPU float64 atan2）及缺失180诊断。缺失cosine仍按1、固定分母保持；这些都是TRAIN内部诊断，不替代用户原15TEST指标，不引入额外验收阈值。
+
+新统计精确只允许原TRAIN、两个已登记模型目录、当前输出及原统计/灯向文件，先拒绝eval_only和GT元数据；所有checkpoint/PLY/32MLP输入SHA运行前后保持，无优化器更新。既有V16、训练入口、物理前向、权重、lr、父、8100预算及停止点全部不变。
+
+gate_visible_plane_complete_train_v1.py会在原终点监督器仍WAITING且无子评价任务时，仅临时SIGSTOP该只读分派器，保存原等待状态及PID启动标识；在跑训练不接收暂停信号。固定8100真实正常退出后先运行新增完整TRAIN统计，成功冻结收据后SIGCONT同一原监督PID；之后原完整光度/工程及隔离TEST流程照常执行。固定相机与材料队列继续等原状态文件。统计失败保留独立结果和日志，TEST门禁不释放，不重启训练。
+
+为保留已登记源代码，原archive_visible_plane_final_v1.py不改，新archive_visible_plane_final_v2.py要求新增135TRAIN收据PASS及其完成时间早于隔离TEST启动，并把四节点/同预算平台统计、完整命令/日志/来源写入最终报告和README。原A46报告/README和所有失败产物保持。
+
+CPU数值门禁visible_plane_complete_train_cpu_audit_v1.json已PASS：四个固定像素含两个缺失时，正向法线有效平均45°、固定分母缺失180平均112.5°；反向目标分别135°和157.5°，验证有向角度及固定缺失分母。该CPU案例不冒充完整GPU运行。新增GPU统计及其前置门禁的实际状态以各收据为准，不提前宣称正式精度通过。
