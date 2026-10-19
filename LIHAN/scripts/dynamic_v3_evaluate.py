@@ -65,6 +65,7 @@ def supplementary_protocol(bundle,track_protocol='triangle_barycentric_v1',corre
         visual_colors='深度/误差固定OpenCV TURBO；无支持黑色、TEST GT前景漏预测误差为品红；法线RGB=.5*n_world+.5',
         visual_only='PNG/视频仅显示时clip与8位量化；定量始终使用原float数组，禁止从PNG反推指标',
         visual_depth_range_world=[0.,10.],visual_error_range_world=[0.,.1],
+        local_review='15TEST固定GT人体/腿/足/鞋包围框加16像素；四类及Stage2 EL/DL全列，等比缩放后补黑边，不改变数值指标',
         limitations=['GT mesh距离为三角几何表面，不模拟透明纹理孔洞',
             '表面采样完整性是Monte Carlo估计，精度与召回均须报告，空mesh不得跳过',
             '轨迹是GT可见表面沿相机射线的几何残差，不是模型物质点或切向运动精度',
@@ -790,19 +791,50 @@ def save_visual(path,pixels):
     if not cv2.imwrite(str(path),pixels[...,::-1]):raise IOError('可视化PNG写入失败：'+str(path))
 
 
-def local_review_crops(folder,n,pred,target,gt):
+def local_review_crops(folder,n,pred,target,gt,mesh_normal,mesh_depth,depth_error):
     masks,status=masks_for(gt);result={}
+    visible=np.isfinite(pred['alpha'])&(pred['alpha']>=.5)
+    normal=np.where((visible&(np.linalg.norm(pred['normal'],axis=-1)>1e-6))[...,None],pred['normal']*.5+.5,0)
+    derived=np.where((visible&(np.linalg.norm(pred['depth_normal'],axis=-1)>1e-6))[...,None],pred['depth_normal']*.5+.5,0)
+    rows=[('rgb',[
+        ('GT corrected RGB',display_rgb(target)),('Predicted RGB',display_rgb(pred['rgb_linear'])),
+        ('GT Alpha',np.repeat(gt['alpha'][...,None],3,axis=2)),('Predicted Alpha',np.repeat(pred['alpha'][...,None],3,axis=2))]),
+        ('normal',[
+            ('GT world normal',np.where(gt['gt_exr_valid'][...,None],gt['gt_exr_normal']*.5+.5,0)),
+            ('GS world normal',normal),('Expected Depth normal',derived),('Mesh world normal',mesh_normal)]),
+        ('depth_mesh',[
+            ('Expected Z [0,10]',scalar_display(pred['expected'],visible,10.)),
+            ('Median Z [0,10]',scalar_display(pred['median'],visible,10.)),
+            ('Mesh Z [0,10]',mesh_depth),('Z error; missing: magenta',depth_error)]),
+        ('separation_components',[
+            ('Red dynamic; green static',pred['separation'])])]
+    if 'environment_linear' in pred and 'direct_linear' in pred:
+        rows[-1][1].extend([
+            ('Environment (no directional V)',display_rgb(pred['environment_linear'])),
+            ('Direct (unweighted)',display_rgb(pred['direct_linear'])),
+            ('Complete forward RGB',display_rgb(pred['rgb_linear']))])
     for name in ('human','leg','foot','shoe'):
         mask=masks[name]&(gt['alpha']>=.5)&gt['valid'];ys,xs=np.where(mask)
         if not len(xs):
             result[name]=dict(status=status.get(name,'NO_GT_PIXELS'),path=None);continue
         x0=max(0,int(xs.min())-16);x1=min(400,int(xs.max())+17);y0=max(0,int(ys.min())-16);y1=min(400,int(ys.max())+17)
-        arrays=[display_rgb(target),display_rgb(pred['rgb_linear']),np.clip(pred['normal']*.5+.5,0,1),
-            scalar_display(pred['expected'],pred['alpha']>=.5,10.)]
-        labels=['GT corrected RGB','Predicted RGB','GS world normal','Expected Z [0,10]']
-        panels=[panel(label,cv2.resize(a[y0:y1,x0:x1],(256,256),interpolation=cv2.INTER_AREA)) for label,a in zip(labels,arrays)]
-        path=folder/f'{name}_{n:04d}.png';save_visual(path,np.concatenate(panels,axis=1))
-        result[name]=dict(status='GENERATED_FIXED_GT_BBOX',path=str(path),bbox_xyxy=[x0,y0,x1,y1],margin_pixels=16)
+        scale=min(256/(x1-x0),256/(y1-y0));width=max(1,round((x1-x0)*scale));height=max(1,round((y1-y0)*scale))
+        def tile(label,array):
+            resized=cv2.resize(array[y0:y1,x0:x1],(width,height),interpolation=cv2.INTER_AREA)
+            canvas=np.zeros((256,256,3),dtype=resized.dtype)
+            top,left=(256-height)//2,(256-width)//2
+            canvas[top:top+height,left:left+width]=resized
+            return panel(label,canvas)
+        row_images=[]
+        for category,entries in rows:
+            panels=[tile(label,array) for label,array in entries]
+            while len(panels)<4:panels.append(panel('Not applicable',np.zeros((256,256,3))))
+            row_images.append(np.concatenate(panels,axis=1))
+        path=folder/f'{name}_{n:04d}.png';save_visual(path,np.concatenate(row_images,axis=0))
+        result[name]=dict(status='GENERATED_FIXED_GT_BBOX',path=str(path),bbox_xyxy=[x0,y0,x1,y1],margin_pixels=16,
+            resize='等比缩放后居中补黑边',content_size_wh=[width,height],
+            panel_rows={category:[label for label,_ in entries] for category,entries in rows},
+            limitation='双腿或双鞋仍可共用同语义总框；不宣称左右肢体独立分割，PNG仅显示量化，不能反推指标')
     return result
 
 
@@ -834,7 +866,7 @@ def continuous_visuals(bundle,frozen,run,predict,meshes,out,files,protocol):
                     predicted_depth_valid=np.isfinite(pred['alpha'])&(pred['alpha']>=.5)&np.isfinite(pred['expected'])&(pred['expected']>0)
                     depth_error=scalar_display(np.abs(pred['expected']-gt['depth_z']),gt_region&predicted_depth_valid,.1)
                     depth_error[gt_region&~predicted_depth_valid]=[1.,0.,1.]
-                    crops=local_review_crops(crop_folder,n,pred,target,gt)
+                    crops=local_review_crops(crop_folder,n,pred,target,gt,mesh_normal,mesh_depth,depth_error)
                 visible=np.isfinite(pred['alpha'])&(pred['alpha']>=.5)
                 normal=np.where((visible&(np.linalg.norm(pred['normal'],axis=-1)>1e-6))[...,None],pred['normal']*.5+.5,0)
                 derived=np.where((visible&(np.linalg.norm(pred['depth_normal'],axis=-1)>1e-6))[...,None],pred['depth_normal']*.5+.5,0)
