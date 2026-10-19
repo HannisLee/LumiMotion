@@ -15,7 +15,8 @@ def main():
     p.add_argument('--gpu', type=int, required=True)
     p.add_argument('--snapshot', type=Path)
     p.add_argument('--entry', choices=['scripts.train_three_stage', 'scripts.train_three_stage_native_pbr',
-                   'scripts.train_three_stage_normal_origin', 'scripts.train_three_stage_direct_base'],
+                   'scripts.train_three_stage_normal_origin', 'scripts.train_three_stage_direct_base',
+                   'scripts.train_three_stage_refine'],
                    default='scripts.train_three_stage')
     p.add_argument('training_args', nargs=argparse.REMAINDER)
     a = p.parse_args()
