@@ -122,6 +122,8 @@ def main(model_class=None, actual_entrypoint='scripts/train_three_stage.py', ext
                         help='仅Stage2的GS/Expected一致性损失权重；Stage3继承父记录。')
     parser.add_argument('--normal_protection', choices=['warmup', 'joint'], default='warmup',
                         help='仅Stage2：normal到opacity的恢复期保护或全联合阶段隔离。')
+    parser.add_argument('--joint_polish_steps', type=int, choices=[0, 4050], default=0,
+                        help='仅Stage2：原日程结束后按末端学习率追加固定步数；冒烟追加10步。')
     parser.add_argument('--lambda_residual', type=float, choices=[0., .1], default=0.)
     parser.add_argument('--pbr_samples', type=int, choices=[16, 128, 256], default=16)
     parser.add_argument('--smoke', action='store_true')
@@ -152,6 +154,8 @@ def main(model_class=None, actual_entrypoint='scripts/train_three_stage.py', ext
             raise ValueError('Stage3不新设几何一致性权重，必须继承父记录。')
         if args.normal_protection != 'warmup':
             raise ValueError('Stage3不新设几何梯度保护，必须继承父记录。')
+        if args.joint_polish_steps:
+            raise ValueError('Stage3不设置Stage2追加预算，必须继承父记录。')
     install_guard(binding['source'], output, parent, binding)
     random.seed(0); np.random.seed(0); torch.manual_seed(0); torch.cuda.manual_seed_all(0)
     torch.set_num_threads(4)
@@ -162,9 +166,17 @@ def main(model_class=None, actual_entrypoint='scripts/train_three_stage.py', ext
         shadow_bias=.009978598594665527, pbr_samples=args.pbr_samples, pbr_pixels=2048,
         base_end=4 if args.smoke else 540, residual_end=8 if args.smoke else 1080,
         protect_end=12 if args.smoke else 1280, iterations=20 if args.smoke else (8100 if args.stage == 2 else 4050))
+    if args.stage == 2:
+        config['joint_polish_steps'] = (10 if args.smoke else args.joint_polish_steps) if args.joint_polish_steps else 0
+    else:
+        config['joint_polish_steps'] = record['config'].get('joint_polish_steps', 0)
+    config['schedule_horizon'] = config['iterations']
+    if args.stage == 2:
+        config['iterations'] += config['joint_polish_steps']
     if args.stage == 2 and config['normal_protection'] == 'joint':
         config['protect_end'] = config['iterations']
     saves = [0, 4, 8, 20] if args.smoke else ([0, 540, 1080, 4050, 8100] if args.stage == 2 else [0, 1350, 2700, 4050])
+    saves = sorted(set(saves + [config['iterations']]))
     model_dir = output/'model_mlp'; model_dir.mkdir()
     model = (model_class or ThreeStageModel)(parent, parent_iteration, binding, args.stage, config)
     cameras = load_cameras(binding['source'])
@@ -212,7 +224,7 @@ def main(model_class=None, actual_entrypoint='scripts/train_three_stage.py', ext
             name = group['name']; lr = group['initial_lr']
             if args.stage == 2:
                 if name in geometry_names or name == 'direction':
-                    progress = max(0, step-config['residual_end'])/max(1, config['iterations']-config['residual_end'])
+                    progress = min(1., max(0, step-config['residual_end'])/max(1, config['schedule_horizon']-config['residual_end']))
                     lr = 0. if step <= config['residual_end'] else lr*(1-.9*progress)
                 elif name == 'sh':
                     lr = 1e-3 if step <= config['base_end'] else (0. if step <= config['residual_end'] else 1e-5)
