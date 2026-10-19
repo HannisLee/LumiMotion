@@ -129,10 +129,19 @@ def main():
         plan.update(steps=commands, protocol_sha256=legacy.sha(args.output/'protocol.json'),
                     three_stage_adapter_sha256=legacy.sha(__file__))
         legacy.write(args.output/'plan.json', plan)
-        with (args.output/'README.md').open('a') as f:
-            f.write('\n本模型使用三阶段显式adapter。完整实际命令以plan.json的steps为准（上方原生模板命令不用于本模型）。\n\n')
-            for item in commands:
-                f.write('```bash\n'+item['shell']+'\n```\n\n')
+        lines = ['# 三阶段固定协议评测', '',
+            f'source：`{args.source}`；model：`{args.model}`；iteration：{args.iteration}；split：{args.split}。', '',
+            '本模型使用三阶段显式adapter；完整实际训练来源见training_record_snapshot.json。',
+            '输出目录：当前实验目录；渲染predictions（冒烟为smoke_render）、Mesh为predicted_meshes、统计metrics、分量components、四类图与视频four_classes。',
+            '日志logs；完整实际渲染／重建／聚合／可视化命令（GPU环境见plan.json）：', '']
+        for item in commands:
+            lines += ['```bash', item['shell'], '```', '']
+        lines += ['定量指标：等待执行。代表图片／视频：等待各步骤生成。', '',
+            'RGB／Alpha／Normal／Separation及EL／DL或PBR／残差目检：尚未执行。', '',
+            '最终结论：PENDING；工程通过不代替重建精度。失败保留所有checkpoint、渲染、统计及日志。', '']
+        if args.split == 'held':
+            lines += ['本划分是已参与开发的TRAIN相机；不称为未见验证集，不读取受限GT。', '']
+        (args.output/'README.md').write_text('\n'.join(lines))
         return commands
 
     def metrics(args):
