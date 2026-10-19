@@ -1,0 +1,9 @@
+# 三个TRAIN视角原生Separation独立导出
+
+2026-10-19，ushas／lumimotion-ushas。新增总控`render_three_train_separation_v1.py`，仅用已保存模型在TRAIN1/75/149导出原生Separation，使正式父审核可以实际查看三个视角完整四类。未修改冻结V12、训练物理分支或旧实验。
+
+着色严格沿用独立审计已有定义：对原生get_binary_feature组成(feature,1-feature,0)，通过同一有效几何与原生光栅override_color渲染。此红绿特征图不是EL/DL、PBR残差或真实材质标签；物理分量继续独立展示。
+
+入口要求135TRAIN原标记、无GT监督、输出在output，冒烟模型与smoke_test目录互相匹配；安装原TRAIN读取白名单。自足重载按已有模型收据核验SHA，三个相机只读渲染、不优化，前后checkpoint SHA相同。输出三个PNG、源/模型/iteration/源码与图片SHA及执行收据，实际目检初始标记PENDING，不自动声称已看或精度PASS。完整外部bootstrap命令、GPU和日志由调用端另行保存。
+
+S25已在真实12150终点后完成三个视角导出，实际退出0；收据fixed_polish_three_train_separation_v1/receipt.json记录执行PASS、0优化及checkpoint不变。三个Separation已在fixed_polish_train_review_v1/three_train_four_classes_components.png六列联系表中实际查看，人工收据单独保存于manual_review.json。原渲染执行收据的初始PENDING不追溯修改，以保留父选择证据SHA；实际审核和父选择见报告1019-103。完整外部命令、GPU1、PID、真实退出码与日志记录在fixed_polish_three_train_separation_launch_v1.json及对应log。
