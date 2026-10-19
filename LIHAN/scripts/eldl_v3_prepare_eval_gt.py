@@ -241,7 +241,7 @@ def prepare(args, out):
         report['frames'][str(number)] = dict(file=filename, sha256=digest(out / 'gt_depth' / filename),
             source_frame=number, mesh=manifest['frames'][str(number)]['mesh'], audit=audit)
         if getattr(args, 'allow_dynamic', False):
-            report['frames'][str(number)]['time'] = (number-1)/149
+            report['frames'][str(number)]['time'] = record.get('time_normalized', (number-1)/149)
             report['frames'][str(number)]['geometry_sha256'] = manifest['frames'][str(number)]['geometry_sha256']
         report['source_sha256'][str(alpha_path.resolve())] = digest(alpha_path)
         report['source_sha256'][str(exr.resolve())] = digest(exr)
