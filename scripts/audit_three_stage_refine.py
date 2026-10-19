@@ -55,6 +55,16 @@ def main():
     groups_expected = ['albedo', 'roughness', 'environment', 'residual_amplitude', 'xyz', 'rotation', 'scale', 'opacity']
     geo_lr = dict(xyz=1e-7, rotation=5e-6, scale=1e-6, opacity=1e-4)
     frozen = config['geometry_continuation'] == 'frozen'
+    assert config['geometry_continuation'] in ['frozen', 'tiny', 'joint_decay']
+    def expected_rates(step):
+        if frozen:
+            return {name: 0. for name in geo_lr}
+        if config['geometry_continuation'] == 'tiny' or step == config['iterations']:
+            return geo_lr.copy()
+        assert config['refine_geometry_lr_schedule'] == 'stage2_joint_linear_to_floor'
+        initial = dict(xyz=1e-6, rotation=5e-5, scale=1e-5, opacity=1e-3)
+        return {name: value*(1-.9*step/config['iterations']) for name, value in initial.items()}
+    assert config['refine_geometry_lr'] == expected_rates(0)
     rows = []
     for step in a.steps:
         directory = a.model/f'three_stage/iteration_{step}'
@@ -76,7 +86,7 @@ def main():
         groups = state['optimizer']['param_groups']
         assert [g['name'] for g in groups] == groups_expected
         assert all(g['lr'] == pg['lr'] for g, pg in zip(groups[:4], ps['optimizer']['param_groups']))
-        assert all(g['lr'] == (0. if frozen else geo_lr[g['name']]) for g in groups[4:])
+        assert all(g['lr'] == expected_rates(step)[g['name']] for g in groups[4:])
         for index, group in enumerate(groups):
             assert len(group['params']) == 1
             key = group['params'][0]
@@ -111,6 +121,7 @@ def main():
         assert abs(row['loss']-expected) < 2e-6
         assert row['normal_depth_ratio'] == 0 and row['pbr_depth_ratio'] == 1 and row['normal_weight'] == .5
         assert row['normal_opacity_protected'] == (row['step'] <= config['refine_protect_end'])
+        assert all(row['groups'][name]['lr'] == lr for name, lr in expected_rates(row['step']).items())
         ng = row['geometry_branch_gradients']['opacity']
         assert ng['photo_alpha_gradient_norm'] > 0
         assert ng['normal_gradient_norm'] == 0 if row['normal_opacity_protected'] else ng['normal_gradient_norm'] > 0

@@ -1,4 +1,4 @@
-"""保留原生PBR与父Adam状态的Stage3末端继续；几何零或既有末端学习率。"""
+"""保留原生PBR与父Adam状态的Stage3末端继续及预登记几何日程。"""
 import argparse
 import copy
 import hashlib
@@ -23,6 +23,20 @@ from scripts.train_three_stage import install_guard, load_cameras, preview
 
 GEOMETRY = dict(xyz='_xyz', rotation='_rotation', scale='_scaling', opacity='_opacity')
 GEOMETRY_LR = dict(xyz=1e-7, rotation=5e-6, scale=1e-6, opacity=1e-4)
+JOINT_GEOMETRY_LR = dict(xyz=1e-6, rotation=5e-5, scale=1e-5, opacity=1e-3)
+
+
+def geometry_lrs(mode, step, horizon):
+    """保留原两种常量模式；新增既有联合初值到同一末端的线性日程。"""
+    assert horizon > 0 and 0 <= step <= horizon
+    if mode == 'frozen':
+        return {name: 0. for name in GEOMETRY_LR}
+    if mode == 'tiny' or (mode == 'joint_decay' and step == horizon):
+        # 终点显式使用登记floor，避免1-.9的浮点舍入改变末端记录。
+        return dict(GEOMETRY_LR)
+    if mode == 'joint_decay':
+        return {name: lr*(1-.9*step/horizon) for name, lr in JOINT_GEOMETRY_LR.items()}
+    raise ValueError('未知预登记几何日程：'+mode)
 
 
 def tensor_sha(tensor):
@@ -105,7 +119,7 @@ def main():
     parser.add_argument('--parent', type=Path, required=True)
     parser.add_argument('--parent_iteration', type=int, choices=[4050], required=True)
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--geometry', choices=['frozen', 'tiny'], required=True)
+    parser.add_argument('--geometry', choices=['frozen', 'tiny', 'joint_decay'], required=True)
     parser.add_argument('--preregistration', type=Path, required=True)
     parser.add_argument('--smoke', action='store_true')
     args = parser.parse_args()
@@ -120,8 +134,12 @@ def main():
     prereg = json.loads(args.preregistration.read_text())
     assert prereg['plan_sha256'] == sha(prereg['plan'])
     control = args.preregistration.resolve().parent
-    choice_path = control/'pbr_geo_refine_parent_train_only_v1.json'
+    choice_path = Path(prereg.get('parent_selection', control/'pbr_geo_refine_parent_train_only_v1.json'))
     assert sha(choice_path) == prereg['parent_selection_sha256']
+    if args.geometry == 'joint_decay':
+        assert prereg['plan_sha256'] == '0815e6ee5e66959b7fc90c7d850c29351b89721ac9328ae34175f693c04071a4'
+        assert prereg['new_A43_A44_test_values_or_images_read_before_registration'] is False
+        assert prereg['gt_used_for_parameters_or_budget'] is False
     # 计划明确固定A42完整终点；不从离线评价推断父路径或参数。
     assert parent == root/'output/1019-49-LH-static-jumpingjacks-ELDL-V3-A42追加预算父主要DL小残差/model_mlp'
     parent_record = json.loads((parent/'three_stage_training.json').read_text())
@@ -144,8 +162,10 @@ def main():
                   iterations=20 if args.smoke else 4050, schedule_horizon=20 if args.smoke else 4050,
                   refine_normal_weight=.5, refine_normal_depth_ratio=0.,
                   refine_protect_end=4 if args.smoke else 200,
-                  refine_geometry_lr={k: (v if args.geometry == 'tiny' else 0.) for k, v in GEOMETRY_LR.items()},
+                  refine_geometry_lr=geometry_lrs(args.geometry, 0, 20 if args.smoke else 4050),
                   refine_appearance_lr='inherit_parent_actual_constant', parent_cumulative_actual_updates=parent_cumulative)
+    if args.geometry == 'joint_decay':
+        config['refine_geometry_lr_schedule'] = 'stage2_joint_linear_to_floor'
     model.config, model.parent, model.parent_iteration = config, parent, args.parent_iteration
     model.anchor_geometry = {key: getattr(model.pc, key).detach().clone() for key in GEOMETRY.values()}
     model.lights.requires_grad_(False)
@@ -210,6 +230,10 @@ def main():
         camera = stack.pop(random.randrange(len(stack)))
         camera.load2device()
         order.append(camera.image_name_train_light)
+        rates = geometry_lrs(args.geometry, step, config['iterations'])
+        for group in optimizer.param_groups:
+            if group['name'] in GEOMETRY:
+                group['lr'] = rates[group['name']]
         package = model.render(camera, step, training=True)
         target, alpha = camera.original_image_train_light.cuda(), camera.gt_alpha_mask.cuda()
         photo, terms = photometric_objective(package, target, alpha, camera.observed_saturation_mask.cuda(), model.stats,
