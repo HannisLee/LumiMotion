@@ -92,13 +92,14 @@ def main():
     install_no_gt_guard(list(models.values())+[Path(p) for p in paths]+[out])
     pairs={name:pair(models[name+'0'],models[name+'1'],paths) for name in ['A','B']}
     passed=all(step['pass_geometry_and_numeric'] for item in pairs.values() for step in item.values())
+    launcher_argv=list(getattr(sys,'orig_argv',[sys.executable]+sys.argv))
     result=dict(status='PASS_CONTROLLED_PREFIX_AUDIT' if passed else 'FAILED_NUMERICAL_PREFIX_EQUIVALENCE',
         gt_read=False,test_read=False,model_accuracy_evaluated=False,all_four_same_parent_inputs_config=True,
-        pairs=pairs,source_sha256=paths,argv=sys.argv,
+        pairs=pairs,source_sha256=paths,argv=sys.argv,launcher_argv=launcher_argv,
         limitation='只证明相同父资产/输入/日程与PS生效前前缀；不证明后续几何准确率、PS收益或GPU逐位确定性')
     (out/'audit.json').write_text(json.dumps(result,ensure_ascii=False,indent=2,allow_nan=False)+'\n')
     (out/'README.md').write_text('# 四组同父配对前缀只读审计\n\n完整命令：\n\n```bash\n'+
-        shlex.join([sys.executable]+sys.argv)+'\n```\n\nsource/model：audit.json所列四组完整8100终点及0/1350前缀。\n'
+        shlex.join(launcher_argv)+'\n```\n\nsource/model：audit.json所列四组完整8100终点及0/1350前缀。\n'
         'iteration：0/1350；最终终点身份固定8100。渲染输出、图片、视频：本入口不生成。\n'
         '日志与定量：audit.json，stdout仅同一摘要；四类可视化均不适用，未冒称目检。\n'
         '最终结论：'+('PASS' if passed else 'FAILED')+'（仅同父前缀契约，不是质量结论）。\n')

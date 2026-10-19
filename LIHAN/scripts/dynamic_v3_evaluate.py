@@ -10,6 +10,7 @@ import importlib
 import importlib.util
 import json
 import math
+import os
 import shlex
 import socket
 import sys
@@ -349,7 +350,7 @@ def runtime(frozen):
     run.deform.deform.eval()
 
     def deformation(camera):
-        # 与原生Trainer/Stage2实际canonical查询一致，确定性二值门控。
+        # 与原生Trainer/Stage2实际canonical查询一致，保留get_binary_feature(eval=True)语义。
         return run.deform.step(run.pc._xyz,camera.fid.reshape(1,1).expand(len(run.pc._xyz),1),
             iteration=run.iteration,feature=run.pc.get_binary_feature(eval=True),
             camera_center=camera.camera_center,is_training=False)
@@ -912,7 +913,10 @@ def evaluate(args):
     out=fresh(args.output)
     log=(out/'evaluation.log').open('x');original_streams=sys.stdout,sys.stderr
     sys.stdout,sys.stderr=LogStream(sys.stdout,log),LogStream(sys.stderr,log)
-    command=shlex.join([sys.executable]+sys.argv)
+    launcher_argv=list(getattr(sys,'orig_argv',[sys.executable]+sys.argv))
+    environment={key:os.environ[key] for key in ['CUDA_VISIBLE_DEVICES','OMP_NUM_THREADS','MKL_NUM_THREADS',
+        'OPENBLAS_NUM_THREADS','NUMEXPR_NUM_THREADS'] if key in os.environ}
+    command=shlex.join(['env']+[key+'='+value for key,value in environment.items()]+launcher_argv)
     (out/'README.md').write_text('# 冻结动态模型统一评价\n\n完整执行/渲染命令：\n\n```bash\n'+command+
         '\n```\n\nsource：`'+frozen['source']+'`；model：`'+frozen['model']+'`；iteration：'+str(frozen['iteration'])+
         '。\n渲染输出：arrays；预测网格：predicted_meshes；日志：evaluation.log。'+
@@ -923,7 +927,7 @@ def evaluate(args):
         '\n最终结论：PENDING；工程执行通过不等于科学目标通过。\n')
     write(out/'supplementary_protocol.json',protocol)
     write(out/'freeze_snapshot.json',frozen)
-    write(out/'command.json',dict(argv=sys.argv,shell=shlex.join([sys.executable]+sys.argv),source=frozen['source'],
+    write(out/'command.json',dict(argv=sys.argv,launcher_argv=launcher_argv,environment=environment,shell=command,source=frozen['source'],
         model=frozen['model'],iteration=frozen['iteration'],output=str(out),test_gt_feedback_allowed=False))
     try:
         run,predict=runtime(frozen)
