@@ -114,6 +114,9 @@ def adapter(model, iteration, source, split, smoke=False):
                 raise AssertionError('完整RGB与独立几何／分量加和不同：'+str(parity))
             for field in ('render', 'base_linear', 'residual_linear', 'render_linear'):
                 prediction['rgb' if field == 'render' else field] = package[field].permute(1, 2, 0).cpu().numpy()
+            for field in ('environment_linear', 'direct_base_linear'):
+                if field in package:
+                    prediction[field] = package[field].permute(1, 2, 0).cpu().numpy()
             return prediction, parity
     return Run()
 
@@ -170,18 +173,25 @@ def main():
             for name, mask in [('full', foreground), ('body', foreground & (y <= stats['q_base_value'])),
                                ('bright', foreground & (y >= stats['q_bright_value']))]:
                 row[name] = dict(pixels=int(mask.sum()), linear_rgb_observed_mae=float(error[mask].mean()) if mask.any() else None)
-            for field in ('base_linear', 'residual_linear', 'render_linear'):
+            fields = ('base_linear', 'residual_linear', 'render_linear')
+            if 'environment_linear' in data:
+                fields += ('environment_linear', 'direct_base_linear')
+            for field in fields:
                 linear = np.maximum(data[field], 0)
                 display = np.where(linear <= .0031308, 12.92*linear, 1.055*np.maximum(linear, 1e-10)**(1/2.4)-.055)
                 legacy.save_png(out/f'{field}_{int(number):04d}.png', display)
                 row[field+'_foreground_mean'] = float(data[field][foreground].mean())
             row['add_max_error'] = float(np.abs(data['base_linear']+data['residual_linear']-data['render_linear']).max())
             assert row['add_max_error'] < 2e-5
+            if 'environment_linear' in data:
+                row['base_add_max_error'] = float(np.abs(data['environment_linear']+data['direct_base_linear']-data['base_linear']).max())
+                assert row['base_add_max_error'] < 2e-5
             rows.append(row)
         legacy.write(out/'metrics.json', dict(status='PASS_SEGMENTED_OBSERVED_RGB_EXECUTION', rows=rows,
             q_base=stats['q_base_value'], q_bright=stats['q_bright_value'], denominator='固定原Alpha前景，TRAIN冻结阈值',
             saturation_note='本表报告截断观测误差，不把饱和亮度解释为真实辐射度；训练另用逐通道删失',
-            component_semantics='Stage2加权EL／DL，或Stage3原生PBR基础／额外小残差；不是Separation图'))
+            component_semantics='Stage2加权EL／DL，或Stage3 PBR基础／额外小残差；新主要DL基础另存环境PBR/主要DL，基础为二者之和；不是Separation图',
+            pbr_base_mode=state['config'].get('pbr_base_mode', 'environment_only')))
     legacy.make_plan, legacy.model_record, legacy.adapter, legacy.metrics = make_plan, model_record, adapter, metrics
     # 逐步执行也验证新adapter，不让原生协议哈希掩盖新增接口的变更。
     if '--output' in sys.argv:

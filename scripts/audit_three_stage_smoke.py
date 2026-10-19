@@ -22,6 +22,27 @@ def main():
     camera = load_cameras(model.binding['source'])[0]; camera.load2device()
     with torch.no_grad():
         before = model.render(camera, a.iteration, components=True)
+        direct_base_check = None
+        if model.config.get('pbr_base_mode') == 'environment_plus_inherited_direct':
+            from scene.three_stage_normal_origin import NormalOriginPBRModel
+            from scene.three_stage_lighting import surface_components
+            from gaussian_renderer import render as render_direct
+            # 同一材质/环境的旧原生PBR前向独立核验环境基础，不用新加和自身证明自身。
+            native = NormalOriginPBRModel.render(model, camera, a.iteration, components=True)
+            effective = model.effective(camera)
+            _, direct, _ = surface_components(camera, effective, model.lights, model.visibility, a.iteration)
+            unit_dl = render_direct(camera, effective, model.pipe, torch.zeros(3, device='cuda'),
+                                    0., 0., 0., override_color=direct)['render']
+            mix = model.config['lambda_mix']
+            amplitude = .25*model.residual_raw.sigmoid()
+            direct_base_check = dict(
+                environment_max_error=float((before['environment_linear']-(1-mix)*native['base_linear']).abs().max()),
+                main_direct_max_error=float((before['direct_base_linear']-mix*unit_dl).abs().max()),
+                residual_max_error=float((before['residual_linear']-model.config['lambda_residual']*amplitude*unit_dl).abs().max()),
+                base_sum_max_error=float((before['base_linear']-before['environment_linear']-before['direct_base_linear']).abs().max()),
+                total_sum_max_error=float((before['render_linear']-before['base_linear']-before['residual_linear']).abs().max()),
+                inherited_lambda_mix=mix, actual_extra_direct_coefficient=float(model.config['lambda_residual']*amplitude))
+            assert max(v for k, v in direct_base_check.items() if k.endswith('_error')) < 2e-5
         native_depth_error = None
         if model.config.get('pbr_surface_depth_mode') == 'native_half':
             from copy import copy
@@ -101,6 +122,7 @@ def main():
         pbr_surface_depth_mode=model.config.get('pbr_surface_depth_mode', 'legacy_expected'),
         native_half_depth_max_abs=native_depth_error, audit_source_sha256=sha(__file__),
         pbr_origin_mode=model.config.get('pbr_origin_mode', 'ray_only'), actual_origin_check=origin_check,
+        pbr_base_mode=model.config.get('pbr_base_mode', 'environment_only'), direct_base_check=direct_base_check,
         normal_opacity=gradient, separation=str(a.output/'separation.png'),
         gt_read=False, test_read=False, scientific_accuracy_pass=False)
     write(a.output/'receipt.json', receipt)

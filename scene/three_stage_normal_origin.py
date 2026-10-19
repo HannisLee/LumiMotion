@@ -14,5 +14,7 @@ class NormalOriginPBRModel(NativePBRModel):
         obj = super().load(folder, step)
         if obj.config.get('pbr_origin_mode') != 'normal_existing_tmin' or obj.config.get('pbr_origin_normal_offset') != obj.config['shadow_bias']:
             raise ValueError('法线起点模式或既有t_min绑定不匹配，禁止重解释旧模型。')
+        if cls is NormalOriginPBRModel and obj.config.get('pbr_base_mode', 'environment_only') != 'environment_only':
+            raise ValueError('主要DL基础扩展必须由显式新类加载。')
         obj.pipe.pbr_origin_normal_offset = obj.config['pbr_origin_normal_offset']
         return obj

@@ -22,6 +22,8 @@ class NativePBRModel(ThreeStageModel):
             raise ValueError('拒绝把旧Expected模型重解释为原生混合深度模型。')
         if cls is NativePBRModel and obj.config.get('pbr_origin_mode', 'ray_only') != 'ray_only':
             raise ValueError('法线起点扩展模型必须由显式新类加载。')
+        if cls is NativePBRModel and obj.config.get('pbr_base_mode', 'environment_only') != 'environment_only':
+            raise ValueError('主要DL基础扩展必须由显式新类加载。')
         obj.pipe.depth_ratio = 1.
         return obj
 
@@ -30,6 +32,14 @@ def load_three_stage_model(folder, step):
     """从显式配置分派；不猜测、不修改旧模型、不使用GT回退。"""
     record = json.loads((Path(folder)/'three_stage_training.json').read_text())
     mode = record['config'].get('pbr_surface_depth_mode', 'legacy_expected')
+    base = record['config'].get('pbr_base_mode', 'environment_only')
+    if base == 'environment_plus_inherited_direct':
+        if mode != 'native_half' or record['config'].get('pbr_origin_mode') != 'normal_existing_tmin':
+            raise ValueError('主要DL基础要求显式原生混合深度与法线起点模式。')
+        from scene.three_stage_direct_base import DirectBasePBRModel
+        return DirectBasePBRModel.load(folder, step)
+    if base != 'environment_only':
+        raise ValueError('未知PBR基础模式：'+str(base))
     if mode == 'native_half':
         origin = record['config'].get('pbr_origin_mode', 'ray_only')
         if origin == 'normal_existing_tmin':

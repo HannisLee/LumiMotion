@@ -65,6 +65,9 @@ def preview(path, package):
         normal=(F.normalize(package['rend_normal'], dim=0)+1)/2,
         base=linear_to_srgb(package['base_linear'].clamp_min(0)),
         residual=linear_to_srgb(package['residual_linear'].clamp_min(0)))
+    for field in ('environment_linear', 'direct_base_linear'):
+        if field in package:
+            views[field] = linear_to_srgb(package[field].clamp_min(0))
     for name, tensor in views.items():
         image = (tensor.detach().permute(1, 2, 0).clamp(0, 1).cpu().numpy()[..., ::-1]*255).round().astype(np.uint8)
         assert cv2.imwrite(str(path/(name+'.png')), image)
