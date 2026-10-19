@@ -120,6 +120,8 @@ def main(model_class=None, actual_entrypoint='scripts/train_three_stage.py', ext
                         help='仅Stage2混合权重；Stage3自动继承父Stage2记录。')
     parser.add_argument('--normal_weight', type=float, choices=[.1, .5], default=.1,
                         help='仅Stage2的GS/Expected一致性损失权重；Stage3继承父记录。')
+    parser.add_argument('--normal_protection', choices=['warmup', 'joint'], default='warmup',
+                        help='仅Stage2：normal到opacity的恢复期保护或全联合阶段隔离。')
     parser.add_argument('--lambda_residual', type=float, choices=[0., .1], default=0.)
     parser.add_argument('--pbr_samples', type=int, choices=[16, 128, 256], default=16)
     parser.add_argument('--smoke', action='store_true')
@@ -148,15 +150,20 @@ def main(model_class=None, actual_entrypoint='scripts/train_three_stage.py', ext
             raise ValueError('Stage3不新设Stage2混合权重，必须继承父记录。')
         if args.normal_weight != .1:
             raise ValueError('Stage3不新设几何一致性权重，必须继承父记录。')
+        if args.normal_protection != 'warmup':
+            raise ValueError('Stage3不新设几何梯度保护，必须继承父记录。')
     install_guard(binding['source'], output, parent, binding)
     random.seed(0); np.random.seed(0); torch.manual_seed(0); torch.cuda.manual_seed_all(0)
     torch.set_num_threads(4)
     inherited_mix = args.lambda_mix if args.stage == 2 else record['config']['lambda_mix']
     config = dict(direction_lr=args.direction_lr, lambda_mix=inherited_mix, lambda_residual=args.lambda_residual,
         normal_weight=args.normal_weight if args.stage == 2 else record['config'].get('normal_weight', .1),
+        normal_protection=args.normal_protection if args.stage == 2 else record['config'].get('normal_protection', 'warmup'),
         shadow_bias=.009978598594665527, pbr_samples=args.pbr_samples, pbr_pixels=2048,
         base_end=4 if args.smoke else 540, residual_end=8 if args.smoke else 1080,
         protect_end=12 if args.smoke else 1280, iterations=20 if args.smoke else (8100 if args.stage == 2 else 4050))
+    if args.stage == 2 and config['normal_protection'] == 'joint':
+        config['protect_end'] = config['iterations']
     saves = [0, 4, 8, 20] if args.smoke else ([0, 540, 1080, 4050, 8100] if args.stage == 2 else [0, 1350, 2700, 4050])
     model_dir = output/'model_mlp'; model_dir.mkdir()
     model = (model_class or ThreeStageModel)(parent, parent_iteration, binding, args.stage, config)
@@ -222,10 +229,12 @@ def main(model_class=None, actual_entrypoint='scripts/train_three_stage.py', ext
         alpha_loss = F.binary_cross_entropy(package['rend_alpha'].clamp(1e-6, 1-1e-6), alpha)
         loss = loss+.1*alpha_loss
         if args.stage == 2 and step > config['residual_end']:
-            normal = geometry_loss(model, camera, package, step <= config['protect_end'])
+            protect_normal_opacity = step <= config['protect_end']
+            normal = geometry_loss(model, camera, package, protect_normal_opacity)
             anchor, smooth = model.lights.direction_regularization()
             loss = loss+config['normal_weight']*normal+anchor+10*smooth
-            terms.update(normal=normal, direction_anchor=anchor, direction_smooth=smooth)
+            terms.update(normal=normal, direction_anchor=anchor, direction_smooth=smooth,
+                         normal_opacity_protected=protect_normal_opacity)
         if args.stage == 3:
             anchor = (model.env.base-math.log(model.env_initial)).square().mean()
             loss = loss+.01*anchor+.01*(.25*model.residual_raw.sigmoid()).square()
