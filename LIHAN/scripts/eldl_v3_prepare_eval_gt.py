@@ -159,7 +159,7 @@ def worker(args):
     if digest(blend) != original_hash:
         raise AssertionError('源blend变化。')
     write(out / 'meshes/manifest.json', report)
-    if not report['static_geometry']:
+    if not report['static_geometry'] and not getattr(args, 'allow_dynamic', False):
         raise ValueError('全部150帧evaluated几何并非完全静态；保留现场。')
 
 
@@ -173,14 +173,13 @@ def prepare(args, out):
     cameras = json.loads((args.source / 'camera.json').read_text())
     width = round(cameras['resolution']['width'] / 2)
     height = round(cameras['resolution']['height'] / 2)
-    meshfile = out / 'meshes' / manifest['frames']['1']['mesh']
-    mesh = dict(np.load(meshfile, allow_pickle=False))
-    scene = o3d.t.geometry.RaycastingScene(nthreads=args.threads)
-    scene.add_triangles(o3d.core.Tensor(mesh['vertices'], dtype=o3d.core.Dtype.Float32),
-                       o3d.core.Tensor(mesh['triangles'].astype(np.uint32)))
+    if not manifest['static_geometry'] and not getattr(args, 'allow_dynamic', False):
+        raise ValueError('静态入口禁止读取动态manifest，必须使用独立动态入口。')
+    # 只缓存当前实际网格；动态150帧不常驻150个BVH。
+    previous_mesh = None
     report = dict(format_version=1, evaluation_only=True,
                   depth_convention='positive camera Z; unnormalized pinhole rays', pixel_center=.5,
-                  width=width, height=height, resolution=2, static_geometry=True,
+                  width=width, height=height, resolution=2, static_geometry=manifest['static_geometry'],
                   unit_system=manifest['unit_system'], meters_per_world_unit=manifest['meters_per_world_unit'],
                   mesh_manifest=str(out / 'meshes/manifest.json'),
                   mesh_manifest_sha256=digest(out / 'meshes/manifest.json'),
@@ -193,6 +192,16 @@ def prepare(args, out):
         anatomy_status={k: 'AVAILABLE' if n else 'NOT_AVAILABLE' for k, n in anatomy.items()},
         rule='按1019-02固定协议；顶点组三角面权重比例>=0.5，足优先；GT仅供评测。'))
     for number in range(1, 151):
+        frame_mesh = manifest['frames'][str(number)]['mesh']
+        if frame_mesh != previous_mesh:
+            meshfile = out / 'meshes' / frame_mesh
+            if digest(meshfile) != manifest['meshes'][frame_mesh]['sha256']:
+                raise ValueError('实际时刻GT网格SHA不符：'+frame_mesh)
+            mesh = dict(np.load(meshfile, allow_pickle=False))
+            scene = o3d.t.geometry.RaycastingScene(nthreads=args.threads)
+            scene.add_triangles(o3d.core.Tensor(mesh['vertices'], dtype=o3d.core.Dtype.Float32),
+                               o3d.core.Tensor(mesh['triangles'].astype(np.uint32)))
+            previous_mesh = frame_mesh
         record = cameras['frames'][f'{number:04d}']
         c2w = np.asarray(record['extrinsics']['camera_to_world'])
         i = record['intrinsics']; sx = width / cameras['resolution']['width']; sy = height / cameras['resolution']['height']
@@ -231,6 +240,9 @@ def prepare(args, out):
             gt_exr_valid=target_valid, intrinsics=intrinsic, camera_to_world=c2w)
         report['frames'][str(number)] = dict(file=filename, sha256=digest(out / 'gt_depth' / filename),
             source_frame=number, mesh=manifest['frames'][str(number)]['mesh'], audit=audit)
+        if getattr(args, 'allow_dynamic', False):
+            report['frames'][str(number)]['time'] = (number-1)/149
+            report['frames'][str(number)]['geometry_sha256'] = manifest['frames'][str(number)]['geometry_sha256']
         report['source_sha256'][str(alpha_path.resolve())] = digest(alpha_path)
         report['source_sha256'][str(exr.resolve())] = digest(exr)
         # 先保留数组/审计再拒绝，失败不删除。
@@ -248,13 +260,19 @@ def prepare(args, out):
     return report
 
 
-def main():
+def main(source=None, allowed=None, script=None, blend_relative='_export/source_scene.blend', allow_dynamic=False):
+    global SOURCE, ALLOWED
+    if source is not None:
+        SOURCE = Path(source).resolve()
+    if allowed is not None:
+        ALLOWED = Path(allowed).resolve()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source', type=Path, default=SOURCE)
     parser.add_argument('--output', type=Path, default=ALLOWED / 'gt_v1')
     parser.add_argument('--blender', type=Path, default=TOOLS / 'blender-5.2.2-linux-x64/blender')
     parser.add_argument('--threads', type=int, default=4)
     parser.add_argument('--blender-worker', action='store_true', help=argparse.SUPPRESS)
+    parser.set_defaults(allow_dynamic=allow_dynamic)
     argv = sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else None
     args = parser.parse_args(argv)
     if socket.gethostname() != 'ushas':
@@ -271,10 +289,11 @@ def main():
     args.output.mkdir(parents=True)
     for sub in ('meshes', 'gt_depth', 'previews', 'logs'):
         (args.output / sub).mkdir()
-    blend = args.source / '_export/source_scene.blend'
-    snapshots = {str(p): digest(p) for p in (blend, args.source / 'camera.json', args.source / 'object_pose.json', Path(__file__))}
-    command = [str(args.blender.resolve()), '--factory-startup', '--disable-autoexec', '-b', str(blend),
-               '--python', str(Path(__file__).resolve()), '--', '--blender-worker',
+    blend = args.source / blend_relative
+    entry = Path(script or __file__).resolve()
+    snapshots = {str(p): digest(p) for p in (blend, args.source / 'camera.json', args.source / 'object_pose.json', Path(__file__), entry)}
+    command = [str(args.blender.resolve()), '--factory-startup', '--disable-autoexec', '--threads', str(args.threads), '-b', str(blend),
+               '--python', str(entry), '--', '--blender-worker',
                '--source', str(args.source), '--output', str(args.output)]
     write(args.output / 'plan.json', dict(command=command, shell=shlex.join(command), source_sha256=snapshots,
         python=sys.executable, host=socket.gethostname(), evaluated_frames=list(range(1,151)),
