@@ -35,6 +35,9 @@ NEW = ROOT/'data/LH-data/LH-dynamic-jumpingjacks-ELDL-V3'
 OLD_GT = CONTROL/'eval_only/old_dynamic_gt_v1/gt_depth'
 NEW_GT = CONTROL/'eval_only/dynamic_gt_v1/gt_depth'
 OLD_MODEL = ROOT/'output/1011-04-LH-dynamic-jumpingjacks_EL_V2-原生LumiMotion两阶段/stage1_frozen'
+DL_V2 = ROOT/'data/LH-data/danamic/LH-dynamic-jumpingjacks_DL_V2'
+DL_V2_GT = ROOT/'output/archive/1011-07-六组训练总控/GT-LH-dynamic-jumpingjacks_DL_V2/gt_depth'
+DL_V2_MODEL = ROOT/'output/1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段/stage1_frozen'
 TEST = list(range(10, 151, 10))
 DEV = [n for n in range(61, 80) if n % 10]
 TRAIN = [n for n in range(1, 151) if n not in TEST + DEV]
@@ -172,8 +175,8 @@ def audit_gt_inputs(bundle):
 
 
 def prepare(args):
-    raw = OLD if args.dataset == 'elv2' else NEW
-    gt = (args.gt or (OLD_GT if args.dataset == 'elv2' else NEW_GT)).resolve()
+    raw = {'elv2': OLD, 'v3': NEW, 'dlv2': DL_V2}[args.dataset]
+    gt = (args.gt or {'elv2': OLD_GT, 'v3': NEW_GT, 'dlv2': DL_V2_GT}[args.dataset]).resolve()
     if not (gt/'manifest.json').is_file():
         raise FileNotFoundError('先定位真实GT目录：'+str(gt))
     camera_path = raw/'camera.json'
@@ -184,7 +187,7 @@ def prepare(args):
     records = {}
     for n in range(1, 151):
         c = camera['frames'][f'{n:04d}']; i = c['intrinsics']
-        records[str(n)] = dict(source_frame=n, time=n/150 if args.dataset == 'elv2' else (n-1)/149,
+        records[str(n)] = dict(source_frame=n, time=n/150 if args.dataset in ('elv2','dlv2') else (n-1)/149,
             transform_matrix=c['extrinsics']['camera_to_world'],
             intrinsics=[i['fx']/2, i['fy']/2, i['cx']/2, i['cy']/2])
     rng = np.random.default_rng(1019); samples=[]
@@ -219,6 +222,8 @@ def source_bundle(path):
     bundle = read(path)
     if bundle['dataset']=='elv2' and Path(bundle['gt']).resolve()!=OLD_GT.resolve():
         raise ValueError('最终EL_V2只使用old_dynamic_gt_v1语义GT，请重新prepare；historical仅供历史诊断。')
+    if bundle['dataset']=='dlv2' and (Path(bundle['gt']).resolve()!=DL_V2_GT.resolve() or Path(bundle['raw']).resolve()!=DL_V2.resolve()):
+        raise ValueError('DL_V2必须绑定自身原数据与归档GT，不可复用ELDL或EL_V2。')
     verify(bundle['source_files'])
     if bundle['test_frames'] != TEST or len(bundle['frames']) != 150 or not bundle['evaluation_only']:
         raise ValueError('评测source需要完整固定15TEST和150时刻。')
@@ -246,8 +251,10 @@ def assets(model, step, stage, dataset):
         paths += [marker_path, model/f'dynamic_v3/iteration_{step}/state.pt',receipt_path]
         if marker.get('gt_supervision') is not False or marker.get('external_test_read') is not False:
             raise ValueError('Stage2需要明确无GT监督/无外部TEST读取。')
-        if marker.get('train_frames')!=TRAIN or dataset!='v3':
+        if marker.get('train_frames')!=TRAIN or dataset not in ('v3','dlv2'):
             raise ValueError('本轮Stage2只能使用新V3固定117TRAIN。')
+        if dataset=='dlv2' and Path(marker['parent']).resolve()!=DL_V2_MODEL.resolve():
+            raise ValueError('DL_V2 Stage2必须从其真实原生Stage1出发。')
         if marker.get('actual_optimizer_updates')!=step or marker.get('parent_iteration')!=35000:
             raise ValueError('Stage2真实新增更新数/Stage1父步数不符。')
         for relative,expected in receipt['checkpoint_sha256'].items():
@@ -266,6 +273,13 @@ def assets(model, step, stage, dataset):
         for relative, expected in marker['checkpoint_sha256'].items():
             if sha(model/relative) != expected:
                 raise ValueError('训练终点checkpoint SHA不符。')
+    elif dataset == 'dlv2':
+        if model != DL_V2_MODEL.resolve() or step != 35000:
+            raise ValueError('DL_V2仅允许已核验stage1_frozen@35000。')
+        original=model.parent/'model_mlp'
+        for relative in ('cfg_args', 'point_cloud/iteration_35000/point_cloud.ply', 'deform/iteration_35000/deform.pth'):
+            if sha(model/relative)!=sha(original/relative):
+                raise ValueError('DL_V2冻结Stage1与真实原生训练资产不一致：'+relative)
     else:
         if model != OLD_MODEL.resolve() or step != 35000:
             raise ValueError('EL_V2仅允许已核验真实stage1_frozen@35000。')
@@ -301,7 +315,7 @@ def freeze(args):
         iteration=args.iteration,stage=args.stage,source_files=files,config=config,
         stage2_module=args.stage2_module,marker_snapshot=marker,
         code_sha256={str(p):sha(p) for p in code_paths},
-        time_rule='frame/150' if bundle['dataset']=='elv2' else '(frame-1)/149',
+        time_rule='frame/150' if bundle['dataset'] in ('elv2','dlv2') else '(frame-1)/149',
         test_frames=TEST,normal_missing_penalty=180,normal_aggregation='帧等权、三方法等权',
         supplementary_protocol=supplementary_protocol(bundle,args.track_protocol,args.correspondence),
         gt_mesh_manifest=str(gt_mesh_directory(bundle)/'manifest.json'),
@@ -539,7 +553,7 @@ def gt_mesh_directory(bundle):
     """已实际核验的两种归档布局；不使用manifest中失效的旧绝对路径。"""
     gt=Path(bundle['gt'])
     historical=ROOT/'output/archive/1011-07-六组训练总控/GT-LH-dynamic-jumpingjacks_EL_V2/gt_depth'
-    folder=gt.parent/('gt_meshes' if gt==historical else 'meshes')
+    folder=gt.parent/('gt_meshes' if gt==historical or bundle['dataset']=='dlv2' else 'meshes')
     if not (folder/'manifest.json').is_file():
         raise FileNotFoundError('未登记该GT的真实mesh目录：'+str(folder))
     return folder
@@ -1075,7 +1089,7 @@ def self_check():
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--action',required=True,choices=('prepare','freeze','check','self-check','run'))
-    parser.add_argument('--dataset',choices=('elv2','v3'),default='v3')
+    parser.add_argument('--dataset',choices=('elv2','v3','dlv2'),default='v3')
     parser.add_argument('--source',type=Path,help='隔离prepare产物source.json')
     parser.add_argument('--gt',type=Path,help='真实gt_depth目录；默认已定位新/旧目录')
     parser.add_argument('--output',type=Path)
