@@ -117,7 +117,16 @@ def direction_audit(args):
     gt_path = RAW/'lights.json'; data = read(gt_path)
     gt = []
     for n in range(1,151):
-        item = data[f'{n:04d}']; v = np.asarray(item['light_dir_world'],np.float64)
+        item = data.get('frames',data)[f'{n:04d}']
+        if 'light_dir_world' in item:
+            v = np.asarray(item['light_dir_world'],np.float64)
+        else:
+            lights = item['lights']
+            assert lights and all(light['source_type']=='SUN' for light in lights)
+            directions = [np.asarray(light['light_dir_world'],np.float64) for light in lights]
+            directions = [d/np.linalg.norm(d) for d in directions]
+            assert all(np.allclose(d,directions[0],atol=1e-7,rtol=0) for d in directions),'多盏SUN不同向，不能用单方向GT代替'
+            v = directions[0]
         assert np.isfinite(v).all() and np.linalg.norm(v)>0
         gt.append(v/np.linalg.norm(v))
     gt = np.asarray(gt)
@@ -140,6 +149,51 @@ def direction_audit(args):
         gt_sha256=sha(gt_path),lighting_sha256=sha(out/'lighting.json'),summary=summary,
         per_frame=[dict(frame=n,error_deg=float(error[n-1]),pred=pred[n-1].tolist(),gt=gt[n-1].tolist()) for n in range(1,151)]))
     print(json.dumps(summary,ensure_ascii=False),flush=True)
+
+
+def finish_evaluation(args):
+    """保留首次评价异常，从既有冻结8100终点继续，不重新训练或选模。"""
+    out=args.experiment.resolve(); assert out.is_relative_to(ROOT/'output')
+    assert socket.gethostname()=='ushas' and Path(sys.executable).resolve()==Path(PYTHON).resolve()
+    state=read(out/'state.json'); assert state['status']=='FAILED'
+    assert read(out/'training_finished.json')['actual_optimizer_updates']==8100
+    lock=read(out/'evaluation_lock.json'); assert lock['both_frozen_before_test']
+    for entry in lock['entries']:assert sha(entry['freeze'])==entry['sha256']
+    previous=out/'state_failed_direction_audit_v1.json';assert not previous.exists()
+    shutil.copyfile(out/'state.json',previous)
+    state.update(status='EVALUATION_RECOVERY_RUNNING',continuation_pid=os.getpid(),
+                 failed_execution_retained=str(previous),evaluation_reader_fix='DL V2 schema2 frames/lights；全部SUN逐帧同向核验')
+    def persist():state['updated_unix']=time.time();write(out/'state.json',state)
+    env=dict(os.environ,CUDA_VISIBLE_DEVICES=str(args.gpu),DYNAMIC_V3_REPO_ROOT=str(ROOT),PYTHONUNBUFFERED='1',
+             OMP_NUM_THREADS='4',MKL_NUM_THREADS='4',OPENBLAS_NUM_THREADS='4',NUMEXPR_NUM_THREADS='4')
+    def job(name,cmd,expected):
+        assert name not in state['jobs'] and not (out/(name+'.log')).exists()
+        row=dict(command=cmd,shell=shlex.join(cmd),started_unix=time.time(),status='STARTING')
+        state['jobs'][name]=row;state['status']='RUNNING_'+name.upper();persist()
+        with (out/'README.md').open('a') as f:f.write('\n### '+name+'完整命令\n\n```bash\n'+shlex.join(cmd)+'\n```\n\n日志：'+name+'.log\n')
+        with (out/(name+'.log')).open('x') as log:
+            proc=subprocess.Popen(cmd,cwd=ROOT,env=env,stdout=log,stderr=subprocess.STDOUT)
+            row.update(pid=proc.pid,status='RUNNING');persist();rc=proc.wait()
+        row.update(exit_code=rc,status='PROCESS_FINISHED' if rc==0 else 'FAILED',finished_unix=time.time());persist()
+        assert rc==0 and Path(expected).is_file(),name+'失败；保留现场'
+    persist()
+    try:
+        job('direction_audit_retry1',[PYTHON,'-m','LIHAN.scripts.reproduce_dynamic_dl_v2_h0','--action','direction-audit',
+            '--experiment',str(out)],out/'eval_only/direction_audit_v1/audit.json')
+        summary={}
+        for entry in lock['entries']:
+            label=entry['label'];folder=out/f'eval_only/1021-01-LH-dynamic-jumpingjacks_DL_V2-{label}统一评价'
+            cmd=[PYTHON,str(ROOT/'LIHAN/scripts/bootstrap_1011.py'),str(ROOT),'LIHAN.scripts.dynamic_v3_evaluate',
+                 '--action','run','--freeze',entry['freeze'],'--output',str(folder)]
+            job('evaluate_'+label,cmd,folder/'COMPLETED.json')
+            metric=read(folder/'metrics.json')
+            summary[label]=dict(evaluation=str(folder),normal_composite=metric['normal_composite_fixed_denominator_mae'],
+                normal=metric['summary']['foreground']['normal'],rgb=metric['rgb']['foreground'],metrics_sha256=sha(folder/'metrics.json'))
+        write(out/'quantitative_summary.json',summary)
+        state.update(status='READY_FOR_MANUAL_REVIEW',finished_unix=time.time());persist()
+        with (out/'README.md').open('a') as f:f.write('\n原8100终点接续方向评价及同协议Stage1/Stage2完整评价完成，全部失败日志保留；最终实际目检/科学结论PENDING。\n')
+    except Exception as exc:
+        state.update(status='FAILED_EVALUATION_RECOVERY',continuation_error=repr(exc),finished_unix=time.time());persist();raise
 
 
 def supervise(args):
@@ -239,7 +293,7 @@ def supervise(args):
 
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--action',choices=['supervise','intensity','direction-audit'],default='supervise')
+    p.add_argument('--action',choices=['supervise','intensity','direction-audit','finish-evaluation'],default='supervise')
     p.add_argument('--experiment',type=Path,required=True);p.add_argument('--gpu',type=int,default=2)
     a=p.parse_args()
-    {'supervise':supervise,'intensity':intensity,'direction-audit':direction_audit}[a.action](a)
+    {'supervise':supervise,'intensity':intensity,'direction-audit':direction_audit,'finish-evaluation':finish_evaluation}[a.action](a)
