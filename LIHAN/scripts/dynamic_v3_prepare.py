@@ -27,7 +27,8 @@ def main():
     args = parser.parse_args()
     source, out = args.source.resolve(), args.output.resolve()
     root = Path(__file__).resolve().parents[2]
-    assert source.name == 'LH-dynamic-jumpingjacks-ELDL-V3'
+    assert source.name in ('LH-dynamic-jumpingjacks-ELDL-V3', 'LH-dynamic-jumpingjacks_DL_V2')
+    dl_v2 = source.name == 'LH-dynamic-jumpingjacks_DL_V2'
     assert out.is_relative_to(root/'output')
     camera = json.loads((source/'camera.json').read_text())
     ids = sorted(map(int, camera['frames']))
@@ -79,7 +80,7 @@ def main():
         assert np.max(np.abs(c2w@w2c-np.eye(4))) < 1e-5
         assert abs(intr['cx']-400) < 1e-6 and abs(intr['cy']-400) < 1e-6
         assert abs(intr['fx']-intr['fy']) < 1e-6
-        records.append(dict(file_path=image.name, source_frame=i, time=(i-1)/149,
+        records.append(dict(file_path=image.name, source_frame=i, time=i/150 if dl_v2 else (i-1)/149,
                             camera_angle_x=intr['fov_x_rad'], camera_angle_y=intr['fov_y_rad'],
                             fl_x=intr['fx'], fl_y=intr['fy'], cx=intr['cx'], cy=intr['cy'],
                             transform_matrix=c2w.tolist()))
@@ -105,7 +106,7 @@ def main():
     PlyData([PlyElement.describe(vertices, 'vertex')]).write(out/'points3d.ply')
     manifest = dict(dataset=source.name, source=str(source), gt_read=False, init_weights_loaded=False,
         train_frames=train, dev_frames=dev, test_frames=test,
-        time_rule='(source_frame-1)/149，所有划分共享全序列时间，禁止按子集重新编号',
+        time_rule=('source_frame/150' if dl_v2 else '(source_frame-1)/149')+'，沿用各自原生Stage1时间，禁止按子集重新编号',
         alpha_source='原albedo的Alpha通道；image的Alpha全满码，albedo RGB禁止进入训练',
         color='16位Standard/sRGB码值；Stage1沿原生码值损失，Stage2统一sRGB逆变换至线性后光栅合成',
         initialization=dict(method='原生随机100k立方体', seed=0),
