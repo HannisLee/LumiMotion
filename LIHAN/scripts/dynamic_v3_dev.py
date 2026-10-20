@@ -43,7 +43,8 @@ def prepare(args):
     import numpy as np
     from LIHAN.scripts.dynamic_v3_radiometry import linearize
     raw = args.raw.resolve()
-    assert raw.name == 'LH-dynamic-jumpingjacks-ELDL-V3'
+    assert raw.name in ('LH-dynamic-jumpingjacks-ELDL-V3', 'LH-dynamic-jumpingjacks_DL_V2')
+    dl_v2 = raw.name == 'LH-dynamic-jumpingjacks_DL_V2'
     radiometry, stats = read(args.radiometry), read(args.stats)
     train_manifest = read(args.train_manifest)
     assert radiometry['status'] == 'PASS_TRAIN_FIXED_BACKGROUND'
@@ -93,7 +94,7 @@ def prepare(args):
         w2c = np.asarray(f['extrinsics']['world_to_camera'])
         assert np.max(np.abs(c2w@w2c-np.eye(4))) < 1e-5
         assert abs(intr['cx']-400) < 1e-6 and abs(intr['cy']-400) < 1e-6
-        records.append(dict(file_path=image.name, source_frame=n, time=(n-1)/149,
+        records.append(dict(file_path=image.name, source_frame=n, time=n/150 if dl_v2 else (n-1)/149,
             camera_angle_x=intr['fov_x_rad'], camera_angle_y=intr['fov_y_rad'],
             fl_x=intr['fx'], fl_y=intr['fy'], cx=intr['cx'], cy=intr['cy'], transform_matrix=c2w.tolist()))
         provenance[str(image)] = dict(sha256=sha(image), used_channels=['R', 'G', 'B'])
@@ -123,7 +124,8 @@ def validate_source(source):
     assert not m['gt_read'] and not m['test_read']
     transforms = read(source/'transforms_dev.json')
     assert [f['source_frame'] for f in transforms['frames']] == DEV
-    assert all(abs(f['time']-(f['source_frame']-1)/149) < 1e-12 for f in transforms['frames'])
+    dl_v2 = Path(m['raw']).name == 'LH-dynamic-jumpingjacks_DL_V2'
+    assert all(abs(f['time']-(f['source_frame']/150 if dl_v2 else (f['source_frame']-1)/149)) < 1e-12 for f in transforms['frames'])
     assert [f['file_path'] for f in transforms['frames']] == [f'image_{n:04d}.png' for n in DEV]
     expected = {'transforms_dev.json'}
     expected.update(f'images/image_{n:04d}.png' for n in DEV)
