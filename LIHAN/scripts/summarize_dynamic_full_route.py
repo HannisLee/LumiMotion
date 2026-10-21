@@ -43,7 +43,8 @@ def main(control):
             for relative,digest in receipt['checkpoint_sha256'].items():
                 assert hashlib.sha256((folder/relative).read_bytes()).hexdigest()==digest
             checkpoint=torch.load(folder/f'dynamic_full_route/iteration_{step}/state.pt',map_location='cpu',weights_only=False)
-            expected=F.normalize(torch.tensor(lighting['directions'],dtype=torch.float32),dim=-1)
+            # 原训练在CUDA上归一化；CPU重算可差一个float32 ULP，不能据此判作灯向漂移。
+            expected=F.normalize(torch.tensor(lighting['directions'],dtype=torch.float32,device='cuda'),dim=-1).cpu()
             assert torch.equal(expected,checkpoint['lighting']['table.raw_directions'])
             if dataset=='dlv2':assert torch.count_nonzero(checkpoint['lighting']['coefficients'])==0
             endpoint_audits[str(step)]=dict(directions_bitwise_unchanged=True,receipt_verified=True,
