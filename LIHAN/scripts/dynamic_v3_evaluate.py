@@ -242,7 +242,23 @@ def assets(model, step, stage, dataset):
     paths=[config_path, model/f'point_cloud/iteration_{step}/point_cloud.ply',
         model/f'deform/iteration_{step}/deform.pth']
     marker = None
-    if stage == 'stage2':
+    if stage == 'stage2' and (model/'dynamic_full_route.json').is_file():
+        marker_path=model/'dynamic_full_route.json';marker=read(marker_path)
+        if marker.get('route')!='dynamic_full_route_v1' or step not in (16000,16500,18000):
+            raise ValueError('完整路线只允许预登记的三个检查点。')
+        if (marker.get('gt_supervision') is not False or marker.get('external_test_read') is not False
+                or marker.get('train_frames')!=TRAIN or marker.get('dataset')!=dataset
+                or marker.get('actual_optimizer_updates')!=18000 or not marker.get('fresh_random_initialization')):
+            raise ValueError('完整路线训练登记不符。')
+        receipt_path=model/f'dynamic_full_route/iteration_{step}/receipt.json';receipt=read(receipt_path)
+        if receipt['actual_optimizer_updates']!=step or receipt['gt_read'] is not False:
+            raise ValueError('完整路线实际更新数不符。')
+        paths += [marker_path,receipt_path,model/f'dynamic_full_route/iteration_{step}/state.pt']
+        for relative,expected in receipt['checkpoint_sha256'].items():
+            path=(model/relative).resolve()
+            if not path.is_relative_to(model) or sha(path)!=expected:raise ValueError('完整路线checkpoint SHA不符。')
+        config.update(marker['config'])
+    elif stage == 'stage2':
         if step != 8100:
             raise ValueError('本轮Stage2仅允许预登记真实新增8100更新终点。')
         marker_path=model/'dynamic_v3_stage2.json';marker=read(marker_path)
@@ -359,7 +375,7 @@ def runtime(frozen):
     run.config=dict(config,compute_cov3D_python=False,convert_SHs_python=False,
                     pbr_rasterizer_backend='lumimotion',depth_ratio=config.get('depth_ratio',1.))
     parent_iteration=int((frozen.get('marker_snapshot') or {}).get('parent_iteration',35000))
-    run.iteration=parent_iteration if photo else step
+    run.iteration=step if (frozen.get('marker_snapshot') or {}).get('route')=='dynamic_full_route_v1' else parent_iteration if photo else step
     run.pc.active_sh_degree=int(config.get('active_sh_degree',min(run.pc.max_sh_degree,run.iteration//config.get('oneupSHdegree_step',1000))))
     run.pc.no_binary_separation=bool(config.get('no_binary_separation',False))
     run.deform.deform.eval()
