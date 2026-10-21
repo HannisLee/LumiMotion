@@ -322,9 +322,15 @@ def freeze(args):
         ROOT/'scene/pbr_rasterizer.py',ROOT/'scene/dataset_readers.py',ROOT/'utils/graphics_utils.py',
         ROOT/'utils/general_utils.py',ROOT/'utils/point_utils.py',ROOT/'utils/sh_utils.py']
     if args.stage=='stage2':
+        if (marker or {}).get('route')=='dynamic_full_route_v1' and args.stage2_module!='LIHAN.scripts.dynamic_full_route':
+            raise ValueError('完整路线必须绑定对应物理状态加载器。')
         spec=importlib.util.find_spec(args.stage2_module)
         if spec is None or spec.origin is None:raise ValueError('Stage2模块尚未实现，不能冻结为可评测。')
         code_paths.append(Path(spec.origin))
+        if (marker or {}).get('route')=='dynamic_full_route_v1':
+            code_paths += [ROOT/'LIHAN/scripts/dynamic_v3_surface.py',ROOT/'scene/stage2_photometric.py',
+                ROOT/'scene/static_dl_censored.py',ROOT/'scene/static_dl_normal_opacity.py',
+                ROOT/'scene/static_dl_ambient.py',ROOT/'scene/static_dl_photometric.py']
     out=fresh(args.output)
     write(out/'freeze.json',dict(evaluation_allowed=True,selection_uses_test_or_gt=False,
         source=str(args.source.resolve()),source_sha256=sha(args.source),model=str(args.model.resolve()),
