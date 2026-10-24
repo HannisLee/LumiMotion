@@ -17,3 +17,5 @@ EL学习环境光。DL沿用已知方向；光强初始化为F-T04训练RGB拟�
 ## 实际启动与工程验收
 
 EL重试与DL冒烟均完成24循环、5次优化器更新，训练/15帧RGB/15帧Albedo均exit0。正式EL重试1在GPU1、DL在GPU2，均从原父重新开始，未沿冒烟权重继续。当前正式状态以各state.json为准；冒烟指标不进入最终对比表。数值表初稿已生成至exports/1024-02-静态EL与DL-数值对比，外观栏待正式终点。
+
+输入配对审计：全部150帧400×400 Alpha>0.5轮廓逐像素一致，相机矩阵最大绝对差3.7052e-6。两组掩膜文件来源不同但最终轮廓一致；RGB照明不同。审计位于总控paired_camera_mask_audit.json，核心源码SHA在scientific_code_manifest.json。
