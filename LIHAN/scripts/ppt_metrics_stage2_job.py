@@ -6,13 +6,14 @@ PYTHON='/home/han.li/miniconda3/envs/lumimotion-ushas/bin/python'
 CONTROL=ROOT/'output/1024-02-静态ELDL-展示数值补全总控'
 def write(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
 def main():
- p=argparse.ArgumentParser();p.add_argument('--kind',choices=['EL','DL'],required=True);p.add_argument('--gpu',type=int,required=True);p.add_argument('--smoke',action='store_true');a=p.parse_args()
+ p=argparse.ArgumentParser();p.add_argument('--kind',choices=['EL','DL'],required=True);p.add_argument('--gpu',type=int,required=True);p.add_argument('--smoke',action='store_true');p.add_argument('--retry',default='');a=p.parse_args()
  assert socket.gethostname()=='ushas' and Path(sys.executable).resolve()==Path(PYTHON).resolve()
  kind=a.kind;start=35000 if kind=='EL' else 16500;end=start+(24 if a.smoke else 20000)
  name=f'1024-{1 if kind=="EL" else 2:02d}-static{kind}-展示Stage2冒烟' if a.smoke else f'1024-{3 if kind=="EL" else 4:02d}-static{kind}-展示Stage2补训'
+ name+=a.retry
  out=ROOT/'output'/('smoke_test' if a.smoke else '')/name;out.mkdir(parents=True,exist_ok=False)
  parent=ROOT/('output/1011-02-LH-static-jumpingjacks_EL_V2-原生LumiMotion两阶段/model_mlp' if kind=='EL' else 'output/1012-16-LH-static-jumpingjacks_DL_V2-F-T04-原增密续训2k/model_mlp')
- source=CONTROL/('source_'+kind)
+ source=(ROOT/'output/1011-02-LH-static-jumpingjacks_EL_V2-原生LumiMotion两阶段/data_view' if kind=='EL' else CONTROL/'source_DL')
  env=dict(os.environ,CUDA_VISIBLE_DEVICES=str(a.gpu),OMP_NUM_THREADS='4',OPENBLAS_NUM_THREADS='4',MKL_NUM_THREADS='4',PYTHONUNBUFFERED='1',TORCH_EXTENSIONS_DIR=str(CONTROL/'native_cache'),CUDA_HOME=str(Path(PYTHON).parents[1]),TORCH_CUDA_ARCH_LIST='8.6',MAX_JOBS='4',PYTHONPATH=str(ROOT/'output/archive/1011-07-六组训练总控/tools/nvdiffrast-sm86/extension'))
  boot=[PYTHON,str(ROOT/'LIHAN/scripts/bootstrap_1011.py'),str(ROOT)]
  cmd=boot+['scripts.train_stage2','--source_path',str(source),'--model_path',str(out/'model_mlp'),'--stage1_model_path',str(parent),'--load_iter',str(start),'--iterations',str(end),'--test_iterations',str(end),'--save_iterations',str(end),'--is_blender','--eval','--load2gpu_on_the_fly','--resolution','2','--train_light_folder','images','--test_light_folder','images','--gt_alpha_mask_as_scene_mask','--diffuse_sample_num','512','--depth_ratio','0','--pbr_rasterizer_backend','lumimotion']
