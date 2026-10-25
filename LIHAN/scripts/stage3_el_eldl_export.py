@@ -8,7 +8,7 @@ import shutil
 from PIL import Image, ImageDraw, ImageFont
 ROOT=Path(__file__).resolve().parents[2]
 DEST=ROOT/'LIHAN/exports/1025-02-静动态EL与GT方向光ELDL-Stage3外观对比'
-FONT=ROOT/'exports/1024-01-静态ELDL-研究展示素材/NotoSansCJKsc-Regular.otf'
+FONT=ROOT/'output/1025-33-静动态EL与GT方向光ELDL-Stage3总控/assets/NotoSansCJKsc-Regular.otf'
 def font(n):return ImageFont.truetype(str(FONT),n)
 def main():
  from LIHAN.scripts.stage3_el_eldl_four import CONTROL
@@ -28,6 +28,7 @@ def main():
   w=csv.DictWriter(f,fieldnames=['实验','视角','PSNR_dB','SSIM']);w.writeheader()
   for arm,r in reports.items():
    for v in sorted(r['frames'],key=lambda x:int(x['frame'])):w.writerow({'实验':labels[arm],'视角':v['frame'],'PSNR_dB':v['psnr'],'SSIM':v['ssim']})
+ assert {r['samples'] for r in reports.values()}=={512}
  pages=[];page=Image.new('RGB',(1920,1080),'#f5f6f8');draw=ImageDraw.Draw(page)
  draw.text((70,65),'静动态 EL 与 GT方向光 ELDL',font=font(56),fill='#192b42')
  draw.text((70,150),'Stage3 外观对比 · 15 个固定 TEST 视角',font=font(34),fill='#536278')

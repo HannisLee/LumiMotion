@@ -14,11 +14,13 @@ from scene.stage2_photometric import frame_key
 from utils.loss_utils import ssim
 
 def main():
- p=argparse.ArgumentParser();p.add_argument('--model',type=Path,required=True);p.add_argument('--iteration',type=int,required=True);p.add_argument('--source',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--directions',default='');p.add_argument('--smoke',action='store_true');p.add_argument('--audit',action='store_true');p.add_argument('--samples',type=int,default=128);a=p.parse_args()
+ p=argparse.ArgumentParser();p.add_argument('--model',type=Path,required=True);p.add_argument('--iteration',type=int,required=True);p.add_argument('--source',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--directions',default='');p.add_argument('--bias',type=float,default=.1);p.add_argument('--direct-multiplier',type=float,default=1.);p.add_argument('--smoke',action='store_true');p.add_argument('--audit',action='store_true');p.add_argument('--samples',type=int,default=128);a=p.parse_args()
  a.output.mkdir(parents=True,exist_ok=False)
  run=Stage2RenderRun(a.model,a.iteration)
  run.args.source_path=a.source
  run.args.diffuse_sample_num=a.samples
+ run.args.light_t_min=a.bias
+ run.args.pbr_mixed_direct_multiplier=a.direct_multiplier
  if a.directions:run.args.pbr_mixed_lights_path=a.directions
  run.context=FrozenScene(run.args,a.model,a.iteration)
  ctx=run.context
@@ -46,7 +48,7 @@ def main():
    row=dict(frame=key,psnr=-10*math.log10(max(mse,1e-12)),ssim=float(ssim(im,target)))
    rows.append(row);print(json.dumps(row),flush=True);ctx.unload_camera(cam)
  assert all(file_sha256(Path(p))==h for p,h in ctx.source_files.items())
- report={'model':str(a.model),'iteration':a.iteration,'source':a.source,'samples':a.samples,'frames':rows,'metrics':{k:float(np.mean([r[k] for r in rows])) for k in ['psnr','ssim']},'protocol':'400×400黑底完整浮点sRGB，逐帧计算后均值；SSIM11×11 sigma1.5；PSNR以float64独立复算','checkpoint_unchanged':True,'direction_source':a.directions or None}
+ report={'model':str(a.model),'iteration':a.iteration,'source':a.source,'samples':a.samples,'light_t_min':a.bias,'direct_multiplier':a.direct_multiplier,'frames':rows,'metrics':{k:float(np.mean([r[k] for r in rows])) for k in ['psnr','ssim']},'protocol':'400×400黑底完整浮点sRGB，逐帧计算后均值；SSIM11×11 sigma1.5；PSNR以float64独立复算','checkpoint_unchanged':True,'direction_source':a.directions or None}
  (a.output/'metrics.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
  print(report['metrics'],flush=True)
 if __name__=='__main__':main()
