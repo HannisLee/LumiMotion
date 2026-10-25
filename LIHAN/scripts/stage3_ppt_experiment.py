@@ -20,6 +20,8 @@ ARMS = {
     'static_geometry': ('1025-04-staticDL-Stage3改进几何', '1012-16-LH-static-jumpingjacks_DL_V2-F-T04-原增密续训2k', 16500, 1),
     'dynamic_native': ('1025-05-dynamicDL-Stage3原生基线', '1011-03-LH-dynamic-jumpingjacks_DL_V2-原生LumiMotion两阶段', 35000, 2),
     'dynamic_geometry': ('1025-06-dynamicDL-Stage3改进几何', '1021-06-LH-dynamic-jumpingjacks_DL_V2-完整路线复现', 16500, 3),
+    'dynamic_directional': ('1025-07-dynamicDL-Stage3估计方向光', '1021-06-LH-dynamic-jumpingjacks_DL_V2-完整路线复现', 16500, 2),
+    'static_directional': ('1025-08-staticDL-Stage3已知方向光', '1012-16-LH-static-jumpingjacks_DL_V2-F-T04-原增密续训2k', 16500, 0),
 }
 
 
@@ -82,19 +84,24 @@ def run(arm, smoke, retry=''):
     parent = ROOT / 'output' / parent_name / 'model_mlp'
     end = start + (24 if smoke else 20000)
     snapshot = CONTROL / ('snapshot_v2' if (CONTROL / 'snapshot_v2').exists() else 'snapshot')
+    training_source = CONTROL / (f'{kind}_directional_train_source' if arm.endswith('_directional') else f'{kind}_train_source')
+    evaluation_source = CONTROL / (f'{kind}_directional_eval_source' if arm.endswith('_directional') else f'{kind}_eval_source')
     environment = dict(os.environ, CUDA_VISIBLE_DEVICES=str(gpu), OMP_NUM_THREADS='4', OPENBLAS_NUM_THREADS='4', MKL_NUM_THREADS='4',
                        PYTHONUNBUFFERED='1', TORCH_EXTENSIONS_DIR=str(CONTROL / 'native_cache'),
                        CUDA_HOME=str(Path(PYTHON).parents[1]), TORCH_CUDA_ARCH_LIST='8.6', MAX_JOBS='4',
                        PYTHONPATH=str(ROOT / 'output/archive/1011-07-六组训练总控/tools/nvdiffrast-sm86/extension'))
     boot = [PYTHON, str(snapshot / 'LIHAN/scripts/bootstrap_1011.py'), str(snapshot)]
-    command = boot + ['LIHAN.scripts.stage3_ppt_native_entry', '--source_path', str(CONTROL / f'{kind}_train_source'),
+    command = boot + ['LIHAN.scripts.stage3_ppt_native_entry', '--source_path', str(training_source),
                      '--model_path', str(output / 'model_mlp'), '--stage1_model_path', str(parent), '--load_iter', str(start),
                      '--iterations', str(end), '--test_iterations', str(end), '--save_iterations',
                      *[str(start + n) for n in ([24] if smoke else [4000, 12000, 20000])],
                      '--is_blender', '--eval', '--load2gpu_on_the_fly', '--resolution', '2', '--train_light_folder', 'images',
                      '--test_light_folder', 'images', '--gt_alpha_mask_as_scene_mask', '--diffuse_sample_num', '512',
                      '--depth_ratio', '1', '--pbr_rasterizer_backend', 'lumimotion']
-    state = dict(arm=arm, smoke=smoke, status='RUNNING', source=str(CONTROL / f'{kind}_train_source'),
+    if arm.endswith('_directional'):
+        lights = CONTROL/('dynamic_estimated_directions.json' if kind == 'dynamic' else 'static_known_directions.json')
+        command += ['--pbr_light_mode', 'gt_directional', '--pbr_gt_lights_path', str(lights), '--pbr_learn_light_intensity']
+    state = dict(arm=arm, smoke=smoke, status='RUNNING', source=str(training_source),
                  parent=str(parent), source_iteration=start, iteration=end, gpu=gpu, started=time.time(),
                  command=command, environment={k: environment[k] for k in ['CUDA_VISIBLE_DEVICES', 'CUDA_HOME', 'PYTHONPATH', 'TORCH_EXTENSIONS_DIR']},
                  parent_sha256={str(parent / p): digest(parent / p) for p in [f'point_cloud/iteration_{start}/point_cloud.ply', f'deform/iteration_{start}/deform.pth']})
@@ -125,7 +132,7 @@ def run(arm, smoke, retry=''):
         state['status'] = 'TRAIN_COMPLETED'
         # 冒烟仅用 TRAIN；正式模型训练全部结束后才接入隔离 TEST。
         evaluate = boot + ['LIHAN.scripts.stage3_ppt_evaluate', '--model', str(output / 'model_mlp'), '--iteration', str(end),
-                           '--source', str(CONTROL / f'{kind}_eval_source'), '--output', str(output / 'evaluation'),
+                           '--source', str(training_source if smoke else evaluation_source), '--output', str(output / 'evaluation'),
                            '--split', 'train' if smoke else 'test']
         execute('evaluation', evaluate)
         state['status'] = 'SMOKE_READY_FOR_REVIEW' if smoke else 'READY_FOR_REVIEW'
