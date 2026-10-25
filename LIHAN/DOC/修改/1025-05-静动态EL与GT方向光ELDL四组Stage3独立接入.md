@@ -1,0 +1,11 @@
+# 静动态EL与GT方向光ELDL四组Stage3独立接入
+
+日期：2026-10-25；服务器ushas；环境lumimotion-ushas。
+
+新增本轮独立脚本stage3_el_eldl_four.py、stage3_el_eldl_entry.py、stage3_el_eldl_mixed.py、stage3_el_eldl_evaluate.py。统一四组来源、隔离TRAIN/DEV/TEST、继承真实父架构、生成仅单位方向的光照表。混合着色将原生环境PBR与已知方向SUN的BRDF贡献在线性域相加，SH间接只在环境分支计一次；方向强度为TRAIN优化的正标量并随环境检查点保存。普通EL分支保留原生前向。
+
+快照中train_stage2仅接入混合光正参数、显式静态父零形变及关闭内置自动TEST报告。FrozenScene对应静态语义同步。评测保存原始float数组并独立float64复算PSNR，SSIM沿用项目11×11 sigma1.5，输出RGB与GT。冒烟额外保留四类内部审计图，不进入最终展示。
+
+未修改其他任务使用中的训练入口、未覆盖已有模型。准备相机表首轮键层级不匹配失败，保留原准备目录，修正为camera.frames[帧号].extrinsics.camera_to_world后重试。
+
+冒烟修复：环境state_dict包含mixed_log_intensity，评测需先注册同名参数再严格加载，不能丢弃保存参数后回退初值。已验证保存强度与JSON相符、四组几何逐字段完全不变、3帧TRAIN重载渲染有限。初次评测CPU线程过多人工停止，目录保留；后续固定4线程。ELDL第一次重试因缺注册参数失败，修复后第二次重试通过。实际查看四组0085的RGB/Alpha/Normal/继承分离。动态DEV使用父数据预处理，TEST使用原RGB和既有Alpha轮廓黑底合成；原始RGB世界背景Alpha恒1，不能直接拿它替换历史前景目标。材质RGB未作为优化监督。
