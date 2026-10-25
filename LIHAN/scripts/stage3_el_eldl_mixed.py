@@ -41,7 +41,7 @@ def install():
             env = kwargs.get('env_light')
             if env is None:
                 raise ValueError('ELDL必须保留训练得到的环境光')
-            scale = env.mixed_log_intensity.exp()
+            scale = env.mixed_log_intensity.exp() * float(getattr(pipe, "pbr_mixed_direct_multiplier", 1.))
             directions, energy = load_gt_directional_lights(path).for_camera(cam, 1.)
             kwargs['directional_lights'] = (directions, energy * scale)
         return original_render(*args, **kwargs)
