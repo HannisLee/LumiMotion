@@ -44,6 +44,7 @@ def main():
   better=all(candidate[k]>baseline[k] for k in ['psnr','ssim'])
   conclusions.append(f"{label}：ΔPSNR {candidate['psnr']-baseline['psnr']:+.4f} dB，ΔSSIM {candidate['ssim']-baseline['ssim']:+.6f}；"+('两项均提升' if better else '未达到两项均提升'))
  for i,line in enumerate(conclusions):draw.text((90,865+i*55),line,font=font(27),fill='#225b48' if '两项均提升' in line and '未达到' not in line else '#9b392c')
+ draw.text((90,1005),'分别对照自身照明 GT；静态 ELDL 从12k保存点恢复，Adam重启。完整来源见随附说明。',font=font(23),fill='#536278')
  page.save(DEST/'1025-02-四组Stage3指标.png');pages.append(page)
  for kind,label in [('static','静态'),('dynamic','动态')]:
   folder=DEST/f'{label}同视角';folder.mkdir()
