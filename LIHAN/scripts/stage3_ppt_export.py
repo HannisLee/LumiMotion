@@ -88,7 +88,7 @@ def main():
             row = {'数据': kind+'DL-V2', '方法': '原生LumiMotion环境PBR' if arm == '原生' else '改进几何＋'+('已知GT方向PBR' if kind == '静态' else '估计方向PBR'),
                    **reports[kind+arm]['metrics'], 'model': reports[kind+arm]['model'], 'iteration': reports[kind+arm]['iteration']}
             rows.append(row)
-    controls = [{'数据': kind+'DL-V2', '方法': '改进几何＋环境PBR', **reports[kind+'仅几何']['metrics'],
+    controls = [{'数据': kind+'DL-V2', '方法': '改进父模型＋环境PBR', **reports[kind+'仅几何']['metrics'],
                  'model': reports[kind+'仅几何']['model'], 'iteration': reports[kind+'仅几何']['iteration']} for kind in ['静态', '动态']]
     with (output/'1025-01-Stage3同协议指标.csv').open('w', encoding='utf-8-sig') as f:
         writer = csv.DictWriter(f, fieldnames=rows[0].keys())
@@ -110,7 +110,7 @@ def main():
         a, b = reports[kind+'原生']['metrics'], reports[kind+'改进']['metrics']
         d.text((90, 846+i*55), f'{kind}改进−原生：PSNR {b["psnr"]-a["psnr"]:+.3f} dB；SSIM {b["ssim"]-a["ssim"]:+.5f}', font=font(29), fill=ACCENT)
     slides.append(('1025-01-Stage3定量结果', image))
-    image = canvas('仅改几何与完整方法分开比较', '三个设置：原生环境PBR／改进几何＋环境PBR／改进几何＋方向PBR；不将全部收益归因于法线', 2)
+    image = canvas('环境 PBR 承接与方向光完整方法', '三个设置：原生父＋环境PBR／改进父＋环境PBR／改进父＋方向PBR；父模型初始化也不同', 2)
     d = ImageDraw.Draw(image)
     for i, row in enumerate([rows[0], controls[0], rows[1], rows[2], controls[1], rows[3]]):
         y = 290+i*103
@@ -154,6 +154,28 @@ def main():
                 d.text((x+345, y+135), arm, font=font(25), fill=ACCENT)
         d.text((95, 972), '红/绿特征只反映模型门控；动态候选全绿源于全点形变设置。鞋部缺陷和材质残留须单独说明。', font=font(22), fill=MUTED)
         slides.append((f'1025-{len(slides)+1:02d}-{kind}四类与材质诊断', image))
+    fixed_records = {}
+    for name in ['动态原生', '动态改进']:
+        directory = ROOT/'output'/EXPERIMENTS[name]/'fixed_view_0149'
+        receipt = json.loads((directory/'receipt.json').read_text())
+        assert len(receipt['frames']) == 150 and receipt['checkpoint_unchanged'] and receipt['target_buffers_zeroed']
+        fixed_records[name] = receipt
+        for category in ['rgb', 'alpha', 'normal', 'separation', 'albedo', 'roughness']:
+            shutil.copy2(directory/(category+'.mp4'), output/'视频'/f'{name}-固定相机0149-{category}.mp4')
+            for key in ['0001', '0075', '0150']:
+                shutil.copy2(directory/category/(key+'.png'), output/'素材'/f'{name}-固定相机-{category}-{key}.png')
+    assert fixed_records['动态原生']['world_view_transform'] == fixed_records['动态改进']['world_view_transform']
+    assert fixed_records['动态原生']['full_proj_transform'] == fixed_records['动态改进']['full_proj_transform']
+    image = canvas('动态：固定相机的时间变化', 'TRAIN相机0149固定；展示时间1/150、75/150、150/150；无逐时GT，不报告此序列PSNR/SSIM', len(slides)+1)
+    d = ImageDraw.Draw(image)
+    for col, key in enumerate(['0001', '0075', '0150']):
+        x = 160+col*570
+        d.text((x+60, 242), f'时间 {int(key)}/150', font=font(29), fill=INK)
+        for row, name in enumerate(['动态原生', '动态改进']):
+            y = 290+row*345
+            put(image, output/'素材'/f'{name}-固定相机-rgb-{key}.png', (x, y, x+330, y+330))
+            d.text((x+340, y+120), '原生' if row == 0 else '完整方法', font=font(23), fill=ACCENT)
+    slides.append((f'1025-{len(slides)+1:02d}-动态固定相机时序', image))
     for name, image in slides:
         image.save(output/(name+'.png'))
     slides[0][1].save(output/'1025-01-Stage3静动态展示合集.pdf', save_all=True, append_images=[im for _, im in slides[1:]], resolution=150)
@@ -161,20 +183,20 @@ def main():
     table += '\n'.join(f'| {r["数据"]} | {r["方法"]} | {r["psnr"]:.6f} | {r["ssim"]:.6f} | {r["psnr_foreground"]:.6f} |' for r in rows)
     report = '# Stage3 静动态实验展示与复现说明\n\n日期：2026-10-25。服务器 ushas，Conda lumimotion-ushas。逻辑 Stage3 对应原生代码 Stage2 的环境 PBR 外观训练。\n\n'+table+'\n\n'
     report += '同一数据内 Stage3 RGB/Alpha输入、512半球采样、400×400、20000新增循环/4999真实更新、原生PBR损失和混合追踪深度1一致；环境光与方向光属于方法变量，相应光照参数/正则按各入口语义处理。静态完整方法使用已知GT方向；动态使用父TRAIN估计方向及插值，不读GT灯向或GT强度。历史API参数名称gt_directional不表示动态数据读取了GT。动态原始RGBA净化与原生视图132张输入RGB/Alpha逐字节相同，证据在总控directional_input_comparison.json。15固定测试视角全图浮点sRGB逐帧PSNR/SSIM后均值；SSIM为项目11×11、sigma1.5；前景分数另列。NumPy/SciPy独立复算指标，保存float数组，配对GT和Mask逐元素一致。\n\n'
-    report += '纯环境PBR仅换几何的控制结果：\n\n| 数据 | PSNR(dB) | SSIM | 前景PSNR(dB) |\n|---|---:|---:|---:|\n'+'\n'.join(f'| {r["数据"]} | {r["psnr"]:.6f} | {r["ssim"]:.6f} | {r["psnr_foreground"]:.6f} |' for r in controls)+'\n\n这两臂与方向PBR完整方法一起保留，不能将方向光承接收益全部归因于法线。\n\n'
+    report += '改进父模型承接纯环境PBR的控制结果：\n\n| 数据 | PSNR(dB) | SSIM | 前景PSNR(dB) |\n|---|---:|---:|---:|\n'+'\n'.join(f'| {r["数据"]} | {r["psnr"]:.6f} | {r["ssim"]:.6f} | {r["psnr_foreground"]:.6f} |' for r in controls)+'\n\n这两臂与方向PBR完整方法一起保留。父模型除几何以外还继承材质DC、SH、门控和MLP初始化，Gaussian数量也不同，因此不是只替换法线/几何的严格单因素消融。不能将完整方法收益全部归因于法线。\n\n'
     report += '对齐的是新增外观预算，不是整条训练链的总计算成本；原生父35000循环、改进父16500更新且包含不同阶段。单场景/单种子实验不声明微小差异的统计显著性。\n\n'
     report += '静态父为原生S1@35000和历史GS最优F-T04@16500（2.663858°）；动态为原生S1@35000和完整路线预登记主检查点@16500（7.329092°，原生14.545605°）。这些法线来自父模型，不冒充当前Stage3的同checkpoint法线MAE。原生动态父见过135训练时刻、改进父117，且动态门控和颜色头设置不同，属于完整方法对照，不能证明法线单因素因果。\n\n'
     report += '训练source移除了TEST；所有TEST指标均在对应模型完成固定预算后计算，TEST不参与优化或选参。早期冒烟只评分和查看TRAIN，但Scene初始化曾加载含TEST图像的评价视图；输入逐字节一致性审计也读取TEST输入，均未用于梯度、TEST评分或按图选参。后续TRAIN诊断改用无TEST视图。历史TEST已被多轮实验查看，不称新盲测。现有1024 EL44.685147dB/0.997835与DL29.316748dB/0.974770为不同照明/已知光设置，不能混入本表。\n\n'
-    report += '展示顺序：先定量页，再静态RGB和四类诊断，再动态RGB和诊断。局部框使用固定相同坐标，并保留完整图。视频目录为按采集顺序的15个TEST视角，静态也会移动相机，动态同时变化相机和时间；不是固定相机动态视频。PNG与PDF可直接插入PPT，HTML离线浏览；CSV可编辑。\n\n'
+    report += '展示顺序：先定量与几何控制页，再静态RGB和诊断，再动态RGB、诊断和固定相机时序。局部框使用固定相同坐标，并保留完整图。视频目录包含两种：文件名“15测试视角”为按采集顺序的15个TEST视角，动态同时变化相机和时间；文件名“固定相机0149”为真正固定TRAIN相机的150帧模型时序，25fps、6秒，目标RGB/Alpha缓冲置零，未观测固定视角没有GT评分。两模型固定相机内外参逐元素相同，六类视频均完整程序解码150帧，程序解码不等于实际人工播放全部视频。PNG与PDF可直接插入PPT，HTML离线浏览；CSV可编辑。\n\n'
     report += '## 来源与完整命令\n\n'
     for name, state in states.items():
         report += f'- {name}：{ROOT/"output"/EXPERIMENTS[name]}；source={state["source"]}；parent={state["parent"]}@{state["source_iteration"]}；model={reports[name]["model"]}@{reports[name]["iteration"]}。完整训练/渲染命令及环境在该目录README.md、state.json；train.log和evaluation.log，evaluation/arrays与metrics.json保留。\n'
     report += '\n## 验收\n\n工程审计和四类实际目检见实验目录 independent_audit.json / manual_review.json。工程完成和数值提升不能替代完整分解质量。最终科学结论见本次报告；没有通过的检查明确写FAILED，全部checkpoint/图片/统计/日志保留。\n'
     (output/'1025-01-Stage3实验展示说明.md').write_text(report)
-    (output/'1025-02-来源清单.json').write_text(json.dumps(dict(artifacts=source_manifest, metrics=reports, states=states), ensure_ascii=False, indent=2)+'\n')
+    (output/'1025-02-来源清单.json').write_text(json.dumps(dict(artifacts=source_manifest, metrics=reports, states=states, fixed_view=fixed_records), ensure_ascii=False, indent=2)+'\n')
     body = '<!doctype html><meta charset="utf-8"><title>Stage3静动态实验展示</title><style>body{background:#172338;color:white;font-family:sans-serif;margin:0}main{max-width:1400px;margin:auto}img{width:100%;display:block;margin:30px 0}a{color:#83ddd8}p{padding:20px}</style><main><p><a href="1025-01-Stage3实验展示说明.md">实验说明</a> · <a href="1025-01-Stage3静动态展示合集.pdf">PDF合集</a> · <a href="1025-01-Stage3同协议指标.csv">指标CSV</a></p>'
     body += ''.join('<img src="'+html.escape(name+'.png')+'" alt="'+html.escape(name)+'">' for name, _ in slides)
-    body += '<p>视频为15个TEST视角的采样序列，非固定相机。'+''.join('<br><a href="'+html.escape(str(p.relative_to(output)))+'">'+html.escape(p.name)+'</a>' for p in (output/'视频').glob('*rgb*'))+'</p></main>'
+    body += '<p>视频已区分15个TEST视角与150帧固定相机时序。'+''.join('<br><a href="'+html.escape(str(p.relative_to(output)))+'">'+html.escape(p.name)+'</a>' for p in (output/'视频').glob('*rgb*'))+'</p></main>'
     (output/'1025-01-Stage3展示.html').write_text(body)
     print(output)
 
