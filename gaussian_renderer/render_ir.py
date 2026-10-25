@@ -146,7 +146,8 @@ def render_ir(viewpoint_camera, pc: GaussianModel, pipe, bg_color: torch.Tensor,
     )
 
     #render color from stage 1
-    shadowed_modulation = d_color[:,None, :3].clamp_max(1.0)
+    # 关闭颜色头的几何模型返回 None；其原生 SH 参考应使用零颜色调制。
+    shadowed_modulation = 0.0 if d_color is None else d_color[:,None, :3].clamp_max(1.0)
     sh_dc_mlp = RGB2SH(SH2RGB(pc._albedo_dc_stage1[:, :1]) * (1 - shadowed_modulation))
     sh_features = torch.cat((sh_dc_mlp, pc._albedo_rest), dim=1)
     output_sh = rasterizer(
