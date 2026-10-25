@@ -21,7 +21,8 @@ def main():
     figure, axes = plt.subplots(1, 2, figsize=(16, 5), constrained_layout=True)
     records = []
     experiments = [('静态原生', '1025-03-staticDL-Stage3原生基线', 0), ('静态改进', '1025-04-staticDL-Stage3改进几何', 0),
-                   ('动态原生', '1025-05-dynamicDL-Stage3原生基线', 1), ('动态改进', '1025-06-dynamicDL-Stage3改进几何', 1)]
+                   ('动态原生', '1025-05-dynamicDL-Stage3原生基线', 1), ('动态改进', '1025-06-dynamicDL-Stage3改进几何', 1),
+                   ('静态方向PBR', '1025-08-staticDL-Stage3已知方向光', 0), ('动态方向PBR', '1025-07-dynamicDL-Stage3估计方向光', 1)]
     for name, directory, panel in experiments:
         path = ROOT/'output'/directory
         state = json.loads((path/'state.json').read_text())
@@ -34,6 +35,10 @@ def main():
         assert np.isfinite(y).all()
         record = dict(experiment=name, status=state['status'], source_iteration=state['source_iteration'],
                       last_flushed_train_loop=int(x[-1]) if len(x) else 0, flushed_train_scalars=len(y), gpu=state['gpu'])
+        if 'pbr_light/intensity_scale' in tags:
+            light = accumulator.Scalars('pbr_light/intensity_scale')
+            if light:
+                record['last_light_intensity_scale'] = float(light[-1].value)
         if len(y) >= 200:
             smoothed = np.convolve(y, np.ones(200)/200, mode='valid')
             axes[panel].plot(x[199:], smoothed, label=name, linewidth=1.7)
