@@ -1,0 +1,78 @@
+{
+  "sources": [
+    {
+      "dataset": "LH-static-jumpingjacks_EL_V2",
+      "frame": 10,
+      "source": "/mnt/workspace/users/han.li/lumimotion/data/LH-data/static/LH-static-jumpingjacks_EL_V2/image/image_0010.png",
+      "sha256": "fc6ac9c4e9ed0388a1e76f7e1d8b5a3ce1ee2e4b3f1075e476d7e7a4e407a7e3",
+      "display": "完整原图统一缩放；未裁剪、未调整曝光或颜色"
+    },
+    {
+      "dataset": "LH-static-jumpingjacks_EL_V2",
+      "frame": 130,
+      "source": "/mnt/workspace/users/han.li/lumimotion/data/LH-data/static/LH-static-jumpingjacks_EL_V2/image/image_0130.png",
+      "sha256": "21528ed822cf9091d9cf5f2ca1fa53aebe2526fb789f9d1e7124ec3f400bd622",
+      "display": "完整原图统一缩放；未裁剪、未调整曝光或颜色"
+    },
+    {
+      "dataset": "LH-static-jumpingjacks_EL_V2",
+      "frame": 150,
+      "source": "/mnt/workspace/users/han.li/lumimotion/data/LH-data/static/LH-static-jumpingjacks_EL_V2/image/image_0150.png",
+      "sha256": "c5c4c21f881c0bd72a311fff92ce87377300efd333fbf1654cf33717bc18a310",
+      "display": "完整原图统一缩放；未裁剪、未调整曝光或颜色"
+    },
+    {
+      "dataset": "LH-static-jumpingjacks-ELDL-V3",
+      "frame": 10,
+      "source": "/mnt/workspace/users/han.li/lumimotion/data/LH-data/static/LH-static-jumpingjacks-ELDL-V3/image/image_0010.png",
+      "sha256": "d6e8fcdc67f79719a441cbd83c555a38e02bdf557912a1450cde39b351842555",
+      "display": "完整原图统一缩放；未裁剪、未调整曝光或颜色"
+    },
+    {
+      "dataset": "LH-static-jumpingjacks-ELDL-V3",
+      "frame": 130,
+      "source": "/mnt/workspace/users/han.li/lumimotion/data/LH-data/static/LH-static-jumpingjacks-ELDL-V3/image/image_0130.png",
+      "sha256": "9ec0d5a18337d46e2c393cca120811e141e5dca56eaf0b7b4de9f36d7e5967cc",
+      "display": "完整原图统一缩放；未裁剪、未调整曝光或颜色"
+    },
+    {
+      "dataset": "LH-static-jumpingjacks-ELDL-V3",
+      "frame": 150,
+      "source": "/mnt/workspace/users/han.li/lumimotion/data/LH-data/static/LH-static-jumpingjacks-ELDL-V3/image/image_0150.png",
+      "sha256": "71fceb73a9e2240671951ad9da3c9784f3eb03f1903544e516a828a351247a56",
+      "display": "完整原图统一缩放；未裁剪、未调整曝光或颜色"
+    }
+  ],
+  "pair_checks": [
+    {
+      "frame": 10,
+      "intrinsics_max_abs_difference": 0.0,
+      "camera_to_world_max_abs_difference": 0.0,
+      "alpha_max_abs_difference": 0.0,
+      "source_resolution": [
+        800,
+        800
+      ]
+    },
+    {
+      "frame": 130,
+      "intrinsics_max_abs_difference": 0.0,
+      "camera_to_world_max_abs_difference": 0.0,
+      "alpha_max_abs_difference": 0.0,
+      "source_resolution": [
+        800,
+        800
+      ]
+    },
+    {
+      "frame": 150,
+      "intrinsics_max_abs_difference": 0.0,
+      "camera_to_world_max_abs_difference": 0.0,
+      "alpha_max_abs_difference": 0.0,
+      "source_resolution": [
+        800,
+        800
+      ]
+    }
+  ]
+}
