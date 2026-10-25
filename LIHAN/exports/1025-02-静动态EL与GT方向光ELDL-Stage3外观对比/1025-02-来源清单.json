@@ -1,0 +1,146 @@
+{
+  "sources": {
+    "static_EL": {
+      "evaluation": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-34-LH-static-EL-Stage3外观/evaluation_final_512",
+      "model": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-34-LH-static-EL-Stage3外观/model_mlp",
+      "iteration": 55000,
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-33-静动态EL与GT方向光ELDL-Stage3总控/static_EL_test_source",
+      "directions": null,
+      "metrics_sha256": "b701516918d10ed771a307de6754ae0f0269c2377dbdac7989e0eb3b6b3fe24e"
+    },
+    "static_ELDL": {
+      "evaluation": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1026-03-LH-static-ELDL-GT方向光-Stage3保存点续训/evaluation_final_512",
+      "model": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1026-03-LH-static-ELDL-GT方向光-Stage3保存点续训/model_mlp",
+      "iteration": 28100,
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-33-静动态EL与GT方向光ELDL-Stage3总控/static_ELDL_test_source",
+      "directions": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-33-静动态EL与GT方向光ELDL-Stage3总控/static_ELDL_test_directions.json",
+      "metrics_sha256": "0d810dd4467ebc97482dbcf6897fd4e7be7e2d80245923a393c73507e5482101"
+    },
+    "dynamic_EL": {
+      "evaluation": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-36-LH-dynamic-EL-Stage3外观/evaluation_final_512",
+      "model": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-36-LH-dynamic-EL-Stage3外观/model_mlp",
+      "iteration": 55000,
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-33-静动态EL与GT方向光ELDL-Stage3总控/dynamic_EL_test_source",
+      "directions": null,
+      "metrics_sha256": "89c6ff78dfa692378c8ed1096f4b29017e9a9d8929c38ceb2e0a09c9eeebb309"
+    },
+    "dynamic_ELDL": {
+      "evaluation": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-37-LH-dynamic-ELDL-GT方向光-Stage3外观/evaluation_final_512",
+      "model": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-37-LH-dynamic-ELDL-GT方向光-Stage3外观/model_mlp",
+      "iteration": 21500,
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-33-静动态EL与GT方向光ELDL-Stage3总控/dynamic_ELDL_test_source",
+      "directions": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-33-静动态EL与GT方向光ELDL-Stage3总控/dynamic_ELDL_test_directions.json",
+      "metrics_sha256": "14d7db43df0e6113f04d6872ddecb1ac3d31af8b4b153e714177150c31139432"
+    }
+  },
+  "selection": {
+    "static_EL": {
+      "experiment": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-34-LH-static-EL-Stage3外观",
+      "model": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-34-LH-static-EL-Stage3外观/model_mlp",
+      "iteration": 55000,
+      "parent_iteration": 35000,
+      "new_loops": 20000,
+      "optimizer_updates": 4999,
+      "optimizer_restarted": false,
+      "light_t_min": 0.1,
+      "direct_multiplier": 1.0,
+      "samples": 512,
+      "evaluation": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-34-LH-static-EL-Stage3外观/evaluation_final_512",
+      "checkpoint_sha256": {
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-34-LH-static-EL-Stage3外观/model_mlp/stage2_config.json": "bf8ae5e501d28aeeb1ef7bd4465eded2c330065eb58ab94df20318565ad7543c",
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-34-LH-static-EL-Stage3外观/model_mlp/point_cloud/iteration_55000/point_cloud.ply": "5d716931c0a75db041c474f390609fb19775cefc96fd14e0a236ac223807c634",
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-34-LH-static-EL-Stage3外观/model_mlp/deform/iteration_55000/deform.pth": "538c92e61e8ed495e7a20b3b12b6c53b81c15c902e8a79cd31803c2fad33d752",
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-34-LH-static-EL-Stage3外观/model_mlp/envmap/iteration_55000/envmap.pth": "3f411af7660b6d9f0e2958b0e0ef2b56da8839ac12de924a004cdfe5ab3ef7fd"
+      },
+      "dev": {
+        "psnr": 45.153769431223026,
+        "ssim": 0.9972366293271383
+      },
+      "frozen_before_test": true
+    },
+    "static_ELDL": {
+      "experiment": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1026-03-LH-static-ELDL-GT方向光-Stage3保存点续训",
+      "model": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1026-03-LH-static-ELDL-GT方向光-Stage3保存点续训/model_mlp",
+      "iteration": 28100,
+      "parent_iteration": 8100,
+      "new_loops": 20000,
+      "optimizer_updates": 4998,
+      "optimizer_restarted": true,
+      "light_t_min": 0.1,
+      "direct_multiplier": 1.0,
+      "samples": 512,
+      "evaluation": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1026-03-LH-static-ELDL-GT方向光-Stage3保存点续训/evaluation_final_512",
+      "checkpoint_sha256": {
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1026-03-LH-static-ELDL-GT方向光-Stage3保存点续训/model_mlp/stage2_config.json": "d8944451591149721c103b76d2ef92139f93ad9d53d3f4a2faa7cd0f59a5a0a1",
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1026-03-LH-static-ELDL-GT方向光-Stage3保存点续训/model_mlp/point_cloud/iteration_28100/point_cloud.ply": "ecb3a850661a6393497f77de786dca2c5395db360919cd8cdaaf4b8b1ed010de",
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1026-03-LH-static-ELDL-GT方向光-Stage3保存点续训/model_mlp/deform/iteration_28100/deform.pth": "acc34b48ac49444ed02d5e7f1a9a57a3e7e9793404cb1850b04213a6a5b7d80f",
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1026-03-LH-static-ELDL-GT方向光-Stage3保存点续训/model_mlp/envmap/iteration_28100/envmap.pth": "1da6ee57ec270eb12325820cbfa1f32193e05b5bfc69e1e926da3c40ec685135",
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1026-03-LH-static-ELDL-GT方向光-Stage3保存点续训/model_mlp/envmap/iteration_28100/mixed.json": "b5b2f7f25e4a810ac6697410e355c8909d29b590d7eea0e11f455ef466dbee2a"
+      },
+      "dev": {
+        "psnr": 38.78455154805381,
+        "ssim": 0.9918988214598762
+      },
+      "frozen_before_test": true
+    },
+    "dynamic_EL": {
+      "experiment": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-36-LH-dynamic-EL-Stage3外观",
+      "model": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-36-LH-dynamic-EL-Stage3外观/model_mlp",
+      "iteration": 55000,
+      "parent_iteration": 35000,
+      "new_loops": 20000,
+      "optimizer_updates": 4999,
+      "optimizer_restarted": false,
+      "light_t_min": 0.1,
+      "direct_multiplier": 1.0,
+      "samples": 512,
+      "evaluation": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-36-LH-dynamic-EL-Stage3外观/evaluation_final_512",
+      "checkpoint_sha256": {
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-36-LH-dynamic-EL-Stage3外观/model_mlp/stage2_config.json": "8e2c5851ff4ca6e87cc2a9ae2a4148aa17450b91ab2f720ee602a87762364342",
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-36-LH-dynamic-EL-Stage3外观/model_mlp/point_cloud/iteration_55000/point_cloud.ply": "58e74bc7a6d7fd249eeb174ce6eb0cc9109fb5384a1540228601943378708db6",
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-36-LH-dynamic-EL-Stage3外观/model_mlp/deform/iteration_55000/deform.pth": "26a2c17fedbae8bd1f2726c42e6894b093eeb976c8d6def6122978e268a69c8e",
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-36-LH-dynamic-EL-Stage3外观/model_mlp/envmap/iteration_55000/envmap.pth": "c18a40471ac30fcdb26df4c40c8a244eb323a7e9dfbdd5c035e7407fe8cc0bd2"
+      },
+      "dev": {
+        "psnr": 38.75492398516295,
+        "ssim": 0.9899109469519721
+      },
+      "frozen_before_test": true
+    },
+    "dynamic_ELDL": {
+      "experiment": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-37-LH-dynamic-ELDL-GT方向光-Stage3外观",
+      "model": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-37-LH-dynamic-ELDL-GT方向光-Stage3外观/model_mlp",
+      "iteration": 21500,
+      "parent_iteration": 1500,
+      "new_loops": 20000,
+      "optimizer_updates": 4999,
+      "optimizer_restarted": false,
+      "light_t_min": 0.1,
+      "direct_multiplier": 1.0,
+      "samples": 512,
+      "evaluation": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-37-LH-dynamic-ELDL-GT方向光-Stage3外观/evaluation_final_512",
+      "checkpoint_sha256": {
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-37-LH-dynamic-ELDL-GT方向光-Stage3外观/model_mlp/stage2_config.json": "776aa21a7358e18d067fbc4439932a38ac2d00036f970a6a9262b654a8afaf74",
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-37-LH-dynamic-ELDL-GT方向光-Stage3外观/model_mlp/point_cloud/iteration_21500/point_cloud.ply": "10f08e04cdf335c620a0e16638d29f5c39990c40d081aa5428dce074f472f2ca",
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-37-LH-dynamic-ELDL-GT方向光-Stage3外观/model_mlp/deform/iteration_21500/deform.pth": "dcde785afcb420cd593d84786df0d64e26d58b9b34df1d5285ad923750130d3f",
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-37-LH-dynamic-ELDL-GT方向光-Stage3外观/model_mlp/envmap/iteration_21500/envmap.pth": "0014d198181a577ba5ba9f4cd404726de016dd23d42fd30116e2c9c09eb9ce59",
+        "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-37-LH-dynamic-ELDL-GT方向光-Stage3外观/model_mlp/envmap/iteration_21500/mixed.json": "c95d2768fb1c7a5001f78a84238898ff49ab1dcc17a000b7a8d29c1868219a56"
+      },
+      "dev": {
+        "psnr": 28.89536170721938,
+        "ssim": 0.9640555216206445
+      },
+      "frozen_before_test": true
+    }
+  },
+  "validation": {
+    "independent_metrics": "四组PASS",
+    "manual_RGB_frames": [
+      10,
+      80,
+      150
+    ],
+    "scope": "跨照明完整方法比较；非因果单因素消融",
+    "static_recovery": "12k＋8k，Adam重启，4998次可追溯更新"
+  }
+}
