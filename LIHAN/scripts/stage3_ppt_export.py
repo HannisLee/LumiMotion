@@ -108,7 +108,9 @@ def main():
             d.text((x, y), value, font=font(31), fill=INK)
     for i, kind in enumerate(['静态', '动态']):
         a, b = reports[kind+'原生']['metrics'], reports[kind+'改进']['metrics']
-        d.text((90, 846+i*55), f'{kind}改进−原生：PSNR {b["psnr"]-a["psnr"]:+.3f} dB；SSIM {b["ssim"]-a["ssim"]:+.5f}', font=font(29), fill=ACCENT)
+        color = ACCENT if b['psnr'] >= a['psnr'] and b['ssim'] >= a['ssim'] else '#a63d35'
+        d.text((90, 846+i*55), f'{kind}改进−原生：PSNR {b["psnr"]-a["psnr"]:+.3f} dB；SSIM {b["ssim"]-a["ssim"]:+.5f}', font=font(29), fill=color)
+    d.text((90, 958), '动态PSNR提升但SSIM下降；完整动态几何恢复与全面指标优势尚未达成。', font=font(23), fill='#a63d35')
     slides.append(('1025-01-Stage3定量结果', image))
     image = canvas('环境 PBR 承接与方向光完整方法', '三个设置：原生父＋环境PBR／改进父＋环境PBR／改进父＋方向PBR；父模型初始化也不同', 2)
     d = ImageDraw.Draw(image)
@@ -152,7 +154,7 @@ def main():
                 y = 294+row*345
                 put(image, output/'素材'/f'{kind}{arm}-{category}-0150.png', (x, y, x+340, y+330))
                 d.text((x+345, y+135), arm, font=font(25), fill=ACCENT)
-        d.text((95, 972), '红/绿特征只反映模型门控；动态候选全绿源于全点形变设置。鞋部缺陷和材质残留须单独说明。', font=font(22), fill=MUTED)
+        d.text((95, 972), '红/绿特征只反映门控；动态候选全绿是配置定义。足部缺陷保留，RGB提升不等同于完整材质分解。', font=font(22), fill=MUTED)
         slides.append((f'1025-{len(slides)+1:02d}-{kind}四类与材质诊断', image))
     fixed_records = {}
     for name in ['动态原生', '动态改进']:
@@ -181,7 +183,8 @@ def main():
     slides[0][1].save(output/'1025-01-Stage3静动态展示合集.pdf', save_all=True, append_images=[im for _, im in slides[1:]], resolution=150)
     table = '| 数据 | 方法 | PSNR(dB) | SSIM | 前景PSNR(dB) |\n|---|---|---:|---:|---:|\n'
     table += '\n'.join(f'| {r["数据"]} | {r["方法"]} | {r["psnr"]:.6f} | {r["ssim"]:.6f} | {r["psnr_foreground"]:.6f} |' for r in rows)
-    report = '# Stage3 静动态实验展示与复现说明\n\n日期：2026-10-25。服务器 ushas，Conda lumimotion-ushas。逻辑 Stage3 对应原生代码 Stage2 的环境 PBR 外观训练。\n\n'+table+'\n\n'
+    report = '# Stage3 静动态实验展示与复现说明\n\n日期：2026-10-25。服务器 ushas，Conda lumimotion-ushas。逻辑 Stage3 对应原生代码 Stage2 的 PBR 外观训练；本次比较环境光与方向光两种照明模块。\n\n'+table+'\n\n'
+    report += '结论：静态已知方向条件下PSNR和SSIM均提升；动态估计方向条件下PSNR提升、SSIM下降，不能宣称全面超过原生。动态足部缺陷仍需独立解决。\n\n'
     report += '同一数据内 Stage3 RGB/Alpha输入、512半球采样、400×400、20000新增循环/4999真实更新、原生PBR损失和混合追踪深度1一致；环境光与方向光属于方法变量，相应光照参数/正则按各入口语义处理。静态完整方法使用已知GT方向；动态使用父TRAIN估计方向及插值，不读GT灯向或GT强度。历史API参数名称gt_directional不表示动态数据读取了GT。动态原始RGBA净化与原生视图132张输入RGB/Alpha逐字节相同，证据在总控directional_input_comparison.json。15固定测试视角全图浮点sRGB逐帧PSNR/SSIM后均值；SSIM为项目11×11、sigma1.5；前景分数另列。NumPy/SciPy独立复算指标，保存float数组，配对GT和Mask逐元素一致。\n\n'
     report += '改进父模型承接纯环境PBR的控制结果：\n\n| 数据 | PSNR(dB) | SSIM | 前景PSNR(dB) |\n|---|---:|---:|---:|\n'+'\n'.join(f'| {r["数据"]} | {r["psnr"]:.6f} | {r["ssim"]:.6f} | {r["psnr_foreground"]:.6f} |' for r in controls)+'\n\n这两臂与方向PBR完整方法一起保留。父模型除几何以外还继承材质DC、SH、门控和MLP初始化，Gaussian数量也不同，因此不是只替换法线/几何的严格单因素消融。不能将完整方法收益全部归因于法线。\n\n'
     report += '对齐的是新增外观预算，不是整条训练链的总计算成本；父检查点分别为iteration35000与16500，历史阶段和真实更新规则不同，不能只按iteration比较总计算成本。单场景/单种子实验不声明微小差异的统计显著性。\n\n'
