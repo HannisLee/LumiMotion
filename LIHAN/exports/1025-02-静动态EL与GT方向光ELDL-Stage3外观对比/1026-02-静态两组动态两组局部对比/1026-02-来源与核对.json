@@ -1,0 +1,270 @@
+{
+  "cases": [
+    {
+      "kind": "static",
+      "name": "静态",
+      "frame": 30,
+      "roi": [
+        170,
+        138,
+        230,
+        198
+      ],
+      "region": "背肩与衣褶",
+      "observation": "可见衣褶明暗与表面颗粒差异；未确认几何优于基线。",
+      "full_image": "1026-01-静态-0030-背肩与衣褶-对比.png",
+      "zoom_image": "1026-01-静态-0030-背肩与衣褶-放大.png"
+    },
+    {
+      "kind": "static",
+      "name": "静态",
+      "frame": 110,
+      "roi": [
+        165,
+        115,
+        225,
+        175
+      ],
+      "region": "肘部与腰侧轮廓",
+      "observation": "肘部与腰侧外轮廓接近；亮度差异不能作为几何改善证据。",
+      "full_image": "1026-02-静态-0110-肘部与腰侧轮廓-对比.png",
+      "zoom_image": "1026-02-静态-0110-肘部与腰侧轮廓-放大.png"
+    },
+    {
+      "kind": "dynamic",
+      "name": "动态",
+      "frame": 140,
+      "roi": [
+        120,
+        25,
+        180,
+        85
+      ],
+      "region": "手腕与袖口",
+      "observation": "两侧手腕和袖口均有不规则边缘；没有明确优于基线的结构证据。",
+      "full_image": "1026-03-动态-0140-手腕与袖口-对比.png",
+      "zoom_image": "1026-03-动态-0140-手腕与袖口-放大.png"
+    },
+    {
+      "kind": "dynamic",
+      "name": "动态",
+      "frame": 150,
+      "roi": [
+        145,
+        65,
+        205,
+        125
+      ],
+      "region": "抬臂肘部与腋下",
+      "observation": "可见袖部颗粒与明暗差异；两侧存在伪影，未确认几何提升。",
+      "full_image": "1026-04-动态-0150-抬臂肘部与腋下-对比.png",
+      "zoom_image": "1026-04-动态-0150-抬臂肘部与腋下-放大.png"
+    }
+  ],
+  "sources": {
+    "static_EL": {
+      "evaluation": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-34-LH-static-EL-Stage3外观/evaluation_final_512",
+      "model": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-34-LH-static-EL-Stage3外观/model_mlp",
+      "iteration": 55000,
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-33-静动态EL与GT方向光ELDL-Stage3总控/static_EL_test_source",
+      "directions": null,
+      "metrics_sha256": "b701516918d10ed771a307de6754ae0f0269c2377dbdac7989e0eb3b6b3fe24e"
+    },
+    "static_ELDL": {
+      "evaluation": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1026-03-LH-static-ELDL-GT方向光-Stage3保存点续训/evaluation_final_512",
+      "model": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1026-03-LH-static-ELDL-GT方向光-Stage3保存点续训/model_mlp",
+      "iteration": 28100,
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-33-静动态EL与GT方向光ELDL-Stage3总控/static_ELDL_test_source",
+      "directions": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-33-静动态EL与GT方向光ELDL-Stage3总控/static_ELDL_test_directions.json",
+      "metrics_sha256": "0d810dd4467ebc97482dbcf6897fd4e7be7e2d80245923a393c73507e5482101"
+    },
+    "dynamic_EL": {
+      "evaluation": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-36-LH-dynamic-EL-Stage3外观/evaluation_final_512",
+      "model": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-36-LH-dynamic-EL-Stage3外观/model_mlp",
+      "iteration": 55000,
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-33-静动态EL与GT方向光ELDL-Stage3总控/dynamic_EL_test_source",
+      "directions": null,
+      "metrics_sha256": "89c6ff78dfa692378c8ed1096f4b29017e9a9d8929c38ceb2e0a09c9eeebb309"
+    },
+    "dynamic_ELDL": {
+      "evaluation": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-37-LH-dynamic-ELDL-GT方向光-Stage3外观/evaluation_final_512",
+      "model": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-37-LH-dynamic-ELDL-GT方向光-Stage3外观/model_mlp",
+      "iteration": 21500,
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-33-静动态EL与GT方向光ELDL-Stage3总控/dynamic_ELDL_test_source",
+      "directions": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1025-33-静动态EL与GT方向光ELDL-Stage3总控/dynamic_ELDL_test_directions.json",
+      "metrics_sha256": "14d7db43df0e6113f04d6872ddecb1ac3d31af8b4b153e714177150c31139432"
+    }
+  },
+  "pixel_checks": [
+    {
+      "case": 1,
+      "arm": "static_EL",
+      "sub": "gt",
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/exports/1025-02-静动态EL与GT方向光ELDL-Stage3外观对比/static_EL/gt/0030.png",
+      "source_sha256": "3f64ca0baf6a423c88652c58ec4f9d26e7d9b6140c1a3586200f09c12729bd45",
+      "crop_pixel_sha256": "7b26f577bb1990dbd3d6054c0121ec2baf7ef147eb533512c70bc1d1612fbd5f"
+    },
+    {
+      "case": 1,
+      "arm": "static_EL",
+      "sub": "rgb",
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/exports/1025-02-静动态EL与GT方向光ELDL-Stage3外观对比/static_EL/rgb/0030.png",
+      "source_sha256": "95532f227b362821144e143e5eef1bf15ae954dbec046ff1c88ffeb039bd260f",
+      "crop_pixel_sha256": "ab2603992249a33285f9cceb79c012becde59bf38209660e48816c53ef9d2900"
+    },
+    {
+      "case": 1,
+      "arm": "static_ELDL",
+      "sub": "gt",
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/exports/1025-02-静动态EL与GT方向光ELDL-Stage3外观对比/static_ELDL/gt/0030.png",
+      "source_sha256": "cb0267e39efc3fdb112ced88566b5570ee7c03ddee4dac4a7aa8518542b789c8",
+      "crop_pixel_sha256": "a197dc5d67a532187e755da4606177ed48fd7632d1c3aec66879ba4dd70788dc"
+    },
+    {
+      "case": 1,
+      "arm": "static_ELDL",
+      "sub": "rgb",
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/exports/1025-02-静动态EL与GT方向光ELDL-Stage3外观对比/static_ELDL/rgb/0030.png",
+      "source_sha256": "8521210dcd583c36500de92698d7ec2b63b216430581489809955d418a63f59f",
+      "crop_pixel_sha256": "6e2592831452538aa4b3786098e07100047020acafc181061852a8c2d41ab747"
+    },
+    {
+      "case": 2,
+      "arm": "static_EL",
+      "sub": "gt",
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/exports/1025-02-静动态EL与GT方向光ELDL-Stage3外观对比/static_EL/gt/0110.png",
+      "source_sha256": "a2afebad23b36215c6dfa6b26d56ae5e94c1424d4f2a15a684649df1118e8cb4",
+      "crop_pixel_sha256": "e83b98b226fac69c7966aeabf0364f18b5b99d68480d6ee04300d4f7aaea6490"
+    },
+    {
+      "case": 2,
+      "arm": "static_EL",
+      "sub": "rgb",
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/exports/1025-02-静动态EL与GT方向光ELDL-Stage3外观对比/static_EL/rgb/0110.png",
+      "source_sha256": "8bea406973232fb5e95952d71fa99e50cb34e5afc183dfab1c81da41a159a2ac",
+      "crop_pixel_sha256": "ad906f315cba1f240ee5756f7cede99e326ffe8842eb30294a753ff661d0c93e"
+    },
+    {
+      "case": 2,
+      "arm": "static_ELDL",
+      "sub": "gt",
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/exports/1025-02-静动态EL与GT方向光ELDL-Stage3外观对比/static_ELDL/gt/0110.png",
+      "source_sha256": "6471a8d28cbc308b5a868d0e2451413f8a792b6f4314a73c1900ea93eceb4133",
+      "crop_pixel_sha256": "eeea1564d307f4cecff0b346dcc8490aae76f90e14ccf5a8c99bda27a3eb912e"
+    },
+    {
+      "case": 2,
+      "arm": "static_ELDL",
+      "sub": "rgb",
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/exports/1025-02-静动态EL与GT方向光ELDL-Stage3外观对比/static_ELDL/rgb/0110.png",
+      "source_sha256": "d15701f72828f481772add4e63e01c262fd1924eb02d8e65631a0e3c17ddb9aa",
+      "crop_pixel_sha256": "2c492fe013aa550e5dda5950df8afabc89f5e6d47cf0de8a68aa3b1e74383e83"
+    },
+    {
+      "case": 3,
+      "arm": "dynamic_EL",
+      "sub": "gt",
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/exports/1025-02-静动态EL与GT方向光ELDL-Stage3外观对比/dynamic_EL/gt/0140.png",
+      "source_sha256": "3189c18f9d2ff041bc6edd3b1fe21c31fad9315310bc6bce985b990583f99048",
+      "crop_pixel_sha256": "480fe435853d86c08d985dc81adc8367665bfd4affbc24cb39fd6b406c206cb4"
+    },
+    {
+      "case": 3,
+      "arm": "dynamic_EL",
+      "sub": "rgb",
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/exports/1025-02-静动态EL与GT方向光ELDL-Stage3外观对比/dynamic_EL/rgb/0140.png",
+      "source_sha256": "ea1fe506748d3a315ff3458ce4541e89ef1bc9ede46666b8db77d577d336d088",
+      "crop_pixel_sha256": "80da97c5b0faebb31de1a7bbbd22c5f313ce9f4265312a230b3903a14498759e"
+    },
+    {
+      "case": 3,
+      "arm": "dynamic_ELDL",
+      "sub": "gt",
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/exports/1025-02-静动态EL与GT方向光ELDL-Stage3外观对比/dynamic_ELDL/gt/0140.png",
+      "source_sha256": "a5576bbf99edbce02045f847f3e14cfc07af6fb69a19898b1456c3d64203ee50",
+      "crop_pixel_sha256": "da32b4f31b1950f67648dc337df8b2292946e5b9ad1faf63ef94d3e06a173c86"
+    },
+    {
+      "case": 3,
+      "arm": "dynamic_ELDL",
+      "sub": "rgb",
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/exports/1025-02-静动态EL与GT方向光ELDL-Stage3外观对比/dynamic_ELDL/rgb/0140.png",
+      "source_sha256": "a805001a2ba6c9a739b760d0e7db59fba7de03b40d4724fe1f896dbac1bd1d21",
+      "crop_pixel_sha256": "512b6cd41257fb1ad063680d7706cdf07ed2ae1e7b27d67f50e139ce8199b7dc"
+    },
+    {
+      "case": 4,
+      "arm": "dynamic_EL",
+      "sub": "gt",
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/exports/1025-02-静动态EL与GT方向光ELDL-Stage3外观对比/dynamic_EL/gt/0150.png",
+      "source_sha256": "d591b98c02603622de8b8d2051a4656ae05da54741af3d43e6ae83b78e0a8361",
+      "crop_pixel_sha256": "7319d8a59c0fcfa92059dc368f92038f39f981fc5e68fd376edd87a934d78387"
+    },
+    {
+      "case": 4,
+      "arm": "dynamic_EL",
+      "sub": "rgb",
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/exports/1025-02-静动态EL与GT方向光ELDL-Stage3外观对比/dynamic_EL/rgb/0150.png",
+      "source_sha256": "0090f845a32592b81ef30b1ea67ebdb93d7af1d70ee000b16c176f12e9303315",
+      "crop_pixel_sha256": "8ce31d7f16565d7dc890590c1cdd17ea868c4ccac0600ad4af1ea18dfadcc897"
+    },
+    {
+      "case": 4,
+      "arm": "dynamic_ELDL",
+      "sub": "gt",
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/exports/1025-02-静动态EL与GT方向光ELDL-Stage3外观对比/dynamic_ELDL/gt/0150.png",
+      "source_sha256": "b9d83b60a32d581e2cd63e84baf8f8dc0da7fa762819d8330b6eb21f1bde84dd",
+      "crop_pixel_sha256": "a67b0e523bb68f4dac3d34dd4ef63814bfa1bfc828d8df18d986abd5364e9cb9"
+    },
+    {
+      "case": 4,
+      "arm": "dynamic_ELDL",
+      "sub": "rgb",
+      "source": "/home/han.li/reproduce/LumiMotion-stage2-perlight/LIHAN/exports/1025-02-静动态EL与GT方向光ELDL-Stage3外观对比/dynamic_ELDL/rgb/0150.png",
+      "source_sha256": "71ec9e0b8ecc80bcff01605cdb39b829936aa7461f3ffd61325acbd2d79bd1d6",
+      "crop_pixel_sha256": "2d3aeb1bb15e626aad9677e3c33f17d56c8ec56e586f0d771b26bb38711a937a"
+    }
+  ],
+  "reviewed": {
+    "test_frames": [
+      10,
+      20,
+      30,
+      40,
+      50,
+      60,
+      70,
+      80,
+      90,
+      100,
+      110,
+      120,
+      130,
+      140,
+      150
+    ],
+    "dev_frames": [
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79
+    ],
+    "views_per_condition": 33
+  },
+  "conclusion": "未找到满足要求的四组明确几何提升；交付为四组局部RGB对照，不标为成功案例。",
+  "validation": "8张PNG，8页PDF；放大区域与原始裁剪最近邻缩放逐像素一致。"
+}
