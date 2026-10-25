@@ -89,7 +89,7 @@ def overview(kind, name, frame):
     return canvas
 
 
-def main():
+def legacy_main():
     DEST.mkdir(exist_ok=False)
     (DEST / '原始裁剪').mkdir()
     pages = []
@@ -157,6 +157,90 @@ def main():
     (DEST / '1026-01-文件校验.json').write_text(json.dumps(hashes, ensure_ascii=False, indent=2) + '\n')
     print(json.dumps(dict(destination=str(DEST), pdf_pages=8, detail_pages=2, overview_images=30,
                           raw_crops=8, crop_pixel_validation='PASS', conclusion='PARTIAL'), ensure_ascii=False))
+
+
+def main():
+    """当前交付：四张框选全图、四张独立放大图，无总览附页。"""
+    global DEST
+    DEST = SOURCE / '1026-02-静态两组动态两组局部对比'
+    DEST.mkdir(exist_ok=False)
+    cases = [
+        dict(kind='static', name='静态', frame=30, roi=[170, 138, 230, 198], region='背肩与衣褶',
+             observation='可见衣褶明暗与表面颗粒差异；未确认几何优于基线。'),
+        dict(kind='static', name='静态', frame=110, roi=[165, 115, 225, 175], region='肘部与腰侧轮廓',
+             observation='肘部与腰侧外轮廓接近；亮度差异不能作为几何改善证据。'),
+        dict(kind='dynamic', name='动态', frame=140, roi=[120, 25, 180, 85], region='手腕与袖口',
+             observation='两侧手腕和袖口均有不规则边缘；没有明确优于基线的结构证据。'),
+        dict(kind='dynamic', name='动态', frame=150, roi=[145, 65, 205, 125], region='抬臂肘部与腋下',
+             observation='可见袖部颗粒与明暗差异；两侧存在伪影，未确认几何提升。'),
+    ]
+    source_info = json.loads((SOURCE / '1025-02-来源清单.json').read_text())['sources']
+    pages = []
+    crop_hashes = []
+    for number, case in enumerate(cases, 1):
+        prefix = f"1026-{number:02d}-{case['name']}-{case['frame']:04d}-{case['region']}"
+        full = Image.new('RGB', (1920, 680), '#f5f6f8')
+        zoom = Image.new('RGB', (1920, 680), '#f5f6f8')
+        fd, zd = ImageDraw.Draw(full), ImageDraw.Draw(zoom)
+        title = f"{case['name']} {number if number <= 2 else number - 2}/2｜视角 {case['frame']:04d}｜{case['region']}"
+        text(fd, (45, 28), title + ' · 框选全图', 36)
+        text(zd, (45, 28), title + ' · 局部放大', 36)
+        for i, (arm, sub, label) in enumerate(columns(case['kind'])):
+            x = 40 + 470 * i
+            original = read(arm, sub, case['frame'])
+            text(fd, (x, 117), label, 24)
+            text(zd, (x, 117), label, 24)
+            full.paste(original, (x, 172))
+            l, t, r, b = case['roi']
+            fd.rectangle((x + l, 172 + t, x + r - 1, 172 + b - 1), outline=BOX, width=2)
+            crop = original.crop(case['roi'])
+            zoom.paste(crop.resize((400, 400), Image.Resampling.NEAREST), (x, 172))
+            zd.rectangle((x, 172, x + 399, 571), outline=BOX, width=2)
+            crop_hashes.append(dict(case=number, arm=arm, sub=sub,
+                                    source=str(SOURCE / arm / sub / f"{case['frame']:04d}.png"),
+                                    source_sha256=hashlib.sha256((SOURCE / arm / sub / f"{case['frame']:04d}.png").read_bytes()).hexdigest(),
+                                    crop_pixel_sha256=hashlib.sha256(crop.tobytes()).hexdigest()))
+            # 导出放大图的每块像素须与同倍率源裁剪完全一致。
+            assert zoom.crop((x, 172, x + 400, 572)).crop((2, 2, 398, 398)).tobytes() == crop.resize((400, 400), Image.Resampling.NEAREST).crop((2, 2, 398, 398)).tobytes()
+        text(fd, (45, 608), '四列相同原图坐标框选；照明不同，分别对照各自 GT。', 24, MUTED)
+        text(zd, (45, 608), '60×60 原始像素统一放大至 400×400（约 6.667 倍最近邻）；仅作局部 RGB 对照。', 24, MUTED)
+        case['full_image'], case['zoom_image'] = prefix + '-对比.png', prefix + '-放大.png'
+        full.save(DEST / case['full_image'])
+        zoom.save(DEST / case['zoom_image'])
+        pages.extend([full, zoom])
+    pdf = DEST / '1026-02-静态两组动态两组RGB对比与放大.pdf'
+    pages[0].save(pdf, save_all=True, append_images=pages[1:], resolution=150)
+    parser = PdfParser.PdfParser(filename=str(pdf))
+    assert len(parser.pages) == 8
+    parser.close()
+    assert len(list(DEST.glob('*.png'))) == 8
+    manifest = dict(cases=cases, sources=source_info, pixel_checks=crop_hashes,
+                    reviewed=dict(test_frames=list(range(10, 151, 10)), dev_frames=[f for f in range(61, 80) if f != 70], views_per_condition=33),
+                    conclusion='未找到满足要求的四组明确几何提升；交付为四组局部RGB对照，不标为成功案例。',
+                    validation='8张PNG，8页PDF；放大区域与原始裁剪最近邻缩放逐像素一致。')
+    (DEST / '1026-02-来源与核对.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n')
+    description = '''# 静态两组、动态两组局部 RGB 对照
+
+本版严格导出四张框选对比图与四张独立放大图，共八张 PNG；另附八页 PDF，按每组全图、放大图交替排列，无指标、总览或其他诊断附页。上一版 `1026-01-几何细节放大版` 已按用户要求从导出目录撤下；原始训练、评估与失败记录保留。
+
+静态选择 0030 背肩衣褶、0110 肘部腰侧；动态选择 0140 手腕袖口、0150 抬臂肘部腋下。均不采用鞋面或平台边缘小凸点。每组四列顺序为 EL 数据 GT、原生 EL Stage3、ELDL 数据 GT、改进 GT方向光 ELDL Stage3。两种照明不同，不能把明暗差异解释为几何提升。
+
+重新检查了每种条件 15 个 TEST 视角及已保存的 18 个 DEV 视角，共每种 33 个视角。没有找到四组明显、可靠的几何提升，故导出的四组仅为人体局部形态对照，不作为“改进均优于原生”的证据。静态轮廓总体接近；动态手腕、手臂存在不规则边缘，改进侧并非稳定更好。各组逐项观察见来源 JSON。不得将本版图表中中性的区域标题解读为提升结论。
+
+原图 400×400；四列使用完全相同的 60×60 裁剪框，最近邻统一放大到 400×400，无锐化、曝光调整、超分、修补或合成。框坐标为左上包含、右下不包含，记录于 JSON。全部取自此前冻结的最终 TEST 导出，未改变模型、iteration 或重新训练。来源模型与完整评估路径见 JSON，完整渲染命令与历史验收仍见实验 README。
+
+导出完整性 PASS：8 张 PNG、8 页 PDF，16 个放大区域像素校验通过。科学结论 FAILED：未找到四组具有说服力的几何提升，当前图像不足以支持所需结论。
+'''
+    (DEST / '1026-02-使用与核对说明.md').write_text(description)
+    body = '<h1>静态两组 · 动态两组</h1><p>四张框选对比 + 四张局部放大。当前为 RGB 形态核对，未证实四组几何提升。</p>'
+    body += f'<p><a href="{pdf.name}">下载八页 PDF</a> · <a href="1026-02-使用与核对说明.md">核对说明</a></p>'
+    for case in cases:
+        for key in ['full_image', 'zoom_image']:
+            body += f'<img src="{html.escape(case[key])}">'
+    (DEST / 'index.html').write_text('<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>静动态四组局部对照</title><style>body{font:18px sans-serif;margin:35px auto;max-width:1500px;background:#f5f6f8;color:#192b42}img{width:100%;margin:18px 0}</style>' + body + '</html>')
+    hashes = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in DEST.iterdir() if p.is_file()}
+    (DEST / '1026-02-文件校验.json').write_text(json.dumps(hashes, ensure_ascii=False, indent=2) + '\n')
+    print(json.dumps(dict(destination=str(DEST), png_images=8, pdf_pages=8, enlarged_regions=16, validation='PASS', geometric_improvement='FAILED'), ensure_ascii=False))
 
 
 if __name__ == '__main__':
