@@ -13,9 +13,11 @@ ROOT = Path(__file__).resolve().parents[2]
 FONT = ROOT/'exports/1024-01-静态ELDL-研究展示素材/NotoSansCJKsc-Regular.otf'
 EXPERIMENTS = {
     '静态原生': '1025-03-staticDL-Stage3原生基线',
-    '静态改进': '1025-04-staticDL-Stage3改进几何',
+    '静态改进': '1025-08-staticDL-Stage3已知方向光',
     '动态原生': '1025-05-dynamicDL-Stage3原生基线',
-    '动态改进': '1025-06-dynamicDL-Stage3改进几何',
+    '动态改进': '1025-07-dynamicDL-Stage3估计方向光',
+    '静态仅几何': '1025-04-staticDL-Stage3改进几何',
+    '动态仅几何': '1025-06-dynamicDL-Stage3改进几何',
 }
 INK = '#15283e'
 MUTED = '#607187'
@@ -41,7 +43,8 @@ def canvas(title, subtitle, index):
 
 def put(image, path, box):
     source = Image.open(path).convert('RGB')
-    source.thumbnail((box[2]-box[0], box[3]-box[1]), Image.Resampling.LANCZOS)
+    scale = min((box[2]-box[0])/source.width, (box[3]-box[1])/source.height)
+    source = source.resize((round(source.width*scale), round(source.height*scale)), Image.Resampling.LANCZOS)
     image.paste(source, (box[0]+(box[2]-box[0]-source.width)//2, box[1]+(box[3]-box[1]-source.height)//2))
 
 
@@ -82,15 +85,17 @@ def main():
             for array in arrays:
                 array.close()
         for arm in ['原生', '改进']:
-            row = {'数据': kind+'DL-V2', '方法': '原生LumiMotion' if arm == '原生' else '改进几何＋原生PBR',
+            row = {'数据': kind+'DL-V2', '方法': '原生LumiMotion环境PBR' if arm == '原生' else '改进几何＋'+('已知GT方向PBR' if kind == '静态' else '估计方向PBR'),
                    **reports[kind+arm]['metrics'], 'model': reports[kind+arm]['model'], 'iteration': reports[kind+arm]['iteration']}
             rows.append(row)
-    with (output/'1025-01-Stage3同协议指标.csv').open('w') as f:
+    controls = [{'数据': kind+'DL-V2', '方法': '改进几何＋环境PBR', **reports[kind+'仅几何']['metrics'],
+                 'model': reports[kind+'仅几何']['model'], 'iteration': reports[kind+'仅几何']['iteration']} for kind in ['静态', '动态']]
+    with (output/'1025-01-Stage3同协议指标.csv').open('w', encoding='utf-8-sig') as f:
         writer = csv.DictWriter(f, fieldnames=rows[0].keys())
         writer.writeheader()
-        writer.writerows(rows)
+        writer.writerows(rows+controls)
     slides = []
-    image = canvas('更准确的几何，是否带来更好的外观？', '原生环境 PBR、相同新增预算与渲染协议；比较固定20000循环终点', 1)
+    image = canvas('几何与方向照明承接后的 Stage3 外观', '同数据、相同新增预算；静态使用已知GT方向，动态只用TRAIN估计方向；固定20000循环终点', 1)
     d = ImageDraw.Draw(image)
     columns = [(90, '数据与方法'), (950, 'PSNR ↑'), (1230, 'SSIM ↑'), (1510, '前景PSNR ↑')]
     for x, label in columns:
@@ -105,21 +110,33 @@ def main():
         a, b = reports[kind+'原生']['metrics'], reports[kind+'改进']['metrics']
         d.text((90, 846+i*55), f'{kind}改进−原生：PSNR {b["psnr"]-a["psnr"]:+.3f} dB；SSIM {b["ssim"]-a["ssim"]:+.5f}', font=font(29), fill=ACCENT)
     slides.append(('1025-01-Stage3定量结果', image))
+    image = canvas('仅改几何与完整方法分开比较', '三个设置：原生环境PBR／改进几何＋环境PBR／改进几何＋方向PBR；不将全部收益归因于法线', 2)
+    d = ImageDraw.Draw(image)
+    for i, row in enumerate([rows[0], controls[0], rows[1], rows[2], controls[1], rows[3]]):
+        y = 290+i*103
+        d.rounded_rectangle((70, y-8, 1850, y+78), radius=10, fill='white' if i%3 == 0 else '#e9f4f5')
+        d.text((95, y), row['数据']+' / '+row['方法'], font=font(30), fill=INK)
+        d.text((1170, y), f'{row["psnr"]:.3f} dB', font=font(31), fill=ACCENT)
+        d.text((1510, y), f'{row["ssim"]:.5f}', font=font(31), fill=ACCENT)
+    d.text((95, 948), '同一数据内相同RGB/Alpha；照明模型属于方法变量。静态GT方向条件不等同于动态未知光估计。', font=font(23), fill=MUTED)
+    slides.append(('1025-02-Stage3几何承接与照明对照', image))
     for kind in ['静态', '动态']:
         for key in ['0080', '0150']:
-            image = canvas(kind+'场景：同视角外观对比', f'固定 TEST {key}；原图完整保留，统一橙框放大人体区域；不按数值挑选视角', len(slides)+1)
+            light_label = '已知GT方向' if kind == '静态' else 'TRAIN估计方向（无GT灯向）'
+            image = canvas(kind+'场景：同视角外观对比', f'固定 TEST {key}；改进组使用{light_label}；保留全图与统一人体窗口', len(slides)+1)
             d = ImageDraw.Draw(image)
             sources = [output/'素材'/f'{kind}原生-gt-{key}.png', output/'素材'/f'{kind}原生-rgb-{key}.png', output/'素材'/f'{kind}改进-rgb-{key}.png']
-            for col, (label, source) in enumerate(zip(['真实观测 GT', '原生 LumiMotion', '改进几何＋原生 PBR'], sources)):
+            for col, (label, source) in enumerate(zip(['真实观测 GT', '原生 LumiMotion', '改进几何＋方向 PBR'], sources)):
                 x = 95+col*610
                 d.text((x, 235), label, fill=INK, font=font(32))
                 put(image, source, (x, 290, x+520, 810))
                 # 固定中心人体窗口；同一场景、三种方法完全同坐标。
-                crop = (145, 80, 260, 270)
+                crop = (150, 120, 250, 205)
                 d.rectangle((x+crop[0]*1.3, 290+crop[1]*1.3, x+crop[2]*1.3, 290+crop[3]*1.3), outline='#f6a23a', width=4)
                 zoom = Image.open(source).convert('RGB').crop(crop)
-                zoom.thumbnail((140, 160), Image.Resampling.LANCZOS)
-                image.paste(zoom, (x+400, 815))
+                zoom_scale = min(190/zoom.width, 160/zoom.height)
+                zoom = zoom.resize((round(zoom.width*zoom_scale), round(zoom.height*zoom_scale)), Image.Resampling.LANCZOS)
+                image.paste(zoom, (x+380, 815))
                 if col:
                     metrics = next(r for r in reports[kind+('原生' if col == 1 else '改进')]['frames'] if r['frame'] == key)
                     d.text((x, 840), f'PSNR {metrics["psnr"]:.2f} dB', fill=ACCENT, font=font(27))
@@ -143,9 +160,11 @@ def main():
     table = '| 数据 | 方法 | PSNR(dB) | SSIM | 前景PSNR(dB) |\n|---|---|---:|---:|---:|\n'
     table += '\n'.join(f'| {r["数据"]} | {r["方法"]} | {r["psnr"]:.6f} | {r["ssim"]:.6f} | {r["psnr_foreground"]:.6f} |' for r in rows)
     report = '# Stage3 静动态实验展示与复现说明\n\n日期：2026-10-25。服务器 ushas，Conda lumimotion-ushas。逻辑 Stage3 对应原生代码 Stage2 的环境 PBR 外观训练。\n\n'+table+'\n\n'
-    report += '同一数据内 Stage3 输入、512半球采样、400×400、20000新增循环/4999真实更新、原生损失和混合追踪深度1一致。15固定测试视角全图浮点sRGB逐帧PSNR/SSIM后均值；SSIM为项目11×11、sigma1.5；前景分数另列。独立CPU复算PSNR，保存float数组，配对GT和Mask逐元素一致。\n\n'
+    report += '同一数据内 Stage3 RGB/Alpha输入、512半球采样、400×400、20000新增循环/4999真实更新、原生PBR损失和混合追踪深度1一致；环境光与方向光属于方法变量，相应光照参数/正则按各入口语义处理。静态完整方法使用已知GT方向；动态使用父TRAIN估计方向及插值，不读GT灯向或GT强度。历史API参数名称gt_directional不表示动态数据读取了GT。动态原始RGBA净化与原生视图132张输入RGB/Alpha逐字节相同，证据在总控directional_input_comparison.json。15固定测试视角全图浮点sRGB逐帧PSNR/SSIM后均值；SSIM为项目11×11、sigma1.5；前景分数另列。NumPy/SciPy独立复算指标，保存float数组，配对GT和Mask逐元素一致。\n\n'
+    report += '纯环境PBR仅换几何的控制结果：\n\n| 数据 | PSNR(dB) | SSIM | 前景PSNR(dB) |\n|---|---:|---:|---:|\n'+'\n'.join(f'| {r["数据"]} | {r["psnr"]:.6f} | {r["ssim"]:.6f} | {r["psnr_foreground"]:.6f} |' for r in controls)+'\n\n这两臂与方向PBR完整方法一起保留，不能将方向光承接收益全部归因于法线。\n\n'
+    report += '对齐的是新增外观预算，不是整条训练链的总计算成本；原生父35000循环、改进父16500更新且包含不同阶段。单场景/单种子实验不声明微小差异的统计显著性。\n\n'
     report += '静态父为原生S1@35000和历史GS最优F-T04@16500（2.663858°）；动态为原生S1@35000和完整路线预登记主检查点@16500（7.329092°，原生14.545605°）。这些法线来自父模型，不冒充当前Stage3的同checkpoint法线MAE。原生动态父见过135训练时刻、改进父117，且动态门控和颜色头设置不同，属于完整方法对照，不能证明法线单因素因果。\n\n'
-    report += '训练source移除了TEST；最终评测只在训练完成后接入TEST。历史TEST已被多轮实验查看，不称新盲测。现有1024 EL44.685147dB/0.997835与DL29.316748dB/0.974770为不同照明/已知光设置，不能混入本表。\n\n'
+    report += '训练source移除了TEST；所有TEST指标均在对应模型完成固定预算后计算，TEST不参与优化或选参。早期冒烟只评分和查看TRAIN，但Scene初始化曾加载含TEST图像的评价视图；输入逐字节一致性审计也读取TEST输入，均未用于梯度、TEST评分或按图选参。后续TRAIN诊断改用无TEST视图。历史TEST已被多轮实验查看，不称新盲测。现有1024 EL44.685147dB/0.997835与DL29.316748dB/0.974770为不同照明/已知光设置，不能混入本表。\n\n'
     report += '展示顺序：先定量页，再静态RGB和四类诊断，再动态RGB和诊断。局部框使用固定相同坐标，并保留完整图。视频目录为按采集顺序的15个TEST视角，静态也会移动相机，动态同时变化相机和时间；不是固定相机动态视频。PNG与PDF可直接插入PPT，HTML离线浏览；CSV可编辑。\n\n'
     report += '## 来源与完整命令\n\n'
     for name, state in states.items():
