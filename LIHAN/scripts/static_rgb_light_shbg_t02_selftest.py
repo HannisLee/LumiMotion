@@ -84,7 +84,12 @@ def main():
     first=project(np.maximum(final_dot,0),d0,np.ones((150,1)),np.ones((150,1),bool)); before=first['q'].copy()
     assert final_eta(before,df,np.ones((150,1)),first['cal'])[0]>.2 and np.array_equal(before,first['q'])
     y=.2+.5*np.maximum(np.einsum('tgc,tc->tg',n,anchor),0)+.3*rec['H']; weights=np.ones_like(y)
-    hold=template(h,n,y,weights,np.arange(3),anchor,True)
+    class OddOnly:
+        def __init__(self,arr): self.arr=arr
+        def __getitem__(self,key):
+            if key!=slice(None,None,2): raise AssertionError('校准读取偶数帧')
+            return self.arr[key]
+    hold=template(h,n,OddOnly(y),OddOnly(weights),np.arange(3),anchor,True)
     changed=y.copy(); changed[1::2]+=100; weights2=weights.copy(); weights2[1::2]*=7
     hold2=template(h,n,changed,weights2,np.arange(3),anchor,True)
     np.testing.assert_array_equal(hold['q'],hold2['q']); np.testing.assert_array_equal(hold['beta'],hold2['beta'])
@@ -104,6 +109,13 @@ def main():
     for _ in range(400): opt.zero_grad(); z=photometric(xx,known,ww,hh,c.sigmoid())[0]; z.backward(); opt.step()
     assert abs(float(c.sigmoid())-.55)<.01
     negative=torch.full_like(xx,-.5); rho,b=kkt(xx,negative,ww); assert (rho==0).all() and (b==0).all()
+    from LIHAN.scripts.static_rgb_light_shbg_t02_choose import calibration_mask
+    mask23=weights.copy(); mask23[46:150:2,0]=0
+    mask24=weights.copy(); mask24[48:150:2,0]=0
+    assert not calibration_mask(n,OddOnly(y),OddOnly(mask23),anchor)[0]
+    assert calibration_mask(n,OddOnly(y),OddOnly(mask24),anchor)[0]
+    missing=weights.copy(); missing[1,:]=0
+    assert np.isinf(heldout_score(n,y,missing,anchor,np.ones(3,bool),hold['H'],.3)[0])
     s1,count1=heldout_score(n,y,weights,anchor,np.ones(3,bool),hold['H'],.3)
     s2,count2=heldout_score(n,changed,weights,anchor,np.ones(3,bool),hold['H'],.3)
     assert s1!=s2 and count1==count2
@@ -112,6 +124,9 @@ def main():
     picked,status=select([dict(row,name='C01',lambda_bg=.0001,J=1.019),row]); assert picked['name']=='C02' and status=='SELECTED_SH'
     assert select([dict(row,all_gates=False)])[1]=='FALLBACK_E4'
     print('T02 合成数值与基础隔离检查通过。')
-    raise RuntimeError('完整优化器、评分和端到端自检尚未完成，禁止签发 PASS')
+    from LIHAN.scripts import static_rgb_light_shbg_t02_optimizer_selftest, static_rgb_light_shbg_t02_integration_selftest
+    static_rgb_light_shbg_t02_optimizer_selftest.main()
+    static_rgb_light_shbg_t02_integration_selftest.main()
+    print('T02 全部合成自检完成。')
 
 if __name__=='__main__': main()
