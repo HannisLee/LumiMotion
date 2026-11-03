@@ -70,11 +70,11 @@ def fit(n, y, w, H, anchor, gamma_initial, elevation_initial, lambda_bg, dest,
                 if rel<1e-9 and mx<.005 and dg<1e-5: break
         restore([z.detach() for z in eff()]); return metrics
     def probe():
-        state=snap(); d0,g0=measure(*state); loss0=float(objective(*state)[0]); opt=torch.optim.Adam([{'params':[ph],'lr':1e-4},{'params':[av],'lr':1e-3},{'params':[c],'lr':1e-3}])
+        state=snap(); d0,g0=measure(*state); loss0=float(objective(*state)[0].detach()); opt=torch.optim.Adam([{'params':[ph],'lr':1e-4},{'params':[av],'lr':1e-3},{'params':[c],'lr':1e-3}])
         try:
             for _ in range(budgets[3]):
                 opt.zero_grad(); loss=objective(ph,av,c)[0]; checked(loss); loss.backward(); opt.step()
-            d1,g1=measure(ph,av,c); loss1=float(objective(ph,av,c)[0]); return float(r5.ang_deg(d0,d1).max()), (loss0-loss1)/max(abs(loss0),1e-30), abs(g1-g0)
+            d1,g1=measure(ph,av,c); loss1=float(objective(ph,av,c)[0].detach()); return float(r5.ang_deg(d0,d1).max()), (loss0-loss1)/max(abs(loss0),1e-30), abs(g1-g0)
         finally: restore(state)
     def certificate(m):
         p=probe(); good=m is not None and m[0]<1e-9 and m[1]<.005 and m[2]<1e-5 and p[0]<.1 and p[1]<1e-4 and p[2]<1e-3
