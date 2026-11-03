@@ -21,20 +21,20 @@ def fit_candidates(observations,baseline,sh_values,extraction_metadata,output,sm
     meta=json.loads(Path(extraction_metadata).read_text()); diag=meta['diagnostics']
     l0=template(h[0],n,y,w,indices['full'],anchors['full'])
     if np.abs(l0['q']).max()>1e-8: raise ArithmeticError('L0 退化自检失败')
-    results={}; cache={}
+    results={}; cache={}; invalid={}; run_keys=('full',) if smoke else RUNS
+    for L in ((1,) if smoke else (1,2)):
+        if diag[str(L)]['invalid_clipping']:
+            invalid[L]='SH_CLIPPING'; continue
+        for key in run_keys:
+            rec=template(h[L],n,y,w,indices[key],anchors[key]); cache[(L,key)]=rec
+            save_template(out/'templates'/f'L{L}_{key}.npz',h[L],indices[key],ids,frames,rec,L)
+            if rec['nondegenerate_fraction']<.2: invalid[L]='SH_DEGENERATE'
     for name,L,lam in (CANDIDATES[:1] if smoke else CANDIDATES):
         results[name]={}; failures=[]
-        if diag[str(L)]['invalid_clipping']:
-            results[name]['failure']='SH_CLIPPING'; continue
-        for key in (('full',) if smoke else RUNS):
-            tag=(L,key)
-            if tag not in cache:
-                cache[tag]=template(h[L],n,y,w,indices[key],anchors[key]); rec=cache[tag]
-                save_template(out/'templates'/f'L{L}_{key}.npz',h[L],indices[key],ids,frames,rec,L)
-            rec=cache[tag]
-            if rec['nondegenerate_fraction']<.2:
-                results[name][key]={'converged':False,'reason':'SH_DEGENERATE'}; failures.append(key); continue
-            idx=indices[key]; anchor=anchors[key]
+        if L in invalid:
+            results[name]['failure']=invalid[L]; continue
+        for key in run_keys:
+            rec=cache[(L,key)]; idx=indices[key]; anchor=anchors[key]
             a=np.arctanh(np.clip((np.arcsin(np.clip(anchor[:,2],-1,1))-np.deg2rad(45))/np.deg2rad(5),-.999999,.999999))
             g=.5
             if key=='hi': a=np.full(len(a),np.arctanh(.9)); g=.9

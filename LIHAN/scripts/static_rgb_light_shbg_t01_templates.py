@@ -47,7 +47,8 @@ def combine_templates(fit_dir,selection_dir,output):
     import shutil
     import zipfile
     inputs=sorted((Path(fit_dir)/'templates').glob('*.npz'))+sorted(Path(selection_dir).glob('L*_holdout.npz'))
-    if not inputs: raise ValueError('没有模板可冻结')
+    if not inputs:
+        np.savez_compressed(output,status='NO_VALID_TEMPLATES'); return
     path=Path(output)
     with zipfile.ZipFile(path,mode='x',compression=zipfile.ZIP_DEFLATED,allowZip64=True) as dest:
         for source in inputs:
