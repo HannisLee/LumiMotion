@@ -10,6 +10,7 @@ from LIHAN.scripts.static_rgb_light_shbg_t01_optimizer import fit
 from LIHAN.scripts.static_rgb_light_shbg_t01_scoring import select
 from LIHAN.scripts.static_rgb_light_shbg_t01_extract import camera_fields
 from LIHAN.scripts.static_rgb_light_fit_r3 import kkt
+from LIHAN.scripts.static_rgb_light_shbg_t01_templates import template
 
 
 def main():
@@ -27,6 +28,13 @@ def main():
         if (both>=0).all(): candidates.append(both)
         reference=min(candidates,key=lambda c:np.linalg.norm(A@c-z))
         np.testing.assert_allclose([r[j],b[j]],reference,atol=1e-6,rtol=0)
+    # 零背景时光度目标对方向变量的梯度与原目标一致。
+    u=torch.tensor(rng.normal(size=(40,3)),dtype=torch.float64,requires_grad=True)
+    xt=torch.sigmoid(u); yt=torch.tensor(y); wt=torch.tensor(w); ht=torch.ones_like(xt)
+    new=photometric(xt,yt,wt,ht,torch.tensor(0.))[0]
+    rho,bias=kkt(xt,yt,wt); old=(wt*.5*(xt*rho+bias-yt).square()).sum()/wt.sum()+1e-5*(rho.square().mean()+bias.square().mean())
+    ga=torch.autograd.grad(new,u,retain_graph=True)[0]; gb=torch.autograd.grad(old,u)[0]
+    assert abs((new-old).item())<=1e-10 and (ga-gb).abs().max().item()<=1e-7
     # 背景确实影响目标，并可从独立随机时变模板中恢复共享幅度。
     x=torch.tensor(rng.uniform(0,1,(120,12))); H=torch.tensor(rng.uniform(0,.2,(120,12)))
     w=torch.ones_like(x); y=.2+.7*x+.55*H; c=torch.tensor(0.,dtype=torch.float64,requires_grad=True)
