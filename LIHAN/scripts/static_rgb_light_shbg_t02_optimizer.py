@@ -78,6 +78,7 @@ def fit(n, y, w, H, anchor, lambda_bg, dest, run='full', control=False):
         return dict(window=window, probe=p, converged=bool(ok))
     try:
         initial = snapshot()
+        print(json.dumps(dict(stage='initial',run=run,control=control,max_anchor_degrees=float(r5.ang_deg(initial[1],anchor).max()),u_degrees=torch.tanh(U).detach().cpu().tolist(),v=(.1*torch.tanh(V)).detach().cpu().tolist(),gamma=initial[2]),ensure_ascii=False),flush=True)
         if abs(float(torch.diff(trajectory(phi0, a0, U, V)[0]).sum().detach())) < np.pi: raise ValueError('初始环绕不足 180 度')
         opt = torch.optim.Adam(params, lr=.03)
         for k in range(1, 1001):

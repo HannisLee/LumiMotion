@@ -71,7 +71,7 @@ def lock(a):
     if not all(p.is_file() for p in files): raise FileNotFoundError('锁定输入或代码缺失')
     out=a.output.resolve(); out.mkdir(parents=True,exist_ok=True)
     if any(p.name not in {'allocation.json','command.txt','environment.json','run.log','launcher.pid'} for p in out.iterdir()): raise FileExistsError('输出目录已使用')
-    rec=dict(utc=time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),argv=sys.argv,files={str(p):dict(sha256=digest(p),size=p.stat().st_size) for p in files},gt_read=False)
+    rec=dict(utc=time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),argv=sys.argv,files={str(p):dict(sha256=digest(p),size=p.stat().st_size,mtime_utc=time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime(p.stat().st_mtime))) for p in files},gt_read=False)
     (out/'input_lock.json').write_text(json.dumps(rec,indent=2)); return rec
 
 
