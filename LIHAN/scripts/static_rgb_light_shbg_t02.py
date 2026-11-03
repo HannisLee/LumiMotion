@@ -90,6 +90,10 @@ def verify(a):
     for p in files:
         if digest(p)!=rec['files'][str(p)]['sha256'] or p.stat().st_size!=rec['files'][str(p)]['size']: raise ValueError('输入或代码哈希变化: '+str(p))
     if digest(a.observations)!=OBS_HASH or digest(a.plan)!=PLAN_HASH: raise ValueError('观测或规划哈希变化')
+    for relative,sha in code_hashes().items():
+        if digest(a.output/'frozen_code'/relative)!=sha: raise ValueError('代码快照发生变化: '+relative)
+    for source in (a.plan,ROOT/'LIHAN/DOC/修改/1103-01-T02低频轨迹切空间保护SH实现.md',ROOT/'LIHAN/DOC/训练/1103-02-T02低频轨迹SH冒烟与正式执行.md'):
+        if digest(a.output/'frozen_docs'/source.name)!=digest(source): raise ValueError('文档快照发生变化: '+source.name)
 
 
 def self_test(out, plan):
