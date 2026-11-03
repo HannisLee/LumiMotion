@@ -47,9 +47,15 @@ def fit(n, y, w, H, anchor, lambda_bg, dest, run='full', control=False):
     def snapshot():
         with torch.no_grad():
             result = checked(); return float(result[0]), result[1].cpu().numpy(), float(result[2])
-    def record(stage, step, loss):
+    def checkpoint(stage, step, optimizer_state):
+        temporary=dest/'checkpoint.pt.tmp'
+        torch.save(dict(parameters=[p.detach().cpu() for p in params],stage=stage,step=step,optimizer_state=optimizer_state,lbfgs_state=last_lbfgs),temporary)
+        temporary.replace(dest/'checkpoint.pt')
+        log=dest/'history.json.tmp'; log.write_text(json.dumps(history,ensure_ascii=False,indent=2)); log.replace(dest/'history.json')
+    def record(stage, step, loss, optimizer_state):
         history.append(dict(stage=stage, step=step, loss=float(loss), gamma=0. if control else float(torch.sigmoid(c).detach())))
-        if step == 1 or step % 50 == 0: print(json.dumps(history[-1]), flush=True)
+        if step == 1 or step % 50 == 0:
+            print(json.dumps(history[-1]), flush=True); checkpoint(stage,step,optimizer_state)
     def lbfgs(count, stop_on_window=True):
         nonlocal last_lbfgs
         opt = torch.optim.LBFGS(params, lr=1, history_size=50, line_search_fn='strong_wolfe', max_iter=20, tolerance_grad=1e-12, tolerance_change=1e-15)
@@ -57,7 +63,7 @@ def fit(n, y, w, H, anchor, lambda_bg, dest, run='full', control=False):
             opt.zero_grad(); return checked(backward=True)[0]
         trace = []; metrics = None
         for k in range(count):
-            opt.step(closure); value = snapshot(); trace.append(value); record('LBFGS', k+1, value[0]); last_lbfgs = opt.state_dict()
+            opt.step(closure); value = snapshot(); trace.append(value); record('LBFGS', k+1, value[0], opt.state_dict()); last_lbfgs = opt.state_dict()
             if len(trace) > 5:
                 old = trace[-6]; rel = abs(value[0]-old[0])/max(abs(old[0]), 1e-30)
                 angle = float(r5.ang_deg(value[1], old[1]).max()); dg = abs(value[2]-old[2])
@@ -82,7 +88,7 @@ def fit(n, y, w, H, anchor, lambda_bg, dest, run='full', control=False):
         if abs(float(torch.diff(trajectory(phi0, a0, U, V)[0]).sum().detach())) < np.pi: raise ValueError('初始环绕不足 180 度')
         opt = torch.optim.Adam(params, lr=.03)
         for k in range(1, 1001):
-            opt.zero_grad(); loss=checked(backward=True)[0]; record('Adam', k, loss.detach()); opt.step()
+            opt.zero_grad(); loss=checked(backward=True)[0]; record('Adam', k, loss.detach(), opt.state_dict()); opt.step()
             if k in (600, 850):
                 for group in opt.param_groups: group['lr'] *= .3
         window, used = lbfgs(200); cert = certificate(window)
@@ -92,7 +98,7 @@ def fit(n, y, w, H, anchor, lambda_bg, dest, run='full', control=False):
         if not cert['converged']:
             before = cert; opt = torch.optim.Adam(params, lr=.003); sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, 6000, eta_min=0)
             for k in range(6000):
-                opt.zero_grad(); loss=checked(backward=True)[0]; record('补充Adam', k+1, loss.detach()); opt.step(); sched.step()
+                opt.zero_grad(); loss=checked(backward=True)[0]; record('补充Adam', k+1, loss.detach(), opt.state_dict()); opt.step(); sched.step()
             window, used = lbfgs(60); cert = certificate(window); cert['pre_supplement'] = before; cert['supplement_outer_iterations'] = used
         with torch.no_grad():
             loss, direction, gamma, phi, a, rho, b = checked()
@@ -103,7 +109,6 @@ def fit(n, y, w, H, anchor, lambda_bg, dest, run='full', control=False):
             np.savez_compressed(dest/'parameters.npz', U=U.cpu().numpy(), V=V.cpu().numpy(), u=(np.pi/180*torch.tanh(U)).cpu().numpy(), v=(.1*torch.tanh(V)).cpu().numpy(), phi=phi.cpu().numpy(), a=a.cpu().numpy(), gamma=float(gamma), rho=rho.cpu().numpy(), b=b.cpu().numpy())
     except Exception as exc:
         cert = dict(converged=False, reason='OPTIMIZER_EXCEPTION', exception=repr(exc))
-    torch.save(dict(parameters=[p.detach().cpu() for p in params], adam_state=opt.state_dict() if 'opt' in locals() else None, lbfgs_state=last_lbfgs), dest/'checkpoint.pt')
-    (dest/'history.json').write_text(json.dumps(history, ensure_ascii=False, indent=2))
+    checkpoint('final',len(history),opt.state_dict() if 'opt' in locals() else None)
     (dest/'certificate.json').write_text(json.dumps(cert, ensure_ascii=False, indent=2))
     return cert
