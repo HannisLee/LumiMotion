@@ -109,9 +109,24 @@ def main():
     for _ in range(400): opt.zero_grad(); z=photometric(xx,known,ww,hh,c.sigmoid())[0]; z.backward(); opt.step()
     assert abs(float(c.sigmoid())-.55)<.01
     negative=torch.full_like(xx,-.5); rho,b=kkt(xx,negative,ww); assert (rho==0).all() and (b==0).all()
+    adjusted=np.column_stack((.7*xx[:,0].numpy()-.2,-.4*xx[:,1].numpy()+.1,np.full(100,-.5)))
+    kr,kb=kkt(xx,torch.tensor(adjusted),ww)
+    for j in range(3):
+        A=np.column_stack((xx[:,j].numpy(),np.ones(100))); target=adjusted[:,j]
+        candidates=[np.zeros(2),np.array([max(0,A[:,0]@target/(A[:,0]@A[:,0])),0]),np.array([0,max(0,target.mean())])]
+        both=np.linalg.lstsq(A,target,rcond=None)[0]
+        if (both>=0).all(): candidates.append(both)
+        expected=min(candidates,key=lambda v:np.linalg.norm(A@v-target))
+        np.testing.assert_allclose([kr[j],kb[j]],expected,atol=1e-6,rtol=0)
+    # 已投影的 H 为可恢复的合成背景幅度。
+    ox=torch.tensor(np.maximum(np.einsum('tgc,tc->tg',n,anchor),0)); oh=torch.tensor(rec['H']); ow=torch.ones_like(ox)
+    oy=.2+.7*ox+.55*oh; c=torch.tensor(0.,dtype=torch.float64,requires_grad=True); opt=torch.optim.Adam([c],lr=.1)
+    for _ in range(400): opt.zero_grad(); loss=photometric(ox,oy,ow,oh,c.sigmoid())[0]; loss.backward(); opt.step()
+    assert abs(float(c.sigmoid().detach())-.55)<.02
     from LIHAN.scripts.static_rgb_light_shbg_t02_choose import calibration_mask
     mask23=weights.copy(); mask23[46:150:2,0]=0
     mask24=weights.copy(); mask24[48:150:2,0]=0
+    assert calibration_mask(n,OddOnly(y),OddOnly(mask23),anchor,min_count=8)[0]
     assert not calibration_mask(n,OddOnly(y),OddOnly(mask23),anchor)[0]
     assert calibration_mask(n,OddOnly(y),OddOnly(mask24),anchor)[0]
     missing=weights.copy(); missing[1,:]=0

@@ -33,6 +33,10 @@ def main():
         out=root/'out'; out.mkdir()
         with patch.object(fitter,'load_support',support),patch.object(fitter,'fit',fake_fit),patch.object(chooser,'load_support',support),patch.object(drawer,'load_support',support):
             baseline_result=chooser.baseline_scores(obs,baseline,out/'baseline_scoring'); assert baseline_result['OLS_count']==75*len(val)
+            w_sparse=w.copy(); w_sparse[46:150:2,val[0]]=0
+            sparse=root/'sparse.npz'; np.savez_compressed(sparse,normals=normals,intensity=y,weights=w_sparse,gaussian_ids=ids,frames=frames)
+            sparse_result=chooser.baseline_scores(sparse,baseline,out/'sparse_scoring')
+            assert sparse_result['OLS_count']==300 and sparse_result['E4_KKT_count']==225
             result=fitter.fit_candidates(obs,baseline,sh,meta,out/'fit'); assert len(result)==5 and all(len(result[k])==8 for k in result)
             choice=chooser.choose(obs,baseline,sh,out/'fit',out/'selection'); assert choice['status']=='FALLBACK_E4' and digest(run/'direction.npy')==digest(out/'selection/direction.npy')
             drawer.figures(obs,baseline,out/'fit',out/'selection',out/'figures')
