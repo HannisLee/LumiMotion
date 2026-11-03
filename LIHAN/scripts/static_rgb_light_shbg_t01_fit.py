@@ -1,0 +1,58 @@
+"""T01 拟合阶段：当前仍在开发，不得用于真实实验。"""
+from pathlib import Path
+import json
+import numpy as np
+from LIHAN.scripts.static_rgb_light_shbg_t01_templates import load_support,template,save_template
+from LIHAN.scripts.static_rgb_light_shbg_t01_optimizer import fit
+
+CANDIDATES=(('C01',1,1e-4),('C02',1,1e-3),('C03',2,1e-4),('C04',2,1e-3))
+RUNS=('full','A','B','boot103108','boot103109','hi','lo')
+
+
+def fit_candidates(observations,baseline,sh_values,extraction_metadata,output,smoke=False):
+    """拟合各候选；不计算选择。尚未完成完整门槛与冻结链。"""
+    out=Path(output); out.mkdir(parents=True,exist_ok=False)
+    indices,val,anchors=load_support(baseline,observations)
+    with np.load(observations,allow_pickle=False) as d:
+        n=d['normals'].astype(np.float64); y=d['intensity'].astype(np.float64); w=d['weights'].astype(np.float64); ids=d['gaussian_ids'].copy(); frames=d['frames'].copy()
+    if y.shape!=w.shape or y.shape!=(150,len(ids)) or not np.isfinite(w).all() or (w<0).any() or ((w>0)&~np.isfinite(y)).any() or not np.isfinite(n).all(): raise ValueError('基础观测含无效值')
+    if n.shape not in ((150,len(ids),3),(len(ids),3)) or not np.allclose(np.linalg.norm(n,axis=-1),1,atol=1e-4): raise ValueError('法线形状或长度无效')
+    with np.load(sh_values,allow_pickle=False) as s:
+        if not np.array_equal(ids,s['gaussian_ids']) or not np.array_equal(frames,s['frames']): raise ValueError('SH 与观察数据未对齐')
+        h={L:s[f'h_L{L}'].copy() for L in (0,1,2)}
+    meta=json.loads(Path(extraction_metadata).read_text()); diag=meta['diagnostics']
+    l0=template(h[0],n,y,w,indices['full'],anchors['full'])
+    if np.abs(l0['q']).max()>1e-8: raise ArithmeticError('L0 退化自检失败')
+    results={}; cache={}; invalid={}; run_keys=('full',) if smoke else RUNS
+    for L in ((1,) if smoke else (1,2)):
+        if diag[str(L)]['invalid_clipping']:
+            invalid[L]='SH_CLIPPING'; continue
+        for key in run_keys:
+            rec=template(h[L],n,y,w,indices[key],anchors[key]); cache[(L,key)]=rec
+            save_template(out/'templates'/f'L{L}_{key}.npz',h[L],indices[key],ids,frames,rec,L)
+            if rec['nondegenerate_fraction']<.2: invalid[L]='SH_DEGENERATE'
+    for name,L,lam in (CANDIDATES[:1] if smoke else CANDIDATES):
+        results[name]={}; failures=[]
+        if L in invalid:
+            results[name]['failure']=invalid[L]; continue
+        for key in run_keys:
+            rec=cache[(L,key)]; idx=indices[key]; anchor=anchors[key]
+            a=np.arctanh(np.clip((np.arcsin(np.clip(anchor[:,2],-1,1))-np.deg2rad(45))/np.deg2rad(5),-.999999,.999999))
+            g=.5
+            if key=='hi': a=np.full(len(a),np.arctanh(.9)); g=.9
+            if key=='lo': a=np.full(len(a),np.arctanh(-.9)); g=.1
+            nn=n[:,idx] if n.ndim==3 else np.broadcast_to(n[idx],(len(y),len(idx),3))
+            run_dir=out/'runs'/name/key
+            try:
+                cert=fit(nn,y[:,idx],w[:,idx],rec['H'],anchor,g,a,lam,run_dir)
+            except Exception as exc:
+                cert={'converged':False,'reason':'INITIALIZATION_ERROR','exception':repr(exc)}
+                run_dir.mkdir(parents=True,exist_ok=True)
+                np.savez_compressed(run_dir/'failure_checkpoint.npz',anchor=anchor,initial_a=a,initial_gamma=g)
+                (run_dir/'certificate.json').write_text(json.dumps(cert,indent=2))
+            results[name][key]=cert
+            if not cert['converged']: failures.append(key)
+            (out/'progress.json').write_text(json.dumps(results,indent=2))
+        results[name]['failure']=None if not failures else failures
+    (out/'fit_results.json').write_text(json.dumps(results,indent=2))
+    return results
