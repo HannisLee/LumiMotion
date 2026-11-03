@@ -76,10 +76,12 @@ def verify(a):
     if digest(a.observations)!=OBS_HASH or digest(a.plan)!=PLAN_HASH: raise ValueError('观测或规划哈希变化')
 
 
-def self_test(out):
+def self_test(out, plan):
     from LIHAN.scripts import static_rgb_light_shbg_t02_selftest as test
-    out=out.resolve(); out.mkdir(parents=True,exist_ok=False)
-    receipt=dict(status='FAILED',gt_read=False,code_sha256=code_hashes(),plan_sha256=PLAN_HASH)
+    if plan.resolve()!=EXPECTED['plan'].resolve() or digest(plan)!=PLAN_HASH: raise ValueError('规划路径或哈希不一致')
+    out=out.resolve(); out.mkdir(parents=True,exist_ok=True)
+    if any(p.name not in {'allocation.json','command.txt','environment.json','run.log','launcher.pid'} for p in out.iterdir()): raise FileExistsError('自检目录已使用')
+    receipt=dict(status='FAILED',gt_read=False,argv=sys.argv,code_sha256=code_hashes(),plan_sha256=PLAN_HASH)
     try:
         with (out/'selftest.log').open('w') as log,contextlib.redirect_stdout(log),contextlib.redirect_stderr(log): test.main()
         receipt['status']='PASS'
@@ -110,11 +112,13 @@ def main():
     for name in ('baseline','observations','source','model','plan','self-test-dir','smoke-dir'): p.add_argument('--'+name,type=Path)
     p.add_argument('--iteration',type=int); p.add_argument('--smoke',action='store_true'); a=p.parse_args()
     if socket.gethostname().split('.')[0]!='ushas' or os.environ.get('CONDA_DEFAULT_ENV')!='lumimotion-ushas': raise RuntimeError('服务器或 Conda 环境不符')
-    if a.command=='self-test': self_test(a.output); return
     if any(getattr(a,k) is None for k in EXPECTED) or a.iteration!=35000: p.error('须指定全部固定输入及 iteration 35000')
+    if a.command=='self-test': self_test(a.output,a.plan); return
     check_selftest(a.self_test_dir)
     if a.command=='lock': lock(a); return
     verify(a)
+    with (a.output/'commands.jsonl').open('a') as log:
+        log.write(json.dumps(dict(utc=time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),argv=sys.argv),ensure_ascii=False)+'\n')
     if a.command=='extract':
         import numpy as np
         from LIHAN.scripts.static_rgb_light_shbg_t01_extract import extract
