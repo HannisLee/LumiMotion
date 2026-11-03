@@ -11,6 +11,7 @@ from LIHAN.scripts.static_rgb_light_shbg_t01_scoring import select
 from LIHAN.scripts.static_rgb_light_shbg_t01_extract import camera_fields, raw_camera_fields
 from LIHAN.scripts.static_rgb_light_fit_r3 import kkt
 from LIHAN.scripts.static_rgb_light_shbg_t01_templates import template
+from LIHAN.scripts.static_rgb_light_shbg_t01_choose import ols_mask, ols_fixed
 
 
 def main():
@@ -35,6 +36,12 @@ def main():
     rho,bias=kkt(xt,yt,wt); old=(wt*.5*(xt*rho+bias-yt).square()).sum()/wt.sum()+1e-5*(rho.square().mean()+bias.square().mean())
     ga=torch.autograd.grad(new,u,retain_graph=True)[0]; gb=torch.autograd.grad(old,u)[0]
     assert abs((new-old).item())<=1e-10 and (ga-gb).abs().max().item()<=1e-7
+    # 评分点只由 E3/E4 锁定；候选退化时拒绝，不能丢弃难点。
+    angles=np.linspace(0,np.pi,150); nn=np.tile(np.stack([np.cos(angles),np.sin(angles),np.zeros(150)],axis=1)[:,None,:],(1,2,1))
+    reference=np.tile([1.,0.,0.],(150,1)); degenerate=np.tile([0.,0.,1.],(150,1))
+    values=.2+.5*np.maximum(nn[:,:,0],0); weights=np.ones_like(values)
+    common=ols_mask(nn,values,weights,[reference]); assert common.all()
+    assert np.isfinite(ols_fixed(nn,values,weights,reference,common)) and np.isinf(ols_fixed(nn,values,weights,degenerate,common))
     # 背景确实影响目标，并可从独立随机时变模板中恢复共享幅度。
     x=torch.tensor(rng.uniform(0,1,(120,12))); H=torch.tensor(rng.uniform(0,.2,(120,12)))
     w=torch.ones_like(x); y=.2+.7*x+.55*H; c=torch.tensor(0.,dtype=torch.float64,requires_grad=True)

@@ -34,6 +34,10 @@ def lock(a):
     for script in ('static_rgb_light_fit_r3.py','static_rgb_light_fit_r5b.py'):
         if digest(root/'LIHAN'/'scripts'/script)!=digest(baseline/'frozen_code'/script): raise ValueError('导入的 E4 代码与冻结基线不一致')
     files=inventory(a)
+    derived=a.observations.resolve().parents[1]/'source_all'
+    for folder in (a.source.resolve()/'image',derived/'images'):
+        for frame in range(1,151):
+            if not (folder/f'image_{frame:04d}.png').is_file(): raise FileNotFoundError(f'缺少 RGB 输入: {folder} 第 {frame} 帧')
     for folder in ('修改','训练'):
         if not any((root/'LIHAN'/'DOC'/folder).glob('*T01*.md')): raise FileNotFoundError(f'缺少 T01 {folder}文档')
     for required in (a.observations.resolve(),a.plan.resolve(),a.source.resolve()/'camera.json',a.observations.resolve().parents[1]/'source_all'/'transforms_all.json',a.observations.resolve().parents[1]/'source_all'/'rgb_only_manifest.json',a.observations.resolve().parents[1]/'preparation_commands.json',a.model.resolve()/'point_cloud'/f'iteration_{a.iteration}'/'point_cloud.ply',a.model.resolve()/'deform'/f'iteration_{a.iteration}'/'deform.pth',baseline/'freeze_manifest.json'):
@@ -105,7 +109,10 @@ def main():
         extract(a.observations,a.source,a.model,a.iteration,a.output/'extraction',OBS_HASH,ids)
     elif a.command=='fit':
         from LIHAN.scripts.static_rgb_light_shbg_t01_fit import fit_candidates
-        if not a.smoke: check_smoke(a)
+        if not a.smoke:
+            check_smoke(a)
+            from LIHAN.scripts.static_rgb_light_shbg_t01_choose import baseline_scores
+            baseline_scores(a.observations,a.baseline,a.output/'baseline_scoring')
         start=time.monotonic()
         import torch
         if torch.cuda.is_available(): torch.cuda.reset_peak_memory_stats()

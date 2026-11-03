@@ -107,7 +107,7 @@ def fit(n, y, w, H, anchor, gamma_initial, elevation_initial, lambda_bg, dest,
             loss,rho,b=objective(ph,av,c); dr,g=measure(ph,av,c); checked(loss)
             np.save(dest/'direction.npy',dr); np.savez_compressed(dest/'parameters.npz',phi=ph.cpu().numpy(),a=av.cpu().numpy(),c=c.cpu().numpy(),gamma=g,rho=rho.cpu().numpy(),b=b.cpu().numpy())
             torch.save({'phi':ph.detach().cpu(),'a':av.detach().cpu(),'c':c.detach().cpu(),'adam_state':opt.state_dict(),'lbfgs_state':last_lbfgs},dest/'checkpoint.pt')
-        cert['loss']=float(loss); cert['reason']=None if cert['converged'] else 'NOT_CONVERGED'
+        cert['orbit_sign']=sign; cert['loss']=float(loss); cert['reason']=None if cert['converged'] else 'NOT_CONVERGED'
     except Exception as exc:
         cert=dict(converged=False,reason='OPTIMIZER_EXCEPTION',exception=repr(exc)); torch.save({'phi':ph.detach().cpu(),'a':av.detach().cpu(),'c':c.detach().cpu(),'adam_state':opt.state_dict() if 'opt' in locals() else None,'lbfgs_state':last_lbfgs},dest/'checkpoint.pt')
     (dest/'history.json').write_text(json.dumps(hist,indent=2)); (dest/'certificate.json').write_text(json.dumps(cert,indent=2)); return cert

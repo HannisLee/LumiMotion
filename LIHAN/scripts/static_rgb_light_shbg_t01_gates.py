@@ -14,7 +14,7 @@ def gate_candidate(ends, infos, templates, indices, n, y, w, relative, e3_score,
     boot=np.mean([r3.compare(ends[k],full)['mean_deg'] for k in ('boot103108','boot103109')])
     el_mae=float(np.mean(np.abs(r5.elev_deg(ends['A'])-r5.elev_deg(ends['B']))))
     saturation=float((np.abs(r5.elev_deg(full)-45)>=4.75).mean())
-    sign=r5.orbit_sign(full); reverse=int((sign*np.diff(np.unwrap(np.arctan2(full[:,1],full[:,0])))<0).sum())
+    sign=infos['full']['orbit_sign']; reverse=int((sign*np.diff(np.unwrap(np.arctan2(full[:,1],full[:,0])))<0).sum())
     fi=indices['full']; yy=y[:,fi]; ww=w[:,fi]; rel=relative[:,fi]
     counts=(ww>0).sum(1)
     if (counts==0).any(): view=np.inf
