@@ -1,5 +1,6 @@
 """T02 完整性冻结；仅在四类图人工目检后调用。"""
 import json
+import os
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -36,7 +37,13 @@ def freeze(root):
     exit_status=root/'freeze.exit_code'
     if exit_status.exists(): raise FileExistsError('冻结退出状态已存在')
     exit_status.write_text('0\n')
-    files=sorted(p for p in root.rglob('*') if p.is_file() and 'evaluation' not in p.relative_to(root).parts and p!=manifest)
+    files=[]
+    for directory,dirs,names in os.walk(root,topdown=True,followlinks=False):
+        dirs[:]=[name for name in dirs if name!='evaluation']
+        for name in names:
+            path=Path(directory)/name
+            if path!=manifest and path.is_file(): files.append(path)
+    files.sort()
     result=dict(status='FROZEN_AWAITING_INDEPENDENT_EVALUATION',frozen_utc=time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),selected=choice['selected'],selection_status=choice['status'],external_inputs=inputs['files'],gt_read=False,files={str(p.relative_to(root)):dict(sha256=digest(p),size=p.stat().st_size,mtime_utc=time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime(p.stat().st_mtime))) for p in files})
     try: manifest.write_text(json.dumps(result,indent=2))
     except Exception:
