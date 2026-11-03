@@ -9,6 +9,13 @@ from LIHAN.scripts.static_rgb_light_shbg_t01_gates import gate_candidate
 from LIHAN.scripts.static_rgb_light_shbg_t01_fit import CANDIDATES,RUNS
 
 
+def json_safe(obj):
+    if isinstance(obj,dict): return {k:json_safe(v) for k,v in obj.items()}
+    if isinstance(obj,(list,tuple)): return [json_safe(v) for v in obj]
+    if isinstance(obj,(float,np.floating)) and not np.isfinite(obj): return None
+    return obj
+
+
 def ols_mask(n,y,w,directions):
     valid=np.isfinite(y)&(w>0); cal=valid.copy(); cal[1::2]=False
     ww=np.where(cal,w,0); s=ww.sum(0); mask=cal.sum(0)>=3
@@ -16,6 +23,31 @@ def ols_mask(n,y,w,directions):
         x=x_for(n,l); mean=(ww*x).sum(0)/np.maximum(s,1e-30)
         mask &= (ww*(x-mean)**2).sum(0)>1e-12
     return mask
+
+
+def ols_fixed(n,y,w,l,common):
+    """以基线锁定评分点；候选让任何评分点退化时失败，不能删点。"""
+    if not common.any(): return np.inf
+    candidate=ols_mask(n,y,w,[l]); test=((np.isfinite(y)&(w>0))[1::2]).any(0)
+    if np.any(common & test & ~candidate): return np.inf
+    try: return r3.ols_score(n[:,common],y[:,common],w[:,common],l)
+    except AssertionError: return np.inf
+
+
+def baseline_scores(observations,baseline,output):
+    """在候选拟合前锁定基线留出掩码并计算 C00/E3 分数。"""
+    dest=Path(output); dest.mkdir(parents=True,exist_ok=False)
+    _,val,anchors=load_support(baseline,observations)
+    with np.load(observations,allow_pickle=False) as d:
+        n=d['normals'].astype(np.float64); y=d['intensity'].astype(np.float64); w=d['weights'].astype(np.float64); ids=d['gaussian_ids'].copy()
+    nv=n[:,val] if n.ndim==3 else np.broadcast_to(n[val],(len(y),len(val),3)); yv=y[:,val]; wv=w[:,val]
+    e3=np.load(Path(baseline)/'fitting'/'runs'/'E3'/'direction.npy',allow_pickle=False); e4=anchors['full']
+    common=ols_mask(nv,yv,wv,[e3,e4]); locked=locked_mask(nv,yv,wv,e4)
+    e3s=ols_fixed(nv,yv,wv,e3,common); e4s=ols_fixed(nv,yv,wv,e4,common)
+    e4bg,count=heldout_score(nv,yv,wv,e4,locked); valid=np.isfinite(yv)&(wv>0); ols_count=int((valid[1::2]&common).sum())
+    np.savez_compressed(dest/'score_masks.npz',gaussian_ids=ids[val],ols_common=common,kkt_locked=locked)
+    rec={'E3_OLS':e3s,'E4_OLS':e4s,'E4_KKT':e4bg,'OLS_count':ols_count,'E4_KKT_count':count,'gt_read':False}
+    (dest/'baseline_scores.json').write_text(json.dumps(json_safe(rec),indent=2,allow_nan=False)); return rec
 
 
 def choose(observations,baseline,sh_values,fit_output,output):
@@ -35,16 +67,15 @@ def choose(observations,baseline,sh_values,fit_output,output):
             if (run/'direction.npy').exists() and (run/'parameters.npz').exists():
                 dirs[name][key]=np.load(run/'direction.npy',allow_pickle=False)
                 with np.load(run/'parameters.npz',allow_pickle=False) as p: gamma=float(p['gamma'])
-                infos[name][key]={'converged':bool(raw[name][key]['converged']),'gamma':gamma}
+                infos[name][key]={'converged':bool(raw[name][key]['converged']),'gamma':gamma,'orbit_sign':raw[name][key]['orbit_sign']}
     nv=n[:,val] if n.ndim==3 else np.broadcast_to(n[val],(len(y),len(val),3)); yv=y[:,val]; wv=w[:,val]
-    eligible_dirs=[dirs[name]['full'] for name,_,_ in CANDIDATES if 'full' in dirs[name]]
-    common=ols_mask(nv,yv,wv,[e3,e4]+eligible_dirs)
-    def ols(l):
-        if not common.any(): return np.inf
-        try: return r3.ols_score(nv[:,common],yv[:,common],wv[:,common],l)
-        except AssertionError: return np.inf
-    e3s=ols(e3); e4s=ols(e4); valid=np.isfinite(yv)&(wv>0); ols_count=int((valid[1::2]&common).sum())
-    locked=locked_mask(nv,yv,wv,e4); e4bg,count=heldout_score(nv,yv,wv,e4,locked)
+    baseline_dir=fit_output.parent/'baseline_scoring'
+    with np.load(baseline_dir/'score_masks.npz',allow_pickle=False) as masks:
+        if not np.array_equal(masks['gaussian_ids'],ids[val]): raise ValueError('锁定评分掩码 ID 不一致')
+        common=masks['ols_common'].copy(); locked=masks['kkt_locked'].copy()
+    scores=json.loads((baseline_dir/'baseline_scores.json').read_text())
+    e3s=scores['E3_OLS'] if scores['E3_OLS'] is not None else np.inf; e4s=scores['E4_OLS'] if scores['E4_OLS'] is not None else np.inf; e4bg=scores['E4_KKT'] if scores['E4_KKT'] is not None else np.inf; ols_count=scores['OLS_count']; count=scores['E4_KKT_count']
+    def ols(l): return ols_fixed(nv,yv,wv,l,common)
     np.savez_compressed(dest/'score_masks.npz',gaussian_ids=ids[val],ols_common=common,kkt_locked=locked)
     with np.errstate(invalid='ignore'):
         import warnings
@@ -68,4 +99,4 @@ def choose(observations,baseline,sh_values,fit_output,output):
     chosen,status=select(rows); direction=e4 if chosen is None else dirs[chosen['name']]['full']
     np.savez_compressed(dest/'predictions.npz',frames=frames,E4=e4,selected=direction)
     result=dict(status=status,selected=None if chosen is None else chosen['name'],baseline={'E3_OLS':e3s,'E4_OLS':e4s,'E4_KKT':e4bg,'OLS_count':ols_count,'E4_KKT_count':count},candidates=rows,gt_read=False)
-    (dest/'candidate_table.json').write_text(json.dumps(result,indent=2)); return result
+    (dest/'candidate_table.json').write_text(json.dumps(json_safe(result),indent=2,allow_nan=False)); return result

@@ -8,7 +8,7 @@ from LIHAN.scripts.static_rgb_light_shbg_t01_extract import digest
 def freeze(root):
     root=Path(root).resolve(); manifest=root/'freeze_manifest.json'
     if manifest.exists(): raise FileExistsError('冻结清单已存在，禁止覆盖')
-    required=['sh_templates.npz','input_lock.json','extraction/extraction.json','extraction/sh_values.npz','fit/fit_results.json','selection/score_masks.npz','selection/predictions.npz','selection/candidate_table.json','README.md','inspection.json']
+    required=['sh_templates.npz','baseline_scoring/score_masks.npz','baseline_scoring/baseline_scores.json','input_lock.json','extraction/extraction.json','extraction/sh_values.npz','fit/fit_results.json','selection/score_masks.npz','selection/predictions.npz','selection/candidate_table.json','README.md','inspection.json']
     images=['01_sh_bg_observation_residual.png','02_direction_azimuth_elevation_split.png','03_gates_and_holdout.png','04_initialization_bootstrap_convergence.png']
     required += ['figures/'+f for f in images]
     for name in required:

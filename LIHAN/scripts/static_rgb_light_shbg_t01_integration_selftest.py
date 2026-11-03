@@ -17,14 +17,14 @@ def main():
     def support(*args): return indices,val,anchors
     def fakefit(nn,yy,ww,H,anchor,g,a,lam,dest):
         dest=Path(dest); dest.mkdir(parents=True); np.save(dest/'direction.npy',anchor); np.savez_compressed(dest/'parameters.npz',gamma=g,rho=np.full(yy.shape[1],.6),b=np.full(yy.shape[1],.2))
-        (dest/'history.json').write_text(json.dumps([{'stage':'fake','step':1,'loss':.01,'gamma':g}])); return {'converged':True}
+        (dest/'history.json').write_text(json.dumps([{'stage':'fake','step':1,'loss':.01,'gamma':g}])); return {'converged':True,'orbit_sign':1.}
     fitter.load_support=support; chooser.load_support=support; fitter.fit=fakefit
     with tempfile.TemporaryDirectory() as tmp:
         root=Path(tmp); obs=root/'obs.npz'; sh=root/'sh.npz'; base=root/'base'; e3=base/'fitting'/'runs'/'E3'; e3.mkdir(parents=True); np.save(e3/'direction.npy',l)
         np.savez_compressed(obs,normals=n,intensity=y,weights=w,gaussian_ids=np.arange(G),frames=np.arange(1,T+1))
         np.savez_compressed(sh,gaussian_ids=np.arange(G),frames=np.arange(1,T+1),h_L0=np.full((T,G),.4),h_L1=h1,h_L2=h2)
         meta=root/'extract.json'; meta.write_text(json.dumps({'diagnostics':{str(i):{'invalid_clipping':False} for i in (0,1,2)}}))
-        fitter.fit_candidates(obs,base,sh,meta,root/'fit'); result=chooser.choose(obs,base,sh,root/'fit',root/'selection')
+        chooser.baseline_scores(obs,base,root/'baseline_scoring'); fitter.fit_candidates(obs,base,sh,meta,root/'fit'); result=chooser.choose(obs,base,sh,root/'fit',root/'selection')
         assert len(result['candidates'])==4 and result['status'] in ('SELECTED_SH','FALLBACK_E4')
         figures(obs,root/'fit',root/'selection',root/'figures'); assert len(list((root/'figures').glob('*.png')))==4
         combine_templates(root/'fit',root/'selection',root/'sh_templates.npz')

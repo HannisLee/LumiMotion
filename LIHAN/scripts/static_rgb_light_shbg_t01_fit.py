@@ -42,10 +42,14 @@ def fit_candidates(observations,baseline,sh_values,extraction_metadata,output,sm
             if key=='hi': a=np.full(len(a),np.arctanh(.9)); g=.9
             if key=='lo': a=np.full(len(a),np.arctanh(-.9)); g=.1
             nn=n[:,idx] if n.ndim==3 else np.broadcast_to(n[idx],(len(y),len(idx),3))
+            run_dir=out/'runs'/name/key
             try:
-                cert=fit(nn,y[:,idx],w[:,idx],rec['H'],anchor,g,a,lam,out/'runs'/name/key)
+                cert=fit(nn,y[:,idx],w[:,idx],rec['H'],anchor,g,a,lam,run_dir)
             except Exception as exc:
                 cert={'converged':False,'reason':'INITIALIZATION_ERROR','exception':repr(exc)}
+                run_dir.mkdir(parents=True,exist_ok=True)
+                np.savez_compressed(run_dir/'failure_checkpoint.npz',anchor=anchor,initial_a=a,initial_gamma=g)
+                (run_dir/'certificate.json').write_text(json.dumps(cert,indent=2))
             results[name][key]=cert
             if not cert['converged']: failures.append(key)
             (out/'progress.json').write_text(json.dumps(results,indent=2))

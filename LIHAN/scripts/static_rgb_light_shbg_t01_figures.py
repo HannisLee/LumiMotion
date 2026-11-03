@@ -14,6 +14,7 @@ def figures(observations,fit_dir,selection_dir,output):
     with np.load(observations,allow_pickle=False) as d: y=d['intensity']; weights=d['weights']; normals=d['normals']
     name=selected if selected is not None else 'C01'; folder=fit_dir/'runs'/name/'full'
     fig,axes=plt.subplots(3,2,figsize=(12,11))
+    fig.suptitle(f'Full-run diagnostics: {name}; selection: {table["status"]}')
     if (folder/'parameters.npz').exists():
         L=next(r['L'] for r in table['candidates'] if r['name']==name)
         with np.load(fit_dir/'templates'/f'L{L}_full.npz',allow_pickle=False) as t:
@@ -33,7 +34,7 @@ def figures(observations,fit_dir,selection_dir,output):
     else:
         for ax in axes.flat: ax.text(.1,.5,'No converged full fit available'); ax.set_axis_off()
     fig.tight_layout(); fig.savefig(out/'01_sh_bg_observation_residual.png',dpi=160); plt.close(fig)
-    fig,axes=plt.subplots(3,1,figsize=(12,10)); frame=np.arange(1,len(e4)+1)
+    fig,axes=plt.subplots(3,1,figsize=(12,10)); fig.suptitle(f'Selection: {table["status"]}; split traces: {name}'); frame=np.arange(1,len(e4)+1)
     for label,l in (('E4',e4),('selected',pred)):
         axes[0].plot(frame,np.rad2deg(np.unwrap(np.arctan2(l[:,1],l[:,0]))),label=label)
         axes[1].plot(frame,np.rad2deg(np.arcsin(np.clip(l[:,2],-1,1))),label=label)
@@ -48,7 +49,7 @@ def figures(observations,fit_dir,selection_dir,output):
     fig.tight_layout(); fig.savefig(out/'02_direction_azimuth_elevation_split.png',dpi=160); plt.close(fig)
     rows=table['candidates']; gates=['G0','G1','G2','G3','G4a','G4b','G5','G6','G7','G8']; mat=np.array([[int(r.get('gates',{}).get(g,False)) for g in gates] for r in rows])
     fig,axes=plt.subplots(1,2,figsize=(12,5)); axes[0].imshow(mat,vmin=0,vmax=1,cmap='RdYlGn',aspect='auto'); axes[0].set_xticks(range(len(gates)),gates,rotation=45); axes[0].set_yticks(range(len(rows)),[r['name'] for r in rows]); axes[0].set_title('gates')
-    xx=np.arange(len(rows)); axes[1].bar(xx-.2,[r.get('G4a_mae',np.nan) for r in rows],.4,label='OLS'); axes[1].bar(xx+.2,[r.get('G4b_mae',np.nan) for r in rows],.4,label='background KKT'); axes[1].set_xticks(xx,[r['name'] for r in rows]); axes[1].legend(); axes[1].set_title('holdout MAE')
+    xx=np.arange(len(rows)); axes[1].bar(xx-.2,[r.get('G4a_mae') if r.get('G4a_mae') is not None else np.nan for r in rows],.4,label='OLS'); axes[1].bar(xx+.2,[r.get('G4b_mae') if r.get('G4b_mae') is not None else np.nan for r in rows],.4,label='background KKT'); axes[1].set_xticks(xx,[r['name'] for r in rows]); axes[1].legend(); axes[1].set_title('holdout MAE')
     fig.tight_layout(); fig.savefig(out/'03_gates_and_holdout.png',dpi=160); plt.close(fig)
     fig,axes=plt.subplots(2,2,figsize=(12,8))
     for key in ('hi','lo','boot103108','boot103109'):
