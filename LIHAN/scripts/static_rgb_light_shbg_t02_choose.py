@@ -13,12 +13,12 @@ from LIHAN.scripts.static_rgb_light_shbg_t02_templates import load_support, temp
 from LIHAN.scripts.static_rgb_light_shbg_t02_fit import CANDIDATES, RUNS
 
 
-def calibration_mask(n,y,w,direction):
+def calibration_mask(n,y,w,direction,min_count=24):
     x=np.maximum(np.einsum('tgc,tc->tg',n[::2],direction[::2]),0)
     yy=y[::2]; ww=w[::2]; valid=np.isfinite(yy)&np.isfinite(ww)&(ww>0)
     weights=np.where(valid,ww,0.); mass=weights.sum(0); mean=(weights*x).sum(0)/np.maximum(mass,1e-30)
     variance=(weights*(x-mean)**2).sum(0)/np.maximum(mass,1e-30)
-    return (valid.sum(0)>=24)&(variance>1e-12)
+    return (valid.sum(0)>=min_count)&(variance>1e-12)
 
 
 def heldout_score(n,y,w,direction,mask,H=None,gamma=0.):
@@ -52,12 +52,13 @@ def baseline_scores(observations, baseline, output):
     _, val, anchors, n, y, w, ids, frames, nv = read_data(observations,baseline)
     yy, ww = y[:,val], w[:,val]; e4=anchors['full']
     e3=np.load(Path(baseline)/'fitting'/'runs'/'E3'/'direction.npy',allow_pickle=False)
-    common=calibration_mask(nv,yy,ww,e4)
+    ols_base=calibration_mask(nv,yy,ww,e4,min_count=8)
+    common=calibration_mask(nv,yy,ww,e4,min_count=24)
     even_valid=np.isfinite(yy[1::2])&np.isfinite(ww[1::2])&(ww[1::2]>0)
-    count=int((even_valid&common).sum())
+    count=int((even_valid&ols_base).sum())
     e3s=ols_fixed(nv,yy,ww,e3,common); e4s=ols_fixed(nv,yy,ww,e4,common)
     e4bg,bgcount=heldout_score(nv,yy,ww,e4,common)
-    np.savez_compressed(out/'score_masks.npz',gaussian_ids=ids[val],frames=frames,common=common,score_valid=even_valid&common)
+    np.savez_compressed(out/'score_masks.npz',gaussian_ids=ids[val],frames=frames,ols_base=ols_base,common=common,score_valid=even_valid&common)
     rec=dict(E3_OLS=e3s,E4_OLS=e4s,E4_KKT=e4bg,OLS_count=count,E4_KKT_count=bgcount,gt_read=False)
     (out/'baseline_scores.json').write_text(json.dumps(json_safe(rec),indent=2,allow_nan=False))
     return rec
