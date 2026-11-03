@@ -3,13 +3,39 @@ import json
 import shutil
 from pathlib import Path
 import numpy as np
+import torch
 from LIHAN.scripts import static_rgb_light_fit_r3 as r3
 from LIHAN.scripts import static_rgb_light_fit_r5b as r5
 from LIHAN.scripts.static_rgb_light_shbg_t01_choose import ols_fixed, json_safe
-from LIHAN.scripts.static_rgb_light_shbg_t01_scoring import locked_mask, heldout_score, select
+from LIHAN.scripts.static_rgb_light_shbg_t01_scoring import select
 from LIHAN.scripts.static_rgb_light_shbg_t02_core import anchor_parameters, design, final_eta
 from LIHAN.scripts.static_rgb_light_shbg_t02_templates import load_support, template, save_template
 from LIHAN.scripts.static_rgb_light_shbg_t02_fit import CANDIDATES, RUNS
+
+
+def calibration_mask(n,y,w,direction):
+    x=np.maximum(np.einsum('tgc,tc->tg',n[::2],direction[::2]),0)
+    yy=y[::2]; ww=w[::2]; valid=np.isfinite(yy)&np.isfinite(ww)&(ww>0)
+    weights=np.where(valid,ww,0.); mass=weights.sum(0); mean=(weights*x).sum(0)/np.maximum(mass,1e-30)
+    variance=(weights*(x-mean)**2).sum(0)/np.maximum(mass,1e-30)
+    return (valid.sum(0)>=24)&(variance>1e-12)
+
+
+def heldout_score(n,y,w,direction,mask,H=None,gamma=0.):
+    x=np.maximum(np.einsum('tgc,tc->tg',n,direction),0)
+    H=np.zeros_like(x) if H is None else H
+    odd_y,odd_w=y[::2],w[::2]
+    valid=np.isfinite(odd_y)&np.isfinite(odd_w)&(odd_w>0)&mask[None,:]
+    weights=np.where(valid,odd_w,0.); target=np.where(valid,odd_y,0.)-gamma*H[::2]
+    if not np.isfinite(x).all() or not np.isfinite(H).all(): return np.inf,0
+    with torch.no_grad():
+        rho,b=r3.kkt(torch.tensor(x[::2]),torch.tensor(target),torch.tensor(weights)); rho=rho.numpy(); b=b.numpy()
+    if not np.isfinite(rho).all() or not np.isfinite(b).all(): return np.inf,0
+    even_y,even_w=y[1::2],w[1::2]; test=np.isfinite(even_y)&np.isfinite(even_w)&(even_w>0)&mask[None,:]
+    scoreweights=np.where(test,even_w,0.); count=int(test.sum())
+    if scoreweights.sum()<=0 or np.any(scoreweights.sum(1)<=0): return np.inf,count
+    error=np.minimum(np.abs(x[1::2]*rho+b+gamma*H[1::2]-np.where(test,even_y,0.)),.2)
+    return float((scoreweights*error).sum()/scoreweights.sum()),count
 
 
 def read_data(observations, baseline):
@@ -26,13 +52,12 @@ def baseline_scores(observations, baseline, output):
     _, val, anchors, n, y, w, ids, frames, nv = read_data(observations,baseline)
     yy, ww = y[:,val], w[:,val]; e4=anchors['full']
     e3=np.load(Path(baseline)/'fitting'/'runs'/'E3'/'direction.npy',allow_pickle=False)
-    common=locked_mask(nv,yy,ww,e4)
-    valid=np.isfinite(yy)&np.isfinite(ww)&(ww>0)
-    common &= valid[::2].sum(0)>=24
-    count=int((valid[1::2]&common).sum())
+    common=calibration_mask(nv,yy,ww,e4)
+    even_valid=np.isfinite(yy[1::2])&np.isfinite(ww[1::2])&(ww[1::2]>0)
+    count=int((even_valid&common).sum())
     e3s=ols_fixed(nv,yy,ww,e3,common); e4s=ols_fixed(nv,yy,ww,e4,common)
     e4bg,bgcount=heldout_score(nv,yy,ww,e4,common)
-    np.savez_compressed(out/'score_masks.npz',gaussian_ids=ids[val],frames=frames,common=common,score_valid=valid[1::2]&common)
+    np.savez_compressed(out/'score_masks.npz',gaussian_ids=ids[val],frames=frames,common=common,score_valid=even_valid&common)
     rec=dict(E3_OLS=e3s,E4_OLS=e4s,E4_KKT=e4bg,OLS_count=count,E4_KKT_count=bgcount,gt_read=False)
     (out/'baseline_scores.json').write_text(json.dumps(json_safe(rec),indent=2,allow_nan=False))
     return rec

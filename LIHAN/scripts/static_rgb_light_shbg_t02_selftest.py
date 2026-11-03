@@ -11,10 +11,10 @@ from LIHAN.scripts import static_rgb_light_shbg_t02_core_selftest as core_test
 from LIHAN.scripts.static_rgb_light_fit_r3 import kkt
 from LIHAN.scripts.static_rgb_light_shbg_t01_core import photometric, sh_luminance, validate_alignment
 from LIHAN.scripts.static_rgb_light_shbg_t01_extract import camera_fields, raw_camera_fields, digest
-from LIHAN.scripts.static_rgb_light_shbg_t01_scoring import heldout_score, select
+from LIHAN.scripts.static_rgb_light_shbg_t01_scoring import select
 from LIHAN.scripts.static_rgb_light_shbg_t02_core import anchor_parameters, design, project, final_eta
 from LIHAN.scripts.static_rgb_light_shbg_t02_templates import template
-from LIHAN.scripts.static_rgb_light_shbg_t02_choose import bg_statistics
+from LIHAN.scripts.static_rgb_light_shbg_t02_choose import bg_statistics, heldout_score
 from LIHAN.scripts.static_rgb_light_shbg_t02_freeze import freeze
 
 
