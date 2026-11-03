@@ -20,6 +20,12 @@ def main():
     assert not boundary_saturated(torch.zeros(5),torch.zeros(5),0.,True)
     with tempfile.TemporaryDirectory() as tmp:
         root=Path(tmp)
+        def interrupt_step(*unused,**kwargs):
+            assert (root/'interrupted/checkpoint.pt').is_file() and (root/'interrupted/history.json').is_file()
+            raise RuntimeError('合成中断')
+        with patch.object(torch.optim.Adam,'step',interrupt_step):
+            interrupted=fit(n,y,w,H,anchor,0.,root/'interrupted',control=True)
+        assert interrupted['reason']=='OPTIMIZER_EXCEPTION' and (root/'interrupted/checkpoint.pt').is_file()
         cert=fit(n,y,w,H,anchor,0.,root/'control',control=True)
         assert cert['converged'] and cert['initial_gamma']==0 and cert['reason'] is None
         ckpt=torch.load(root/'control/checkpoint.pt',map_location='cpu',weights_only=False)
