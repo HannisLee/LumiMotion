@@ -58,7 +58,7 @@ def choose(observations,baseline,sh_values,fit_output,output):
                 idx=indices[key]
                 recs[key]=template(h[L],n,y,w,idx,anchors[key])
             hold=template(h[L],n,y,w,val,e4,holdout=True)
-            if not (dest/f'L{L}_holdout.npz').exists(): save_template(dest/f'L{L}_holdout.npz',h[L],val,ids,frames,hold)
+            if not (dest/f'L{L}_holdout.npz').exists(): save_template(dest/f'L{L}_holdout.npz',h[L],val,ids,frames,hold,L)
             bs,bc=heldout_score(nv,yv,wv,dirs[name]['full'],locked,hold['H'],infos[name]['full']['gamma'])
             gates,metrics=gate_candidate(dirs[name],infos[name],recs,indices,n,y,w,relative,e3s,e4s,ols(dirs[name]['full']),bs,e4bg,bc,ols_count)
             row.update(metrics or {}); row['gates']=gates; row['all_gates']=all(gates.values())

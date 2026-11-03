@@ -29,7 +29,9 @@ def lock(a):
     files=inventory(a)
     for required in (a.observations.resolve(),a.plan.resolve(),a.source.resolve()/'transforms_all.json',a.model.resolve()/'point_cloud'/f'iteration_{a.iteration}'/'point_cloud.ply',a.model.resolve()/'deform'/f'iteration_{a.iteration}'/'deform.pth',baseline/'freeze_manifest.json'):
         if required not in files: raise FileNotFoundError(required)
-    out=a.output.resolve(); out.mkdir(parents=True,exist_ok=False)
+    out=a.output.resolve(); out.mkdir(parents=True,exist_ok=True)
+    allowed={'allocation.json','command.txt','environment.json','run.log','launcher.pid'}
+    if any(p.name not in allowed or not p.is_file() for p in out.iterdir()): raise FileExistsError('输出目录非空或已分配')
     rec={'utc':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),'argv':sys.argv,'files':{str(p):{'sha256':digest(p),'size':p.stat().st_size} for p in files},'gt_read':False}
     (out/'input_lock.json').write_text(json.dumps(rec,indent=2)); return rec
 
