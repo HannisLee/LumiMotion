@@ -3,6 +3,7 @@ import json
 import tempfile
 from pathlib import Path
 from unittest.mock import patch
+from types import SimpleNamespace
 import numpy as np
 from LIHAN.scripts.static_rgb_light_shbg_t01_extract import digest
 from LIHAN.scripts import static_rgb_light_shbg_t02_fit as fitter
@@ -10,6 +11,30 @@ from LIHAN.scripts import static_rgb_light_shbg_t02_choose as chooser
 from LIHAN.scripts import static_rgb_light_shbg_t02_figures as drawer
 from LIHAN.scripts.static_rgb_light_shbg_t02_freeze import freeze
 from LIHAN.scripts.static_rgb_light_shbg_t02_core import anchor_parameters
+
+
+def test_lock_snapshot(root):
+    from LIHAN.scripts import static_rgb_light_shbg_t02 as entry
+    project=root/'project'; scripts=project/'LIHAN/scripts'; scripts.mkdir(parents=True)
+    for name in ('static_rgb_light_fit_r3.py','static_rgb_light_fit_r5b.py','static_rgb_light_shbg_t01_extract.py','static_rgb_light_shbg_t01_core.py'):
+        (scripts/name).write_text(name)
+    docs=project/'LIHAN/DOC'; (docs/'修改').mkdir(parents=True); (docs/'训练').mkdir()
+    impl=docs/'修改/1103-01-T02低频轨迹切空间保护SH实现.md'; impl.write_text('合成实施')
+    train=docs/'训练/1103-02-T02低频轨迹SH冒烟与正式执行.md'; train.write_text('合成计划')
+    plan=project/'plan.md'; plan.write_text('合成规划'); obs=project/'obs.npz'; obs.write_bytes(b'synthetic')
+    baseline=project/'baseline'; frozen=baseline/'frozen_code'; frozen.mkdir(parents=True)
+    for name in ('static_rgb_light_fit_r3.py','static_rgb_light_fit_r5b.py'): (frozen/name).write_text(name)
+    members=list(frozen.iterdir()); (baseline/'freeze_manifest.json').write_text(json.dumps({'files':{str(p.relative_to(project)):digest(p) for p in members}}))
+    source=project/'source'; source.mkdir(); model=project/'model'; model.mkdir(); output=root/'locked'
+    a=SimpleNamespace(plan=plan,observations=obs,source=source,model=model,baseline=baseline,iteration=35000,output=output)
+    hashes={str(p.relative_to(project)):digest(p) for p in scripts.iterdir()}; expected=dict(plan=plan,observations=obs,source=source,model=model,baseline=baseline)
+    files=[plan,obs,impl,train,*list(scripts.iterdir()),*members,baseline/'freeze_manifest.json']
+    with patch.object(entry,'ROOT',project),patch.object(entry,'PROJECT',project),patch.object(entry,'EXPECTED',expected),patch.object(entry,'PLAN_HASH',digest(plan)),patch.object(entry,'OBS_HASH',digest(obs)),patch.object(entry,'T01_EXTRACT_HASH',digest(scripts/'static_rgb_light_shbg_t01_extract.py')),patch.object(entry,'T01_CORE_HASH',digest(scripts/'static_rgb_light_shbg_t01_core.py')),patch.object(entry,'code_hashes',return_value=hashes),patch.object(entry,'allowed_baseline',return_value=members),patch.object(entry,'inventory',return_value=sorted(files)):
+        entry.lock(a); entry.verify(a)
+        target=output/'frozen_code'/next(iter(hashes)); target.write_text('篡改')
+        try: entry.verify(a)
+        except ValueError: pass
+        else: raise AssertionError('代码快照变化未拒绝')
 
 
 def main():
@@ -25,7 +50,7 @@ def main():
         cert=dict(converged=False,reason='NOT_CONVERGED',orbit_sign=1.); (dest/'certificate.json').write_text(json.dumps(cert)); (dest/'history.json').write_text('[]'); (dest/'checkpoint.pt').write_bytes(b'synthetic')
         return cert
     with tempfile.TemporaryDirectory() as tmp:
-        root=Path(tmp); baseline=root/'baseline'; run=baseline/'fitting/runs/a1e+00_e1e+01_full'; run.mkdir(parents=True); np.save(run/'direction.npy',anchor)
+        root=Path(tmp); test_lock_snapshot(root); baseline=root/'baseline'; run=baseline/'fitting/runs/a1e+00_e1e+01_full'; run.mkdir(parents=True); np.save(run/'direction.npy',anchor)
         e3=baseline/'fitting/runs/E3'; e3.mkdir(parents=True); np.save(e3/'direction.npy',anchor)
         obs=root/'observations.npz'; np.savez_compressed(obs,normals=normals,intensity=y,weights=w,gaussian_ids=ids,frames=frames)
         sh=root/'sh.npz'; np.savez_compressed(sh,gaussian_ids=ids,frames=frames,h_L0=np.full((T,G),.3),h_L1=rng.normal(size=(T,G)),h_L2=rng.normal(size=(T,G)))
