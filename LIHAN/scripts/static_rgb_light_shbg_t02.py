@@ -35,6 +35,9 @@ def code_hashes():
             for name in names:
                 candidate=ROOT.joinpath(*name.split('.')).with_suffix('.py')
                 if candidate.is_file() and candidate.resolve() not in seen: todo.append(candidate)
+    launcher=ROOT/'LIHAN/scripts/static_rgb_light_shbg_t02_launch.sh'
+    if not launcher.is_file(): raise FileNotFoundError('启动脚本缺失')
+    seen.add(launcher.resolve())
     return {str(p.relative_to(ROOT)):digest(p) for p in sorted(seen)}
 
 
@@ -47,6 +50,8 @@ def inventory(a):
     derived=a.observations.resolve().parents[1]/'source_all'; b=a.baseline.resolve()
     files=[a.plan.resolve(),a.observations.resolve(),a.source.resolve()/'camera.json',derived/'transforms_all.json',derived/'rgb_only_manifest.json',derived.parent/'preparation_commands.json',a.model.resolve()/'point_cloud'/f'iteration_{a.iteration}'/'point_cloud.ply',b/'freeze_manifest.json']+allowed_baseline(b)
     files += [ROOT/p for p in code_hashes()]
+    files += [folder/f'image_{frame:04d}.png' for folder in (a.source.resolve()/'image',derived/'images') for frame in range(1,151)]
+    files += [ROOT/'LIHAN/DOC/修改/1103-01-T02低频轨迹切空间保护SH实现.md',ROOT/'LIHAN/DOC/训练/1103-02-T02低频轨迹SH冒烟与正式执行.md']
     return sorted(set(files))
 
 
