@@ -36,7 +36,23 @@ def template(h,n,y,w,idx,anchor,holdout=False):
     return dict(q=q,H=H,beta=beta,cal=cal,error=errors,valid=valid,nondegenerate_fraction=fraction,eligible=eligible)
 
 
-def save_template(path, h, idx, ids, frames, record):
+def save_template(path, h, idx, ids, frames, record, L):
     path=Path(path); path.parent.mkdir(parents=True,exist_ok=True)
-    np.savez_compressed(path,frames=frames,gaussian_ids=ids[idx],indices=idx,h=h[:,idx],q=record['q'],H=record['H'],beta=record['beta'],calibration_mask=record['cal'],orthogonality_error=record['error'])
+    np.savez_compressed(path,L=L,frames=frames,gaussian_ids=ids[idx],indices=idx,h=h[:,idx],q=record['q'],H=record['H'],beta=record['beta'],calibration_mask=record['cal'],orthogonality_error=record['error'])
     (path.with_suffix('.json')).write_text(json.dumps({'nondegenerate_fraction':record['nondegenerate_fraction'],'eligible_points':int(record['eligible'].sum())},indent=2))
+
+
+def combine_templates(fit_dir,selection_dir,output):
+    """流式合并各流程与留出模板，不占用多个模板的额外内存。"""
+    import shutil
+    import zipfile
+    inputs=sorted((Path(fit_dir)/'templates').glob('*.npz'))+sorted(Path(selection_dir).glob('L*_holdout.npz'))
+    if not inputs: raise ValueError('没有模板可冻结')
+    path=Path(output)
+    with zipfile.ZipFile(path,mode='x',compression=zipfile.ZIP_DEFLATED,allowZip64=True) as dest:
+        for source in inputs:
+            with zipfile.ZipFile(source) as src:
+                for item in src.infolist():
+                    if not item.filename.endswith('.npy'): raise ValueError('模板成员格式错误')
+                    with src.open(item) as inp, dest.open(f'{source.stem}__{item.filename}',mode='w',force_zip64=True) as out:
+                        shutil.copyfileobj(inp,out,1024*1024)

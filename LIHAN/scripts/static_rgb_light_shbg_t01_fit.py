@@ -30,7 +30,7 @@ def fit_candidates(observations,baseline,sh_values,extraction_metadata,output,sm
             tag=(L,key)
             if tag not in cache:
                 cache[tag]=template(h[L],n,y,w,indices[key],anchors[key]); rec=cache[tag]
-                save_template(out/'templates'/f'L{L}_{key}.npz',h[L],indices[key],ids,frames,rec)
+                save_template(out/'templates'/f'L{L}_{key}.npz',h[L],indices[key],ids,frames,rec,L)
             rec=cache[tag]
             if rec['nondegenerate_fraction']<.2:
                 results[name][key]={'converged':False,'reason':'SH_DEGENERATE'}; failures.append(key); continue
