@@ -68,11 +68,12 @@ def self_test(out):
     import contextlib,traceback
     from LIHAN.scripts import static_rgb_light_shbg_t01_selftest as unit
     from LIHAN.scripts import static_rgb_light_shbg_t01_integration_selftest as integration
+    from LIHAN.scripts import static_rgb_light_shbg_t01_extract_selftest as extract_test
     out=out.resolve(); out.mkdir(parents=True,exist_ok=False)
     receipt={'status':'FAILED','gt_read':False,'code_sha256':code_hashes()}
     try:
         with (out/'selftest.log').open('w') as log, contextlib.redirect_stdout(log), contextlib.redirect_stderr(log):
-            unit.main(); integration.main()
+            unit.main(); extract_test.main(); integration.main()
         receipt['status']='PASS'
     except Exception:
         with (out/'selftest.log').open('a') as log: traceback.print_exc(file=log)

@@ -19,6 +19,8 @@ def sh_luminance(coeff, xyz, centers, degree):
     if np.any(norm == 0) or not np.isfinite(norm).all():
         raise ValueError('相机和点的视向无效')
     raw = eval_sh(degree, np.asarray(coeff, dtype=np.float64)[None], v / norm) + .5
+    # L0 的基函数不依赖视向，eval_sh 返回 1×G×3；统一广播到逐帧布局。
+    raw = np.broadcast_to(raw, v.shape)
     rgb = np.clip(raw, 0, 1)
     linear = np.where(rgb <= .04045, rgb / 12.92, ((rgb + .055) / 1.055) ** 2.4)
     return linear @ np.array([.2126, .7152, .0722]), raw

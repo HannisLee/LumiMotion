@@ -186,9 +186,13 @@ def extract(observations,source,model,iteration,dest,expected_obs_sha,expected_i
     if not np.array_equal(frames,cframes) or not np.array_equal(frames,original_frames) or not np.allclose(matrices,original,atol=1e-10,rtol=0): raise ValueError('原始、转换相机及观测帧不一致')
     check_provenance(Path(source),derived)
     ply=Path(model)/'point_cloud'/f'iteration_{iteration}'/'point_cloud.ply'
-    coeff=read_coefficients(ply,ids); valid=np.isfinite(y)&(w>0); result={'frames':frames,'gaussian_ids':ids}; diagnostics={}
+    coeff=read_coefficients(ply,ids); valid=np.isfinite(y)&(w>0)
+    if not valid.any(): raise ValueError('没有有效观测，无法计算 SH 截断率')
+    result={'frames':frames,'gaussian_ids':ids}; diagnostics={}
     for L in (0,1,2):
-        h,raw=sh_luminance(coeff,xyz,centers,L); clipped=(raw<0)|(raw>1)
+        h,raw=sh_luminance(coeff,xyz,centers,L)
+        if h.shape!=y.shape or raw.shape!=(*y.shape,3) or not np.isfinite(raw).all(): raise ValueError('SH 输出形状或数值无效')
+        clipped=(raw<0)|(raw>1)
         fractions=clipped[valid].mean(axis=0); diagnostics[str(L)]={'low':(raw[valid]<0).mean(axis=0).tolist(),'high':(raw[valid]>1).mean(axis=0).tolist(),'invalid_clipping':bool((fractions>.2).any())}
         result[f'h_L{L}']=h; result[f'raw_L{L}']=raw
     np.savez_compressed(dest/'sh_values.npz',**result)
