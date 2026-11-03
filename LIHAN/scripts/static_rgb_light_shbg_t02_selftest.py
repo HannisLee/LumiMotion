@@ -57,15 +57,24 @@ def main():
     mask=np.ones((150,1),bool); mask[::4]=False
     rr=project(rng.normal(size=(150,1)),singular,np.ones((150,1)),mask)
     assert rr['rank'][0]==1 and rr['counts'][0]==112 and rr['error'][0]<1e-8
-    # 多列联合解释度：各单列相关均小于 .2，而整体投影接近 1。
-    q=rng.normal(size=150); q-=q.mean(); q/=np.linalg.norm(q)
-    basis=rng.normal(size=(150,12)); basis,_=np.linalg.qr(basis)
-    q=basis@np.ones(12); q/=np.linalg.norm(q)
-    scores=np.abs(basis.T@q); eta=final_eta(q[:,None],basis[:,None,:],np.ones((150,1)),np.ones((150,1),bool))[0]
-    assert scores.max()<.3 and eta>.999999
-    # 最终设计变化引入相关，不改动 q。
-    before=rec['q'].copy(); fake=d.copy(); fake[:,0,2]=before[:,0]
-    assert final_eta(before,fake,w,rec['cal'])[0]>.99 and np.array_equal(before,rec['q'])
+    # 高度相关的列可用差分解释 q，逐列相关远小于门槛。
+    z=rng.normal(size=150); z-=z.mean(); z/=np.linalg.norm(z)
+    q=rng.normal(size=150); q-=z*np.dot(z,q); q/=np.linalg.norm(q)
+    basis=np.zeros((150,1,12)); basis[:,0,0]=z; basis[:,0,1]=z+.01*q
+    correlations=np.abs(basis[:,0,:2].T@q)/np.linalg.norm(basis[:,0,:2],axis=0)
+    eta=final_eta(q[:,None],basis,np.ones((150,1)),np.ones((150,1),bool))[0]
+    assert correlations.max()<.2 and eta>.999999
+    # 最终方向跨越明暗边界：以最终直射为合成 h，保留初始投影 q。
+    tangent=np.stack((-np.sin(phi),np.cos(phi),np.zeros(150)),axis=1)
+    shift=rng.uniform(-.012,.002,size=150); normals=tangent+shift[:,None]*anchor
+    normals/=np.linalg.norm(normals,axis=1,keepdims=True); normals=normals[:,None,:]
+    delta=np.deg2rad(1.); final_phi=phi+delta
+    final_l=np.stack((np.cos(np.pi/4)*np.cos(final_phi),np.cos(np.pi/4)*np.sin(final_phi),np.full(150,np.sin(np.pi/4))),axis=1)
+    initial_dot=np.einsum('tgc,tc->tg',normals,anchor); final_dot=np.einsum('tgc,tc->tg',normals,final_l)
+    assert np.any((initial_dot<=0)&(final_dot>0))
+    d0=design(normals,phi,a); df=design(normals,final_phi,a)
+    first=project(np.maximum(final_dot,0),d0,np.ones((150,1)),np.ones((150,1),bool)); before=first['q'].copy()
+    assert final_eta(before,df,np.ones((150,1)),first['cal'])[0]>.2 and np.array_equal(before,first['q'])
     y=.2+.5*np.maximum(np.einsum('tgc,tc->tg',n,anchor),0)+.3*rec['H']; weights=np.ones_like(y)
     hold=template(h,n,y,weights,np.arange(3),anchor,True)
     changed=y.copy(); changed[1::2]+=100; weights2=weights.copy(); weights2[1::2]*=7
