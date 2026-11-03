@@ -15,6 +15,15 @@ def freeze(root):
         if not (root/name).is_file(): raise FileNotFoundError('冻结缺少 '+name)
     choice=json.loads((root/'selection/candidate_table.json').read_text()); runs=json.loads((root/'fit/fit_results.json').read_text()); review=json.loads((root/'inspection.json').read_text())
     if set(runs)!={'C00L','C01','C02','C03','C04'} or len(choice['candidates'])!=4 or choice['status'] not in ('SELECTED_SH','FALLBACK_E4'): raise ValueError('候选或选择未完成')
+    keys=('full','A','B','boot103108','boot103109','hi','lo')
+    for candidate,result in runs.items():
+        if result.get('failure') in ('SH_DEGENERATE','SH_CLIPPING'): continue
+        for key in keys:
+            if key not in result: raise ValueError('缺少流程状态: '+candidate+'/'+key)
+            run=root/'fit/runs'/candidate/key
+            for file in ('certificate.json','history.json','checkpoint.pt'):
+                if not (run/file).is_file(): raise FileNotFoundError('缺少流程证据: '+str(run/file))
+            if result[key].get('converged') and not all((run/f).is_file() for f in ('direction.npy','parameters.npz')): raise FileNotFoundError('缺少已收敛流程预测')
     if set(review.get('figures',{}))!=set(images) or not review.get('inspected_at_utc') or not all(review['figures'].values()): raise ValueError('目检记录不完整')
     if datetime.strptime(review['inspected_at_utc'],'%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)>datetime.now(timezone.utc): raise ValueError('目检时间无效')
     readme=(root/'README.md').read_text()

@@ -4,6 +4,7 @@ from pathlib import Path
 import numpy as np
 from LIHAN.scripts.static_rgb_light_shbg_t02_templates import load_support, template, save_template
 from LIHAN.scripts.static_rgb_light_shbg_t02_optimizer import fit
+from LIHAN.scripts.static_rgb_light_shbg_t02_core import anchor_parameters
 
 CANDIDATES = (('C01', 1, 1e-4), ('C02', 1, 1e-3), ('C03', 2, 1e-4), ('C04', 2, 1e-3))
 RUNS = ('full', 'A', 'B', 'boot103108', 'boot103109', 'hi', 'lo')
@@ -12,6 +13,7 @@ RUNS = ('full', 'A', 'B', 'boot103108', 'boot103109', 'hi', 'lo')
 def fit_candidates(observations, baseline, sh_values, extraction_metadata, output, smoke=False):
     out = Path(output); out.mkdir(parents=True, exist_ok=False)
     indices, _, anchors = load_support(baseline, observations)
+    for anchor in anchors.values(): anchor_parameters(anchor)
     with np.load(observations, allow_pickle=False) as d:
         n, y, w = (d[k].astype(np.float64) for k in ('normals', 'intensity', 'weights'))
         ids, frames = d['gaussian_ids'].copy(), d['frames'].copy()
