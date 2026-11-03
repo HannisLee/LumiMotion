@@ -44,7 +44,7 @@ def main():
     oldr, oldb = kkt(x, yt, wt); old = (wt*.5*(x*oldr+oldb-yt).square()).sum()/wt.sum()+1e-5*(oldr.square().mean()+oldb.square().mean())
     np.testing.assert_allclose(v.detach(), old.detach(), atol=1e-10, rtol=0)
     assert abs(photometric(x, yt, wt, ht, torch.tensor(.4))[0].item()) < abs(v.item())
-    print('PASS: 合成数值核心检查；非完整 T01 自检；未读取真实数据或 GT')
+    print('PASS: 合成数值核心检查；未读取真实数据或 GT')
 
 
 if __name__ == '__main__':

@@ -6,7 +6,7 @@ from LIHAN.scripts.static_rgb_light_fit_r3 import kkt
 
 
 def validate_alignment(ids, expected_ids, frames):
-    if not np.array_equal(ids, expected_ids) or not np.array_equal(frames, np.arange(1, 151)):
+    if ids.ndim!=1 or not np.issubdtype(ids.dtype,np.integer) or np.any(np.diff(ids)<=0) or not np.array_equal(ids, expected_ids) or not np.array_equal(frames, np.arange(1, 151)):
         raise ValueError('Gaussian ID 或帧号不一致')
 
 

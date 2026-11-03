@@ -46,9 +46,12 @@ def fit(n, y, w, H, anchor, gamma_initial, elevation_initial, lambda_bg, dest,
         return U@torch.diag(ev.rsqrt())@U.T
     Pp, Pa = precond(1, .5), precond(10, 1.)
     hist = []; last_lbfgs = {}
-    def checked(loss):
+    def checked(loss, params=None):
         if not torch.isfinite(loss): raise FloatingPointError('非有限目标')
-        if not all(torch.isfinite(z).all() for z in (ph,av,c)): raise FloatingPointError('非有限参数')
+        p,a,cc=(ph,av,c) if params is None else params
+        if not all(torch.isfinite(z).all() for z in (p,a,cc)): raise FloatingPointError('非有限参数')
+        g=torch.sigmoid(cc)
+        if not (g>0 and g<1): raise FloatingPointError('背景幅度数值到达边界')
     def record(stage, step, value, cc=None):
         cc=c if cc is None else cc
         item = dict(stage=stage, step=step, loss=float(value), gamma=float(torch.sigmoid(cc).detach()))
@@ -59,10 +62,12 @@ def fit(n, y, w, H, anchor, gamma_initial, elevation_initial, lambda_bg, dest,
         opt = torch.optim.LBFGS([qp,qa,qc], lr=1, history_size=50, line_search_fn='strong_wolfe', max_iter=20, tolerance_grad=1e-12, tolerance_change=1e-15)
         def eff(): return base[0]+Pp@qp, base[1]+Pa@qa, base[2]+qc
         def closure():
-            opt.zero_grad(); value = objective(*eff())[0]; checked(value); value.backward(); return value
+            opt.zero_grad(); params=eff(); value = objective(*params)[0]; checked(value,params); value.backward(); return value
         trace=[]; dirs=[]; gs=[]; metrics=None
         for k in range(count):
-            opt.step(closure); p,a,cc=eff(); value=objective(p,a,cc)[0]; checked(value)
+            opt.step(closure); p,a,cc=eff(); value=objective(p,a,cc)[0]; checked(value,(p,a,cc))
+            restore([p.detach(),a.detach(),cc.detach()])
+            last_lbfgs.update(state=opt.state_dict(),base=[z.detach().cpu() for z in base],q=[z.detach().cpu() for z in (qp,qa,qc)])
             dr,g=measure(p,a,cc); trace.append(float(value.detach())); dirs.append(dr); gs.append(g)
             record('LBFGS',k+1,value.detach(),cc)
             if len(trace)>5:
@@ -97,7 +102,7 @@ def fit(n, y, w, H, anchor, gamma_initial, elevation_initial, lambda_bg, dest,
             before=cert; base=snap(); qp=torch.nn.Parameter(torch.zeros_like(ph)); qa=torch.nn.Parameter(torch.zeros_like(av)); qc=torch.nn.Parameter(torch.zeros_like(c))
             opt=torch.optim.Adam([qp,qa,qc],lr=.003); sched=torch.optim.lr_scheduler.CosineAnnealingLR(opt,budgets[4],eta_min=0)
             for k in range(budgets[4]):
-                opt.zero_grad(); loss=objective(base[0]+Pp@qp,base[1]+Pa@qa,base[2]+qc)[0]; checked(loss); record('TC',k+1,loss.detach(),base[2]+qc); loss.backward(); opt.step(); sched.step()
+                opt.zero_grad(); params=(base[0]+Pp@qp,base[1]+Pa@qa,base[2]+qc); loss=objective(*params)[0]; checked(loss,params); record('TC',k+1,loss.detach(),base[2]+qc); loss.backward(); opt.step(); sched.step(); restore([base[0]+Pp@qp,base[1]+Pa@qa,base[2]+qc])
             restore([base[0]+Pp@qp,base[1]+Pa@qa,base[2]+qc]); m,used_tc=lbfgs(budgets[5]); cert=certificate(m); cert['pre_TC']=before; cert['TC_outer_iterations']=used_tc
         with torch.no_grad():
             loss,rho,b=objective(ph,av,c); dr,g=measure(ph,av,c); checked(loss)

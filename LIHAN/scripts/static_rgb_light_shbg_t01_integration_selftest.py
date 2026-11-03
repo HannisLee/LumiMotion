@@ -7,6 +7,7 @@ from LIHAN.scripts import static_rgb_light_shbg_t01_fit as fitter
 from LIHAN.scripts import static_rgb_light_shbg_t01_choose as chooser
 from LIHAN.scripts.static_rgb_light_shbg_t01_figures import figures
 from LIHAN.scripts.static_rgb_light_shbg_t01_templates import combine_templates
+from LIHAN.scripts.static_rgb_light_shbg_t01_freeze import freeze
 
 
 def main():
@@ -28,6 +29,13 @@ def main():
         figures(obs,root/'fit',root/'selection',root/'figures'); assert len(list((root/'figures').glob('*.png')))==4
         combine_templates(root/'fit',root/'selection',root/'sh_templates.npz')
         with np.load(root/'sh_templates.npz',allow_pickle=False) as z: assert 'L1_full__q' in z.files and 'L1_holdout__L' in z.files
+        from datetime import datetime,timezone
+        (root/'input_lock.json').write_text('{}'); (root/'extraction').mkdir(); (root/'extraction'/'extraction.json').write_text('{}'); (root/'extraction'/'sh_values.npz').write_bytes(b'synthetic')
+        (root/'README.md').write_text('source model iteration 命令 日志 目检 新渲染不适用 PASS FAILED；合成自检占位')
+        (root/'inspection.json').write_text(json.dumps({'inspected_at_utc':datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),'figures':{p.name:'合成测试占位' for p in (root/'figures').glob('*.png')}}))
+        frozen=freeze(root); assert frozen['status']=='FROZEN_AWAITING_INDEPENDENT_EVALUATION' and 'selection/predictions.npz' in frozen['files']
+        try: freeze(root); raise AssertionError('重复冻结未被拒绝')
+        except FileExistsError: pass
     print('合成联调通过；优化器为模拟，未读取真实数据或 GT。')
 
 if __name__=='__main__': main()
