@@ -33,16 +33,17 @@ def figures(observations,fit_dir,selection_dir,output):
     else:
         for ax in axes.flat: ax.text(.1,.5,'No converged full fit available'); ax.set_axis_off()
     fig.tight_layout(); fig.savefig(out/'01_sh_bg_observation_residual.png',dpi=160); plt.close(fig)
-    fig,axes=plt.subplots(2,1,figsize=(12,8)); frame=np.arange(1,len(e4)+1)
+    fig,axes=plt.subplots(3,1,figsize=(12,10)); frame=np.arange(1,len(e4)+1)
     for label,l in (('E4',e4),('selected',pred)):
         axes[0].plot(frame,np.rad2deg(np.unwrap(np.arctan2(l[:,1],l[:,0]))),label=label)
         axes[1].plot(frame,np.rad2deg(np.arcsin(np.clip(l[:,2],-1,1))),label=label)
+        for j,component in enumerate('xyz'): axes[2].plot(frame,l[:,j],label=f'{label} {component}')
     for key in ('A','B'):
         f=fit_dir/'runs'/name/key/'direction.npy'
         if f.exists():
             l=np.load(f,allow_pickle=False); axes[0].plot(frame,np.rad2deg(np.unwrap(np.arctan2(l[:,1],l[:,0]))),label=key,alpha=.6)
             axes[1].plot(frame,np.rad2deg(np.arcsin(np.clip(l[:,2],-1,1))),label=key,alpha=.6)
-    axes[0].set_ylabel('azimuth (deg)'); axes[1].set_ylabel('elevation (deg)')
+    axes[0].set_ylabel('azimuth (deg)'); axes[1].set_ylabel('elevation (deg)'); axes[2].set_ylabel('direction components')
     for ax in axes: ax.legend(); ax.set_xlabel('frame')
     fig.tight_layout(); fig.savefig(out/'02_direction_azimuth_elevation_split.png',dpi=160); plt.close(fig)
     rows=table['candidates']; gates=['G0','G1','G2','G3','G4a','G4b','G5','G6','G7','G8']; mat=np.array([[int(r.get('gates',{}).get(g,False)) for g in gates] for r in rows])
