@@ -24,5 +24,6 @@ def freeze(root):
     for required_text in ('source','model','iteration','命令','日志','目检','新渲染不适用','PASS','FAILED'):
         if required_text not in readme: raise ValueError(f'README 缺少 {required_text}')
     files=sorted(p for p in root.rglob('*') if p.is_file() and 'evaluation' not in p.relative_to(root).parts and p!=manifest)
-    result={'status':'FROZEN_AWAITING_INDEPENDENT_EVALUATION','frozen_utc':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),'selected':choice['selected'],'selection_status':choice['status'],'gt_read':False,'files':{str(p.relative_to(root)):{'sha256':digest(p),'size':p.stat().st_size} for p in files}}
+    input_lock=json.loads((root/'input_lock.json').read_text())
+    result={'external_inputs':input_lock.get('files',{}),'input_lock_utc':input_lock.get('utc'),'status':'FROZEN_AWAITING_INDEPENDENT_EVALUATION','frozen_utc':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),'selected':choice['selected'],'selection_status':choice['status'],'gt_read':False,'files':{str(p.relative_to(root)):{'sha256':digest(p),'size':p.stat().st_size} for p in files}}
     manifest.write_text(json.dumps(result,indent=2)); return result
