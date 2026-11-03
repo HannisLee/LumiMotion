@@ -9,6 +9,10 @@ from LIHAN.scripts.static_rgb_light_shbg_t01_core import photometric
 from LIHAN.scripts.static_rgb_light_shbg_t02_core import anchor_parameters, trajectory
 
 
+def boundary_saturated(U, V, gamma, control=False):
+    return bool((torch.abs(torch.tanh(U)) > .98).any() or (torch.abs(torch.tanh(V)) > .98).any() or (not control and not (.01 <= float(gamma) <= .99)))
+
+
 def fit(n, y, w, H, anchor, lambda_bg, dest, run='full', control=False):
     dest = Path(dest); dest.mkdir(parents=True, exist_ok=False)
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -46,7 +50,7 @@ def fit(n, y, w, H, anchor, lambda_bg, dest, run='full', control=False):
     def record(stage, step, loss):
         history.append(dict(stage=stage, step=step, loss=float(loss), gamma=0. if control else float(torch.sigmoid(c).detach())))
         if step == 1 or step % 50 == 0: print(json.dumps(history[-1]), flush=True)
-    def lbfgs(count):
+    def lbfgs(count, stop_on_window=True):
         nonlocal last_lbfgs
         opt = torch.optim.LBFGS(params, lr=1, history_size=50, line_search_fn='strong_wolfe', max_iter=20, tolerance_grad=1e-12, tolerance_change=1e-15)
         def closure():
@@ -58,7 +62,7 @@ def fit(n, y, w, H, anchor, lambda_bg, dest, run='full', control=False):
                 old = trace[-6]; rel = abs(value[0]-old[0])/max(abs(old[0]), 1e-30)
                 angle = float(r5.ang_deg(value[1], old[1]).max()); dg = abs(value[2]-old[2])
                 metrics = (rel, angle, dg)
-                if rel < 1e-9 and angle < .005 and (control or dg < 1e-5): break
+                if stop_on_window and rel < 1e-9 and angle < .005 and (control or dg < 1e-5): break
         return metrics, len(trace)
     def probe():
         saved = state(); before = snapshot(); opt = torch.optim.Adam(params, lr=.001)
@@ -82,7 +86,7 @@ def fit(n, y, w, H, anchor, lambda_bg, dest, run='full', control=False):
                 for group in opt.param_groups: group['lr'] *= .3
         window, used = lbfgs(200); cert = certificate(window)
         if not cert['converged'] and used < 400:
-            window, more = lbfgs(400-used); used += more; cert = certificate(window)
+            window, more = lbfgs(400-used, stop_on_window=False); used += more; cert = certificate(window)
         cert['outer_iterations'] = used
         if not cert['converged']:
             before = cert; opt = torch.optim.Adam(params, lr=.003); sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, 6000, eta_min=0)
@@ -91,7 +95,7 @@ def fit(n, y, w, H, anchor, lambda_bg, dest, run='full', control=False):
             window, used = lbfgs(60); cert = certificate(window); cert['pre_supplement'] = before; cert['supplement_outer_iterations'] = used
         with torch.no_grad():
             loss, direction, gamma, phi, a, rho, b = checked()
-            saturated = bool((torch.abs(torch.tanh(U)) > .98).any() or (torch.abs(torch.tanh(V)) > .98).any() or (not control and not (.01 <= float(gamma) <= .99)))
+            saturated = boundary_saturated(U, V, gamma, control)
             cert.update(initial_loss=initial[0], initial_max_anchor_deg=float(r5.ang_deg(initial[1], anchor).max()), initial_gamma=initial[2], orbit_sign=sign, loss=float(loss), reason='BOUNDARY_SATURATION' if saturated else None if cert['converged'] else 'NOT_CONVERGED')
             cert['converged'] = bool(cert['converged'] and not saturated)
             np.save(dest/'direction.npy', direction.cpu().numpy())
