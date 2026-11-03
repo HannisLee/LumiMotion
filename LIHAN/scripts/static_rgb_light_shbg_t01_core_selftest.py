@@ -31,11 +31,14 @@ def main():
     xyz = np.broadcast_to(np.array([1., 0., 0.]), (150, 5, 3)); centers = np.zeros((150, 3))
     _, raw = sh_luminance(coeff, xyz, centers, 1)
     np.testing.assert_allclose(raw, .5 - .1*.4886025119029199)
+    coeff[:]=0; coeff[:,:,8]=.1
+    _, raw=sh_luminance(coeff,xyz,centers,2)
+    np.testing.assert_allclose(raw,.5+.1*.5462742152960396)
     x = torch.tensor(rng.uniform(0, 1, (150, 5)), dtype=torch.float64)
     wt = torch.ones_like(x); ht = torch.tensor(H); yt = .7*x + .2 + .4*ht
-    gamma = torch.tensor(.4, dtype=torch.float64, requires_grad=True)
+    gamma = torch.tensor(.2, dtype=torch.float64, requires_grad=True)
     loss, _, _ = photometric(x, yt, wt, ht, gamma); loss.backward()
-    assert gamma.grad is not None and np.isfinite(gamma.grad.item())
+    assert gamma.grad is not None and np.isfinite(gamma.grad.item()) and abs(gamma.grad.item())>1e-10
     zero = torch.tensor(0., dtype=torch.float64, requires_grad=True)
     v, r, b = photometric(x, yt, wt, ht, zero)
     oldr, oldb = kkt(x, yt, wt); old = (wt*.5*(x*oldr+oldb-yt).square()).sum()/wt.sum()+1e-5*(oldr.square().mean()+oldb.square().mean())
