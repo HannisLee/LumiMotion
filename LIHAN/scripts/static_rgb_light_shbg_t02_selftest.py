@@ -2,6 +2,7 @@
 import json
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 import numpy as np
 import torch
 from LIHAN.scripts import static_rgb_light_shbg_t01_core_selftest as old_core
@@ -34,6 +35,13 @@ def main():
         raw={'frames':{f'{i:04d}':{'frame':int(i),'extrinsics':{'camera_to_world':np.eye(4).tolist(),'ignored':[1]},'ignored':True} for i in frames}}
         camera.write_text(json.dumps(raw)); fr,matrices=raw_camera_fields(camera); assert np.array_equal(fr,frames) and matrices.shape==(150,4,4)
         camera.write_text('old'); old=digest(camera); camera.write_text('new'); assert digest(camera)!=old
+        from LIHAN.scripts import static_rgb_light_shbg_t02 as entry
+        receipt={'status':'PASS','code_sha256':{'synthetic':old},'plan_sha256':entry.PLAN_HASH}
+        (path/'receipt.json').write_text(json.dumps(receipt))
+        with patch.object(entry,'code_hashes',return_value={'synthetic':digest(camera)}):
+            try: entry.check_selftest(path)
+            except ValueError: pass
+            else: raise AssertionError('代码哈希变化未拒绝')
         try: freeze(path)
         except FileNotFoundError: pass
         else: raise AssertionError('冻结未拒绝缺失文件')
@@ -80,6 +88,12 @@ def main():
     changed=y.copy(); changed[1::2]+=100; weights2=weights.copy(); weights2[1::2]*=7
     hold2=template(h,n,changed,weights2,np.arange(3),anchor,True)
     np.testing.assert_array_equal(hold['q'],hold2['q']); np.testing.assert_array_equal(hold['beta'],hold2['beta'])
+    def calibrate_gamma(yy,ww,H):
+        xt=torch.tensor(np.maximum(np.einsum('tgc,tc->tg',n,anchor),0)[::2]); yt=torch.tensor(yy[::2]); wt=torch.tensor(ww[::2]); ht=torch.tensor(H[::2]); c=torch.tensor(0.,dtype=torch.float64,requires_grad=True); opt=torch.optim.Adam([c],lr=.03)
+        for _ in range(100): opt.zero_grad(); loss=photometric(xt,yt,wt,ht,c.sigmoid())[0]; loss.backward(); opt.step()
+        rho,b=kkt(xt,yt-c.sigmoid()*ht,wt)
+        return c.detach().numpy(),rho.detach().numpy(),b.detach().numpy()
+    for first,second in zip(calibrate_gamma(y,weights,hold['H']),calibrate_gamma(changed,weights2,hold2['H'])): np.testing.assert_array_equal(first,second)
     x=torch.tensor(rng.uniform(.1,1,(150,3)),requires_grad=True); yt=torch.tensor(y); wt=torch.ones_like(x); H=torch.tensor(hold['H']); zero=torch.tensor(0.)
     new=photometric(x,yt,wt,H,zero)[0]; rho,b=kkt(x,yt,wt); old=(wt*.5*(x*rho+b-yt).square()).sum()/wt.sum()+1e-5*(rho.square().mean()+b.square().mean())
     grad1=torch.autograd.grad(new,x,retain_graph=True)[0]; grad2=torch.autograd.grad(old,x)[0]
