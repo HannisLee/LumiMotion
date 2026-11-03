@@ -4,6 +4,7 @@ import ast
 import contextlib
 import json
 import os
+import shutil
 from pathlib import Path
 import socket
 import sys
@@ -72,6 +73,14 @@ def lock(a):
     out=a.output.resolve(); out.mkdir(parents=True,exist_ok=True)
     if any(p.name not in {'allocation.json','command.txt','environment.json','run.log','launcher.pid'} for p in out.iterdir()): raise FileExistsError('输出目录已使用')
     rec=dict(utc=time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),argv=sys.argv,files={str(p):dict(sha256=digest(p),size=p.stat().st_size,mtime_utc=time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime(p.stat().st_mtime))) for p in files},gt_read=False)
+    snapshot=out/'frozen_code'; snapshot.mkdir(exist_ok=False)
+    for relative,sha in code_hashes().items():
+        source=ROOT/relative; target=snapshot/relative; target.parent.mkdir(parents=True,exist_ok=True); shutil.copyfile(source,target)
+        if digest(target)!=sha: raise ValueError('代码快照哈希不一致: '+relative)
+    docs=out/'frozen_docs'; docs.mkdir(exist_ok=False)
+    for source in (a.plan,ROOT/'LIHAN/DOC/修改/1103-01-T02低频轨迹切空间保护SH实现.md',ROOT/'LIHAN/DOC/训练/1103-02-T02低频轨迹SH冒烟与正式执行.md'):
+        target=docs/source.name; shutil.copyfile(source,target)
+        if digest(target)!=digest(source): raise ValueError('文档快照哈希不一致: '+str(source))
     (out/'input_lock.json').write_text(json.dumps(rec,indent=2)); return rec
 
 
