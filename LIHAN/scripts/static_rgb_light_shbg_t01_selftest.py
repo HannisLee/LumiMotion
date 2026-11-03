@@ -53,6 +53,9 @@ def main():
         x=np.maximum(np.einsum('tgc,tc->tg',n,l),0); H=rng.uniform(0,.1,(T,G)); y=.2+.7*x+.4*H
         result=fit(n,y,np.ones_like(y),H,l,.5,0,1e-4,p/'tc',budgets=(2,6,8,2,3,6),force_tc=True)
         assert 'pre_TC' in result and (p/'tc'/'checkpoint.pt').exists()
+        bad=n.copy(); bad[0,0,0]=np.nan
+        failed=fit(bad,y,np.ones_like(y),H,l,.5,0,1e-4,p/'failure',budgets=(2,6,8,2,3,6))
+        assert not failed['converged'] and failed['reason']=='OPTIMIZER_EXCEPTION' and (p/'failure'/'checkpoint.pt').exists()
     base=dict(all_gates=True,J=1.,G4b_mae=.1,G4a_mae=.1,L=1,lambda_bg=.001,name='C02')
     other=dict(base,name='C01',lambda_bg=.0001,J=1.019)
     chosen,status=select([other,base]); assert chosen['name']=='C02' and status=='SELECTED_SH'
