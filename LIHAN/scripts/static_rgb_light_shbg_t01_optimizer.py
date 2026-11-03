@@ -68,7 +68,7 @@ def fit(n, y, w, H, anchor, gamma_initial, elevation_initial, lambda_bg, dest,
                 mx=float(r5.ang_deg(dirs[-6],dirs[-1]).max()); dg=abs(gs[-6]-gs[-1])
                 metrics=(rel,mx,dg)
                 if rel<1e-9 and mx<.005 and dg<1e-5: break
-        restore([z.detach() for z in eff()]); return metrics
+        restore([z.detach() for z in eff()]); return metrics, len(trace)
     def probe():
         state=snap(); d0,g0=measure(*state); loss0=float(objective(*state)[0].detach()); opt=torch.optim.Adam([{'params':[ph],'lr':1e-4},{'params':[av],'lr':1e-3},{'params':[c],'lr':1e-3}])
         try:
@@ -86,16 +86,18 @@ def fit(n, y, w, H, anchor, gamma_initial, elevation_initial, lambda_bg, dest,
             if k in (600,850):
                 for group in opt.param_groups: group['lr']*=.3
             if k==1 or k%50==0: record('TA',k,loss.detach())
-        m=lbfgs(budgets[1]); cert=certificate(m)
-        if not cert['converged']:
-            m=lbfgs(budgets[2]-budgets[1]); cert=certificate(m)
+        m,used=lbfgs(budgets[1]); cert=certificate(m)
+        while not cert['converged'] and used<budgets[2]:
+            limit=(budgets[1]-used) if used<budgets[1] else (budgets[2]-used)
+            m,extra=lbfgs(limit); used+=extra; cert=certificate(m)
+        cert['outer_iterations']=used
         if not cert['converged'] or force_tc:
             before=cert; base=snap(); qp=torch.nn.Parameter(torch.zeros_like(ph)); qa=torch.nn.Parameter(torch.zeros_like(av)); qc=torch.nn.Parameter(torch.zeros_like(c))
             opt=torch.optim.Adam([qp,qa,qc],lr=.003); sched=torch.optim.lr_scheduler.CosineAnnealingLR(opt,budgets[4],eta_min=0)
             for k in range(budgets[4]):
                 opt.zero_grad(); loss=objective(base[0]+Pp@qp,base[1]+Pa@qa,base[2]+qc)[0]; checked(loss); loss.backward(); opt.step(); sched.step()
                 if k%500==0: record('TC',k,loss.detach())
-            restore([base[0]+Pp@qp,base[1]+Pa@qa,base[2]+qc]); m=lbfgs(budgets[5]); cert=certificate(m); cert['pre_TC']=before
+            restore([base[0]+Pp@qp,base[1]+Pa@qa,base[2]+qc]); m,used_tc=lbfgs(budgets[5]); cert=certificate(m); cert['pre_TC']=before; cert['TC_outer_iterations']=used_tc
         with torch.no_grad():
             loss,rho,b=objective(ph,av,c); dr,g=measure(ph,av,c); checked(loss)
             np.save(dest/'direction.npy',dr); np.savez_compressed(dest/'parameters.npz',phi=ph.cpu().numpy(),a=av.cpu().numpy(),c=c.cpu().numpy(),gamma=g,rho=rho.cpu().numpy(),b=b.cpu().numpy())
