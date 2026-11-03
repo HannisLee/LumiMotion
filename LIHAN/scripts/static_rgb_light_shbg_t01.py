@@ -14,10 +14,11 @@ PLAN_HASH='a71d513f797465e7509a3b5144aef600adf3152e902986dd1b56cb52bd30d5c5'
 
 def inventory(a):
     root=Path(__file__).resolve().parents[2]; baseline=a.baseline.resolve(); model=a.model.resolve(); source=a.source.resolve()
-    files=[a.plan.resolve(),a.observations.resolve(),source/'transforms_all.json',model/'point_cloud'/f'iteration_{a.iteration}'/'point_cloud.ply',model/'deform'/f'iteration_{a.iteration}'/'deform.pth',baseline/'freeze_manifest.json',root/'utils'/'sh_utils.py']
+    derived=a.observations.resolve().parents[1]/'source_all'
+    files=[a.plan.resolve(),a.observations.resolve(),source/'camera.json',derived/'transforms_all.json',derived/'rgb_only_manifest.json',derived.parent/'preparation_commands.json',model/'point_cloud'/f'iteration_{a.iteration}'/'point_cloud.ply',model/'deform'/f'iteration_{a.iteration}'/'deform.pth',baseline/'freeze_manifest.json',root/'utils'/'sh_utils.py']
     files += list((baseline/'fitting').rglob('*'))+list((baseline/'frozen_code').rglob('*'))
-    for folder in ('images','rgba'):
-        if (source/folder).exists(): files += [p for p in (source/folder).rglob('*') if p.suffix.lower() in ('.png','.jpg','.jpeg','.exr')]
+    for folder in (source/'image',derived/'images'):
+        if folder.exists(): files += [p for p in folder.rglob('*') if p.suffix.lower() in ('.png','.jpg','.jpeg','.exr')]
     files += list((root/'LIHAN'/'DOC'/'修改').glob('*T01*.md')) + list((root/'LIHAN'/'DOC'/'训练').glob('*T01*.md'))
     files += list((root/'LIHAN'/'scripts').glob('static_rgb_light_shbg_t01*.py'))
     files += [root/'LIHAN'/'scripts'/'static_rgb_light_fit_r3.py',root/'LIHAN'/'scripts'/'static_rgb_light_fit_r5b.py']
@@ -35,7 +36,7 @@ def lock(a):
     files=inventory(a)
     for folder in ('修改','训练'):
         if not any((root/'LIHAN'/'DOC'/folder).glob('*T01*.md')): raise FileNotFoundError(f'缺少 T01 {folder}文档')
-    for required in (a.observations.resolve(),a.plan.resolve(),a.source.resolve()/'transforms_all.json',a.model.resolve()/'point_cloud'/f'iteration_{a.iteration}'/'point_cloud.ply',a.model.resolve()/'deform'/f'iteration_{a.iteration}'/'deform.pth',baseline/'freeze_manifest.json'):
+    for required in (a.observations.resolve(),a.plan.resolve(),a.source.resolve()/'camera.json',a.observations.resolve().parents[1]/'source_all'/'transforms_all.json',a.observations.resolve().parents[1]/'source_all'/'rgb_only_manifest.json',a.observations.resolve().parents[1]/'preparation_commands.json',a.model.resolve()/'point_cloud'/f'iteration_{a.iteration}'/'point_cloud.ply',a.model.resolve()/'deform'/f'iteration_{a.iteration}'/'deform.pth',baseline/'freeze_manifest.json'):
         if required not in files: raise FileNotFoundError(required)
     out=a.output.resolve(); out.mkdir(parents=True,exist_ok=True)
     allowed={'allocation.json','command.txt','environment.json','run.log','launcher.pid'}
@@ -56,7 +57,7 @@ def code_hashes():
     root=Path(__file__).resolve().parents[2]
     files=list((root/'LIHAN'/'scripts').glob('static_rgb_light_shbg_t01*.py'))
     files += [root/'LIHAN'/'scripts'/'static_rgb_light_fit_r3.py',root/'LIHAN'/'scripts'/'static_rgb_light_fit_r5b.py',root/'utils'/'sh_utils.py']
-    return {str(p.resolve()):digest(p) for p in sorted(files)}
+    return {str(p.relative_to(root)):digest(p) for p in sorted(files)}
 
 
 def self_test(out):
