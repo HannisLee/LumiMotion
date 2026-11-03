@@ -6,11 +6,29 @@ import numpy as np
 import torch
 from LIHAN.scripts import static_rgb_light_fit_r3 as r3
 from LIHAN.scripts import static_rgb_light_fit_r5b as r5
-from LIHAN.scripts.static_rgb_light_shbg_t01_choose import ols_fixed, json_safe
 from LIHAN.scripts.static_rgb_light_shbg_t01_scoring import select
 from LIHAN.scripts.static_rgb_light_shbg_t02_core import anchor_parameters, design, final_eta
 from LIHAN.scripts.static_rgb_light_shbg_t02_templates import load_support, template, save_template
 from LIHAN.scripts.static_rgb_light_shbg_t02_fit import CANDIDATES, RUNS
+
+
+def json_safe(obj):
+    if isinstance(obj,dict): return {k:json_safe(v) for k,v in obj.items()}
+    if isinstance(obj,(list,tuple)): return [json_safe(v) for v in obj]
+    if isinstance(obj,(float,np.floating)) and not np.isfinite(obj): return None
+    return obj
+
+
+def ols_fixed(n,y,w,direction,common):
+    if not common.any(): return np.inf
+    x=np.maximum(np.einsum('tgc,tc->tg',n[::2],direction[::2]),0)
+    yy=y[::2]; ww=w[::2]; valid=np.isfinite(yy)&(ww>0); weights=np.where(valid,ww,0.)
+    mass=weights.sum(0); mean=(weights*x).sum(0)/np.maximum(mass,1e-30)
+    candidate=(valid.sum(0)>=3)&((weights*(x-mean)**2).sum(0)>1e-12)
+    score_present=(np.isfinite(y[1::2])&(w[1::2]>0)).any(0)
+    if np.any(common&score_present&~candidate): return np.inf
+    try: return r3.ols_score(n[:,common],y[:,common],w[:,common],direction)
+    except AssertionError: return np.inf
 
 
 def calibration_mask(n,y,w,direction,min_count=24):
