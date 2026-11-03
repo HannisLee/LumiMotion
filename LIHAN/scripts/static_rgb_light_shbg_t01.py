@@ -26,6 +26,9 @@ def inventory(a):
 
 def lock(a):
     if digest(a.observations)!=OBS_HASH or digest(a.plan)!=PLAN_HASH: raise ValueError('观测或规划 SHA256 不匹配')
+    project=a.observations.resolve().parents[3]
+    expected={'observations':project/'output/1030-01-LH-static-ELDL-V3-RGB方向光初始化/extraction/observations.npz','source':project/'data/LH-data/static/LH-static-jumpingjacks-ELDL-V3','model':project/'output/1019-02-LH-static-jumpingjacks-ELDL-V3-B00原生Stage1/model_mlp','baseline':project/'output/1031-12-LH-static-ELDL-V3-第五轮修订版环绕先验时变仰角','plan':project/'LIHAN/DOC/规划/1103-01-T01利用Stage1低阶SH分离背景外观代理规划.md'}
+    if any(getattr(a,k).resolve()!=v.resolve() for k,v in expected.items()): raise ValueError('输入路径与预注册规格不一致')
     baseline=a.baseline.resolve(); root=Path(__file__).resolve().parents[2]
     for script in ('static_rgb_light_fit_r3.py','static_rgb_light_fit_r5b.py'):
         if digest(root/'LIHAN'/'scripts'/script)!=digest(baseline/'frozen_code'/script): raise ValueError('导入的 E4 代码与冻结基线不一致')
