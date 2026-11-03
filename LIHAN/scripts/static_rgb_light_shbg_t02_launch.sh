@@ -31,7 +31,7 @@ if [[ $mode == worker ]]; then
         freeze) run freeze || code=$? ;;
         *) echo '未知阶段' >&2; code=2 ;;
     esac
-    printf '%s\n' "$code" > "$out/${phase}.exit_code"
+    if [[ $phase != freeze || $code != 0 ]]; then printf '%s\n' "$code" > "$out/${phase}.exit_code"; fi
     exit "$code"
 fi
 case "$mode" in

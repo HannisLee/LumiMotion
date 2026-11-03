@@ -33,6 +33,13 @@ def freeze(root):
     for path,entry in inputs['files'].items():
         p=Path(path)
         if not p.is_file() or digest(p)!=entry['sha256'] or p.stat().st_size!=entry['size']: raise ValueError('输入发生变化: '+path)
+    exit_status=root/'freeze.exit_code'
+    if exit_status.exists(): raise FileExistsError('冻结退出状态已存在')
+    exit_status.write_text('0\n')
     files=sorted(p for p in root.rglob('*') if p.is_file() and 'evaluation' not in p.relative_to(root).parts and p!=manifest)
     result=dict(status='FROZEN_AWAITING_INDEPENDENT_EVALUATION',frozen_utc=time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),selected=choice['selected'],selection_status=choice['status'],external_inputs=inputs['files'],gt_read=False,files={str(p.relative_to(root)):dict(sha256=digest(p),size=p.stat().st_size,mtime_utc=time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime(p.stat().st_mtime))) for p in files})
-    manifest.write_text(json.dumps(result,indent=2)); return result
+    try: manifest.write_text(json.dumps(result,indent=2))
+    except Exception:
+        exit_status.unlink(missing_ok=True)
+        raise
+    return result
