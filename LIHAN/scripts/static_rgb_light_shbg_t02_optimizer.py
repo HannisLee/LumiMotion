@@ -13,7 +13,8 @@ def fit(n, y, w, H, anchor, lambda_bg, dest, run='full', control=False):
     dest = Path(dest); dest.mkdir(parents=True, exist_ok=False)
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     tensor = lambda x: torch.as_tensor(x, dtype=torch.float64, device=device)
-    nt, yt, wt, ht = map(tensor, (n, np.nan_to_num(y), np.where(np.isfinite(y) & np.isfinite(w) & (w > 0), w, 0), H))
+    valid = np.isfinite(y) & np.isfinite(w) & (w > 0)
+    nt, yt, wt, ht = map(tensor, (n, np.where(valid, y, 0.), np.where(valid, w, 0.), H))
     phi0, a0 = anchor_parameters(anchor); phi0, a0 = tensor(phi0), tensor(a0)
     sign = r5.orbit_sign(anchor)
     start = math.atanh(.5) * (1 if run == 'hi' else -1 if run == 'lo' else 0)
@@ -43,7 +44,7 @@ def fit(n, y, w, H, anchor, lambda_bg, dest, run='full', control=False):
         with torch.no_grad():
             result = checked(); return float(result[0]), result[1].cpu().numpy(), float(result[2])
     def record(stage, step, loss):
-        history.append(dict(stage=stage, step=step, loss=float(loss)))
+        history.append(dict(stage=stage, step=step, loss=float(loss), gamma=0. if control else float(torch.sigmoid(c).detach())))
         if step == 1 or step % 50 == 0: print(json.dumps(history[-1]), flush=True)
     def lbfgs(count):
         nonlocal last_lbfgs
