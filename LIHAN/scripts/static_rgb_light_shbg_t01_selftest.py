@@ -8,7 +8,7 @@ from LIHAN.scripts import static_rgb_light_shbg_t01_core_selftest as coretest
 from LIHAN.scripts.static_rgb_light_shbg_t01_core import photometric
 from LIHAN.scripts.static_rgb_light_shbg_t01_optimizer import fit
 from LIHAN.scripts.static_rgb_light_shbg_t01_scoring import select
-from LIHAN.scripts.static_rgb_light_shbg_t01_extract import camera_fields
+from LIHAN.scripts.static_rgb_light_shbg_t01_extract import camera_fields, raw_camera_fields
 from LIHAN.scripts.static_rgb_light_fit_r3 import kkt
 from LIHAN.scripts.static_rgb_light_shbg_t01_templates import template
 
@@ -45,9 +45,12 @@ def main():
     assert photometric(x,y,w,H,c.sigmoid())[0] < photometric(x,y,w,H,torch.tensor(0.))[0]
     # 纯合成相机：未知字段值不解析；帧顺序独立检查。
     with tempfile.TemporaryDirectory() as tmp:
-        p=Path(tmp); frames=[dict(file_path=f'r_{i:04d}',transform_matrix=np.eye(4).tolist(),unused={'secret':[1,2,3]}) for i in range(1,151)]
+        p=Path(tmp); frames=[dict(file_path=f'r_{i:04d}',source_frame=i,transform_matrix=np.eye(4).tolist(),unused={'secret':[1,2,3]}) for i in range(1,151)]
         (p/'camera.json').write_text(json.dumps({'unused':{'other':True},'frames':frames}))
         ids,centers=camera_fields(p/'camera.json'); assert np.array_equal(ids,np.arange(1,151)) and centers.shape==(150,3)
+        raw={'frames':{f'{i:04d}':{'frame':i,'extrinsics':{'camera_to_world':np.eye(4).tolist(),'other':[1,2,3]},'ignored':{'x':1}} for i in range(1,151)},'ignored':[1,2]}
+        (p/'raw.json').write_text(json.dumps(raw)); rawids,matrices=raw_camera_fields(p/'raw.json')
+        assert np.array_equal(ids,rawids) and np.array_equal(centers,matrices[:,:3,3])
         T=12; G=6; phi=np.linspace(0,2*np.pi,T); l=np.stack([np.cos(phi)/np.sqrt(2),np.sin(phi)/np.sqrt(2),np.full(T,1/np.sqrt(2))],1)
         n=rng.normal(size=(T,G,3)); n/=np.linalg.norm(n,axis=-1,keepdims=True)
         x=np.maximum(np.einsum('tgc,tc->tg',n,l),0); H=rng.uniform(0,.1,(T,G)); y=.2+.7*x+.4*H

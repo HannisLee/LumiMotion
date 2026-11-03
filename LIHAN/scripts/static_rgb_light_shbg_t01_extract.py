@@ -15,7 +15,7 @@ def digest(path):
     return h.hexdigest()
 
 
-def camera_fields(path):
+def camera_fields(path, include_matrices=False):
     """扫描 JSON，只解析 frames 数组中 file_path 和 transform_matrix。
 
     对所有其他字段跳过文本，不解析其值。返回相机世界坐标和平移对应帧。
@@ -49,7 +49,7 @@ def camera_fields(path):
             key,i=string(i); i=ws(i)
             if s[i]!=':': raise ValueError('JSON 缺少冒号')
             i=ws(i+1)
-            if key in ('file_path','transform_matrix'):
+            if key in ('file_path','transform_matrix','source_frame'):
                 if key in got: raise ValueError('相机字段重复')
                 got[key],i=dec.raw_decode(s,i)
             else: i=skip(i)
@@ -81,15 +81,85 @@ def camera_fields(path):
     if frames is None: raise ValueError('缺少 frames')
     rows=[]
     for item in frames:
-        if set(item)!={'file_path','transform_matrix'}: raise ValueError('缺少相机字段')
+        if set(item)!={'file_path','transform_matrix','source_frame'}: raise ValueError('缺少相机字段')
         match=re.search(r'_(\d+)$',Path(item['file_path']).stem)
-        if match is None: raise ValueError('帧号格式错误')
+        if match is None or int(match.group(1))!=item['source_frame']: raise ValueError('帧号格式错误')
         matrix=np.asarray(item['transform_matrix'],dtype=np.float64)
         if matrix.shape!=(4,4) or not np.isfinite(matrix).all(): raise ValueError('相机矩阵无效')
-        rows.append((int(match.group(1)),matrix[:3,3]))
-    rows.sort(key=lambda x:x[0]); ids=np.array([r[0] for r in rows]); centers=np.array([r[1] for r in rows])
+        rows.append((int(match.group(1)),matrix))
+    rows.sort(key=lambda x:x[0]); ids=np.array([r[0] for r in rows]); matrices=np.array([r[1] for r in rows]); centers=matrices[:,:3,3]
     if not np.array_equal(ids,np.arange(1,151)): raise ValueError('相机帧不匹配')
-    return ids,centers
+    return (ids,centers,matrices) if include_matrices else (ids,centers)
+
+
+def raw_camera_fields(path):
+    """仅解析 frames.*.frame 与 frames.*.extrinsics.camera_to_world。"""
+    s=Path(path).read_text(); dec=json.JSONDecoder(); N=len(s)
+    def ws(i):
+        while i<N and s[i].isspace(): i+=1
+        return i
+    def skip(i):
+        i=ws(i)
+        if s[i]=='"': return dec.raw_decode(s,i)[1]
+        if s[i] in '[{':
+            stack=[s[i]]; i+=1
+            while stack:
+                if s[i]=='"': i=dec.raw_decode(s,i)[1]; continue
+                if s[i] in '[{': stack.append(s[i])
+                elif s[i] in ']}':
+                    if (stack.pop(),s[i]) not in [('[',']'),('{','}')]: raise ValueError('非法 JSON')
+                i+=1
+            return i
+        while i<N and s[i] not in ',}] \t\r\n': i+=1
+        return i
+    def obj(i,level):
+        i=ws(i)
+        if s[i]!='{': raise ValueError('原始相机对象格式错误')
+        i+=1; result={}
+        while True:
+            i=ws(i)
+            if s[i]=='}': return result,i+1
+            key,i=dec.raw_decode(s,i); i=ws(i)
+            if s[i]!=':': raise ValueError('原始相机格式错误')
+            i=ws(i+1)
+            nested=(level=='root' and key=='frames') or (level=='frames' and re.fullmatch(r'\d{4}',key)) or (level=='frame' and key=='extrinsics')
+            if nested:
+                if key in result: raise ValueError('重复相机字段')
+                nxt={'root':'frames','frames':'frame','frame':'extrinsics'}[level]
+                result[key],i=obj(i,nxt)
+            elif (level=='frame' and key=='frame') or (level=='extrinsics' and key=='camera_to_world'):
+                if key in result: raise ValueError('重复相机字段')
+                result[key],i=dec.raw_decode(s,i)
+            else: i=skip(i)
+            i=ws(i)
+            if s[i]==',': i+=1
+            elif s[i]!='}': raise ValueError('原始相机格式错误')
+    raw,_=obj(0,'root'); frames=raw.get('frames',{}); ids=[]; mats=[]
+    for key in sorted(frames):
+        entry=frames[key]; number=int(key)
+        if entry.get('frame')!=number or set(entry.get('extrinsics',{}))!={'camera_to_world'}: raise ValueError('原始相机帧字段不完整')
+        matrix=np.asarray(entry['extrinsics']['camera_to_world'],dtype=np.float64)
+        if matrix.shape!=(4,4) or not np.isfinite(matrix).all(): raise ValueError('原始相机矩阵无效')
+        ids.append(number); mats.append(matrix)
+    ids=np.asarray(ids); mats=np.asarray(mats)
+    if not np.array_equal(ids,np.arange(1,151)): raise ValueError('原始相机帧不完整')
+    return ids,mats
+
+
+def check_provenance(source,derived):
+    """检查上游准备命令、原始相机及转换文件的冻结摘要。"""
+    command_path=derived.parent/'preparation_commands.json'; commands=json.loads(command_path.read_text())
+    cmd=commands[0]; project=derived.parents[2]
+    if '--source' not in cmd or '--output' not in cmd: raise ValueError('准备命令缺少输入输出')
+    if (project/cmd[cmd.index('--source')+1]).resolve()!=source.resolve() or (project/cmd[cmd.index('--output')+1]).resolve()!=derived.resolve(): raise ValueError('准备命令来源不符')
+    text=(derived/'rgb_only_manifest.json').read_text()
+    def value(key):
+        pattern=r'"'+re.escape(key)+r'"\s*:\s*"([0-9a-f]{64})"'
+        found=re.findall(pattern,text)
+        if len(found)!=1: raise ValueError('来源清单缺少或重复 '+key)
+        return found[0]
+    if value('camera_sha256')!=digest(source/'camera.json') or value('transforms_all.json')!=digest(derived/'transforms_all.json'): raise ValueError('相机来源摘要不匹配')
+    return cmd
 
 
 def read_coefficients(ply_path, ids):
@@ -110,8 +180,11 @@ def extract(observations,source,model,iteration,dest,expected_obs_sha,expected_i
         ids=d['gaussian_ids'].copy(); frames=d['frames'].copy(); xyz=d['frame_xyz'].copy(); y=d['intensity'].copy(); w=d['weights'].copy()
     validate_alignment(ids,expected_ids,frames)
     if xyz.shape!=(150,len(ids),3) or y.shape!=(150,len(ids)) or w.shape!=(150,len(ids)): raise ValueError('观测尺寸错误')
-    cf=Path(source)/'transforms_all.json'; cframes,centers=camera_fields(cf)
-    if not np.array_equal(frames,cframes): raise ValueError('相机和观测帧不一致')
+    derived=Path(observations).resolve().parents[1]/'source_all'
+    cf=derived/'transforms_all.json'; cframes,centers,matrices=camera_fields(cf,include_matrices=True)
+    original_frames,original=raw_camera_fields(Path(source)/'camera.json')
+    if not np.array_equal(frames,cframes) or not np.array_equal(frames,original_frames) or not np.allclose(matrices,original,atol=1e-10,rtol=0): raise ValueError('原始、转换相机及观测帧不一致')
+    check_provenance(Path(source),derived)
     ply=Path(model)/'point_cloud'/f'iteration_{iteration}'/'point_cloud.ply'
     coeff=read_coefficients(ply,ids); valid=np.isfinite(y)&(w>0); result={'frames':frames,'gaussian_ids':ids}; diagnostics={}
     for L in (0,1,2):
@@ -119,5 +192,5 @@ def extract(observations,source,model,iteration,dest,expected_obs_sha,expected_i
         fractions=clipped[valid].mean(axis=0); diagnostics[str(L)]={'low':(raw[valid]<0).mean(axis=0).tolist(),'high':(raw[valid]>1).mean(axis=0).tolist(),'invalid_clipping':bool((fractions>.2).any())}
         result[f'h_L{L}']=h; result[f'raw_L{L}']=raw
     np.savez_compressed(dest/'sh_values.npz',**result)
-    (dest/'extraction.json').write_text(json.dumps({'input_sha256':digest(observations),'camera_sha256':digest(cf),'ply_sha256':digest(ply),'gt_read':False,'diagnostics':diagnostics},indent=2))
+    (dest/'extraction.json').write_text(json.dumps({'input_sha256':digest(observations),'camera_sha256':digest(cf),'original_camera_sha256':digest(Path(source)/'camera.json'),'preparation_commands_sha256':digest(derived.parent/'preparation_commands.json'),'source_manifest_sha256':digest(derived/'rgb_only_manifest.json'),'ply_sha256':digest(ply),'gt_read':False,'diagnostics':diagnostics},indent=2))
     return diagnostics
