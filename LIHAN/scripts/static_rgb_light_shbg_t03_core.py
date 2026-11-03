@@ -25,7 +25,7 @@ def backlight(normals, anchor, valid):
     if not np.isfinite(n[valid]).all() or np.any(np.abs(length[valid]-1) > 1e-6):
         raise ValueError('有效观测法线无效')
     nn = np.zeros_like(n)
-    np.divide(n, length[..., None], out=nn, where=(length > 0)[..., None])
+    np.divide(n, length[..., None], out=nn, where=(valid & (length > 0))[..., None])
     return nn, valid & (np.einsum('tgc,tc->tg', nn, anchor) <= -np.sin(R)-1e-6)
 
 
