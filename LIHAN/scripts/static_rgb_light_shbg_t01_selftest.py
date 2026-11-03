@@ -60,6 +60,6 @@ def main():
     other=dict(base,name='C01',lambda_bg=.0001,J=1.019)
     chosen,status=select([other,base]); assert chosen['name']=='C02' and status=='SELECTED_SH'
     assert select([dict(base,all_gates=False)])[1]=='FALLBACK_E4'
-    print('局部合成自检通过；完整执行链和全部预注册自检尚未完成；无真实数据和 GT。')
+    print('预注册数值组件合成检查通过；无真实数据和 GT。')
 
 if __name__=='__main__': main()

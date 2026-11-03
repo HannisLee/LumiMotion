@@ -15,6 +15,8 @@ def fit_candidates(observations,baseline,sh_values,extraction_metadata,output,sm
     indices,val,anchors=load_support(baseline,observations)
     with np.load(observations,allow_pickle=False) as d:
         n=d['normals'].astype(np.float64); y=d['intensity'].astype(np.float64); w=d['weights'].astype(np.float64); ids=d['gaussian_ids'].copy(); frames=d['frames'].copy()
+    if y.shape!=w.shape or y.shape!=(150,len(ids)) or not np.isfinite(w).all() or (w<0).any() or ((w>0)&~np.isfinite(y)).any() or not np.isfinite(n).all(): raise ValueError('基础观测含无效值')
+    if n.shape not in ((150,len(ids),3),(len(ids),3)) or not np.allclose(np.linalg.norm(n,axis=-1),1,atol=1e-4): raise ValueError('法线形状或长度无效')
     with np.load(sh_values,allow_pickle=False) as s:
         if not np.array_equal(ids,s['gaussian_ids']) or not np.array_equal(frames,s['frames']): raise ValueError('SH 与观察数据未对齐')
         h={L:s[f'h_L{L}'].copy() for L in (0,1,2)}

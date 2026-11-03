@@ -39,8 +39,10 @@ def choose(observations,baseline,sh_values,fit_output,output):
     nv=n[:,val] if n.ndim==3 else np.broadcast_to(n[val],(len(y),len(val),3)); yv=y[:,val]; wv=w[:,val]
     eligible_dirs=[dirs[name]['full'] for name,_,_ in CANDIDATES if 'full' in dirs[name]]
     common=ols_mask(nv,yv,wv,[e3,e4]+eligible_dirs)
-    if not common.any(): raise ValueError('共同 OLS 留出掩码为空')
-    def ols(l): return r3.ols_score(nv[:,common],yv[:,common],wv[:,common],l)
+    def ols(l):
+        if not common.any(): return np.inf
+        try: return r3.ols_score(nv[:,common],yv[:,common],wv[:,common],l)
+        except AssertionError: return np.inf
     e3s=ols(e3); e4s=ols(e4); valid=np.isfinite(yv)&(wv>0); ols_count=int((valid[1::2]&common).sum())
     locked=locked_mask(nv,yv,wv,e4); e4bg,count=heldout_score(nv,yv,wv,e4,locked)
     np.savez_compressed(dest/'score_masks.npz',gaussian_ids=ids[val],ols_common=common,kkt_locked=locked)

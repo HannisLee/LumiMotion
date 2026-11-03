@@ -1,6 +1,8 @@
 """T01 预注册流程入口：只读取冻结观测、相机、SH 与无 GT 基线。"""
 import argparse
 import json
+import os
+import socket
 from pathlib import Path
 import sys
 import time
@@ -86,6 +88,7 @@ def check_smoke(a):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__); p.add_argument('command',choices=['self-test','lock','extract','fit','choose','figures','freeze']); p.add_argument('--output',type=Path,required=True); p.add_argument('--baseline',type=Path); p.add_argument('--observations',type=Path); p.add_argument('--source',type=Path); p.add_argument('--model',type=Path); p.add_argument('--iteration',type=int); p.add_argument('--plan',type=Path); p.add_argument('--self-test-dir',type=Path); p.add_argument('--smoke-dir',type=Path); p.add_argument('--smoke',action='store_true'); a=p.parse_args()
+    if socket.gethostname().split('.')[0]!='ushas' or os.environ.get('CONDA_DEFAULT_ENV')!='lumimotion-ushas': raise RuntimeError('服务器或 Conda 环境不符合预注册规划')
     if a.command=='self-test': self_test(a.output); return
     if any(v is None for v in (a.baseline,a.observations,a.source,a.model,a.iteration,a.plan)) or a.iteration!=35000: p.error('须指定全部固定输入且 iteration 为 35000')
     check_selftest(a.self_test_dir)
@@ -104,7 +107,8 @@ def main():
         if torch.cuda.is_available(): torch.cuda.reset_peak_memory_stats()
         result=fit_candidates(a.observations,a.baseline,a.output/'extraction'/'sh_values.npz',a.output/'extraction'/'extraction.json',a.output/'fit',a.smoke)
         if a.smoke:
-            record={'elapsed_seconds':time.monotonic()-start,'peak_gpu_bytes':torch.cuda.max_memory_allocated() if torch.cuda.is_available() else None,'fit':result,'gt_read':False}
+            import resource
+            record={'elapsed_seconds':time.monotonic()-start,'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,'peak_gpu_bytes':torch.cuda.max_memory_allocated() if torch.cuda.is_available() else None,'fit':result,'gt_read':False}
             (a.output/'smoke_result.json').write_text(json.dumps(record,indent=2))
     elif a.command=='choose':
         from LIHAN.scripts.static_rgb_light_shbg_t01_choose import choose
