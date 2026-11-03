@@ -31,6 +31,11 @@ def test_lock_snapshot(root):
     files=[plan,obs,impl,train,*list(scripts.iterdir()),*members,baseline/'freeze_manifest.json']
     with patch.object(entry,'ROOT',project),patch.object(entry,'PROJECT',project),patch.object(entry,'EXPECTED',expected),patch.object(entry,'PLAN_HASH',digest(plan)),patch.object(entry,'OBS_HASH',digest(obs)),patch.object(entry,'T01_EXTRACT_HASH',digest(scripts/'static_rgb_light_shbg_t01_extract.py')),patch.object(entry,'T01_CORE_HASH',digest(scripts/'static_rgb_light_shbg_t01_core.py')),patch.object(entry,'code_hashes',return_value=hashes),patch.object(entry,'allowed_baseline',return_value=members),patch.object(entry,'inventory',return_value=sorted(files)):
         entry.lock(a); entry.verify(a)
+        obs.write_bytes(b'changed')
+        try: entry.verify(a)
+        except ValueError: pass
+        else: raise AssertionError('输入哈希变化未拒绝')
+        obs.write_bytes(b'synthetic')
         target=output/'frozen_code'/next(iter(hashes)); target.write_text('篡改')
         try: entry.verify(a)
         except ValueError: pass
