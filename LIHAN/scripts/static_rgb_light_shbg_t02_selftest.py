@@ -89,5 +89,6 @@ def main():
     picked,status=select([dict(row,name='C01',lambda_bg=.0001,J=1.019),row]); assert picked['name']=='C02' and status=='SELECTED_SH'
     assert select([dict(row,all_gates=False)])[1]=='FALLBACK_E4'
     print('T02 合成数值与基础隔离检查通过。')
+    raise RuntimeError('完整优化器、评分和端到端自检尚未完成，禁止签发 PASS')
 
 if __name__=='__main__': main()
