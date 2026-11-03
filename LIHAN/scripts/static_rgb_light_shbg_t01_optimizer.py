@@ -94,9 +94,8 @@ def fit(n, y, w, H, anchor, gamma_initial, elevation_initial, lambda_bg, dest,
             if k in (600,850):
                 for group in opt.param_groups: group['lr']*=.3
         m,used=lbfgs(budgets[1]); cert=certificate(m)
-        while not cert['converged'] and used<budgets[2]:
-            limit=(budgets[1]-used) if used<budgets[1] else (budgets[2]-used)
-            m,extra=lbfgs(limit); used+=extra; cert=certificate(m)
+        if not cert['converged'] and used<budgets[2]:
+            m,extra=lbfgs(budgets[2]-used); used+=extra; cert=certificate(m)
         cert['outer_iterations']=used
         if not cert['converged'] or force_tc:
             before=cert; base=snap(); qp=torch.nn.Parameter(torch.zeros_like(ph)); qa=torch.nn.Parameter(torch.zeros_like(av)); qc=torch.nn.Parameter(torch.zeros_like(c))
