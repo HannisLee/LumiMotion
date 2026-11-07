@@ -155,7 +155,7 @@ def fit_traj(n,y,w,init,a0,lam_a,lam_e,out,label,steps=STEPS,outer=OUTER,outer_e
         loss,data,p,e=objective();end=direction();pp={k:float(v) for k,v in p.items()};eld=np.rad2deg(e.cpu().numpy())
         x=torch.relu(torch.einsum('tgc,tc->tg',nt,torch.as_tensor(end,device=device)) if nt.ndim==3 else torch.as_tensor(end,device=device)@nt.T)
         rho,b=kkt(x,yt,ww)
-        np.savez_compressed(dest/'parameters.npz',phi=phi.cpu().numpy(),a=a.cpu().numpy(),rho=rho.cpu().numpy(),b=b.cpu().numpy())
+        np.savez_compressed(dest/'parameters.npz',phi=phi.detach().cpu().numpy(),a=a.detach().cpu().numpy(),rho=rho.cpu().numpy(),b=b.cpu().numpy())
     info=dict(penalties=pp,orbit_sign=s,final_loss=float(loss),data_loss=float(data),certificate=cert,converged=cert['converged'],elev_deg=eld.tolist())
     np.save(dest/'direction.npy',end);write(dest/'history.json',hist);write(dest/'certificate.json',cert)
     write(dest/'config.json',dict(lam_a=lam_a,lam_e=lam_e,lam_rev=LAM_REV,adam_steps=steps,lr_phi=LR_PHI,lr_a=LR_A,drops=list(DROPS),e_center_deg=45.,e_halfwidth_deg=float(np.rad2deg(E_MAX)),device=device,dtype='float64',support_count=y.shape[1],final_loss=float(loss),certificate=cert,penalties=pp))
@@ -206,6 +206,8 @@ def fit_or_record(n,y,w,init,a0,lam_e,out,label):
         if '非有限' not in str(exc) and 'non-finite' not in str(exc).lower():raise
         dest=out/'runs'/label;dest.mkdir(parents=True,exist_ok=True)
         cert=dict(converged=False,path='numerical_failure',reason=str(exc));write(dest/'certificate.json',cert)
+        write(dest/'config.json',dict(lam_a=1.,lam_e=lam_e,lam_rev=LAM_REV,e_halfwidth_deg=float(np.rad2deg(E_MAX)),status='NONFINITE',support_count=y.shape[1]))
+        if not (dest/'history.json').exists():write(dest/'history.json',[])
         return np.full_like(init,np.nan),dict(certificate=cert,converged=False,final_loss=float('nan'),data_loss=float('nan'),penalties={},orbit_sign=orbit_sign(init))
 
 def main():
@@ -214,7 +216,6 @@ def main():
     out=a.output;out.mkdir(parents=True,exist_ok=False)
     torch.set_num_threads(2);torch.manual_seed(103108);np.random.seed(103108)
     if a.self_test:self_test(out);return
-    raise RuntimeError('T01 实现未完成，禁止正式运行')
     expected={Path('LIHAN/scripts/static_rgb_light_fit_r5b.py'):'ea6a90084d61d88ee87dbcd5230793de65f56e8b1f562b2125a68d90dd6d12e2',Path(r3.__file__):'0359461d5c4436698d4eee4d417a564ca273edf0091bfa87153f1ef0eb834517',BASE/'predictions.npz':'e888f8758301ded62d075d78de719a8ba1da61761a440d6275a1c2f3fec52757',BASE/'method_config.json':'0e43568348a0036fcd7f290c4b37dad8f3167462e9da398abf56f9edf517de04',OBS:OBS_HASH,PREREG:PREREG_HASH,ADDENDUM:ADDENDUM_HASH,ADDENDUM2:ADDENDUM2_HASH,ADDENDUM3:ADDENDUM3_HASH,ADDENDUM4:ADDENDUM4_HASH}
     for path,digest in expected.items():
         if sha(path)!=digest:raise RuntimeError(f'输入指纹不匹配: {path}')
@@ -240,10 +241,12 @@ def main():
     for k in ['E1','E2']:results[k],voteinfo[k]=initial(sub(n,fi),y[:,fi],w[:,fi],relative[:,fi],k,scoredata)
     results['E3'],_,_=r3.fit(sub(n,fi),y[:,fi],w[:,fi],results['E2'],False,.03,0.,out,'E3',False)
     with np.load(R3_PRED) as old:
-        repro=dict(E1=float(abs(results['E1']-old['E1']).max()),E2=float(abs(results['E2']-old['E2']).max()),E3=float(abs(results['E3']-old['E3']).max()))
-    write(out/'r3_reproduction.json',dict(max_abs_diff=repro,tolerance=1e-6,source=str(R3_PRED),gt_read=False))
-    if max(repro.values())>1e-6:
-        write(out/'baseline_reproduction.json',dict(status='BASELINE_REPRODUCTION_FAILED',r3_reproduction=repro))
+        repro={key:float(abs(results[key]-old[key]).max()) for key in ('E1','E2','E3')}
+    with np.load(BASE/'predictions.npz') as old:
+        repro_r5b={key:float(abs(results[key]-old[key]).max()) for key in ('E1','E2','E3')}
+    write(out/'r3_reproduction.json',dict(max_abs_diff=repro,r5b_max_abs_diff=repro_r5b,tolerance=1e-6,source=str(R3_PRED),gt_read=False))
+    if max(*repro.values(),*repro_r5b.values())>1e-6:
+        write(out/'baseline_reproduction.json',dict(status='BASELINE_REPRODUCTION_FAILED',r3_reproduction=repro,r5b_reproduction=repro_r5b))
         raise RuntimeError(f'第三轮E1–E3未复现：{repro}')
     e3mae=ols_score(*scoredata,results['E3'])
     # ---- 各支撑集共享的E2→Stage1 ----
@@ -273,9 +276,9 @@ def main():
         full=ends['full'];sp=compare(ends['A'],ends['B']);hl=compare(ends['hi'],ends['lo']);e=elev_deg(full);de=np.diff(e)
         ea=elev_deg(ends['A']);eb=elev_deg(ends['B']);corr=float(np.corrcoef(ea,eb)[0,1]) if ea.std()>1e-12 and eb.std()>1e-12 else None
         mask=abs(e-45)>=.95*h;longest=max(map(len, ''.join('1' if x else '0' for x in mask).split('0')))
-        row=dict(name=name,lam_a=1.,lam_e=lam_e,halfwidth_deg=h,lam_rev=LAM_REV,split_mean_deg=sp['mean_deg'],split_p90_deg=sp['p90_deg'],split_el_mae_deg=float(abs(ea-eb).mean()),hilo_mean_deg=hl['mean_deg'],boot_each_mean_deg=[compare(ends[f'boot{s}'],full)['mean_deg'] for s in BOOT],view_dz_abs=float(abs(full[front,2].mean()-full[side,2].mean())),body_heldout_mae=ols_score(*scoredata,full),E3_body_heldout_mae=e3mae,full_penalties=infos['full']['penalties'],data_loss=infos['full']['data_loss'],converged=all(v['converged'] for v in infos.values()),certificates={k:v['certificate'] for k,v in infos.items()},final_loss={k:v['final_loss'] for k,v in infos.items()},r_AB=corr,quantiles_deg=np.quantile(e,[0,.05,.25,.5,.75,.95,1]).tolist(),rms_de_deg=float(np.sqrt(np.mean(de**2))),actual_boundary_frac=float(mask.mean()),actual_boundary_longest=longest,**traj_stats(full,infos['full']['orbit_sign']))
+        row=dict(name=name,lam_a=1.,lam_e=lam_e,halfwidth_deg=h,lam_rev=LAM_REV,split_mean_deg=sp['mean_deg'],split_p90_deg=sp['p90_deg'],split_el_mae_deg=float(abs(ea-eb).mean()),hilo_mean_deg=hl['mean_deg'],boot_each_mean_deg=[compare(ends[f'boot{s}'],full)['mean_deg'] for s in BOOT],view_dz_abs=float(abs(full[front,2].mean()-full[side,2].mean())),body_heldout_mae=ols_score(*scoredata,full),E3_body_heldout_mae=e3mae,full_penalties=infos['full']['penalties'],data_loss=infos['full']['data_loss'],converged=all(v['converged'] for v in infos.values()),certificates={k:v['certificate'] for k,v in infos.items()},final_loss={k:v['final_loss'] for k,v in infos.items()},r_AB=corr,quantiles_deg=np.quantile(e,[0,.05,.25,.5,.75,.95,1]).tolist(),rms_de_deg=float(np.sqrt(np.mean(de**2))),actual_boundary_frac=float(mask.mean()),actual_boundary_longest=longest,view_elevation_correlation=(float(np.corrcoef(dark,e)[0,1]) if dark.std()>1e-12 and e.std()>1e-12 else None),**traj_stats(full,infos['full']['orbit_sign']))
         row['boot_mean_deg']=float(np.mean(row['boot_each_mean_deg']));row['J']=row['split_mean_deg']+.5*row['split_p90_deg']+row['split_el_mae_deg']+row['boot_mean_deg']+row['hilo_mean_deg']
-        row['gates']={g:bool(f(row)) for g,f in GATES.items()};row['all_gates']=all(row['gates'].values()) and all(np.isfinite(row[k]) for k in ['J','body_heldout_mae','view_dz_abs']) and all(np.isfinite(v).all() for v in ends.values())
+        row['gates']={g:bool(f(row)) for g,f in GATES.items()};row['all_gates']=all(row['gates'].values()) and all(np.isfinite(row[k]) for k in ['J','body_heldout_mae','view_dz_abs']) and all(np.isfinite(v).all() for v in ends.values()) and all(np.isfinite(v['final_loss']) and np.isfinite(v['data_loss']) and all(np.isfinite(x) for x in v['penalties'].values()) for v in infos.values())
         rows.append(row);ends_all[name]=ends;infos_all[name]=infos;np.savez_compressed(out/'runs'/f'{name}_ends.npz',**ends)
         write(out/'candidate_table.json',dict(E3_body_heldout_mae=e3mae,candidates=rows))
         if name=='C00':
@@ -286,16 +289,28 @@ def main():
             if not baseline_ok:raise RuntimeError('BASELINE_REPRODUCTION_FAILED')
     chosen=select_t01(rows);name=chosen['name'] if chosen else 'E4_fallback_no_strict_noGT_improvement'
     with np.load(BASE/'predictions.npz') as old:results['E4']=ends_all[name]['full'].copy() if chosen else old['E4'].copy()
+    for key,value in results.items():
+        if value.shape!=(150,3) or not np.isfinite(value).all() or not np.allclose(np.linalg.norm(value,axis=1),1.,rtol=0,atol=1e-10):raise RuntimeError(f'无效预测: {key}')
     np.savez_compressed(out/'predictions.npz',frames=frames,**results)
-    sens=sensitivity(rows);write(out/'sensitivity.json',dict(main_selection=name,rows=sens));write(out/'selection.json',dict(selected=name,selected_row=chosen,candidates=rows,rule='G0-G7; J < C00 - .02; window .02 then body MAE and candidate ID'))
-    write(out/'method_config.json',dict(selected=name,gt_read=False,coordinate_system='world',direction_convention='surface_to_light',directional_intensity=1,candidates=CANDIDATES,plan_sha256=sha(PLAN),input_sha256=sha(OBS),r3_reproduction=repro,votes=voteinfo))
+    sens=sensitivity(rows);write(out/'sensitivity.json',dict(main_selection=name,rows=sens));ranking=[r['name'] for r in sorted((r for r in rows[1:] if r['all_gates'] and np.isfinite(r['J']) and r['J']<rows[0]['J']-.02),key=lambda r:(r['J'],r['body_heldout_mae'],r['name']))];write(out/'selection.json',dict(selected=name,selected_row=chosen,candidates=rows,eligible_by_J=ranking,rule='G0-G7; J < C00 - .02; window .02 then body MAE and candidate ID'))
+    write(out/'method_config.json',dict(final_method='E4',selected=name,fit_gaussians=len(fi),heldout_gaussians=len(vi),gt_read=False,coordinate_system='world',direction_convention='surface_to_light',directional_intensity=1,candidates=CANDIDATES,plan_sha256=sha(PLAN),input_sha256=sha(OBS),r3_reproduction=repro,votes=voteinfo))
     make_figures(out,d,n,y,w,relative,fi,results,voteinfo,rows,ends_all,sens,name)
     write(out/'fit_complete.json',dict(status='T01_FIT_COMPLETE_AWAITING_REVIEW',selected=name,gt_read=False))
 
 def make_figures(out,d,n,y,w,relative,fi,results,voteinfo,rows,ends_all,sens,name):
-    from LIHAN.scripts import static_rgb_light_fit_r5b as original
-    # 复用原图一的支撑/KKT路径，随后重绘图二至图四以覆盖本轮所有候选。
-    original.figures(out,d,n,y,w,relative,fi,results,voteinfo,rows,ends_all,{k:{} for k in ends_all},name)
+    l=results['E4'];x=np.maximum(r3.shade(sub(n,fi),l),0);yy=np.nan_to_num(y[:,fi]);ww=w[:,fi]
+    with torch.no_grad():rho,b=kkt(torch.tensor(x),torch.tensor(yy),torch.tensor(ww));rho=rho.numpy();b=b.numpy()
+    residual=x*rho+b-y[:,fi]
+    np.savez_compressed(out/'photometric_diagnostics.npz',residual=residual,rho=rho,b=b,body_fit=fi,diagnostic_only=True)
+    uv=d['projection_uv'][:,fi] if 'projection_uv' in d else None
+    fig,axs=plt.subplots(2,3,figsize=(14,8))
+    for col,t in enumerate([0,74,149]):
+        ok=(ww[t]>0)&np.isfinite(y[t,fi]);pix=(uv[t]+1)*200-.5 if uv is not None else d['xyz'][fi,:2]
+        high=ok&(relative[t,fi]>=np.quantile(relative[t,fi][ok],1-voteinfo['E2']['selected']['top']))
+        axs[0,col].scatter(pix[ok,0],pix[ok,1],s=2,c='lightgray');axs[0,col].scatter(pix[high,0],pix[high,1],s=5,c=relative[t,fi][high],cmap='viridis');axs[0,col].set_title(f'Frame {t+1}: E2 body vote')
+        sc=axs[1,col].scatter(pix[ok,0],pix[ok,1],s=4,c=residual[t,ok],cmap='coolwarm',vmin=-.15,vmax=.15);axs[1,col].set_title(f'E4 ({name}) KKT residual');fig.colorbar(sc,ax=axs[1,col])
+        for ax in axs[:,col]:ax.set_aspect('equal');ax.invert_yaxis()
+    fig.tight_layout();fig.savefig(out/'01_percentile_residual.png',dpi=150);plt.close(fig)
     fig,axes=plt.subplots(2,2,figsize=(14,9))
     for row in rows:
         key=row['name'];ends=ends_all[key]
@@ -314,10 +329,11 @@ def make_figures(out,d,n,y,w,relative,fi,results,voteinfo,rows,ends_all,sens,nam
     fig,axes=plt.subplots(2,2,figsize=(14,9))
     for row in rows:
         key=row['name'];ends=ends_all[key]
-        for tag in ('hi','lo','boot103108','boot103109'):axes[0,0].plot(elev_deg(ends[tag]),alpha=.5,label=f'{key}-{tag}')
+        if key==(name if name in ends_all else 'C00'):
+            for tag in ('full','hi','lo','boot103108','boot103109'):axes[0,0].plot(elev_deg(ends[tag]),label=f'{key}-{tag}')
         axes[0,1].bar(key,row['hilo_mean_deg']);axes[1,0].bar(key,row['boot_mean_deg'])
     cert=np.array([[int(rows[i]['certificates'][k]['converged']) for k in ['full','A','B','boot103108','boot103109','hi','lo']] for i in range(len(rows))]);axes[1,1].imshow(cert,aspect='auto',vmin=0,vmax=1);axes[1,1].set_yticks(range(len(ids)),ids);axes[1,1].set_xticks(range(7),['full','A','B','boot1','boot2','hi','lo'],rotation=45)
-    axes[0,0].set_ylabel('elevation');axes[0,1].set_ylabel('hi/lo mean');axes[1,0].set_ylabel('bootstrap mean');fig.tight_layout();fig.savefig(out/'04_hilo_convergence.png',dpi=150);plt.close(fig)
+    axes[0,0].legend(fontsize=7);axes[0,0].set_ylabel('elevation');axes[0,1].set_ylabel('hi/lo mean');axes[1,0].set_ylabel('bootstrap mean');fig.tight_layout();fig.savefig(out/'04_hilo_convergence.png',dpi=150);plt.close(fig)
 
 def self_test(out):
     from scipy.optimize import nnls
@@ -327,7 +343,8 @@ def self_test(out):
         design=np.column_stack([x[:,g],np.ones(60)])*np.sqrt(w[:,g,None]);target=y[:,g]*np.sqrt(w[:,g]);err=max(err,float(np.max(abs(nnls(design,target)[0]-np.array([rho[g].item(),b[g].item()])))))
     assert err<2e-5
     th=torch.linspace(0,2*np.pi,150,dtype=torch.float64);e=torch.deg2rad(45+3*torch.sin(th));p=penalties(th,e,1.);data=torch.tensor(.123,dtype=torch.float64);strong=data+p['a1']+p['a2']+10*(p['e1']+p['e2'])+.1*p['rev'];weak=data+p['a1']+p['a2']+.1*p['rev'];assert torch.allclose(strong-weak,10*(p['e1']+p['e2']),rtol=0,atol=1e-15)
-    assert torch.equal(torch.eye(150,dtype=torch.float64),torch.eye(150,dtype=torch.float64)+0*torch.diff(torch.eye(150,dtype=torch.float64),dim=0).T@torch.diff(torch.eye(150,dtype=torch.float64),dim=0))
+    eye=torch.eye(150,dtype=torch.float64);D1=torch.diff(eye,dim=0);D2=torch.diff(D1,dim=0);L2=0./(150*1e-4);M=eye+L2*D1.T@D1+L2**2*D2.T@D2;ev,U=torch.linalg.eigh(M);Pa=U@torch.diag(ev.rsqrt())@U.T;assert torch.allclose(Pa,eye,rtol=0,atol=1e-14)
+    ga=torch.zeros(150,dtype=torch.float64,requires_grad=True);gp=th.detach().clone().requires_grad_();q=penalties(gp,E_C+np.deg2rad(5.)*torch.tanh(ga),1.);z=q['a1']+q['a2']+0*(q['e1']+q['e2'])+.1*q['rev'];z.backward();assert torch.isfinite(ga.grad).all() and torch.isfinite(gp.grad).all()
     global E_MAX
     for _,_,h in CANDIDATES:
         E_MAX=np.deg2rad(h);a=torch.atanh((e-E_C)/E_MAX).detach().requires_grad_();restored=elev(a);assert torch.max(abs(restored-e))<1e-14
