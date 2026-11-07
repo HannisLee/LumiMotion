@@ -56,5 +56,8 @@ def log_step(trainer, loss, result, l1):
         with (root / 'metrics.jsonl').open('a') as handle:
             handle.write(json.dumps(record, ensure_ascii=False) + '\n')
     except Exception:
-        with (root / 'metrics_error.log').open('a') as handle:
-            handle.write(f'iteration {trainer.iteration}\n{traceback.format_exc()}\n')
+        try:
+            with (root / 'metrics_error.log').open('a') as handle:
+                handle.write(f'iteration {trainer.iteration}\n{traceback.format_exc()}\n')
+        except Exception:
+            pass  # 日志本身失败也不能中断训练

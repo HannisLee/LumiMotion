@@ -257,7 +257,7 @@ def main():
                     env_vis=parts['env_vis'].numpy(), sun_vis=parts.get('sun_vis', torch.zeros(0)).numpy(),
                     s=parts.get('s', torch.zeros(0)).numpy(), env=parts['env'].numpy(),
                     sun=parts.get('sun', torch.zeros(0, 3)).numpy(), ind=parts['ind'].numpy(),
-                    albedo_lin=pkg['base_color_linear'].detach().cpu()[:, fgc].T.numpy(),
+                    albedo_lin=(pkg['base_color_linear'] / pkg['rend_alpha'].clamp_min(1e-3)).detach().cpu()[:, fgc].T.numpy(),  # 去 alpha 预乘(黑底)
                     resid_lin=(render_lin - target_lin).numpy(), normal=normal.numpy())
             rows.append(row)
             print(json.dumps(row, ensure_ascii=False), flush=True)

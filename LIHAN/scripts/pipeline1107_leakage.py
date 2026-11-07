@@ -188,6 +188,11 @@ def m1(pool1, pool2, g1, g2):
     lit_r = res['pixel']['E2'].get('lit(s>=0.05)', {}).get('luminance', {}).get('median')
     lit = relative(lit_l, lit_r)
     res['low_v_relative_change'], res['lit_relative_change'] = low, lit
+    # 补充(不参与旗标)：受光且环境高可见(s>=0.05 且 V>=0.8)的对照档，避免受光档混入低V像素
+    def lit_high(pool):
+        m = (pool['s'] >= S_THRESHOLD) & (pool['v'] >= V_EDGES[1]) if len(pool['s']) == len(pool['v']) else np.zeros(len(pool['v']), bool)
+        return float(np.median(pool['lum'][m])) if m.any() else None
+    res['lit_highV_relative_change_supplementary'] = relative(lit_high(pool1), lit_high(pool2))
     res['flag'] = None if low is None or lit is None else bool(
         low > THRESHOLDS['m1_low_v_relative'] and abs(lit) < THRESHOLDS['m1_lit_relative'])
     res['rule'] = '低可见度档E2 albedo亮度中位数比E1高>10%(相对)，且受光档差异<3%'
