@@ -200,17 +200,28 @@ def sensitivity(rows):
             result.append(dict(axis=axis,value=value,selected=chosen['name'] if chosen else 'E4_fallback_no_strict_noGT_improvement',score_difference=score(chosen)-score(rows[0]) if chosen else None))
     return result
 
+def fit_or_record(n,y,w,init,a0,lam_e,out,label):
+    try:return fit_traj(n,y,w,init,a0,1.,lam_e,out,label)
+    except (RuntimeError,FloatingPointError) as exc:
+        if '非有限' not in str(exc) and 'non-finite' not in str(exc).lower():raise
+        dest=out/'runs'/label;dest.mkdir(parents=True,exist_ok=True)
+        cert=dict(converged=False,path='numerical_failure',reason=str(exc));write(dest/'certificate.json',cert)
+        return np.full_like(init,np.nan),dict(certificate=cert,converged=False,final_loss=float('nan'),data_loss=float('nan'),penalties={},orbit_sign=orbit_sign(init))
+
 def main():
     global E_MAX
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',type=Path,required=True);p.add_argument('--self-test',action='store_true');a=p.parse_args()
     out=a.output;out.mkdir(parents=True,exist_ok=False)
     torch.set_num_threads(2);torch.manual_seed(103108);np.random.seed(103108)
     if a.self_test:self_test(out);return
+    raise RuntimeError('T01 实现未完成，禁止正式运行')
     expected={Path('LIHAN/scripts/static_rgb_light_fit_r5b.py'):'ea6a90084d61d88ee87dbcd5230793de65f56e8b1f562b2125a68d90dd6d12e2',Path(r3.__file__):'0359461d5c4436698d4eee4d417a564ca273edf0091bfa87153f1ef0eb834517',BASE/'predictions.npz':'e888f8758301ded62d075d78de719a8ba1da61761a440d6275a1c2f3fec52757',BASE/'method_config.json':'0e43568348a0036fcd7f290c4b37dad8f3167462e9da398abf56f9edf517de04',OBS:OBS_HASH,PREREG:PREREG_HASH,ADDENDUM:ADDENDUM_HASH,ADDENDUM2:ADDENDUM2_HASH,ADDENDUM3:ADDENDUM3_HASH,ADDENDUM4:ADDENDUM4_HASH}
     for path,digest in expected.items():
         if sha(path)!=digest:raise RuntimeError(f'输入指纹不匹配: {path}')
+    if sha(PLAN)!='7495cca5ac9daaad0e2a6f228caf8a0534107466b9b5144410f3466afe6a2976':raise RuntimeError('规划哈希不一致')
+    model=Path('output/1019-02-LH-static-jumpingjacks-ELDL-V3-B00原生Stage1/model_mlp');frozen=[model/'point_cloud/iteration_35000/point_cloud.ply',model/'deform/iteration_35000/deform.pth',R3_PRED,BASE/'runs/a1e+00_e1e+01_ends.npz',BASE/'candidate_table.json',Path(__file__)]
     a.observations=OBS
-    write(out/'launch.json',dict(pid=os.getpid(),argv=sys.argv,plan_sha256=sha(PLAN),code_sha256=sha(__file__),inputs={str(k):v for k,v in expected.items()},gt_read=False))
+    write(out/'launch.json',dict(pid=os.getpid(),argv=sys.argv,plan_sha256=sha(PLAN),code_sha256=sha(__file__),inputs={**{str(k):v for k,v in expected.items()},**{str(k):sha(k) for k in frozen}},gt_read=False))
     # ---- 支撑集：与第三轮main逐字等价 ----
     d=np.load(a.observations);n=d['normals'].astype(np.float64);y=d['intensity'].astype(np.float64);w=d['weights'].astype(np.float64);xyz=d['xyz'];ids=d['gaussian_ids'];frames=d['frames']
     assert np.array_equal(frames,np.arange(1,151)) and y.shape==w.shape==(150,len(ids))
@@ -231,7 +242,9 @@ def main():
     with np.load(R3_PRED) as old:
         repro=dict(E1=float(abs(results['E1']-old['E1']).max()),E2=float(abs(results['E2']-old['E2']).max()),E3=float(abs(results['E3']-old['E3']).max()))
     write(out/'r3_reproduction.json',dict(max_abs_diff=repro,tolerance=1e-6,source=str(R3_PRED),gt_read=False))
-    if max(repro.values())>1e-6:raise RuntimeError(f'第三轮E1–E3未复现：{repro}')
+    if max(repro.values())>1e-6:
+        write(out/'baseline_reproduction.json',dict(status='BASELINE_REPRODUCTION_FAILED',r3_reproduction=repro))
+        raise RuntimeError(f'第三轮E1–E3未复现：{repro}')
     e3mae=ols_score(*scoredata,results['E3'])
     # ---- 各支撑集共享的E2→Stage1 ----
     supports={'full':(fi,results['E3'])};
@@ -240,6 +253,7 @@ def main():
         supports[key]=(idx,r3.fit(sub(n,idx),y[:,idx],w[:,idx],init,False,.03,0.,out,f'stage1_{key}',False)[0])
     for seed in BOOT:
         pick=np.random.default_rng(seed).choice(fi,len(fi),replace=True);np.save(out/f'bootstrap_{seed}_sample.npy',pick)
+        if not np.array_equal(pick,np.load(BASE/f'bootstrap_{seed}_sample.npy')):raise RuntimeError('bootstrap 索引与原档不符')
         init,voteinfo[f'boot{seed}']=initial(sub(n,pick),y[:,pick],w[:,pick],relative[:,pick],'E2')
         supports[f'boot{seed}']=(pick,r3.fit(sub(n,pick),y[:,pick],w[:,pick],init,False,.03,0.,out,f'stage1_boot{seed}',False)[0])
     dark=((relative[:,fi]<.15)&(w[:,fi]>0)).sum(1)/(w[:,fi]>0).sum(1);front=dark<=np.quantile(dark,.3);side=dark>=np.quantile(dark,.7)
@@ -248,9 +262,14 @@ def main():
         E_MAX=np.deg2rad(h);ends={};infos={}
         for key,(idx,s1) in supports.items():
             original=a_from_z(s1[:,2].mean()) if h==5 else float(np.arctanh((np.deg2rad(5.)*np.tanh(float(np.arctanh(np.clip((np.arcsin(s1[:,2].mean())-E_C)/np.deg2rad(5.),-.9,.9)))))/E_MAX))
-            ends[key],infos[key]=fit_traj(sub(n,idx),y[:,idx],w[:,idx],s1,original,1.,lam_e,out,f'{name}_{key}')
+            ends[key],infos[key]=fit_or_record(sub(n,idx),y[:,idx],w[:,idx],s1,original,lam_e,out,f'{name}_{key}')
         for key,offset in [('hi',4.5),('lo',-4.5)]:
-            a0=float(np.arctanh(offset/h));ends[key],infos[key]=fit_traj(sub(n,fi),y[:,fi],w[:,fi],results['E3'],a0,1.,lam_e,out,f'{name}_{key}')
+            a0=float(np.arctanh(offset/h));ends[key],infos[key]=fit_or_record(sub(n,fi),y[:,fi],w[:,fi],results['E3'],a0,lam_e,out,f'{name}_{key}')
+        if any(not np.isfinite(v).all() for v in ends.values()):
+            row=dict(name=name,lam_a=1.,lam_e=lam_e,halfwidth_deg=h,split_mean_deg=float('nan'),split_p90_deg=float('nan'),split_el_mae_deg=float('nan'),hilo_mean_deg=float('nan'),boot_mean_deg=float('nan'),body_heldout_mae=float('nan'),E3_body_heldout_mae=e3mae,view_dz_abs=float('nan'),saturation_frac=float('nan'),J=float('nan'),gates={f'G{i}':False for i in range(8)},all_gates=False,converged=False,certificates={k:v['certificate'] for k,v in infos.items()},failure='NONFINITE')
+            rows.append(row);ends_all[name]=ends;infos_all[name]=infos;np.savez_compressed(out/'runs'/f'{name}_ends.npz',**ends);write(out/'candidate_table.json',dict(E3_body_heldout_mae=e3mae,candidates=rows))
+            if name=='C00':write(out/'baseline_reproduction.json',dict(status='BASELINE_REPRODUCTION_FAILED',reason='NONFINITE'));raise RuntimeError('BASELINE_REPRODUCTION_FAILED')
+            continue
         full=ends['full'];sp=compare(ends['A'],ends['B']);hl=compare(ends['hi'],ends['lo']);e=elev_deg(full);de=np.diff(e)
         ea=elev_deg(ends['A']);eb=elev_deg(ends['B']);corr=float(np.corrcoef(ea,eb)[0,1]) if ea.std()>1e-12 and eb.std()>1e-12 else None
         mask=abs(e-45)>=.95*h;longest=max(map(len, ''.join('1' if x else '0' for x in mask).split('0')))
@@ -270,7 +289,35 @@ def main():
     np.savez_compressed(out/'predictions.npz',frames=frames,**results)
     sens=sensitivity(rows);write(out/'sensitivity.json',dict(main_selection=name,rows=sens));write(out/'selection.json',dict(selected=name,selected_row=chosen,candidates=rows,rule='G0-G7; J < C00 - .02; window .02 then body MAE and candidate ID'))
     write(out/'method_config.json',dict(selected=name,gt_read=False,coordinate_system='world',direction_convention='surface_to_light',directional_intensity=1,candidates=CANDIDATES,plan_sha256=sha(PLAN),input_sha256=sha(OBS),r3_reproduction=repro,votes=voteinfo))
+    make_figures(out,d,n,y,w,relative,fi,results,voteinfo,rows,ends_all,sens,name)
     write(out/'fit_complete.json',dict(status='T01_FIT_COMPLETE_AWAITING_REVIEW',selected=name,gt_read=False))
+
+def make_figures(out,d,n,y,w,relative,fi,results,voteinfo,rows,ends_all,sens,name):
+    from LIHAN.scripts import static_rgb_light_fit_r5b as original
+    # 复用原图一的支撑/KKT路径，随后重绘图二至图四以覆盖本轮所有候选。
+    original.figures(out,d,n,y,w,relative,fi,results,voteinfo,rows,ends_all,{k:{} for k in ends_all},name)
+    fig,axes=plt.subplots(2,2,figsize=(14,9))
+    for row in rows:
+        key=row['name'];ends=ends_all[key]
+        for col,fn in enumerate((lambda z:np.rad2deg(np.unwrap(np.arctan2(z[:,1],z[:,0]))),elev_deg)):
+            axes[0,col].plot(fn(ends['full']),label=key)
+            for subset in ('A','B'):axes[1,col].plot(fn(ends[subset]),label=f'{key} {subset}',alpha=.7)
+    for col,fn in enumerate((lambda z:np.rad2deg(np.unwrap(np.arctan2(z[:,1],z[:,0]))),elev_deg)):axes[0,col].plot(fn(results['E4']),label='selected',lw=2,ls='--')
+    for ax in axes.flat:ax.legend(fontsize=6,ncol=3);ax.set_xlabel('frame');ax.grid(alpha=.2)
+    axes[0,0].set_ylabel('azimuth');axes[0,1].set_ylabel('elevation');axes[1,0].set_ylabel('A/B azimuth');axes[1,1].set_ylabel('A/B elevation');fig.tight_layout();fig.savefig(out/'02_direction_split.png',dpi=150);plt.close(fig)
+    fig,axes=plt.subplots(2,2,figsize=(14,9));ids=[r['name'] for r in rows]
+    gates=np.array([[int(r['gates'][f'G{i}']) for i in range(8)] for r in rows]);axes[0,0].imshow(gates,aspect='auto',vmin=0,vmax=1);axes[0,0].set_yticks(range(len(ids)),ids);axes[0,0].set_xticks(range(8),[f'G{i}' for i in range(8)])
+    axes[0,1].bar(ids,[r['body_heldout_mae'] for r in rows]);axes[0,1].set_ylabel('body heldout MAE')
+    axes[1,0].bar(ids,[r['J'] for r in rows]);axes[1,0].set_ylabel('J')
+    labels=[f"{x['axis']}={x['value']}" for x in sens];vals=[ids.index(x['selected']) if x['selected'] in ids else -1 for x in sens];axes[1,1].scatter(range(len(vals)),vals);axes[1,1].set_xticks(range(len(vals)),labels,rotation=90,fontsize=6);axes[1,1].set_yticks([-1]+list(range(len(ids))),['fallback']+ids)
+    fig.tight_layout();fig.savefig(out/'03_holdout_stability.png',dpi=150);plt.close(fig)
+    fig,axes=plt.subplots(2,2,figsize=(14,9))
+    for row in rows:
+        key=row['name'];ends=ends_all[key]
+        for tag in ('hi','lo','boot103108','boot103109'):axes[0,0].plot(elev_deg(ends[tag]),alpha=.5,label=f'{key}-{tag}')
+        axes[0,1].bar(key,row['hilo_mean_deg']);axes[1,0].bar(key,row['boot_mean_deg'])
+    cert=np.array([[int(rows[i]['certificates'][k]['converged']) for k in ['full','A','B','boot103108','boot103109','hi','lo']] for i in range(len(rows))]);axes[1,1].imshow(cert,aspect='auto',vmin=0,vmax=1);axes[1,1].set_yticks(range(len(ids)),ids);axes[1,1].set_xticks(range(7),['full','A','B','boot1','boot2','hi','lo'],rotation=45)
+    axes[0,0].set_ylabel('elevation');axes[0,1].set_ylabel('hi/lo mean');axes[1,0].set_ylabel('bootstrap mean');fig.tight_layout();fig.savefig(out/'04_hilo_convergence.png',dpi=150);plt.close(fig)
 
 def self_test(out):
     from scipy.optimize import nnls
@@ -286,14 +333,28 @@ def self_test(out):
         E_MAX=np.deg2rad(h);a=torch.atanh((e-E_C)/E_MAX).detach().requires_grad_();restored=elev(a);assert torch.max(abs(restored-e))<1e-14
         loss=sum(penalties(th,restored,1.).values());loss.backward();assert torch.isfinite(a.grad).all()
         extreme=torch.rad2deg(elev(torch.tensor([-1000.,1000.],dtype=torch.float64)));assert extreme[0]>=45-h-1e-10 and extreme[1]<=45+h+1e-10
-        for start in [-4.5,4.5]:assert abs(float(torch.rad2deg(elev(torch.tensor(np.arctanh(start/h)))))-45-start)<1e-10
+        for start in [-4.5,4.5]:assert abs(float(torch.rad2deg(elev(torch.tensor(np.arctanh(start/h),dtype=torch.float64))))-45-start)<1e-10
     E_MAX=np.deg2rad(5.)
     def row(name,j,mae,ok=True):return dict(name=name,split_mean_deg=j,split_p90_deg=0.,split_el_mae_deg=0.,boot_mean_deg=0.,hilo_mean_deg=0.,body_heldout_mae=mae,all_gates=ok)
     rows=[row('C00',2.,1.),row('C01',1.98,.8),row('C02',1.9,.9),row('C03',1.91,.7)]
     assert select_t01(rows)['name']=='C03';assert select_t01(rows[:2]) is None
     assert select_t01([rows[0],row('C01',float('nan'),1.)]) is None
     before=select_t01(rows)['name'];sensitivity(rows);assert select_t01(rows)['name']==before
-    write(out/'numeric_tests.json',dict(status='PARTIAL',nnls_max_parameter_difference=err,gt_read=False,missing=['C00 optimization parity','zero smoothing full optimization','data and azimuth loss invariance']))
-    raise RuntimeError('自检尚未完成；禁止正式运行')
+    # 同物理轨迹跨带宽的数据与方位正则一致。
+    normals=torch.tensor(rng.normal(size=(20,3)),dtype=torch.float64);normals=normals/torch.linalg.vector_norm(normals,dim=1)[:,None]
+    reference=None
+    for _,_,h in CANDIDATES:
+        E_MAX=np.deg2rad(h);aa=torch.atanh((e-E_C)/E_MAX);ll=compose(torch.stack([torch.cos(th),torch.sin(th)],1),elev(aa));shade=torch.relu(ll@normals.T);r,b=kkt(shade,torch.ones_like(shade)*.3,torch.ones_like(shade));dat=((shade*r+b-.3)**2).mean();q=penalties(th,elev(aa),1.);pair=np.array([float(dat),float(q['a1']+q['a2']+.1*q['rev'])])
+        if reference is None:reference=pair
+        assert np.max(abs(reference-pair))<1e-12
+    # 小规模完整执行，并对 C00 比较原 r5b 路径。
+    import LIHAN.scripts.static_rgb_light_fit_r5b as orig
+    global TC_STEPS,TC_OUTER
+    TC_STEPS=orig.TC_STEPS=2;TC_OUTER=orig.TC_OUTER=6;E_MAX=np.deg2rad(5.)
+    tt=12;phi=np.linspace(0,2*np.pi,tt);init=np.column_stack([np.cos(phi)*np.cos(E_C),np.sin(phi)*np.cos(E_C),np.full(tt,np.sin(E_C))]);nn=rng.normal(size=(20,3));nn/=np.linalg.norm(nn,axis=1)[:,None];sy=np.maximum(init@nn.T,0)*.5+.1;sw=np.ones_like(sy)
+    kwargs=dict(n=nn,y=sy,w=sw,init=init,a0=0.,lam_a=1.,out=out,steps=2,outer=6,outer_ext=12)
+    a0,_=orig.fit_traj(lam_e=10.,label='original',**kwargs);a1,_=fit_traj(lam_e=10.,label='c00',**kwargs);parity=float(abs(a0-a1).max());assert parity<=1e-12
+    zero,info=fit_traj(lam_e=0.,label='zero_smoothing',**kwargs);assert np.isfinite(zero).all() and np.isfinite(info['final_loss'])
+    write(out/'numeric_tests.json',dict(status='PASS',nnls_max_parameter_difference=err,c00_max_abs_difference=parity,zero_smoothing_finite=True,gt_read=False))
 
 if __name__=='__main__':main()
