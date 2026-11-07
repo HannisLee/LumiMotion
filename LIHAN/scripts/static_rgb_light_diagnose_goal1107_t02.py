@@ -31,11 +31,32 @@ def selftest():
     assert np.isclose(np.sum(values*WEIGHT),np.dot(values,WEIGHT))
     return {'same_trajectory':values.tolist(),'rotation_10_deg_before':angle(t,b).tolist(),'rotation_10_deg_after':angle(t@rot.T,b@rot.T).tolist(),'status':'PASS'}
 
+def g7_audit(out):
+    obs=ROOT/'output/1030-01-LH-static-ELDL-V3-RGB方向光初始化/extraction/observations.npz'
+    support=R/'fitting/support.npz'; launch=json.loads((R/'fitting/launch.json').read_text()); frozen=json.loads((R/'freeze_manifest.json').read_text()); fs={x['path']:x['sha256'] for x in frozen['files']}
+    expected_obs=next(v for k,v in launch['inputs'].items() if k.endswith('/extraction/observations.npz'))
+    before={'observations':sha(obs),'support':sha(support)}
+    if before['observations']!=expected_obs or before['support']!=fs['fitting/support.npz']: raise RuntimeError('G7 输入哈希不符')
+    z=np.load(obs); y=z['intensity'].astype(np.float64); w=z['weights'].astype(np.float64); fi=np.load(support)['body_fit']
+    import warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore',RuntimeWarning); q20=np.nanquantile(y,.2,axis=0); q95=np.nanquantile(y,.95,axis=0)
+    relative=np.clip((y[:,fi]-q20[fi])/(q95[fi]-q20[fi]+.001),0,1.5)
+    dark=((relative<.15)&(w[:,fi]>0)).sum(1)/(w[:,fi]>0).sum(1); q30,q70=np.quantile(dark,[.3,.7]); front=dark<=q30; side=dark>=q70
+    rows=json.loads((R/'fitting/candidate_table.json').read_text())['candidates']; checks=[]
+    for row in rows:
+        full=np.load(R/f"fitting/runs/{row['name']}_ends.npz")['full']; x=float(abs(full[front,2].mean()-full[side,2].mean())); checks.append({'name':row['name'],'value':x,'archive':row['view_dz_abs'],'difference':x-row['view_dz_abs']})
+    if max(abs(x['difference']) for x in checks)>1e-8: raise RuntimeError('G7 重算与存档不符')
+    result={'input_sha256_before':before,'input_sha256_after':{'observations':sha(obs),'support':sha(support)},'q30':float(q30),'q70':float(q70),'front_count':int(front.sum()),'side_count':int(side.sum()),'overlap_count':int((front&side).sum()),'checks':checks}
+    (out/'g7_audit.json').write_text(json.dumps(result,indent=2,ensure_ascii=False)+'\n'); print('G7 核算 PASS')
+
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--self-test',action='store_true');p.add_argument('--output',type=Path,required=True);args=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--self-test',action='store_true');p.add_argument('--g7-audit',action='store_true');p.add_argument('--output',type=Path,required=True);args=p.parse_args()
     args.output.mkdir(parents=True,exist_ok=True)
     if args.self_test:
         (args.output/'synthetic.json').write_text(json.dumps(selftest(),indent=2,ensure_ascii=False)+'\n');print('synthetic PASS');return
+    if args.g7_audit:
+        g7_audit(args.output); return
     manifest=json.loads((R/'freeze_manifest.json').read_text()); frozen={x['path']:x['sha256'] for x in manifest['files']}
     rel=['fitting/candidate_table.json']+[f'fitting/runs/{n}_ends.npz' for n in NAMES]
     for n in NAMES:
