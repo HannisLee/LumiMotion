@@ -32,16 +32,16 @@
     }
   ],
   "输出文件": [
-    "LIHAN/export/1017-01-阴影反推方向光原理.png",
-    "LIHAN/export/1017-01-阴影反推方向光原理.svg",
-    "LIHAN/export/1017-01-阴影反推方向光原理.pdf",
-    "LIHAN/export/1017-02-阴影估光方法流程.png",
-    "LIHAN/export/1017-02-阴影估光方法流程.svg",
-    "LIHAN/export/1017-02-阴影估光方法流程.pdf",
-    "LIHAN/export/1017-03-真实观测与阴影投影对比.png",
-    "LIHAN/export/1017-03-真实观测与阴影投影对比.svg",
-    "LIHAN/export/1017-03-真实观测与阴影投影对比.pdf",
-    "LIHAN/export/1017-04-阴影反推方向光演示合集.pdf"
+    "LIHAN/exports/1017-01-方向光原理图/1017-01-阴影反推方向光原理.png",
+    "LIHAN/exports/1017-01-方向光原理图/1017-01-阴影反推方向光原理.svg",
+    "LIHAN/exports/1017-01-方向光原理图/1017-01-阴影反推方向光原理.pdf",
+    "LIHAN/exports/1017-02-估光流程图/1017-02-阴影估光方法流程.png",
+    "LIHAN/exports/1017-02-估光流程图/1017-02-阴影估光方法流程.svg",
+    "LIHAN/exports/1017-02-估光流程图/1017-02-阴影估光方法流程.pdf",
+    "LIHAN/exports/1017-03-观测投影对比图/1017-03-真实观测与阴影投影对比.png",
+    "LIHAN/exports/1017-03-观测投影对比图/1017-03-真实观测与阴影投影对比.svg",
+    "LIHAN/exports/1017-03-观测投影对比图/1017-03-真实观测与阴影投影对比.pdf",
+    "LIHAN/exports/1017-04-演示合集/1017-04-阴影反推方向光演示合集.pdf"
   ],
   "PNG尺寸": [
     3840,

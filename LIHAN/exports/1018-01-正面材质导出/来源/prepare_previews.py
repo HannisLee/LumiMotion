@@ -10,7 +10,7 @@ from PIL import Image, ImageDraw, ImageFont
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / 'data/LH-data/static/LH-static-jumpingjacks_EL_V2'
 RUN = Path(__file__).resolve().parent
-OUT = ROOT / 'LIHAN/export/1018-01'
+OUT = ROOT / 'LIHAN/exports/1018-01-正面材质导出'
 OUT.mkdir(exist_ok=True)
 
 def sha(p):
