@@ -121,7 +121,9 @@ def fit_traj(n,y,w,init,a0,out,label,steps=STEPS,outer=OUTER,outer_ext=OUTER_EXT
         o=torch.optim.Adam([dict(params=[phi],lr=LR_PHI),dict(params=[a],lr=LR_A)]);N=6000+steps;sched=torch.optim.lr_scheduler.CosineAnnealingLR(o,N,eta_min=0)
         fl=[]
         for _ in range(N):
-            o.zero_grad();l=objective()[0];l.backward();o.step();sched.step();fl.append(float(l.detach()))
+            o.zero_grad();l=objective()[0]
+            if not torch.isfinite(l):raise FloatingPointError('非有限loss(Adam fallback)')
+            l.backward();o.step();sched.step();fl.append(float(l.detach()))
         d_last=direction();rel=abs(fl[-501]-fl[-1])/max(abs(fl[-501]),1e-300);disp,drop=probe()
         cert=dict(path='adam_fallback',reason=str(exc),C1_rel=rel,C3_disp_deg=disp,C3_drop=drop,converged=bool(rel<1e-7 and disp<.1 and drop<1e-4));final_losses=fl
     with torch.no_grad():
@@ -242,9 +244,28 @@ def main():
     assert direction_valid(reference,np.ones(1),np.ones(1))
     ends={};infos={};diagnostics={};arrays={};write(out/'regularization_audit.json',audit())
     for key in ['full','A','B','boot103108','boot103109','hi','lo','repeat_full']:
-        source=key if key in supports else 'full';idx=supports[source];init=initial[source];a0=np.arctanh(.9)*(1 if key=='hi' else -1) if key in ('hi','lo') else a_from_z(init[:,2].mean());end,info=fit_traj(sub(n,idx),y[:,idx],w[:,idx],init,a0,out,key);ends[key]=end;infos[key]=info
+        source=key if key in supports else 'full';idx=supports[source];init=initial[source];a0=np.arctanh(.9)*(1 if key=='hi' else -1) if key in ('hi','lo') else a_from_z(init[:,2].mean())
+        try:
+            end,info=fit_traj(sub(n,idx),y[:,idx],w[:,idx],init,a0,out,key)
+        except (FloatingPointError,RuntimeError) as exc:
+            if '非有限loss' not in str(exc):raise
+            diagnostics[key]={'valid':False,'converged':False,'status':'NO_FINITE_ENDPOINT','reason':str(exc)}
+            write(out/'runs'/key/'failure.json',diagnostics[key]);write(out/'diagnostics_partial.json',diagnostics);continue
+        ends[key]=end;infos[key]=info
+        if not direction_valid(end,np.ones(1),np.ones(1)):
+            diagnostics[key]={'valid':False,'converged':False,'status':'INVALID_DIRECTION'};write(out/'diagnostics_partial.json',diagnostics);continue
         st,arr=stats(sub(n,idx),y[:,idx],w[:,idx],end);valid=direction_valid(end,arr[3],arr[4]);diagnostics[key]={'valid':valid,'converged':bool(info['converged']),'status':'CONVERGED' if info['converged'] else 'NOT_CONVERGED','coefficients':st,'band':band(end),'body_heldout_clipped_mae':ols_score(sub(n,vi),y[:,vi],w[:,vi],end),'body_heldout_unclipped':heldout_raw(sub(n,vi),y[:,vi],w[:,vi],end)};arrays[key]=arr
         write(out/'diagnostics_partial.json',diagnostics)
+    if not diagnostics['full']['valid']:
+        selected=choose(False);write(out/'selection.json',selected);write(out/'diagnostics.json',{'runs':diagnostics,'gt_read':False});write(out/'candidate_table.json',{'C00':{'reference_only':True},'C01':diagnostics['full']})
+        np.savez_compressed(out/'predictions.npz',frames=frames,reference_E4=reference,**historical,**{f'C01_{k}':v for k,v in ends.items() if k!='full' and diagnostics[k]['valid']})
+        write(out/'fit_complete.json',dict(status='NO_VALID_NOREG_PREDICTION',selected=selected,gt_read=False));return
+    invalid_aux=[key for key in diagnostics if key!='full' and not diagnostics[key]['valid']]
+    if invalid_aux:
+        # 不用其他流程代替无效诊断；保留有效 full 和所有已完成证据。
+        selected=choose(True);selected['diagnostic_incomplete']=invalid_aux;write(out/'selection.json',selected);write(out/'diagnostics.json',{'runs':diagnostics,'gt_read':False});write(out/'candidate_table.json',{'C00':{'reference_only':True},'C01':diagnostics['full']})
+        np.savez_compressed(out/'predictions.npz',frames=frames,reference_E4=reference,C01_full=ends['full'],**historical,**{f'C01_{k}':v for k,v in ends.items() if k!='full' and diagnostics[k]['valid']})
+        write(out/'fit_complete.json',dict(status='INCOMPLETE_DIAGNOSTICS',selected=selected,gt_read=False));return
     selected=choose(diagnostics['full']['valid']);full=ends['full'];c00,c00arr=stats(sub(n,fi),y[:,fi],w[:,fi],reference);ref_photo=ols_score(sub(n,vi),y[:,vi],w[:,vi],reference)
     for k in ['rho','b']:diagnostics['full']['coefficients'][k+'_inflation']=bool(diagnostics['full']['coefficients'][k]['p99']>10*max(c00[k]['p99'],1e-8))
     differences={f'{k}_vs_full':diff(ends[k],full) for k in ['A','B','boot103108','boot103109','hi','lo','repeat_full']};differences['A_vs_B']=diff(ends['A'],ends['B']);differences['hi_vs_lo']=diff(ends['hi'],ends['lo']);repeat=differences['repeat_full_vs_full']['max_deg'];selected['repeat_status']='DETERMINISTIC' if repeat<=1e-4 else 'NONDETERMINISTIC'
