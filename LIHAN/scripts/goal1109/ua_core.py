@@ -580,3 +580,33 @@ def repeat_status(full_dir, repeat_dir):
     if repeat_dir is None or full_dir is None:
         return 'UNAVAILABLE'
     return 'DETERMINISTIC' if float(chord_deg(full_dir, repeat_dir).max()) <= 1e-4 else 'NONDETERMINISTIC'
+
+
+# ------------------------------------------------------------------ 正则审计（S9 同款合成断言，运行时写入 regularization_audit.json）
+def regularization_audit_probe():
+    """在合成小问题上断言：total == data + 0.1*rev（torch.equal），总梯度逐位等于 data+0.1*rev 的梯度（即 L_coef/a1/a2/e1/e2 的梯度贡献严格为 0），
+    参数清单 == {phi, nu}，预条件为单位阵（fit_traj_ua 中 Pphi=Pnu=I）。"""
+    import inspect
+    rng = np.random.default_rng(SEED)
+    T, G = 150, 9
+    n = unit(rng.normal(size=(G, 3)))
+    y = rng.random((T, G, 3))
+    w = rng.random((T, G))
+    ctx = make_ctx(n, y, w, 'cpu')
+    phi = torch.tensor(np.linspace(0, 7, T) + rng.normal(0, .03, T), dtype=torch.float64, requires_grad=True)
+    nu = torch.tensor(rng.normal(size=T), dtype=torch.float64, requires_grad=True)
+    res = {}
+    for arm in ('A0', 'A1'):
+        total, data, pen, e, amb, rho = objective_ua(phi, nu, ctx, arm, 1.0)
+        ref = data + LAM_REV * pen['rev']
+        assert torch.equal(total, ref), arm
+        g1 = torch.autograd.grad(total, (phi, nu), retain_graph=True)
+        g2 = torch.autograd.grad(ref, (phi, nu), retain_graph=True)
+        assert all(torch.equal(u, v) for u, v in zip(g1, g2)), arm
+        res[arm] = dict(total_equals_data_plus_0p1_rev=True, grad_equals_reference=True, raw_penalties={k: float(v.detach()) for k, v in pen.items()})
+    src = inspect.getsource(objective_ua)
+    for token in ("'a1'", "'a2'", "'e1'", "'e2'", 'square().mean()', 'kkt', 'sh9', 'env_terms', 'get_features', 'eval_sh'):
+        assert token not in src, token
+    res['parameters'] = dict(phi=[T], nu=[T])
+    res['preconditioner'] = 'identity (Pphi=Pnu=I)'
+    return res
