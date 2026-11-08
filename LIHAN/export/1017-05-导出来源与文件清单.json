@@ -1,0 +1,51 @@
+{
+  "服务器": "ushas",
+  "环境": "lumimotion-ushas",
+  "说明": "只读实验的演示配图，无训练、无GT资产读取",
+  "真实示例": {
+    "frame": "frame_0075",
+    "index": 67,
+    "samples": 1404,
+    "positive": 49,
+    "negative": 1355,
+    "均衡错误率": {
+      "RGB基线": 0.515257172979893,
+      "阴影估光": 0.1314330898411025
+    }
+  },
+  "输入文件": [
+    {
+      "路径": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1015-06-LH-static-DL-T02表面轨迹初始化/cache/tracks.pt",
+      "SHA256": "dd9a4d8078575fb333a76e7bbcceabe18129fff83cdf715e569f76123dbab342"
+    },
+    {
+      "路径": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1015-14-LH-static-DL-T05复核/seed_1015/checkpoint.pt",
+      "SHA256": "b2523a7454cf21bfb6288657dadf3cb5aac472699d854145d193ffcf4cda3833"
+    },
+    {
+      "路径": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1011-01-LH-static-jumpingjacks_DL_V2-原生LumiMotion两阶段/data_view/images/frame_0075.png",
+      "SHA256": "b04a25601dbe6cdad55010042acce812825833c838f60e99e22575a0ca8cee84"
+    },
+    {
+      "路径": "/tmp/lumimotion-ppt-1017/NotoSansCJKsc-Regular.otf",
+      "SHA256": "2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b"
+    }
+  ],
+  "输出文件": [
+    "LIHAN/export/1017-01-阴影反推方向光原理.png",
+    "LIHAN/export/1017-01-阴影反推方向光原理.svg",
+    "LIHAN/export/1017-01-阴影反推方向光原理.pdf",
+    "LIHAN/export/1017-02-阴影估光方法流程.png",
+    "LIHAN/export/1017-02-阴影估光方法流程.svg",
+    "LIHAN/export/1017-02-阴影估光方法流程.pdf",
+    "LIHAN/export/1017-03-真实观测与阴影投影对比.png",
+    "LIHAN/export/1017-03-真实观测与阴影投影对比.svg",
+    "LIHAN/export/1017-03-真实观测与阴影投影对比.pdf",
+    "LIHAN/export/1017-04-阴影反推方向光演示合集.pdf"
+  ],
+  "PNG尺寸": [
+    3840,
+    2160
+  ],
+  "PDF页数": 3
+}
