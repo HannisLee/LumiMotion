@@ -1,0 +1,41 @@
+{
+  "状态": "PASS",
+  "视角": 6,
+  "分辨率": [
+    800,
+    800
+  ],
+  "人物姿态来源帧": 100,
+  "有效法线像素": 146150,
+  "法线单位长度误差中位数": 0.0,
+  "粗糙度有效像素": 148500,
+  "粗糙度范围": [
+    0.352234423160553,
+    0.9500002861022949
+  ],
+  "粗糙度RGB通道最大差": 0.0,
+  "来源文件": [
+    {
+      "路径": "/home/han.li/reproduce/LumiMotion-stage2-perlight/data/LH-data/static/LH-static-jumpingjacks_EL_V2/image/image_0006.png",
+      "SHA256": "96b7ded4a6c3b10f902fa7e8bb59ee8a3359930abd0e874b4648612f8bb2faf4",
+      "输出": "rgb_0006.png"
+    },
+    {
+      "路径": "/home/han.li/reproduce/LumiMotion-stage2-perlight/data/LH-data/static/LH-static-jumpingjacks_EL_V2/albedo/albedo_0006.png",
+      "SHA256": "c0237fad0e80cd9c0894ac320bd251923de1ec9e0269ac9928e3cc64cae7b68b",
+      "输出": "albedo_0006.png"
+    },
+    {
+      "路径": "/home/han.li/reproduce/LumiMotion-stage2-perlight/data/LH-data/static/LH-static-jumpingjacks_EL_V2/normal_exr/normal_0006.exr",
+      "SHA256": "76bfe6b9d18422c3ae7a540be3c6882ba73b695f5ed6f56fc3dd043ec58d62f6",
+      "输出": "normal_world_0006.exr"
+    },
+    {
+      "路径": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1018-01-LH-static-jumpingjacks_EL_V2-正面真实材质导出/roughness/roughness_0006.exr",
+      "SHA256": "f4041db39eef670ed7caa97a328b4d98549b3c7d51163e5747f803da5d7750e2",
+      "输出": "roughness_0006.exr"
+    }
+  ],
+  "场景SHA256": "2828576869196f31d163bd1b4e6c4bfc610caf4f200a9cf69efc60786ef84645",
+  "说明": "RGB、Albedo、世界法线直接复用数据集真实导出；Roughness从同场景真实Principled输入补渲染。透明层为透射率与Alpha加权有效粗糙度。"
+}
