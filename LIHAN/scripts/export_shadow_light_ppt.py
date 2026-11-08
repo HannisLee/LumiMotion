@@ -271,7 +271,7 @@ def evidence(data, state, image_path):
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--font', type=Path, required=True, help='中文字体，例如 NotoSansCJKsc-Regular.otf')
-    p.add_argument('--output', type=Path, default=ROOT/'LIHAN/export')
+    p.add_argument('--output', type=Path, default=ROOT/'LIHAN/exports')
     args = p.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     fm.fontManager.addfont(str(args.font))
@@ -286,13 +286,20 @@ def main():
     figs = [principle(), methods()]
     third, sample = evidence(data, state, original)
     figs.append(third)
-    names = ['1017-01-阴影反推方向光原理', '1017-02-阴影估光方法流程', '1017-03-真实观测与阴影投影对比']
+    names = [
+        ('1017-01-方向光原理图', '1017-01-阴影反推方向光原理'),
+        ('1017-02-估光流程图', '1017-02-阴影估光方法流程'),
+        ('1017-03-观测投影对比图', '1017-03-真实观测与阴影投影对比'),
+    ]
     files = []
-    pdf = args.output/'1017-04-阴影反推方向光演示合集.pdf'
+    pdf = args.output/'1017-04-演示合集'/'1017-04-阴影反推方向光演示合集.pdf'
+    pdf.parent.mkdir(parents=True, exist_ok=True)
     with PdfPages(pdf) as pages:
-        for fig, name in zip(figs, names):
+        for fig, (folder, name) in zip(figs, names):
+            figure_dir = args.output/folder
+            figure_dir.mkdir(parents=True, exist_ok=True)
             for ext in ['png', 'svg', 'pdf']:
-                path = args.output/f'{name}.{ext}'
+                path = figure_dir/f'{name}.{ext}'
                 fig.savefig(path, dpi=240, facecolor='white')
                 files.append(str(path.relative_to(ROOT)))
             pages.savefig(fig)
@@ -302,7 +309,9 @@ def main():
                     真实示例=sample, 输入文件=[dict(路径=str(x), SHA256=hashlib.sha256(x.read_bytes()).hexdigest())
                                              for x in [cache, ckpt, original, args.font]],
                     输出文件=files, PNG尺寸=[3840, 2160], PDF页数=3)
-    (args.output/'1017-05-导出来源与文件清单.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2)+'\n')
+    manifest_path = args.output/'1017-05-来源清单'/'1017-05-导出来源与文件清单.json'
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2)+'\n')
     print(json.dumps(manifest, ensure_ascii=False, indent=2))
 
 
