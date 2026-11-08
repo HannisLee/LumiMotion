@@ -445,15 +445,16 @@ def dir_from_ea(phi, e):
 
 def profile_zmode(ctx, l, eps, e4_lum, e4_w, e4_l, deltas=(-4, -3, -2, -1, -.5, 0, .5, 1, 2, 3, 4), als_iter=300):
     """K4：沿整体仰角平移 Δ(度，φ不变、不受带宽限制)的 data 轮廓；(a)ALS重解rho,eps (b)eps固定只重解rho (c)E4 kkt。"""
-    nt, Yb, yt, ww = ctx['nt'], ctx['Yb'], ctx['yt'], ctx['ww']; eps = torch.as_tensor(eps, dtype=torch.float64)
+    dev = 'cuda' if torch.cuda.is_available() else 'cpu'   # 仅为速度；float64 数值与CPU一致到舍入
+    nt, Yb, yt, ww = (ctx[k].to(dev) for k in ('nt', 'Yb', 'yt', 'ww')); eps = torch.as_tensor(eps, dtype=torch.float64, device=dev)
     phi, e = dir_angles(l); out = {'delta_deg': list(deltas), 'a_R6_als': [], 'b_R6_eps_fixed': [], 'c_E4_kkt': []}
-    yl = torch.as_tensor(np.nan_to_num(e4_lum), dtype=torch.float64); wl = torch.as_tensor(np.where(np.isfinite(e4_lum), e4_w, 0), dtype=torch.float64)
+    yl = torch.as_tensor(np.nan_to_num(e4_lum), dtype=torch.float64, device=dev); wl = torch.as_tensor(np.where(np.isfinite(e4_lum), e4_w, 0), dtype=torch.float64, device=dev)
     ph4, e4e = dir_angles(e4_l)
     for d in deltas:
-        dr = np.deg2rad(d); lt = torch.as_tensor(dir_from_ea(phi, e + dr))
+        dr = np.deg2rad(d); lt = torch.as_tensor(dir_from_ea(phi, e + dr), device=dev)
         ea, _ = als_init(Yb, nt, yt, ww, lt, max_iter=als_iter, eps0=eps); out['a_R6_als'].append(float(env_terms(lt, ea, Yb, nt, yt, ww)[0]))
         out['b_R6_eps_fixed'].append(float(env_terms(lt, eps, Yb, nt, yt, ww)[0]))
-        l4 = torch.as_tensor(dir_from_ea(ph4, e4e + dr)); x4 = torch.relu(torch.einsum('tgc,tc->tg', nt, l4)); r4, b4 = kkt(x4, yl, wl)
+        l4 = torch.as_tensor(dir_from_ea(ph4, e4e + dr), device=dev); x4 = torch.relu(torch.einsum('tgc,tc->tg', nt, l4)); r4, b4 = kkt(x4, yl, wl)
         out['c_E4_kkt'].append(float((wl * .5 * (r4[None] * x4 + b4[None] - yl).square()).sum() / wl.sum()))
     curv = {}
     for k in ['a_R6_als', 'b_R6_eps_fixed', 'c_E4_kkt']:
@@ -493,6 +494,11 @@ def channel_residuals(ctx, l, eps, e4_lum, e4_w, e4_l):
     xl = torch.relu(torch.einsum('tgc,tc->tg', nt, torch.as_tensor(e4_l, dtype=torch.float64))); rl, bl = kkt(xl, yl, wl)
     re = (rl[None] * xl + bl[None] - yl).numpy(); out['e4_luminance_rms_at_frozen_direction'] = float(np.sqrt((wl.numpy() * re ** 2).sum() / wl.numpy().sum()))
     out['rms_ratio_max_over_min'] = float(max(rms_all) / min(rms_all)); out['flag_F4'] = bool(out['rms_ratio_max_over_min'] > 2); out['gt_read'] = False; return out
+
+
+def chord_angle_deg(a, b):
+    """数值精确的小角度：2*asin(|a-b|/2)。arccos(点积) 在单位向量上有约1.2e-6度的浮点下限，不能用于1e-6度量级的回归判定。"""
+    return np.degrees(2 * np.arcsin(np.clip(np.linalg.norm(np.asarray(a) - np.asarray(b), axis=-1) / 2, 0, 1)))
 
 
 def elev_deg_(l): return np.rad2deg(np.arcsin(np.clip(l[:, 2], -1, 1)))
@@ -776,8 +782,8 @@ def main():
     e4dir_frozen = np.load(e4 / 'fitting/runs/a1e+00_e1e+01_full/direction.npy'); e4pred = np.load(e4 / 'fitting/predictions.npz')['E4']
     assert np.array_equal(e4dir_frozen, e4pred) or float(ang_deg(e4dir_frozen, e4pred).max()) < 1e-9
     t0 = time.time(); reg, reginfo = r5b.fit_traj(sub(n, fi), y[:, fi], w[:, fi], results['E3'], a_from_z(results['E3'][:, 2].mean()), 1., 10., out, 'E4regress_full')
-    dd = float(ang_deg(reg, e4dir_frozen).max())
-    write(out / 'e4_regression.json', dict(max_angle_diff_deg=dd, tolerance_deg=1e-6, ok=bool(dd <= 1e-6), seconds=time.time() - t0, certificate=reginfo['certificate'], device='cuda' if torch.cuda.is_available() else 'cpu', gt_read=False))
+    dd = float(chord_angle_deg(reg, e4dir_frozen).max()); dd_arccos = float(ang_deg(reg, e4dir_frozen).max()); dd_abs = float(abs(reg - e4dir_frozen).max())
+    write(out / 'e4_regression.json', dict(max_angle_diff_deg=dd, max_angle_diff_deg_arccos_form=dd_arccos, arccos_form_floor_note='arccos(点积)对相同单位向量也可给出~1.2e-6度，故判定改用弦长角；见实现记录D12说明', max_abs_component_diff=dd_abs, tolerance_deg=1e-6, ok=bool(dd <= 1e-6), seconds=time.time() - t0, certificate=reginfo['certificate'], device='cuda' if torch.cuda.is_available() else 'cpu', gt_read=False))
     print('E4_REGRESSION_MAX_DEG', dd, flush=True)
     if dd > 1e-6: raise RuntimeError(f'E4回归超差：{dd}°>1e-6°（规划D12：停止并上报）')
     if a.e4_regress_only: print('R6_E4_REGRESS_ONLY_OK', flush=True); return
