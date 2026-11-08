@@ -48,7 +48,7 @@ def fit_traj(n,y,w,init,a0,out,label,steps=STEPS,outer=OUTER,outer_ext=OUTER_EXT
     hist=[];losses=[]; all_trace=[]
     def checkpoint(stage,step):
         np.savez_compressed(dest/'checkpoint_latest.npz',phi=phi.detach().cpu().numpy(),a=a.detach().cpu().numpy(),stage=stage,step=step)
-        write(dest/'history_partial.json',dict(adam=hist,optimization=all_trace))
+        write(dest/'history_partial.json',dict(adam=hist,adam_losses=losses,optimization=all_trace))
     # ---- T-A Adam ----
     opt=torch.optim.Adam([dict(params=[phi],lr=LR_PHI),dict(params=[a],lr=LR_A)])
     for step in range(1,steps+1):
@@ -86,7 +86,9 @@ def fit_traj(n,y,w,init,a0,out,label,steps=STEPS,outer=OUTER,outer_ext=OUTER_EXT
     def probe():
         base=direction();st=state();lb0=float(objective()[0].detach());o=torch.optim.Adam([dict(params=[phi],lr=1e-4),dict(params=[a],lr=1e-3)])
         for _ in range(500):
-            o.zero_grad();l=objective()[0];l.backward();o.step()
+            o.zero_grad();l=objective()[0]
+            if not torch.isfinite(l):restore(st);raise FloatingPointError('非有限loss(probe)')
+            l.backward();o.step()
         d1=direction();l1=float(objective()[0].detach());disp=float(ang_deg(base,d1).max());drop=(lb0-l1)/max(abs(lb0),1e-300);restore(st);return disp,drop
     cert=dict(path='lbfgs');fallback=False
     try:
@@ -120,16 +122,17 @@ def fit_traj(n,y,w,init,a0,out,label,steps=STEPS,outer=OUTER,outer_ext=OUTER_EXT
         fallback=True;restore((torch.as_tensor(phi0,dtype=torch.float64,device=device),torch.as_tensor(np.broadcast_to(a0,(len(init),)).copy(),dtype=torch.float64,device=device)))
         o=torch.optim.Adam([dict(params=[phi],lr=LR_PHI),dict(params=[a],lr=LR_A)]);N=6000+steps;sched=torch.optim.lr_scheduler.CosineAnnealingLR(o,N,eta_min=0)
         fl=[]
-        for _ in range(N):
+        for fallback_step in range(N):
             o.zero_grad();l=objective()[0]
             if not torch.isfinite(l):raise FloatingPointError('非有限loss(Adam fallback)')
-            l.backward();o.step();sched.step();fl.append(float(l.detach()))
+            l.backward();o.step();sched.step();fl.append(float(l.detach()));all_trace.append(dict(stage='fallback',step=fallback_step+1,loss=fl[-1]))
+            if fallback_step%500==0:checkpoint('fallback',fallback_step+1);write(out/'progress.json',dict(pid=os.getpid(),run=label,stage='fallback',step=fallback_step+1,loss=fl[-1],updated_utc=time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime())))
         d_last=direction();rel=abs(fl[-501]-fl[-1])/max(abs(fl[-501]),1e-300);disp,drop=probe()
         cert=dict(path='adam_fallback',reason=str(exc),C1_rel=rel,C3_disp_deg=disp,C3_drop=drop,converged=bool(rel<1e-7 and disp<.1 and drop<1e-4));final_losses=fl
     with torch.no_grad():
         loss,data,p,e=objective();end=direction(); xt=torch.relu(torch.einsum('tgc,tc->tg',nt,torch.as_tensor(end,device=device)) if nt.ndim==3 else torch.as_tensor(end,device=device)@nt.T); rho,b=kkt(xt,yt,ww); pp={k:float(v) for k,v in p.items()};eld=np.rad2deg(e.cpu().numpy())
     info=dict(penalties=pp,orbit_sign=s,final_loss=float(loss),certificate=cert,converged=cert['converged'],elev_deg=eld.tolist())
-    np.save(dest/'direction.npy',end); np.savez_compressed(dest/'parameters.npz',phi=phi.detach().cpu().numpy(),a=a.detach().cpu().numpy(),rho=rho.detach().cpu().numpy(),b=b.detach().cpu().numpy()); write(dest/'history.json',dict(adam=hist,optimization=all_trace,final_losses=final_losses));write(dest/'certificate.json',cert)
+    np.save(dest/'direction.npy',end); np.savez_compressed(dest/'parameters.npz',phi=phi.detach().cpu().numpy(),a=a.detach().cpu().numpy(),rho=rho.detach().cpu().numpy(),b=b.detach().cpu().numpy()); write(dest/'history.json',dict(adam=hist,adam_losses=losses,optimization=all_trace,final_losses=final_losses));write(dest/'certificate.json',cert)
     write(dest/'config.json',dict(lam_a=0.,lam_e=0.,lam_rev=LAM_REV,adam_steps=steps,lr_phi=LR_PHI,lr_a=LR_A,drops=list(DROPS),e_center_deg=45.,e_halfwidth_deg=5.,device=device,dtype='float64',support_count=y.shape[1],final_loss=float(loss),certificate=cert,penalties=pp))
     print(json.dumps(dict(run=label,stage='DONE',final_loss=float(loss),certificate=cert)),flush=True)
     return end,info
@@ -209,6 +212,12 @@ def self_test(out):
     assert abs(float(elev(torch.tensor(0.,dtype=torch.float64)))-E_C)<1e-15 and float(elev(torch.tensor(-1000.)))>=np.deg2rad(40)-1e-7 and float(elev(torch.tensor(1000.)))<=np.deg2rad(50)+1e-7
     init=np.column_stack((np.cos(np.linspace(0,7,T))*np.cos(E_C),np.sin(np.linspace(0,7,T))*np.cos(E_C),np.full(T,np.sin(E_C))));assert orbit_sign(init)==1 and abs(a_from_z(init[:,2].mean()))<1e-12;assert choose(False)['selected'] is None and choose(True)['selected']=='C01/full';assert diff(init,init)['max_deg']<=1e-4
     assert diff(init,np.column_stack((-init[:,:2],init[:,2])))['large_disagreement'];assert not (np.isfinite(float('nan')) and float('nan')<1e-9)
+    # 重复性阈值两侧；三维旋转绕 z 轴，单位向量保持不变。
+    def rotated(degrees):
+        angle=np.deg2rad(degrees)/np.cos(E_C);c=np.cos(angle);ss=np.sin(angle);return np.column_stack((c*init[:,0]-ss*init[:,1],ss*init[:,0]+c*init[:,1],init[:,2]))
+    assert diff(init,rotated(.00009))['max_deg']<=1e-4 and diff(init,rotated(.00011))['max_deg']>1e-4
+    assert 0./max(abs(0.),1e-300)==0. and np.isfinite(0./max(abs(0.),1e-300))
+    xx=torch.tensor([[0.,0.,0.],[.5,.5,.5],[1.,1.,1.]],dtype=torch.float64); yy2=torch.tensor([[.4,-.5,.2],[.3,.5,.45],[.2,1.5,.7]],dtype=torch.float64); rr3,bb3=kkt(xx,yy2,torch.ones_like(xx));assert rr3[0]==0 and bb3[0]>0 and rr3[1]>0 and bb3[1]==0 and rr3[2]>0 and bb3[2]>0
     write(out/'numeric_tests.json',{'status':'PASS','gt_read':False,'objective_and_gradients':'PASS','kkt_identical_degenerate_zero_weight':'PASS','band_orbit_init':'PASS','invalid_no_fallback':'PASS','high_disagreement':'PASS','repeat_boundary':'PASS','unconverged_not_selection_gate':'PASS'});write(out/'regularization_audit.json',audit())
 
 def main():
@@ -256,39 +265,66 @@ def main():
             diagnostics[key]={'valid':False,'converged':False,'status':'INVALID_DIRECTION'};write(out/'diagnostics_partial.json',diagnostics);continue
         st,arr=stats(sub(n,idx),y[:,idx],w[:,idx],end);valid=direction_valid(end,arr[3],arr[4]);diagnostics[key]={'valid':valid,'converged':bool(info['converged']),'status':'CONVERGED' if info['converged'] else 'NOT_CONVERGED','coefficients':st,'band':band(end),'body_heldout_clipped_mae':ols_score(sub(n,vi),y[:,vi],w[:,vi],end),'body_heldout_unclipped':heldout_raw(sub(n,vi),y[:,vi],w[:,vi],end)};arrays[key]=arr
         write(out/'diagnostics_partial.json',diagnostics)
-    if not diagnostics['full']['valid']:
-        selected=choose(False);write(out/'selection.json',selected);write(out/'diagnostics.json',{'runs':diagnostics,'gt_read':False});write(out/'candidate_table.json',{'C00':{'reference_only':True},'C01':diagnostics['full']})
-        np.savez_compressed(out/'predictions.npz',frames=frames,reference_E4=reference,**historical,**{f'C01_{k}':v for k,v in ends.items() if k!='full' and diagnostics[k]['valid']})
-        write(out/'fit_complete.json',dict(status='NO_VALID_NOREG_PREDICTION',selected=selected,gt_read=False));return
+    full_valid=diagnostics['full']['valid']; selected=choose(full_valid)
     invalid_aux=[key for key in diagnostics if key!='full' and not diagnostics[key]['valid']]
-    if invalid_aux:
-        # 不用其他流程代替无效诊断；保留有效 full 和所有已完成证据。
-        selected=choose(True);selected['diagnostic_incomplete']=invalid_aux;write(out/'selection.json',selected);write(out/'diagnostics.json',{'runs':diagnostics,'gt_read':False});write(out/'candidate_table.json',{'C00':{'reference_only':True},'C01':diagnostics['full']})
-        np.savez_compressed(out/'predictions.npz',frames=frames,reference_E4=reference,C01_full=ends['full'],**historical,**{f'C01_{k}':v for k,v in ends.items() if k!='full' and diagnostics[k]['valid']})
-        write(out/'fit_complete.json',dict(status='INCOMPLETE_DIAGNOSTICS',selected=selected,gt_read=False));return
-    selected=choose(diagnostics['full']['valid']);full=ends['full'];c00,c00arr=stats(sub(n,fi),y[:,fi],w[:,fi],reference);ref_photo=ols_score(sub(n,vi),y[:,vi],w[:,vi],reference)
-    for k in ['rho','b']:diagnostics['full']['coefficients'][k+'_inflation']=bool(diagnostics['full']['coefficients'][k]['p99']>10*max(c00[k]['p99'],1e-8))
-    differences={f'{k}_vs_full':diff(ends[k],full) for k in ['A','B','boot103108','boot103109','hi','lo','repeat_full']};differences['A_vs_B']=diff(ends['A'],ends['B']);differences['hi_vs_lo']=diff(ends['hi'],ends['lo']);repeat=differences['repeat_full_vs_full']['max_deg'];selected['repeat_status']='DETERMINISTIC' if repeat<=1e-4 else 'NONDETERMINISTIC'
-    ambiguity={};full_fit=diagnostics['full']['coefficients']['rmse']
-    for k in ['hi','lo']:
-        st,arr=stats(sub(n,fi),y[:,fi],w[:,fi],ends[k]);rd=abs(st['rmse']-full_fit)/max((st['rmse']+full_fit)/2,1e-12);ambiguity[k]={'photometric_ambiguity':bool(differences[k+'_vs_full']['mean_deg']>5 and rd<=.01),'relative_rmse_difference':rd,'rho_abs_diff':qstats(abs(arr[3]-arrays['full'][3])),'b_abs_diff':qstats(abs(arr[4]-arrays['full'][4]))}
-    diagnostics['full']['photo_degraded']=bool(diagnostics['full']['body_heldout_clipped_mae']>1.05*ref_photo)
+    selected['diagnostic_incomplete']=invalid_aux
+    valid_ends={k:v for k,v in ends.items() if diagnostics[k]['valid']}; full=valid_ends.get('full')
+    c00,c00arr=stats(sub(n,fi),y[:,fi],w[:,fi],reference);ref_photo=ols_score(sub(n,vi),y[:,vi],w[:,vi],reference)
+    differences={};ambiguity={}
+    if full_valid:
+        for k in ['rho','b']:
+            diagnostics['full']['coefficients'][k+'_inflation']=bool(diagnostics['full']['coefficients'][k]['p99']>10*max(c00[k]['p99'],1e-8))
+        for k in ['A','B','boot103108','boot103109','hi','lo','repeat_full']:
+            if k in valid_ends:differences[f'{k}_vs_full']=diff(valid_ends[k],full)
+        diagnostics['full']['photo_degraded']=bool(diagnostics['full']['body_heldout_clipped_mae']>1.05*ref_photo)
+        if 'repeat_full' in valid_ends:selected['repeat_status']='DETERMINISTIC' if differences['repeat_full_vs_full']['max_deg']<=1e-4 else 'NONDETERMINISTIC'
+        else:selected['repeat_status']='UNAVAILABLE'
+        full_fit=diagnostics['full']['coefficients']['rmse']
+        for k in ['hi','lo']:
+            if k not in valid_ends:continue
+            st,arr=stats(sub(n,fi),y[:,fi],w[:,fi],valid_ends[k]);rd=abs(st['rmse']-full_fit)/max((st['rmse']+full_fit)/2,1e-12)
+            ambiguity[k]={'photometric_ambiguity':bool(differences[k+'_vs_full']['mean_deg']>5 and rd<=.01),'relative_rmse_difference':rd,'rho_abs_diff':qstats(abs(arr[3]-arrays['full'][3])),'b_abs_diff':qstats(abs(arr[4]-arrays['full'][4]))}
+    else:selected['repeat_status']='UNAVAILABLE'
+    for a,b in [('A','B'),('hi','lo')]:
+        if a in valid_ends and b in valid_ends:differences[f'{a}_vs_{b}']=diff(valid_ends[a],valid_ends[b])
     write(out/'selection.json',selected);write(out/'diagnostics.json',dict(runs=diagnostics,differences=differences,ambiguity=ambiguity,reference_coefficients=c00,reference_body_heldout_clipped_mae=ref_photo,gt_read=False));write(out/'candidate_table.json',{'C00':{'reference_only':True,'body_heldout_clipped_mae':ref_photo},'C01':diagnostics['full']})
-    np.savez_compressed(out/'predictions.npz',frames=frames,reference_E4=reference,**historical,**({'C01_full':full} if selected['selected'] else {}),**{f'C01_{k}':v for k,v in ends.items() if k!='full'})
-    x,ww,yy,r,b,ratio,res=arrays['full'];np.savez_compressed(out/'photometric_diagnostics.npz',residual=res,rho=r,b=b,gram_ratio=ratio,body_fit=fi)
-    fig,ax=plt.subplots(1,2,figsize=(12,4));ax[0].plot(np.sum(ww>0,axis=1));ax[0].set_title('Support count per frame');ax[1].imshow(np.where(ww>0,res,np.nan).T,aspect='auto',vmin=-.2,vmax=.2,cmap='coolwarm');ax[1].set_title('Photometric residual');fig.tight_layout();fig.savefig(out/'01_support_residual.png');plt.close(fig)
-    fig,ax=plt.subplots(1,2,figsize=(12,4))
-    for k,l in {'E4':reference,'C01':full,'A':ends['A'],'B':ends['B']}.items():ax[0].plot(np.rad2deg(np.unwrap(np.arctan2(l[:,1],l[:,0]))),label=k);ax[1].plot(elev_deg(l),label=k)
-    for a in ax:a.legend();a.grid(alpha=.2)
+    np.savez_compressed(out/'predictions.npz',frames=frames,reference_E4=reference,**historical,**{f'C01_{k}':v for k,v in valid_ends.items()})
+    # 无有效 full 时仅以历史参考绘图，并在图题和文件中明确标记，不作为预测。
+    x,ww,yy,r,b,ratio,res=arrays['full'] if full_valid else c00arr;shown='C01/full' if full_valid else 'C00 reference only'
+    np.savez_compressed(out/'photometric_diagnostics.npz',residual=res,rho=r,b=b,gram_ratio=ratio,body_fit=fi,shown=shown)
+    fig,ax=plt.subplots(1,2,figsize=(12,4));ax[0].plot(np.sum(ww>0,axis=1));ax[0].set_title('Support count per frame');ax[1].imshow(np.where(ww>0,res,np.nan).T,aspect='auto',vmin=-.2,vmax=.2,cmap='coolwarm');ax[1].set_title('Residual: '+shown);fig.tight_layout();fig.savefig(out/'01_support_residual.png');plt.close(fig)
+    fig,ax=plt.subplots(1,2,figsize=(12,4));plot_ends={'E4 reference':reference}
+    for key in ['full','A','B']:
+        if key in valid_ends:plot_ends['C01/'+key]=valid_ends[key]
+    for k,l in plot_ends.items():ax[0].plot(np.rad2deg(np.unwrap(np.arctan2(l[:,1],l[:,0]))),label=k);ax[1].plot(elev_deg(l),label=k)
+    for axis in ax:axis.legend();axis.grid(alpha=.2)
     for v in [40,50]:ax[1].axhline(v,ls=':',c='k')
     ax[0].set_title('Azimuth');ax[1].set_title('Elevation');fig.tight_layout();fig.savefig(out/'02_trajectories.png');plt.close(fig)
-    fig,ax=plt.subplots(1,3,figsize=(15,4));ax[0].hist(r,bins=50,alpha=.6,label='rho');ax[0].hist(b,bins=50,alpha=.6,label='b');ax[0].legend();ax[1].hist(np.log10(np.maximum(ratio,1e-16)),bins=50);ax[1].set_title('log10 Gram ratio');ax[2].bar(['direct','background'],[diagnostics['full']['coefficients']['energy_direct_fraction'],diagnostics['full']['coefficients']['energy_background_fraction']]);fig.tight_layout();fig.savefig(out/'03_coefficients.png');plt.close(fig)
-    fig,ax=plt.subplots(1,2,figsize=(12,4))
-    for k in ['hi','lo','boot103108','boot103109','repeat_full']:ax[0].plot(ang_deg(ends[k],full),label=k)
+    fig,ax=plt.subplots(1,3,figsize=(15,4));ax[0].hist(r,bins=50,alpha=.6,label='rho');ax[0].hist(b,bins=50,alpha=.6,label='b');ax[0].legend();ax[0].set_title(shown);ax[1].hist(np.log10(np.maximum(ratio,1e-16)),bins=50);ax[1].set_title('log10 Gram ratio');source_stats=diagnostics['full']['coefficients'] if full_valid else c00
+    energy=[source_stats['energy_direct_fraction'],source_stats['energy_background_fraction']]
+    if all(v is not None for v in energy):ax[2].bar(['direct','background'],energy)
+    else:ax[2].text(.1,.5,'Energy unavailable')
+    fig.tight_layout();fig.savefig(out/'03_coefficients.png');plt.close(fig)
+    fig,ax=plt.subplots(1,2,figsize=(12,4));any_diff=False;any_history=False
+    if full_valid:
+        for k in ['hi','lo','boot103108','boot103109','repeat_full']:
+            if k in valid_ends:ax[0].plot(ang_deg(valid_ends[k],full),label=k);any_diff=True
+    if not any_diff:ax[0].text(.1,.5,'Difference to full unavailable')
     for k in ['full','hi','lo']:
-        hist=json.loads((out/'runs'/k/'history.json').read_text());ax[1].plot(hist['final_losses'],label=k)
-    for a in ax:a.legend();a.grid(alpha=.2)
-    ax[0].set_title('Difference to full, deg');ax[1].set_title('Final optimization loss');fig.tight_layout();fig.savefig(out/'04_uncertainty_convergence.png');plt.close(fig)
-    write(out/'fit_complete.json',dict(status='AWAITING_REVIEW',selected=selected,gt_read=False))
+        histpath=out/'runs'/k/'history.json'
+        if histpath.exists():
+            hist=json.loads(histpath.read_text());ax[1].plot(hist['final_losses'],label=k);any_history=True
+        else:
+            partial=out/'runs'/k/'history_partial.json'
+            if partial.exists():
+                hist=json.loads(partial.read_text());losses=[e['loss'] for e in hist['optimization'] if np.isfinite(e['loss'])]
+                if losses:ax[1].plot(losses,label=k+' partial');any_history=True
+    if not any_history:ax[1].text(.1,.5,'Convergence history unavailable')
+    if any_diff:ax[0].legend()
+    if any_history:ax[1].legend()
+    for axis in ax:axis.grid(alpha=.2)
+    ax[0].set_title('Difference to full, deg');ax[1].set_title('Optimization loss');fig.tight_layout();fig.savefig(out/'04_uncertainty_convergence.png');plt.close(fig)
+    status='NO_VALID_NOREG_PREDICTION' if not full_valid else ('INCOMPLETE_DIAGNOSTICS' if invalid_aux else 'AWAITING_REVIEW')
+    write(out/'fit_complete.json',dict(status=status,selected=selected,gt_read=False))
 
 if __name__=='__main__':main()
