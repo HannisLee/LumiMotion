@@ -180,6 +180,16 @@ def stats(n,y,w,l):
     result=dict(variance=qstats(v[valid]),near_constant_fraction=float((v[valid]<=1e-6).mean()),weak_separation=bool((v[valid]<=1e-6).mean()>.2),gram_ratio=qstats(ratio[valid]),collinear_fraction=float((ratio[valid]<=1e-6).mean()),rho=qstats(r),b=qstats(b),rho_zero_fraction=float((r==0).mean()),b_zero_fraction=float((b==0).mean()),rho_b_pearson=corr,energy_direct_fraction=direct/tot if tot else None,energy_background_fraction=background/tot if tot else None,branches=branches,mae=mae,rmse=rmse)
     return result,(x,ww,yy,r,b,ratio,res)
 
+def heldout_raw(n,y,w,l):
+    x=np.maximum(r3.shade(n,l),0); yy=np.nan_to_num(y); valid=np.isfinite(y)&(w>0)
+    cal=valid&(np.arange(len(y))[:,None]%2==0); test=valid&~cal; ww=np.where(cal,w,0)
+    ss=ww.sum(0); mx=(ww*x).sum(0)/np.maximum(ss,1e-12); my=(ww*yy).sum(0)/np.maximum(ss,1e-12)
+    sxx=(ww*(x-mx)**2).sum(0); sxy=(ww*(x-mx)*(yy-my)).sum(0)
+    rho=np.divide(sxy,sxx,out=np.zeros_like(sxy),where=sxx>1e-12); b=my-rho*mx
+    residual=x*rho+b-yy; weights=np.where(test&(cal.sum(0)[None]>=3)&(sxx[None]>1e-12),w,0); total=weights.sum()
+    assert total>0
+    return dict(mae=float((weights*abs(residual)).sum()/total),rmse=float(np.sqrt((weights*residual**2).sum()/total)))
+
 def band(l):
     e=elev_deg(l);mask=abs(e-45)>=4.75;longest=run=0
     for value in mask:run=run+1 if value else 0;longest=max(longest,run)
@@ -226,14 +236,14 @@ def main():
         pick=np.random.default_rng(seed).choice(fi,len(fi),replace=True);assert np.array_equal(pick,np.load(BASE/f'bootstrap_{seed}_sample.npy'));supports[f'boot{seed}']=pick;np.save(out/f'bootstrap_{seed}_sample.npy',pick)
     mapping={'full':'E3','A':'stage1_A','B':'stage1_B','boot103108':'stage1_boot103108','boot103109':'stage1_boot103109'};initial={}
     for key,dirname in mapping.items():
-        l=np.load(BASE/'runs'/dirname/'direction.npy');conf=json.loads((BASE/'runs'/dirname/'config.json').read_text());assert l.shape==(150,3) and np.isfinite(l).all() and np.max(abs(np.linalg.norm(l,axis=1)-1))<=1e-10 and conf['support_count']==len(supports[key]) and conf['stage2'] is False and conf['geo_smooth']==0 and conf['balanced'] is False
+        l=np.load(BASE/'runs'/dirname/'direction.npy');conf=json.loads((BASE/'runs'/dirname/'config.json').read_text());assert l.shape==(150,3) and np.isfinite(l).all() and np.max(abs(np.linalg.norm(l,axis=1)-1))<=1e-10 and conf['support_count']==len(supports[key]) and conf['stage2'] is False and conf['geo_smooth']==0 and conf['balanced'] is False and conf['steps']==250 and conf['delta']==.03 and conf['dtype']=='float64'
         initial[key]=l
     with np.load(BASE/'predictions.npz',allow_pickle=False) as old:reference=old['E4'].copy();historical={k:old[k].copy() for k in ['E1','E2','E3']}
     assert direction_valid(reference,np.ones(1),np.ones(1))
     ends={};infos={};diagnostics={};arrays={};write(out/'regularization_audit.json',audit())
     for key in ['full','A','B','boot103108','boot103109','hi','lo','repeat_full']:
         source=key if key in supports else 'full';idx=supports[source];init=initial[source];a0=np.arctanh(.9)*(1 if key=='hi' else -1) if key in ('hi','lo') else a_from_z(init[:,2].mean());end,info=fit_traj(sub(n,idx),y[:,idx],w[:,idx],init,a0,out,key);ends[key]=end;infos[key]=info
-        st,arr=stats(sub(n,idx),y[:,idx],w[:,idx],end);valid=direction_valid(end,arr[3],arr[4]);diagnostics[key]={'valid':valid,'converged':bool(info['converged']),'status':'CONVERGED' if info['converged'] else 'NOT_CONVERGED','coefficients':st,'band':band(end),'body_heldout_clipped_mae':ols_score(sub(n,vi),y[:,vi],w[:,vi],end)};arrays[key]=arr
+        st,arr=stats(sub(n,idx),y[:,idx],w[:,idx],end);valid=direction_valid(end,arr[3],arr[4]);diagnostics[key]={'valid':valid,'converged':bool(info['converged']),'status':'CONVERGED' if info['converged'] else 'NOT_CONVERGED','coefficients':st,'band':band(end),'body_heldout_clipped_mae':ols_score(sub(n,vi),y[:,vi],w[:,vi],end),'body_heldout_unclipped':heldout_raw(sub(n,vi),y[:,vi],w[:,vi],end)};arrays[key]=arr
         write(out/'diagnostics_partial.json',diagnostics)
     selected=choose(diagnostics['full']['valid']);full=ends['full'];c00,c00arr=stats(sub(n,fi),y[:,fi],w[:,fi],reference);ref_photo=ols_score(sub(n,vi),y[:,vi],w[:,vi],reference)
     for k in ['rho','b']:diagnostics['full']['coefficients'][k+'_inflation']=bool(diagnostics['full']['coefficients'][k]['p99']>10*max(c00[k]['p99'],1e-8))
