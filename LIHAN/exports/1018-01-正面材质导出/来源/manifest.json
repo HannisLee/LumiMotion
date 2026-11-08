@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "parameter": "roughness_r",
+  "source_blend": "/mnt/workspace/users/han.li/lumimotion/data/LH-data/static/LH-static-jumpingjacks_EL_V2/scene_snapshot.blend",
+  "source_blend_sha256": "2828576869196f31d163bd1b4e6c4bfc610caf4f200a9cf69efc60786ef84645",
+  "transforms": "/home/han.li/reproduce/LumiMotion-stage2-perlight/output/1018-01-LH-static-jumpingjacks_EL_V2-正面真实材质导出/transforms_0006.json",
+  "transforms_sha256": "6583fbe4496bcf9a20501243ddfdbde6a6b78cabb5850ce417a45251f398051b",
+  "frames": {
+    "0006": {
+      "file": "roughness_0006.exr",
+      "sha256": "f4041db39eef670ed7caa97a328b4d98549b3c7d51163e5747f803da5d7750e2",
+      "time": 0.04,
+      "camera_to_world": [
+        [
+          0.9928134679794312,
+          -0.07150379568338394,
+          0.09596135467290878,
+          0.4291522204875946
+        ],
+        [
+          0.11967194080352783,
+          0.5932044386863708,
+          -0.7961075305938721,
+          -3.5603010654449463
+        ],
+        [
+          5.937472735695337e-10,
+          0.8018701672554016,
+          0.59749835729599,
+          3.322093963623047
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  },
+  "width": 800,
+  "height": 800,
+  "method": "Principled Roughness input -> emission -> raw float RGBA EXR",
+  "alpha_association": "premultiplied_RGB",
+  "render_engine": "CYCLES",
+  "samples": 32,
+  "use_adaptive_sampling": false,
+  "min_transparent_bounces": 8,
+  "transparent_max_bounces": 8,
+  "min_light_bounces": 12,
+  "max_bounces": 12,
+  "parameter_transport": "emission through transparency without roulette reweighting",
+  "transparent_parameter_definition": "transmittance-alpha weighted effective r",
+  "blender_version": "5.2.2 LTS"
+}
