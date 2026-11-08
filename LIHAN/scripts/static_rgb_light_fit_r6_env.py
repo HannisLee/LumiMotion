@@ -111,6 +111,15 @@ def eps_precond(Yb, ww, rho, omega):
     return h.clamp_min(1e-12).rsqrt()
 
 
+def total_objective(phi, a, eps, Yb, nt, yt, ww, lam_a, lam_e, s):
+    """规划3.6：data + 1e-5*mean(rho^2) + lam_a(a1+a2) + lam_e(e1+e2) + 0.1*rev；惩罚项直接调用 r5b.penalties。"""
+    e = elev(a); l = compose(torch.stack([torch.cos(phi), torch.sin(phi)], 1), e)
+    data, rho, _, _, _ = env_terms(l, eps, Yb, nt, yt, ww)
+    p = penalties(phi, e, s)
+    total = data + COEF_REG * rho.square().mean() + lam_a * (p['a1'] + p['a2']) + lam_e * (p['e1'] + p['e2']) + LAM_REV * p['rev']
+    return total, data, p, e, rho
+
+
 # ---------------------------------------------------------------- 优化：复刻 r5b.fit_traj，增加 epsilon
 def fit_traj_env(n, y, w, init, a0, lam_a, lam_e, out, label, eps_lr=EPS_LR, steps=STEPS, outer=OUTER, outer_ext=OUTER_EXT,
                  force_tc=False, force_fallback=False):
@@ -138,11 +147,7 @@ def fit_traj_env(n, y, w, init, a0, lam_a, lam_e, out, label, eps_lr=EPS_LR, ste
 
     def objective(phi_=None, a_=None, eps_=None):
         phi_ = phi if phi_ is None else phi_; a_ = a if a_ is None else a_; eps_ = epsp if eps_ is None else eps_
-        e = elev(a_); l = compose(torch.stack([torch.cos(phi_), torch.sin(phi_)], 1), e)
-        data, rho, _, _, _ = env_terms(l, eps_, Yb, nt, yt, ww)
-        p = penalties(phi_, e, s)
-        total = data + COEF_REG * rho.square().mean() + lam_a * (p['a1'] + p['a2']) + lam_e * (p['e1'] + p['e2']) + LAM_REV * p['rev']
-        return total, data, p, e, rho
+        return total_objective(phi_, a_, eps_, Yb, nt, yt, ww, lam_a, lam_e, s)
 
     def direction(phi_=None, a_=None):
         phi_ = phi if phi_ is None else phi_; a_ = a if a_ is None else a_
@@ -177,7 +182,7 @@ def fit_traj_env(n, y, w, init, a0, lam_a, lam_e, out, label, eps_lr=EPS_LR, ste
             for g in opt.param_groups: g['lr'] *= .3
         if step % 50 == 0 or step == 1:
             entry = dict(stage='TA', step=step, loss=losses[-1], data=float(data.detach()), **{k: float(v.detach()) for k, v in p.items()},
-                         e_min_deg=float(torch.rad2deg(e.min())), e_max_deg=float(torch.rad2deg(e.max())), eps=epsp.detach().cpu().flatten().tolist())
+                         e_min_deg=float(torch.rad2deg(e.min()).detach()), e_max_deg=float(torch.rad2deg(e.max()).detach()), eps=epsp.detach().cpu().flatten().tolist())
             hist.append(entry)
             print(json.dumps({k: v for k, v in dict(run=label, **entry).items() if k != 'eps'}), flush=True)
             write(out / 'progress.json', dict(pid=os.getpid(), run=label, **{k: v for k, v in entry.items() if k != 'eps'}, updated_utc=time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())))
@@ -396,7 +401,7 @@ def fisher_report(ctx, l, eps, rho_unused, phi, e, s, e4_lum, e4_w, e4_l, data_r
                          info_new_eliminated_prior_only_total=at_p)
     Ai = A + tau * I2
     Lc = torch.linalg.cholesky(Ai); Lcc = torch.linalg.cholesky(Cc + 1e-12 * torch.trace(Cc) / Cc.shape[0] * torch.eye(Cc.shape[0], dtype=torch.float64))
-    Z = torch.linalg.solve_triangular(Lcc, torch.linalg.solve_triangular(Lc, B.T, upper=False), upper=False)  # 白化后的 θ-ε 耦合
+    Z = torch.linalg.solve_triangular(Lcc, torch.linalg.solve_triangular(Lc, B.T, upper=False).T, upper=False)  # 白化后的 θ-ε 耦合
     sv = torch.linalg.svdvals(Z)[:5].tolist()
     return dict(modes=rep, canonical_corr_top5_theta_eps=sv, flag_F1=bool(rep['u_e0']['R_new_with_prior'] < .1), F1_value=rep['u_e0']['R_new_with_prior'],
                 active_rho=F['active_rho'], total_rho=F['total_rho'], e4_active_rho=E4['active_rho'], e4_active_b=E4['active_b'],
@@ -532,3 +537,294 @@ def stage1_chroma(ids_fit, rho, ply_path, ids_all):
     cs = (lin * rho).sum(1) / np.maximum(np.linalg.norm(lin, axis=1) * np.linalg.norm(rho, axis=1), 1e-12)
     ang = np.rad2deg(np.arccos(np.clip(cs, -1, 1))); ok = np.linalg.norm(rho, axis=1) > 1e-8
     return dict(median_angle_deg=float(np.median(ang[ok])), p90_angle_deg=float(np.percentile(ang[ok], 90)), count=int(ok.sum()), ply_vertices=int(N), gt_read=False)
+
+
+# ================================================================ 合成自检 S1–S10（合成真值不是数据集GT）
+EPS_TRUE = np.array([[.30 / .282095, .02 / .488603, .05 / .488603, .02 / .488603, .01, .01, .02, .01, .01],
+                     [.28 / .282095, -.03 / .488603, .08 / .488603, .01 / .488603, .01, -.01, .02, .01, -.01],
+                     [.35 / .282095, .01 / .488603, .12 / .488603, -.02 / .488603, -.01, .01, -.02, .01, .02]])
+
+
+def synth_scene(rng, T=150, G=600, sigma=.003):
+    """150帧变速环绕，仰角在带宽内平滑游走；1/3高斯带随时间旋转的法线；rho∈U(.3,.8)^3；正的L2环境(β_z≠0,三通道不同色)。"""
+    nn = unit(rng.normal(size=(G, 3)))
+    ang = .4 * np.sin(np.linspace(0, 2 * np.pi * 1.5, T)); rot = nn[:G // 3]
+    nt = np.broadcast_to(nn, (T, G, 3)).copy()
+    for t in range(T):   # 绕x轴转动 ang[t]
+        c, s_ = np.cos(ang[t]), np.sin(ang[t]); R = np.array([[1, 0, 0], [0, c, -s_], [0, s_, c]]); nt[t, :G // 3] = rot @ R.T
+    speed = 2.4 * (1 + .3 * np.sin(np.linspace(0, 3, T))); phi = np.deg2rad(np.cumsum(speed))
+    walk = np.cumsum(rng.normal(0, .15, T)); walk = np.convolve(walk, np.ones(9) / 9, 'same'); walk -= walk.mean(); walk = 3.9 * walk / abs(walk).max()
+    truth = dir_from_ea(phi, np.deg2rad(45 + walk)); rho = rng.uniform(.3, .8, (G, 3))
+    E = sh9(nt) @ EPS_TRUE.T; x = np.maximum(np.einsum('tgc,tc->tg', nt, truth), 0)
+    y = rho[None] * (E + x[..., None]) + rng.normal(0, sigma, (T, G, 3)); w = np.ones((T, G))
+    init = np.column_stack([unit(truth[:, :2] + rng.normal(0, .03, (T, 2))) * np.cos(r5b.E_C), np.full(T, np.sin(r5b.E_C))])
+    return nt, y, w, truth, init, rho
+
+
+def lit_scene(rng, T=40, G=30, e_deg=45., theta_max_deg=28.):
+    """所有法线始终处于受光锥内(θ<45°)、仰角为常数：用于命题2/3的退化族验证。"""
+    th = np.deg2rad(rng.uniform(0, theta_max_deg, G)); al = rng.uniform(0, 2 * np.pi, G)
+    nn = np.stack([np.sin(th) * np.cos(al), np.sin(th) * np.sin(al), np.cos(th)], 1)
+    phi = np.cumsum(rng.uniform(.05, .3, T)); l = dir_from_ea(phi, np.full(T, np.deg2rad(e_deg)))
+    rho = rng.uniform(.3, .8, (G, 3)); eps = rng.normal(0, .25, (3, 9)); eps[:, 0] += 1.
+    nt = np.broadcast_to(nn, (T, G, 3)).copy(); return nt, l, rho, eps
+
+
+def selftest(out):
+    from scipy.optimize import nnls
+    rng = np.random.default_rng(SEED); res = {}
+    # S1 SH 基正交性
+    P = fibonacci(100000); Y = sh9(P); gram = 4 * np.pi / len(P) * Y.T @ Y; res['S1_gram_max_dev'] = float(abs(gram - np.eye(9)).max()); assert res['S1_gram_max_dev'] < 1e-3, res
+    # S2 辐照度公式：随机 L2 辐亮度 -> 暴力球面积分 vs 解析 A_l
+    Q = fibonacci(1000000); YQ = sh9(Q); rel = []
+    for _ in range(3):
+        Lc = rng.normal(0, 1, 9); radiance = YQ @ Lc
+        for nrm in unit(rng.normal(size=(4, 3))):
+            brute = (radiance * np.maximum(Q @ nrm, 0)).sum() * 4 * np.pi / len(Q); ana = (A_HAT * Lc * sh9(nrm)).sum(); rel.append(abs(brute - ana) / (abs(Lc).max() * np.pi))
+    res['S2_irradiance_rel_err_max'] = float(max(rel)); assert max(rel) < 1e-3, res
+    # S3 rho 一维 NNLS 对照
+    x = rng.random((60, 40)); y = rng.random((60, 40)); w = rng.random((60, 40))
+    y[:, 0] = -.3 - .2 * x[:, 0]; y[:, 1] = 2 * x[:, 1] - .5; y[:, 2] = .2 + .5 * x[:, 2]; w[:, 4] = 0
+    rh = rho_closed(torch.tensor(x)[..., None], torch.tensor(y)[..., None], torch.tensor(w))[:, 0].numpy(); err = 0.
+    for g in range(40):
+        got = nnls((x[:, g] * np.sqrt(w[:, g]))[:, None], y[:, g] * np.sqrt(w[:, g]))[0][0]; err = max(err, abs(got - rh[g]))
+    res['S3_rho_vs_nnls_max_diff'] = float(err); assert err < 2e-5, err; assert rh[0] == 0 and rh[4] == 0, rh[:5]
+    # S4 命题3：常数仰角 + 受光锥 + L≥1 环境 -> 竖直平移退化族 L_data 不变（damp=0 以排除1e-6稳定项）
+    nt, l, rho0, eps = lit_scene(rng); T, G = nt.shape[:2]; ntt = torch.as_tensor(nt); Yb = sh9(ntt)
+    yy = torch.as_tensor(np.maximum(rho0[None] * (sh9(nt) @ EPS_TRUE.T + np.einsum('tgc,tc->tg', nt, l)[..., None]) + rng.normal(0, .02, (T, G, 3)), 1e-3)); ww = torch.ones(T, G, dtype=torch.float64)
+    base = float(env_terms(torch.as_tensor(l), torch.as_tensor(eps), Yb, ntt, yy, ww, damp=0.)[0]); diffs = []
+    sin_e = np.sin(np.deg2rad(45.))
+    for c in (.05, -.05, .1, -.1):
+        k = np.sqrt(1 + 2 * c * sin_e + c * c); l2 = (l + np.array([0, 0, c])) / k; e2 = eps / k; e2[:, 2] = (eps[:, 2] * .488603 - c) / (k * .488603)
+        diffs.append(abs(float(env_terms(torch.as_tensor(l2), torch.as_tensor(e2), Yb, ntt, yy, ww, damp=0.)[0]) - base))
+    k_ = np.sqrt(1 + .2 * sin_e + .01); ctrl = abs(float(env_terms(torch.as_tensor((l + np.array([0, 0, .1])) / k_), torch.as_tensor(eps / k_), Yb, ntt, yy, ww, damp=0.)[0]) - base)   # 阴性对照：只平移l、不修正beta_z
+    res['S4_prop3_data_diff_max'] = float(max(diffs)); res['S4_negative_control_diff'] = float(ctrl); assert max(diffs) < 1e-12 and ctrl > 1e-8, (diffs, ctrl)
+    # S5 命题2：逐帧 s_t + L≥1 -> 任意 c 的三维精确退化
+    s_t = rng.uniform(.8, 1.2, T); diffs = []; base = float(env_terms(torch.as_tensor(l), torch.as_tensor(eps), Yb, ntt, yy, ww, damp=0., s=torch.as_tensor(s_t))[0])
+    for cvec in (np.array([.05, -.03, .07]), np.array([-.1, .08, .02]), np.array([.0, .0, -.1])):
+        v = s_t[:, None] * l + cvec[None]; s2 = np.linalg.norm(v, axis=1); l2 = v / s2[:, None]; e2 = eps.copy()
+        e2[:, 1] -= cvec[1] / .488603; e2[:, 2] -= cvec[2] / .488603; e2[:, 3] -= cvec[0] / .488603     # β=(x,y,z) 对应 k=3,1,2
+        diffs.append(abs(float(env_terms(torch.as_tensor(l2), torch.as_tensor(e2), Yb, ntt, yy, ww, damp=0., s=torch.as_tensor(s2))[0]) - base))
+    ctrl5 = abs(float(env_terms(torch.as_tensor(l2), torch.as_tensor(eps), Yb, ntt, yy, ww, damp=0., s=torch.as_tensor(s2))[0]) - base)       # 阴性对照：不修正beta
+    res['S5_prop2_data_diff_max'] = float(max(diffs)); res['S5_negative_control_diff'] = float(ctrl5); assert max(diffs) < 1e-12 and ctrl5 > 1e-8, (diffs, ctrl5)
+    # S6 恢复测试(含 T-C 路径与 Adam 回退路径、确定性重复)
+    nt6, y6, w6, truth, init, rho_true = synth_scene(rng)
+    end, info = fit_traj_env(nt6, y6, w6, init, 0., 1e-2, 1e-2, out, 'synthetic'); err6 = compare(end, truth)
+    res['S6_synthetic'] = err6; res['S6_certificate'] = info['certificate']; res['S6_eps_max_abs_err'] = float(abs(info['eps'] - EPS_TRUE).max())
+    assert err6['mean_deg'] < 1., err6; assert info['converged'], info['certificate']
+    ez = np.rad2deg(np.arcsin(end[:, 2])); assert ez.min() > 40 and ez.max() < 50
+    end2, _ = fit_traj_env(nt6, y6, w6, init, 0., 1e-2, 1e-2, out, 'synthetic_repeat'); res['S6_repeat_max_abs'] = float(abs(end - end2).max()); assert np.allclose(end, end2, atol=1e-8)
+    tcend, itc = fit_traj_env(nt6, y6, w6, init, np.arctanh(.9), 1e-2, 1e-2, out, 'synthetic_tc', force_tc=True)
+    res['S6_tc_certificate'] = itc['certificate']; res['S6_tc_vs_main_deg'] = compare(tcend, end); assert itc['converged'] and itc['certificate']['path'] == 'lbfgs+TC', itc['certificate']; assert compare(tcend, end)['mean_deg'] < .1
+    fbend, ifb = fit_traj_env(nt6, y6, w6, init, 0., 1e-2, 1e-2, out, 'synthetic_fallback', force_fallback=True)
+    res['S6_fallback_certificate'] = ifb['certificate']; res['S6_fallback_vs_main_deg'] = compare(fbend, end); assert ifb['certificate']['path'] == 'adam_fallback' and ifb['converged'], ifb['certificate']; assert compare(fbend, end)['mean_deg'] < .1
+    # S7 梯度检查(内点、远离ReLU边界、rho>0)
+    nt7, l7, rho7, eps7 = lit_scene(rng, T=5, G=8, theta_max_deg=15.); n7 = torch.as_tensor(nt7); Y7 = sh9(n7); ww7 = torch.ones(5, 8, dtype=torch.float64)
+    y7 = torch.as_tensor(np.maximum(rho7[None] * (sh9(nt7) @ EPS_TRUE.T + np.einsum('tgc,tc->tg', nt7, l7)[..., None]) + rng.normal(0, .02, (5, 8, 3)), 1e-2))
+    ph0 = torch.tensor(np.arctan2(l7[:, 1], l7[:, 0]) + .01, requires_grad=True); a7 = torch.tensor(rng.normal(0, .2, 5), requires_grad=True); e7 = torch.tensor(EPS_TRUE + .01, requires_grad=True)
+    f7 = lambda p_, a_, e_: total_objective(p_, a_, e_, Y7, n7, y7, ww7, 1e-2, 1e-2, 1.)[0]
+    assert torch.autograd.gradcheck(f7, (ph0, a7, e7), eps=1e-6, atol=1e-6, rtol=1e-5); res['S7_gradcheck'] = 'PASS'
+    # S8 惩罚项与 r5b.penalties 的数值恒等
+    pt = torch.tensor(rng.normal(size=20).cumsum() * .1); a8 = torch.tensor(rng.normal(size=20)); nn8 = torch.as_tensor(unit(rng.normal(size=(20, 3, 3))))
+    tot8 = total_objective(pt, a8, torch.zeros(3, 9, dtype=torch.float64), sh9(nn8), nn8, torch.rand(20, 3, 3, dtype=torch.float64), torch.ones(20, 3, dtype=torch.float64), 1., 10., 1.)
+    et = elev(a8); p5 = tot8[2]
+    d_ = pt[1:] - pt[:-1]; de_ = et[1:] - et[:-1]
+    ref = dict(a1=(d_ - d_.mean()).square().mean(), a2=(d_[1:] - d_[:-1]).square().mean(), e1=de_.square().mean(), e2=(de_[1:] - de_[:-1]).square().mean(), rev=torch.relu(-1. * d_).square().mean())
+    res['S8_penalty_max_diff'] = float(max(abs(p5[k] - ref[k]) for k in ref)); assert res['S8_penalty_max_diff'] < 1e-15 and penalties is r5b.penalties
+    # S9 K1 Schur 补与稠密求逆对照
+    nt9, l9, rho9, eps9 = lit_scene(rng, T=6, G=10, theta_max_deg=70.); nt9 = unit(rng.normal(size=(6, 10, 3))); y9 = np.maximum(rho9[None] * (sh9(nt9) @ EPS_TRUE.T + np.maximum(np.einsum('tgc,tc->tg', nt9, l9), 0)[..., None]) + rng.normal(0, .02, (6, 10, 3)), 1e-3)
+    ctx9 = make_ctx(nt9, y9, np.ones((6, 10))); F9 = fisher_env(ctx9, l9, eps9); ref9 = dense_fisher(ctx9, l9, eps9)
+    res['S9_schur_rel_diff'] = max(float((F9[k] - ref9[k]).abs().max() / ref9[k].abs().max()) for k in 'ABC'); assert res['S9_schur_rel_diff'] < 1e-8, res['S9_schur_rel_diff']
+    # S10 eps≡0 + luminance 退化路径与 b≡0 的 E4 目标一致
+    nt10 = torch.as_tensor(nt9); yl = torch.as_tensor(rng.uniform(.05, .9, (6, 10, 1))); w10 = torch.as_tensor(rng.uniform(.5, 1., (6, 10)))
+    l10 = torch.as_tensor(l9); d10, r10, _, _, x10 = env_terms(l10, torch.zeros(1, 9, dtype=torch.float64), sh9(nt10), nt10, yl, w10)
+    rb = ((w10 * x10 * yl[..., 0]).sum(0) / ((w10 * x10.square()).sum(0) + DAMP)).clamp_min(0); ref10 = (w10 * .5 * (x10 * rb[None] - yl[..., 0]).square()).sum() / w10.sum()
+    res['S10_diff'] = float(abs(d10 - ref10)); assert res['S10_diff'] < 1e-12
+    # 诊断函数在合成数据上的试运行（保证K1–K7代码路径可执行，数值有限）
+    res['diagnostics_dry_run'] = diag_dry_run(nt6, y6, w6, end, info, rng)
+    res.update(status='PASS', gt_read=False, note='合成真值不是数据集GT'); write(out / 'numeric_tests.json', res); print('R6_ENV_SELF_TEST_PASS', json.dumps({k: v for k, v in res.items() if k.startswith('S') and not isinstance(v, (dict, list))}), flush=True)
+
+
+def dense_fisher(ctx, l, eps):
+    """S9 参照：用 autograd 全雅可比构造稠密 Fisher，再稠密求逆消去 rho。"""
+    nt, Yb, yt, ww = ctx['nt'], ctx['Yb'], ctx['yt'], ctx['ww']; T, G, C = yt.shape
+    lt = torch.as_tensor(l); eps = torch.as_tensor(eps, dtype=torch.float64); phi, e = dir_angles(l)
+    _, rho, _, _, _ = env_terms(lt, eps, Yb, nt, yt, ww); v = (ww[..., None] / C / ww.sum()).expand(T, G, C).reshape(-1).sqrt()
+
+    def r(th, rh, ep):
+        ph, ee = th[:T], th[T:]; ll = compose(torch.stack([torch.cos(ph), torch.sin(ph)], 1), ee)
+        x = torch.relu(torch.einsum('tgc,tc->tg', nt, ll)); A = Yb @ ep.T + x[..., None]
+        return (v * (rh.reshape(G, C)[None] * A - yt).reshape(-1))
+    th0 = torch.cat([torch.as_tensor(phi), torch.as_tensor(e)]); Jt, Jr, Je = torch.autograd.functional.jacobian(r, (th0, rho.reshape(-1).clone(), eps))
+    J = torch.cat([Jt, Jr, Je.reshape(len(v), -1)], 1); Fm = J.T @ J; nu = 2 * T; nr = G * C; act = torch.nonzero(rho.reshape(-1) > 1e-12).squeeze(1)
+    idx_u = torch.cat([torch.arange(nu), nu + nr + torch.arange(C * 9)]); idx_r = nu + act
+    Fuu = Fm[idx_u][:, idx_u]; Fur = Fm[idx_u][:, idx_r]; Frr = Fm[idx_r][:, idx_r]
+    S = Fuu - Fur @ torch.linalg.inv(Frr) @ Fur.T
+    return dict(A=S[:nu, :nu], B=S[nu:, :nu], C=S[nu:, nu:])
+
+
+def diag_dry_run(n, y, w, end, info, rng):
+    ctx = make_ctx(n, y, w); lum = (y * KAPPA).sum(-1); l = end; eps = info['eps']; T = len(l); phi, e = dir_angles(l); s = orbit_sign(l)
+    fk = fisher_report(ctx, l, eps, None, phi, e, s, lum, w, l, info['final_data'], info['final_data'])
+    en = energy_share(ctx, l, eps, lum, w, l); ir, pts, E = irradiance_check(ctx, eps)
+    pr = profile_zmode(ctx, l, eps, lum, w, l, deltas=(-2, 0, 2), als_iter=40); ch = channel_residuals(ctx, l, eps, lum, w, l)
+    ho = heldout(n[:, :100], y[:, :100], lum[:, :100], w[:, :100], eps, {'R6': l})
+    allv = [fk['F1_value'], en['r6']['all']['eta_lin'][0], ir['obs_negative_weighted_fraction'], pr['a_R6_als'][0], ch['r6_luminance_projected_rms'], ho['new_style_fixed_eps_mae']['R6']['channel_mae'][0]]
+    assert np.isfinite(allv).all(), allv
+    return dict(F1_value=fk['F1_value'], eta_var=en['r6']['all']['eta_var'], curvature_ratio=pr['curvature_ratio_a_over_b'], ok=True)
+
+
+# ================================================================ 图
+def figures(out, ctx, results, ends, infos, fi, d, e4_dir, eps, l):
+    nt, Yb, yt, ww = ctx['nt'], ctx['Yb'], ctx['yt'], ctx['ww']; T = yt.shape[0]
+    _, rho, res, A, x = env_terms(torch.as_tensor(l), torch.as_tensor(eps), Yb, nt, yt, ww); res = res.numpy(); wn = ww.numpy()
+    uv = d['projection_uv'][:, fi] if 'projection_uv' in d.files else None
+    fig, axs = plt.subplots(3, 5, figsize=(22, 11))
+    for j, t in enumerate([0, 37, 74, 111, 149]):
+        ok = wn[t] > 0; pix = (uv[t] + 1) * 200 - .5 if uv is not None else d['xyz'][fi, :2]
+        for c in range(3):
+            sc = axs[c, j].scatter(pix[ok, 0], pix[ok, 1], s=3, c=res[t, ok, c], cmap='coolwarm', vmin=-.1, vmax=.1); axs[c, j].set_title(f'Frame {t + 1} ch {"RGB"[c]} residual'); axs[c, j].set_aspect('equal'); axs[c, j].invert_yaxis()
+        fig.colorbar(sc, ax=axs[:, j], shrink=.6)
+    fig.savefig(out / '01_residual_rgb.png', dpi=130); plt.close(fig)
+    fig, axs = plt.subplots(2, 2, figsize=(13, 8)); fig.suptitle('E3 / E4(frozen) / R6 and A/B splits')
+    for k, ll in [('E3', results['E3']), ('E4', e4_dir), ('R6', ends['full'])]:
+        axs[0, 0].plot(np.rad2deg(np.unwrap(np.arctan2(ll[:, 1], ll[:, 0]))), label=k); axs[0, 1].plot(elev_deg_(ll), label=k)
+    for k in ['A', 'B']:
+        axs[1, 0].plot(np.rad2deg(np.unwrap(np.arctan2(ends[k][:, 1], ends[k][:, 0]))), label=f'R6 {k}'); axs[1, 1].plot(elev_deg_(ends[k]), label=f'R6 {k}')
+    for ax in axs[:, 1]: ax.axhline(40, c='k', ls=':'); ax.axhline(50, c='k', ls=':')
+    axs[0, 1].set_ylim(35, 75)
+    for ax in axs.flat: ax.legend(); ax.set_xlabel('Frame index')
+    axs[0, 0].set_ylabel('Unwrapped azimuth (deg)'); axs[0, 1].set_ylabel('Elevation (deg)'); fig.tight_layout(); fig.savefig(out / '02_direction.png', dpi=140); plt.close(fig)
+    ident = json.loads((out / 'diagnostics/fisher.json').read_text()); prof = json.loads((out / 'diagnostics/profile.json').read_text())
+    fig, axs = plt.subplots(1, 2, figsize=(15, 5)); names = list(ident['modes']); xs = np.arange(len(names))
+    axs[0].bar(xs - .2, [ident['modes'][k]['R_new_with_prior'] for k in names], .4, label='R6 (rho,eps eliminated)'); axs[0].bar(xs + .2, [ident['modes'][k]['R_E4_with_prior'] for k in names], .4, label='E4 (rho,b eliminated)')
+    axs[0].set_xticks(xs); axs[0].set_xticklabels(names, rotation=70, fontsize=7); axs[0].axhline(.1, c='k', ls='--'); axs[0].legend(); axs[0].set_ylabel('information retention R(u)')
+    for k, lab in [('a_R6_als', 'R6 ALS'), ('b_R6_eps_fixed', 'R6 eps fixed'), ('c_E4_kkt', 'E4 kkt')]: axs[1].plot(prof['delta_deg'], prof['curvature'][k]['delta_data'], 'o-', label=lab)
+    axs[1].set_xlabel('elevation shift (deg)'); axs[1].set_ylabel('Δ L_data'); axs[1].legend(); axs[1].set_yscale('symlog', linthresh=1e-8)
+    fig.tight_layout(); fig.savefig(out / '03_identifiability.png', dpi=140); plt.close(fig)
+    fig, axs = plt.subplots(2, 2, figsize=(13, 8))
+    for k in ['full', 'hi', 'lo'] + [f'boot{s}' for s in BOOT]:
+        axs[0, 0].plot(elev_deg_(ends[k]), label=k); axs[0, 1].plot(np.rad2deg(np.unwrap(np.arctan2(ends[k][:, 1], ends[k][:, 0]))), label=k)
+    for k in ['full', 'hi', 'lo']:
+        h = json.loads((out / 'runs' / f'R6_{k}' / 'history.json').read_text()); axs[1, 0].plot([q['step'] for q in h], [q['loss'] for q in h], label=k)
+    h = json.loads((out / 'runs' / 'R6_full' / 'history.json').read_text()); E = np.array([q['eps'] for q in h]); axs[1, 1].plot([q['step'] for q in h], E, lw=.8); axs[1, 1].set_title('eps trajectory (full, T-A)')
+    axs[0, 0].axhline(40, c='k', ls=':'); axs[0, 0].axhline(50, c='k', ls=':'); axs[1, 0].set_yscale('log'); axs[1, 0].set_ylabel('loss')
+    for ax in axs.flat[:3]: ax.legend(); ax.grid(alpha=.2)
+    fig.tight_layout(); fig.savefig(out / '04_hilo_boot_convergence.png', dpi=140); plt.close(fig)
+    sph = np.load(out / 'diagnostics/irradiance_sphere.npz'); pts, Es = sph['points'], sph['E']
+    lon = np.arctan2(pts[:, 1], pts[:, 0]); lat = np.arcsin(pts[:, 2]); fig, axs = plt.subplots(1, 3, figsize=(18, 4.5))
+    for c in range(3):
+        sc = axs[c].scatter(np.rad2deg(lon), np.rad2deg(lat), c=Es[:, c], s=6, cmap='viridis'); fig.colorbar(sc, ax=axs[c])
+        neg = Es[:, c] < 0; axs[c].scatter(np.rad2deg(lon[neg]), np.rad2deg(lat[neg]), s=10, c='none', edgecolors='r', linewidths=.4); axs[c].set_title(f'E_{"RGB"[c]}(n) (red ring: E<0)'); axs[c].set_xlabel('azimuth (deg)'); axs[c].set_ylabel('elevation (deg)')
+    fig.tight_layout(); fig.savefig(out / '05_irradiance_map.png', dpi=140); plt.close(fig)
+
+
+# ================================================================ 主流程
+def support_and_obs(a):
+    d = np.load(a.observations); n = d['normals'].astype(np.float64); y = d['intensity'].astype(np.float64); w = d['weights'].astype(np.float64)
+    rgb = d['rgb'].astype(np.float64); xyz = d['xyz']; ids = d['gaussian_ids']; frames = d['frames']
+    assert np.array_equal(frames, np.arange(1, 151)) and y.shape == w.shape == (150, len(ids)) and rgb.shape == (150, len(ids), 3)
+    # I1：RGB 线性化与 luminance 一致性
+    assert np.array_equal(np.isfinite(y), np.isfinite(rgb).all(-1)), 'intensity 与 rgb 有限性掩码不一致'
+    lin = srgb_to_linear(rgb); m = np.isfinite(y); lum_err = float(abs((lin * KAPPA).sum(-1)[m] - y[m]).max()); assert lum_err <= 1e-5, lum_err
+    nerr = float(abs(np.linalg.norm(n[m], axis=-1) - 1).max()); assert nerr <= 1e-4, nerr
+    lin[~m] = np.nan
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', RuntimeWarning); q20 = np.nanquantile(y, .2, axis=0); q95 = np.nanquantile(y, .95, axis=0)
+    eligible = (np.isfinite(y).sum(0) >= 8) & (q95 - q20 > .015)
+    mn = n.mean(0); body = (xyz[:, 2] >= .05) & (abs(mn[:, 2]) <= .85)
+    cells = np.floor(xyz * 20).astype(np.int64); hval = cells[:, 0] * 73856093 ^ cells[:, 1] * 19349663 ^ cells[:, 2] * 83492791
+    held = hval % 5 == 0; fi = np.flatnonzero(eligible & body & ~held); vi = np.flatnonzero(eligible & body & held); allvi = np.flatnonzero(eligible & held)
+    A = fi[(hval[fi] // 5) % 2 == 0]; B = fi[(hval[fi] // 5) % 2 != 0]
+    assert (len(fi), len(vi), len(A), len(B)) == (2683, 648, 1450, 1233), (len(fi), len(vi), len(A), len(B))
+    relative = np.clip((y - q20) / (q95 - q20 + .001), 0, 1.5); relative[:, ~eligible] = np.nan
+    return d, n, y, w, lin, xyz, ids, frames, relative, fi, vi, allvi, A, B, hval, body, dict(luminance_max_abs_err=lum_err, normal_norm_max_err=nerr)
+
+
+def check_inputs(a, e4):
+    """I1/I2：输入与依赖代码哈希。"""
+    assert sha(a.observations) == OBS_HASH
+    man = json.loads((e4 / 'freeze_manifest.json').read_text()); rec = {}
+    for p in (r3.__file__, r5b.__file__):
+        rel = str(Path(p).resolve().relative_to(Path.cwd().resolve())); assert man['files'][rel] == sha(p), f'依赖代码与冻结不一致：{rel}'; rec[rel] = sha(p)
+    return rec
+
+
+def main():
+    p = argparse.ArgumentParser(description=__doc__); p.add_argument('--output', type=Path, required=True); p.add_argument('--observations', type=Path, default=OBS)
+    p.add_argument('--e4-root', type=Path, default=E4_ROOT); p.add_argument('--plan', type=Path, default=PLAN_DEFAULT); p.add_argument('--self-test', action='store_true')
+    p.add_argument('--smoke', action='store_true'); p.add_argument('--e4-regress-only', action='store_true', help='仅做支撑集/E1-E3/E4回归检查，不拟合R6'); p.add_argument('--k8', action='store_true')
+    p.add_argument('--eps-lr', type=float, default=EPS_LR); a = p.parse_args()
+    out = a.output; out.mkdir(parents=True, exist_ok=False)
+    torch.set_num_threads(2); torch.manual_seed(SEED); np.random.seed(SEED)
+    if a.self_test: selftest(out); return
+    e4 = a.e4_root; deps = check_inputs(a, e4)
+    write(out / 'launch.json', dict(pid=os.getpid(), argv=sys.argv, plan_sha256=sha(a.plan), code_sha256=sha(__file__), dependency_sha256=deps, input_sha256=sha(a.observations), eps_lr=a.eps_lr, gt_read=False))
+    (d, n, y, w, lin, xyz, ids, frames, relative, fi, vi, allvi, A, B, hval, body, qc) = support_and_obs(a)
+    # I4：支撑集与冻结值逐元素相等
+    np.savez_compressed(out / 'support.npz', body_fit=fi, body_val=vi, all_val=allvi, split_A=A, split_B=B, gaussian_ids=ids, hval=hval, body_mask=body)
+    with np.load(e4 / 'fitting/support.npz') as fz:
+        for k, v in dict(body_fit=fi, body_val=vi, all_val=allvi, split_A=A, split_B=B, hval=hval, body_mask=body, gaussian_ids=ids).items(): assert np.array_equal(fz[k], v), f'支撑集与冻结不一致：{k}'
+    write(out / 'support_manifest.json', dict(support_sha256=sha(out / 'support.npz'), body_fit=2683, body_val=648, split_A=1450, split_B=1233, equals_frozen=True, linearization_qc=qc))
+    scoredata = (sub(n, vi), y[:, vi], w[:, vi]); results = {'E0': np.tile([0., 0., 1.], (150, 1))}; voteinfo = {}
+    for k in ['E1', 'E2']: results[k], voteinfo[k] = initial(sub(n, fi), y[:, fi], w[:, fi], relative[:, fi], k, scoredata)
+    results['E3'], _, _ = r3.fit(sub(n, fi), y[:, fi], w[:, fi], results['E2'], False, .03, 0., out, 'E3', False)
+    with np.load(R3_PRED) as old: repro = dict(E1=float(abs(results['E1'] - old['E1']).max()), E2=float(abs(results['E2'] - old['E2']).max()), E3=float(abs(results['E3'] - old['E3']).max()))
+    write(out / 'r3_reproduction.json', dict(max_abs_diff=repro, tolerance=1e-6, source=str(R3_PRED), gt_read=False))
+    if max(repro.values()) > 1e-6: raise RuntimeError(f'第三轮E1–E3未复现：{repro}')
+    # I7：E4 回归（调用 r5b.fit_traj，λ=(1,10)）；超差则停止并上报（D12）
+    e4dir_frozen = np.load(e4 / 'fitting/runs/a1e+00_e1e+01_full/direction.npy'); e4pred = np.load(e4 / 'fitting/predictions.npz')['E4']
+    assert np.array_equal(e4dir_frozen, e4pred) or float(ang_deg(e4dir_frozen, e4pred).max()) < 1e-9
+    t0 = time.time(); reg, reginfo = r5b.fit_traj(sub(n, fi), y[:, fi], w[:, fi], results['E3'], a_from_z(results['E3'][:, 2].mean()), 1., 10., out, 'E4regress_full')
+    dd = float(ang_deg(reg, e4dir_frozen).max())
+    write(out / 'e4_regression.json', dict(max_angle_diff_deg=dd, tolerance_deg=1e-6, ok=bool(dd <= 1e-6), seconds=time.time() - t0, certificate=reginfo['certificate'], device='cuda' if torch.cuda.is_available() else 'cpu', gt_read=False))
+    print('E4_REGRESSION_MAX_DEG', dd, flush=True)
+    if dd > 1e-6: raise RuntimeError(f'E4回归超差：{dd}°>1e-6°（规划D12：停止并上报）')
+    if a.e4_regress_only: print('R6_E4_REGRESS_ONLY_OK', flush=True); return
+    for sd in BOOT:
+        pick = np.random.default_rng(sd).choice(fi, len(fi), replace=True); assert np.array_equal(pick, np.load(e4 / f'fitting/bootstrap_{sd}_sample.npy')); np.save(out / f'bootstrap_{sd}_sample.npy', pick)
+    full_init = results['E3']; a_full = a_from_z(full_init[:, 2].mean())
+    if a.smoke:
+        t0 = time.time(); _, inf = fit_traj_env(sub(n, fi), sub(lin, fi), w[:, fi], full_init, a_full, LAM_A, LAM_E, out, 'R6_full', eps_lr=a.eps_lr)
+        write(out / 'smoke_result.json', dict(certificate=inf['certificate'], converged=inf['converged'], final_loss=inf['final_loss'], als_init=inf['als_init'], eps_lr=a.eps_lr, seconds=time.time() - t0, gt_read=False)); print('R6_SMOKE', inf['converged'], flush=True); return
+    supports = {'full': (fi, full_init)}
+    for key, idx in [('A', A), ('B', B)]:
+        init, voteinfo[key] = initial(sub(n, idx), y[:, idx], w[:, idx], relative[:, idx], 'E2'); supports[key] = (idx, r3.fit(sub(n, idx), y[:, idx], w[:, idx], init, False, .03, 0., out, f'stage1_{key}', False)[0])
+    for sd in BOOT:
+        pick = np.load(out / f'bootstrap_{sd}_sample.npy'); init, voteinfo[f'boot{sd}'] = initial(sub(n, pick), y[:, pick], w[:, pick], relative[:, pick], 'E2')
+        supports[f'boot{sd}'] = (pick, r3.fit(sub(n, pick), y[:, pick], w[:, pick], init, False, .03, 0., out, f'stage1_boot{sd}', False)[0])
+    ends = {}; infos = {}
+    for key, (idx, s1) in supports.items(): ends[key], infos[key] = fit_traj_env(sub(n, idx), sub(lin, idx), w[:, idx], s1, a_from_z(s1[:, 2].mean()), LAM_A, LAM_E, out, f'R6_{key}', eps_lr=a.eps_lr)
+    for key, a0 in [('hi', np.arctanh(.9)), ('lo', -np.arctanh(.9))]: ends[key], infos[key] = fit_traj_env(sub(n, fi), sub(lin, fi), w[:, fi], full_init, a0, LAM_A, LAM_E, out, f'R6_{key}', eps_lr=a.eps_lr)
+    results['R6'] = ends['full'].copy(); fit_info = infos['full']
+    for k, v in results.items(): assert v.shape == (150, 3) and np.isfinite(v).all() and np.allclose(np.linalg.norm(v, axis=1), 1, atol=1e-10), k
+    np.savez_compressed(out / 'predictions.npz', frames=frames, **results)
+    np.savez_compressed(out / 'env.npz', eps=fit_info['eps'], basis=BASIS_NAME, gauge='s=1', rho=fit_info['rho'], body_fit=fi)
+    # ---- 诊断 K1–K7(K8)
+    dg = out / 'diagnostics'; dg.mkdir(); ctx = make_ctx(sub(n, fi), sub(lin, fi), w[:, fi]); lum_fit = y[:, fi]; w_fit = w[:, fi]; e4_dir = e4pred; l = ends['full']; eps = fit_info['eps']
+    phi, e = dir_angles(l); s_or = orbit_sign(l); e4_data = None
+    xe = torch.relu(torch.einsum('tgc,tc->tg', ctx['nt'], torch.as_tensor(e4_dir))); yl_ = torch.as_tensor(np.nan_to_num(lum_fit)); wl_ = torch.as_tensor(np.where(np.isfinite(lum_fit), w_fit, 0)); r4, b4 = kkt(xe, yl_, wl_)
+    e4_data = float((wl_ * .5 * (r4[None] * xe + b4[None] - yl_).square()).sum() / wl_.sum())
+    write(dg / 'fisher.json', fisher_report(ctx, l, eps, None, phi, e, s_or, lum_fit, w_fit, e4_dir, fit_info['final_data'], e4_data))
+    write(dg / 'profile.json', profile_zmode(ctx, l, eps, lum_fit, w_fit, e4_dir)); write(dg / 'energy.json', energy_share(ctx, l, eps, lum_fit, w_fit, e4_dir))
+    irr, pts, Es = irradiance_check(ctx, eps); write(dg / 'irradiance.json', irr); np.savez_compressed(dg / 'irradiance_sphere.npz', points=pts, E=Es)
+    write(dg / 'residual_channels.json', channel_residuals(ctx, l, eps, lum_fit, w_fit, e4_dir))
+    cand = json.loads((e4 / 'fitting/candidate_table.json').read_text())['candidates']; e4row = [r for r in cand if r['name'] == 'a1e+00_e1e+01'][0]
+    write(dg / 'repeatability.json', repeatability(ends, infos, e4row))
+    write(dg / 'heldout.json', heldout(sub(n, vi), sub(lin, vi), y[:, vi], w[:, vi], eps, {'R6': l, 'E3': results['E3'], 'E4': e4_dir}))
+    if a.k8:
+        ply = Path('output/1019-02-LH-static-jumpingjacks-ELDL-V3-B00原生Stage1/model_mlp/point_cloud/iteration_35000/point_cloud.ply')
+        assert sha(ply) == 'adf94a9370f2251532d8885ef3f3e5a188ad2cdb6daa41539cb8d227d39222ff'; write(dg / 'stage1_chroma.json', stage1_chroma(fi, fit_info['rho'], ply, ids))
+    flags = dict(F1=json.loads((dg / 'fisher.json').read_text())['flag_F1'], F2=json.loads((dg / 'energy.json').read_text())['flag_F2'], F3=irr['flag_F3'], F4=json.loads((dg / 'residual_channels.json').read_text())['flag_F4'])
+    config = dict(final_method='R6', model='R6-ENV', basis=BASIS_NAME, gauge='s=1', eps_params=27, omega='1/3 per channel', lam=dict(a=LAM_A, e=LAM_E, rev=LAM_REV), coef_reg=COEF_REG, eps_lr=a.eps_lr,
+                  elevation_center_deg=45., elevation_halfwidth_deg=5., plan_sha256=sha(a.plan), code_sha256=sha(__file__), input_sha256=sha(a.observations), dependency_sha256=deps, flags=flags,
+                  full_certificate=fit_info['certificate'], full_converged=fit_info['converged'], als_init_full=fit_info['als_init'], e4_regression_max_deg=dd, r3_reproduction=repro, linearization_qc=qc, votes=voteinfo,
+                  trajectory_stats=traj_stats(l, s_or), gt_read=False, coordinate_system='world', direction_convention='surface_to_light',
+                  information_limitations='稳定性/平滑/留出残差均为无GT经验量，不证明GT精度；E4的G0-G7与J选档在本轮仅作诊断')
+    write(out / 'method_config.json', config); figures(out, ctx, results, ends, infos, fi, d, e4_dir, eps, l)
+    write(out / 'fit_complete.json', dict(status='R6_FIT_COMPLETE_AWAITING_REVIEW', full_converged=fit_info['converged'], flags=flags, pid=os.getpid(), gt_read=False))
+    print('R6_FIT_COMPLETE', fit_info['converged'], flags, flush=True)
+
+
+if __name__ == '__main__':
+    main()
