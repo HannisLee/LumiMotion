@@ -33,3 +33,5 @@ submodules/surfel_tracer/*.egg-info/
 **/*.egg-info/
 **/dist/
 **/.pytest_cache/
+# Shared tree (symlink) - never commit its contents; see worktree SOP
+LIHAN
