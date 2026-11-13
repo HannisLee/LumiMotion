@@ -2,6 +2,7 @@
 import math
 import torch
 from . import physics as P
+from . import optimizer as O
 
 
 def run():
@@ -54,6 +55,29 @@ def run():
     assert P.guard(.3,.3,.1,.25)[0]
     assert not P.guard(.3,.3,.10001,.25)[0]
     assert P.ALPHA == .5
+    # 分块与整块总损失及全部梯度一致。
+    params = {'rho': rho.detach().clone().requires_grad_(), 'env': env.detach().clone().requires_grad_(),
+              'phi': phi.clone().requires_grad_(), 'a': a.clone().requires_grad_()}
+    data = dict(n=n, v=v, target=target, w=w, b=b+.1)
+    full = O.objective_backward(data,params,K,.5,1.,chunk=2)
+    grads = {k:p.grad.clone() for k,p in params.items()}
+    for p in params.values(): p.grad = None
+    split = O.objective_backward(data,params,K,.5,1.,chunk=1)
+    assert abs(full['total']-split['total']) < 1e-12
+    assert all(torch.allclose(grads[k],p.grad,atol=1e-12,rtol=1e-12) for k,p in params.items())
+    # 阶段冻结计划、学习率衰减与包含优化器状态的恢复一致。
+    for stage, expected in [('B',{'env'}),('C1',{'rho'}),('C2',{'rho','env'}),('C3',{'rho','env','phi','a'})]:
+        opt = O.make_optimizer(stage,params,.7)
+        assert {k for k,p in params.items() if p.requires_grad} == expected
+    opt = O.make_optimizer('C3',params,.7)
+    O.step(data,params,opt,'C3',1,K,.5,1.,1)
+    saved = O.checkpoint(params,opt,'C3',1)
+    O.step(data,params,opt,'C3',2,K,.5,1.,1)
+    want = {k:p.detach().clone() for k,p in params.items()}
+    O.restore(saved,params,opt)
+    O.step(data,params,opt,'C3',2,K,.5,1.,1)
+    assert all(torch.equal(want[k],p) for k,p in params.items())
     return {'固角': 'PASS', '固定粗糙度与有限非负BRDF': 'PASS', '旋转对称': 'PASS',
             '共享rho梯度': 'PASS', 'RGB与b环境梯度': 'PASS', '时间均值': 'PASS',
-            'E4动态代数': 'PASS', '门槛边界': 'PASS'}
+            'E4动态代数': 'PASS', '门槛边界': 'PASS', '分块梯度': 'PASS',
+            '阶段冻结': 'PASS', '恢复优化器': 'PASS'}
