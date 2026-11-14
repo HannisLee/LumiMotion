@@ -66,7 +66,9 @@ def run(root, device):
             image,_,maps=raster(means3D=means,means2D=torch.zeros_like(means),shs=None,colors_precomp=colors,
                                 opacities=opacity,scales=scales,rotations=rot,cov3D_precomp=None)
             return image,maps
-        di,maps=rasterize(dc); st,_=rasterize(sc); al,_=rasterize(material.float())
+        di,maps=rasterize(dc); st,_=rasterize(sc); composed,_=rasterize(dc+sc)
+        if not torch.allclose(composed,di+st,atol=2e-5,rtol=2e-5): raise ValueError('光栅线性可加性不符')
+        al,_=rasterize(material.float())
         normal,_=rasterize(((n+1)/2).float()); missing,_=rasterize(torch.tensor(~data['observed'],device=device,dtype=torch.float32)[:,None].expand(-1,3).contiguous())
         alpha=maps[1:2]; total=di+st
         arrays={k:v.permute(1,2,0).cpu().numpy() for k,v in dict(total=total,direct=di,static=st,albedo=al,normal=normal,alpha=alpha).items()}
@@ -85,6 +87,19 @@ def run(root, device):
         video.write(frame[...,::-1]); coverage.append(float(missing.sum()/alpha.sum().clamp_min(1e-12)/3))
         c.load2device('cpu'); print('光栅渲染',t+1,flush=True)
     video.release()
+    reader=cv2.VideoCapture(str(out/'total.mp4')); count=0
+    while True:
+        ok,frame=reader.read()
+        if not ok: break
+        if frame.shape[:2]!=(c.image_height,c.image_width): raise ValueError('视频尺寸不符')
+        count+=1
+    reader.release()
+    if count!=150: raise ValueError(f'视频解码帧数不符：{count}')
+    for t in (1,38,75,113,150):
+        for name in ('total','direct','static','albedo','normal','alpha'):
+            image=cv2.imread(str(out/f'{name}_{t:04d}.png'),cv2.IMREAD_UNCHANGED)
+            if image is None or image.shape[:2]!=(c.image_height,c.image_width): raise ValueError('代表图读回失败')
     (out/'summary.json').write_text(json.dumps(dict(stage=stage,selected=status.get('selected'),unobserved=int((~data['observed']).sum()),
         unobserved_screen_fraction=coverage,clipped_nonfit=int((unbounded>1).sum()),
-        clipped_max_error=float(np.maximum(unbounded-1,0).max()),indirect=0),ensure_ascii=False,indent=2)+'\n')
+        clipped_max_error=float(np.maximum(unbounded-1,0).max()),indirect=0,video_decoded_frames=count,
+        component_raster_additivity='PASS',representative_png_readback='PASS'),ensure_ascii=False,indent=2)+'\n')

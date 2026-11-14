@@ -25,14 +25,23 @@ def run(root,device):
     if source.shape[:2]!=image.shape[:2]: source=cv2.resize(source,(image.shape[1],image.shape[0]),interpolation=cv2.INTER_AREA)
     linear=np.where(source<=.04045,source/12.92,((source+.055)/1.055)**2.4)
     residual=image-linear
-    fig,ax=plt.subplots(2,3,figsize=(12,8))
+    fig,ax=plt.subplots(2,4,figsize=(16,8))
     from .render import srgb
     ax[0,0].imshow(np.clip(source,0,1)); ax[0,0].set_title('真实 RGB')
     ax[0,1].imshow(np.clip(srgb(image),0,1)); ax[0,1].set_title('合成 RGB')
     ax[0,2].imshow(np.clip(abs(residual)*3,0,1)); ax[0,2].set_title('线性残差 ×3')
     for i,c in enumerate('RGB'):
         ax[1,i].imshow(residual[...,i],cmap='coolwarm',vmin=-.2,vmax=.2); ax[1,i].set_title(c+' 通道残差')
-    for a in ax.flat:a.axis('off')
+    with torch.no_grad():
+        direction=P.direction(params['phi'],params['a']); n=data['n'][t:t+1]; v=data['v'][t:t+1]
+        direct,static=P.components(n,v,params['rho'],params['env'],direction[t:t+1],meta['K'])
+        observed=data['target'][t].cpu().numpy(); predicted=(direct+static)[0].cpu().numpy()
+        valid=(data['w'][t]>0).cpu().numpy()
+    ax[0,3].scatter(observed[valid].reshape(-1),predicted[valid].reshape(-1),s=2,alpha=.2); ax[0,3].set_title('采样域：真实 / 合成')
+    for i,c in enumerate('RGB'):
+        ax[1,3].hist((predicted-observed)[valid,i],bins=40,histtype='step',label=c)
+    ax[1,3].legend(); ax[1,3].set_title('采样域线性残差')
+    for a in list(ax[0,:3])+list(ax[1,:3]):a.axis('off')
     fig.tight_layout(); fig.savefig(out/'01-rgb.png',dpi=130); plt.close(fig)
     with np.load(root/f'render/linear_{t+1:04d}.npz') as z: maps={k:z[k] for k in ('albedo','normal','direct','static')}
     fig,ax=plt.subplots(2,3,figsize=(12,8))
@@ -57,6 +66,15 @@ def run(root,device):
     ax[1,0].scatter(b,sbar,s=2,alpha=.3); ax[1,0].set_xlabel('b'); ax[1,0].set_ylabel('时间平均 S')
     ax[1,1].hist((sbar-b)/meta['scale'],bins=50); ax[1,1].set_title('带符号 b 残差 / s'); ax[1,2].axis('off')
     fig.tight_layout(); fig.savefig(out/'03-env-b.png',dpi=130); plt.close(fig)
+    fig,axes=plt.subplots(1,5,figsize=(15,3))
+    for a,name in zip(axes,('A','B','C1','C2','C3')):
+        p=root/'fitting'/name
+        candidates=[p/'checkpoint.pt'] if name=='A' else sorted(p.glob('checkpoint_*.pt'))
+        if candidates and candidates[-1].exists():
+            ck=torch.load(candidates[-1],map_location='cpu',weights_only=False)
+            a.imshow(np.clip(srgb(ck['params']['env'].numpy().reshape(8,16,3)),0,1))
+        a.set_title(name); a.axis('off')
+    fig.tight_layout(); fig.savefig(out/'03-env-stages.png',dpi=130); plt.close(fig)
     l=l.cpu().numpy(); fig,ax=plt.subplots(2,2,figsize=(12,8))
     ax[0,0].plot(np.rad2deg(np.unwrap(np.arctan2(l[:,1],l[:,0])))); ax[0,0].set_title('方位角')
     ax[0,1].plot(np.rad2deg(np.arcsin(np.clip(l[:,2],-1,1)))); ax[0,1].set_title('仰角')

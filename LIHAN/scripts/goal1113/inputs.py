@@ -39,7 +39,7 @@ def whitelist():
               'LIHAN/scripts/goal1113/optimizer.py','LIHAN/scripts/goal1113/inputs.py',
               'LIHAN/scripts/goal1113/fit.py','LIHAN/scripts/goal1113/render.py','LIHAN/scripts/goal1113/supplement.py',
               'LIHAN/scripts/goal1113/figures.py','LIHAN/scripts/goal1113/freeze.py','LIHAN/scripts/goal1113/evaluate.py',
-              'LIHAN/scripts/goal1113/run.py','LIHAN/scripts/goal1113/selftest.py',
+              'LIHAN/scripts/goal1113/run.py','LIHAN/scripts/goal1113/selftest.py','LIHAN/scripts/goal1113/raster_selftest.py',
               'LIHAN/scripts/static_rgb_light_extract.py','LIHAN/scripts/static_rgb_light_fit_r3.py',
               'scene/dataset_readers.py','utils/camera_utils.py','scene/deform_model.py',
               'gaussian_renderer/__init__.py','utils/general_utils.py')]

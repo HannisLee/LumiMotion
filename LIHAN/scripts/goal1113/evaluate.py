@@ -35,6 +35,7 @@ def run(root):
         for i in range(1,151):
             entry=record[f'{i:04d}']
             if entry.get('source_type')!='SUN': raise ValueError('光源类型不符')
+            if 'direction_convention' in entry and entry['direction_convention']!='Unit vector from surface toward sun; max(dot(normal, light_dir_world), 0)': raise ValueError('GT方向约定不符')
             v=np.asarray(entry['light_dir_world'],dtype=np.float64)
             if v.shape!=(3,) or not np.isfinite(v).all() or np.linalg.norm(v)<1e-12: raise ValueError('GT方向无效')
             truth.append(v/np.linalg.norm(v))

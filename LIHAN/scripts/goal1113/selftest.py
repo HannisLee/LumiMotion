@@ -71,6 +71,11 @@ def run(out=None):
     for stage, expected in [('B',{'env'}),('C1',{'rho'}),('C2',{'rho','env'}),('C3',{'rho','env','phi','a'})]:
         opt = O.make_optimizer(stage,params,.7)
         assert {k for k,p in params.items() if p.requires_grad} == expected
+    opt=O.make_optimizer('B',params,.7)
+    before={k:v.detach().clone() for k,v in params.items()}
+    O.step(data,params,opt,'B',1,K,.5,1.,1)
+    assert all(torch.equal(before[k],params[k]) for k in ('rho','phi','a'))
+    assert not torch.equal(before['env'],params['env'])
     opt = O.make_optimizer('C3',params,.7)
     O.step(data,params,opt,'C3',1,K,.5,1.,1)
     saved = O.checkpoint(params,opt,'C3',1)
@@ -94,9 +99,16 @@ def run(out=None):
         # 合成冻结与篡改检测；失败状态不允许替补阶段为主预测。
         root=out/'freeze_fixture'
         for name in ('inputs','fitting','render','figures'): (root/name).mkdir(parents=True)
-        (root/'fitting/status.json').write_text(json.dumps({'selected':None,'status':'INIT_GUARD_FAILED'}))
-        for name in ('manifest.json','config.json','prior.npz'): (root/'inputs'/name).write_bytes(b'synthetic')
+        (root/'fitting/status.json').write_text(json.dumps({'selected':None,'status':'INIT_GUARD_FAILED','stage':'B'}))
+        (root/'fitting/B').mkdir()
+        (root/'fitting/B/diagnostic.json').write_text(json.dumps({'pass_guard':False}))
+        original=root/'synthetic_input.bin'; original.write_bytes(b'synthetic')
+        (root/'inputs/manifest.json').write_text(json.dumps({'hashes':{str(original):freeze.sha(original)}}))
+        for name in ('config.json','prior.npz'): (root/'inputs'/name).write_bytes(b'synthetic')
         for name in ('summary.json','total.mp4'): (root/'render'/name).write_bytes(b'synthetic')
+        for name in ('fit','render'):
+            log='run.log' if name=='fit' else 'render.log'; (root/log).write_text('synthetic')
+            (root/f'{name}_execution.json').write_text(json.dumps(dict(schema_version=1,mode=name,exit_code=0,command='synthetic',argv=['synthetic'],log_path=log,cwd='synthetic',hostname='synthetic',pid=1,started_utc='synthetic',finished_utc='synthetic')))
         for i in range(1,151): (root/'render'/f'linear_{i:04d}.npz').write_bytes(b'synthetic')
         for name in ('01-rgb','02-components','03-env-b','04-trajectory'): (root/'figures'/f'{name}.png').write_bytes(b'synthetic')
         m=freeze.run(root); assert m['selected'] is None and freeze.verify(root)['selected'] is None
@@ -104,6 +116,11 @@ def run(out=None):
         try: freeze.verify(root)
         except ValueError: pass
         else: raise AssertionError('冻结篡改未检出')
+        (root/'render/linear_0001.npz').write_bytes(b'synthetic')
+        original.write_bytes(b'tampered')
+        try: freeze.verify(root)
+        except ValueError: pass
+        else: raise AssertionError('输入篡改未检出')
     return {'固角': 'PASS', '固定粗糙度与有限非负BRDF': 'PASS', '旋转对称': 'PASS',
             '共享rho梯度': 'PASS', 'RGB与b环境梯度': 'PASS', '时间均值': 'PASS',
             'E4动态代数': 'PASS', '门槛边界': 'PASS', '分块梯度': 'PASS',
