@@ -1,11 +1,13 @@
 """只使用合成数据验证已实现的物理核心。"""
 import math
+import json
+from pathlib import Path
 import torch
-from . import physics as P
+from . import physics as P, inputs as I, freeze
 from . import optimizer as O
 
 
-def run():
+def run(out=None):
     torch.manual_seed(111301)
     dtype = torch.float64
     omega, solid = P.grid('cpu', dtype)
@@ -77,7 +79,34 @@ def run():
     O.restore(saved,params,opt)
     O.step(data,params,opt,'C3',2,K,.5,1.,1)
     assert all(torch.equal(want[k],p) for k,p in params.items())
+    try:
+        I.sha(Path('/synthetic/lights.json'))
+    except ValueError:
+        pass
+    else: raise AssertionError('未拒绝 GT 路径')
+    if out is not None:
+        out=Path(out)
+        # 序列化检查点后恢复，验证磁盘恢复也保持优化器状态。
+        path=out/'synthetic_checkpoint.pt'; torch.save(saved,path)
+        disk=torch.load(path,map_location='cpu',weights_only=False)
+        O.restore(disk,params,opt); O.step(data,params,opt,'C3',2,K,.5,1.,1)
+        assert all(torch.equal(want[k],p) for k,p in params.items())
+        # 合成冻结与篡改检测；失败状态不允许替补阶段为主预测。
+        root=out/'freeze_fixture'
+        for name in ('inputs','fitting','render','figures'): (root/name).mkdir(parents=True)
+        (root/'fitting/status.json').write_text(json.dumps({'selected':None,'status':'INIT_GUARD_FAILED'}))
+        for name in ('manifest.json','config.json','prior.npz'): (root/'inputs'/name).write_bytes(b'synthetic')
+        for name in ('summary.json','total.mp4'): (root/'render'/name).write_bytes(b'synthetic')
+        for i in range(1,151): (root/'render'/f'linear_{i:04d}.npz').write_bytes(b'synthetic')
+        for name in ('01-rgb','02-components','03-env-b','04-trajectory'): (root/'figures'/f'{name}.png').write_bytes(b'synthetic')
+        m=freeze.run(root); assert m['selected'] is None and freeze.verify(root)['selected'] is None
+        (root/'render/linear_0001.npz').write_bytes(b'tampered')
+        try: freeze.verify(root)
+        except ValueError: pass
+        else: raise AssertionError('冻结篡改未检出')
     return {'固角': 'PASS', '固定粗糙度与有限非负BRDF': 'PASS', '旋转对称': 'PASS',
             '共享rho梯度': 'PASS', 'RGB与b环境梯度': 'PASS', '时间均值': 'PASS',
             'E4动态代数': 'PASS', '门槛边界': 'PASS', '分块梯度': 'PASS',
-            '阶段冻结': 'PASS', '恢复优化器': 'PASS'}
+            '阶段冻结': 'PASS', '恢复优化器': 'PASS', 'GT路径拒绝':'PASS',
+            '磁盘恢复和冻结篡改': 'PASS' if out is not None else '未执行',
+            '失败不替补': 'PASS' if out is not None else '未执行'}

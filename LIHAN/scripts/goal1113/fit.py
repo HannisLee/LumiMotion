@@ -24,6 +24,7 @@ def setup(device):
     length=np.linalg.norm(view,axis=-1,keepdims=True)
     if not np.isfinite(length).all() or (length<=1e-8).any(): raise ValueError('视线退化')
     view/=length
+    src['view']=view
     fi=src['support']['body_fit']; w=src['w'][:,fi]
     if (w.sum(0)<=0).any(): raise ValueError('fit 高斯无有效观测')
     dev=torch.device(device)
@@ -82,6 +83,32 @@ def diagnostic(data, params, meta):
                 pass_guard=ok,status=status)
 
 
+@torch.no_grad()
+def independent_diagnostics(src, data, params, meta):
+    """不参加选择：留出、A/B 分割、通道比例和方向漂移。"""
+    dev=data['n'].device; fi=src['support']['body_fit']; results={}
+    for label, ids in [('A',src['support']['split_A']),('B',src['support']['split_B'])]:
+        pos=np.searchsorted(fi,ids)
+        sub={k:(v[:,pos] if k in ('n','v','target','w') else v[pos] if k=='b' else
+                (v[0][:,pos],v[1][:,pos])) for k,v in data.items()}
+        pp=dict(params); pp['rho']=params['rho'][pos]
+        results[label]=diagnostic(sub,pp,meta)
+    ids=src['support']['body_val']; t=lambda x:torch.as_tensor(x,dtype=torch.float64,device=dev)
+    val=dict(n=t(src['n'][:,ids]),v=t(src['view'][:,ids]),target=t(src['target'][:,ids]),
+             w=t(src['w'][:,ids]),b=t(src['b'][ids]))
+    val['basis']=P.brdf_basis(val['n'],val['v'])
+    pp=dict(params); pp['rho']=t(np.repeat(np.clip(src['rho_y'][ids]/meta['K'],0,1)[:,None],3,axis=1))
+    results['val']=diagnostic(val,pp,meta)
+    l=P.direction(params['phi'],params['a']).cpu().numpy(); initial=src['direction']
+    angle=np.rad2deg(np.arccos(np.clip((l*initial).sum(-1),-1,1)))
+    elevation=np.rad2deg(np.arcsin(np.clip(l[:,2],-1,1)))
+    rms=diagnostic(data,params,meta)['rms']
+    results['channel_rms_ratios']={'R/G':rms[0]/max(rms[1],1e-12),'R/B':rms[0]/max(rms[2],1e-12),'G/B':rms[1]/max(rms[2],1e-12)}
+    results['direction_change_deg']=angle.tolist()
+    results['elevation_boundary_fraction']=float((np.abs(elevation-45)>=4.9).mean())
+    return results
+
+
 def run(root, device, resume=None):
     torch.manual_seed(111301); np.random.seed(111301)
     root=Path(root); src,data,params,meta=setup(device)
@@ -117,25 +144,39 @@ def run(root, device, resume=None):
         opt=O.make_optimizer(stage,params,meta['c0'])
         if waiting:
             O.restore(state,params,opt); start=state['step']; waiting=False
-            history=json.loads((out/'history.json').read_text()) if start else []
+            history=state['history'] if start else []
             if len(history)!=start: raise ValueError('历史与 checkpoint 不匹配')
         else:
             out.mkdir(exist_ok=False); history=[]; start=0
-            torch.save(O.checkpoint(params,opt,stage,0),out/'checkpoint_0000.pt')
-        for step in range(start+1,O.STAGES[stage][0]+1):
-            O.step(data,params,opt,stage,step,meta['K'],meta['scale'],meta['sign'])
-            with torch.no_grad():
-                values=O.objective_backward(data,params,meta['K'],meta['scale'],meta['sign'],backward=False)
-            history.append(values)
-            if step%100==0 or step==O.STAGES[stage][0]:
-                torch.save(O.checkpoint(params,opt,stage,step),out/f'checkpoint_{step:04d}.pt')
-                write(out/'history.json',history)
-                print(stage,step,values,flush=True)
+            torch.save(O.checkpoint(params,opt,stage,0,history),out/'checkpoint_0000.pt')
+            with torch.no_grad(): zero=O.objective_backward(data,params,meta['K'],meta['scale'],meta['sign'],backward=False)
+            write(out/'step_0000.json',zero); print(stage,0,zero,flush=True)
+        locked={k:v.detach().clone() for k,v in params.items() if not v.requires_grad}
+        step=start
+        try:
+            for step in range(start+1,O.STAGES[stage][0]+1):
+                O.step(data,params,opt,stage,step,meta['K'],meta['scale'],meta['sign'])
+                if any(not torch.equal(params[k],v) for k,v in locked.items()): raise RuntimeError('冻结参数发生改变')
+                with torch.no_grad():
+                    values=O.objective_backward(data,params,meta['K'],meta['scale'],meta['sign'],backward=False)
+                history.append(values)
+                if step%100==0 or step==O.STAGES[stage][0]:
+                    tmp=out/f'.checkpoint_{step:04d}.tmp'
+                    torch.save(O.checkpoint(params,opt,stage,step,history),tmp)
+                    tmp.replace(out/f'checkpoint_{step:04d}.pt')
+                    write(out/'history.json',history)
+                    print(stage,step,values,flush=True)
+        except BaseException as exc:
+            torch.save(O.checkpoint(params,opt,stage,step,history),out/'error_checkpoint.pt')
+            write(out/'error.json',dict(stage=stage,step=step,error_type=type(exc).__name__,error=str(exc)))
+            print('ERROR',stage,step,type(exc).__name__,str(exc),flush=True)
+            raise
         result=diagnostic(data,params,meta)
         tail=np.asarray([x['total'] for x in history[-100:]])
         result['convergence_relative_difference']=float(abs(tail[50:].mean()-tail[:50].mean())/max(abs(tail[:50].mean()),1e-12))
         result['converged']=result['convergence_relative_difference']<=1e-3
         write(out/'diagnostic.json',result)
+        write(out/'independent_diagnostics.json',independent_diagnostics(src,data,params,meta))
         if not result['pass_guard']:
             write(root/'fitting'/'status.json',dict(selected=None,status=result['status'],stage=stage)); return
     write(root/'fitting'/'status.json',dict(selected='C3',status='FIT_COMPLETE'))

@@ -76,13 +76,14 @@ def step(data, params, optimizer, stage, number, K, scale, sign, chunk=128):
     return parts
 
 
-def checkpoint(params, optimizer, stage, number):
+def checkpoint(params, optimizer, stage, number, history=None):
     return {'params': {k:v.detach().clone() for k,v in params.items()},
-            'optimizer': copy.deepcopy(optimizer.state_dict()), 'stage':stage, 'step':number}
+            'optimizer': copy.deepcopy(optimizer.state_dict()), 'stage':stage, 'step':number,
+            'history':copy.deepcopy(history) if history is not None else None}
 
 
 def restore(state, params, optimizer):
     with torch.no_grad():
         for k,v in state['params'].items():
             params[k].copy_(v)
-    optimizer.load_state_dict(state['optimizer'])
+    optimizer.load_state_dict(copy.deepcopy(state['optimizer']))

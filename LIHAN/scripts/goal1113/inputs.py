@@ -37,8 +37,12 @@ def whitelist():
     paths += [SOURCE/f'image/image_{i:04d}.png' for i in range(1,151)]
     paths += [Path(p) for p in ('LIHAN/scripts/goal1113/__init__.py','LIHAN/scripts/goal1113/physics.py',
               'LIHAN/scripts/goal1113/optimizer.py','LIHAN/scripts/goal1113/inputs.py',
+              'LIHAN/scripts/goal1113/fit.py','LIHAN/scripts/goal1113/render.py','LIHAN/scripts/goal1113/supplement.py',
+              'LIHAN/scripts/goal1113/figures.py','LIHAN/scripts/goal1113/freeze.py','LIHAN/scripts/goal1113/evaluate.py',
+              'LIHAN/scripts/goal1113/run.py','LIHAN/scripts/goal1113/selftest.py',
               'LIHAN/scripts/static_rgb_light_extract.py','LIHAN/scripts/static_rgb_light_fit_r3.py',
-              'scene/dataset_readers.py','utils/camera_utils.py')]
+              'scene/dataset_readers.py','utils/camera_utils.py','scene/deform_model.py',
+              'gaussian_renderer/__init__.py','utils/general_utils.py')]
     hashes = {str(p):sha(p) for p in paths}
     for p,h in EXPECTED.items():
         if hashes[str(p)] != h: raise ValueError(f'哈希不符：{p}')
