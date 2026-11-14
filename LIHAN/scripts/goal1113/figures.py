@@ -1,7 +1,6 @@
 """生成四类无 GT 可视化；目检结论由执行方独立记录。"""
 import json
 from pathlib import Path
-import cv2
 import numpy as np
 import torch
 import matplotlib
@@ -18,11 +17,11 @@ def run(root,device):
     src,data,_,meta=fit.setup(device)
     for k in params: params[k]=params[k].to(device)
     t=74
-    source=cv2.imread(str(I.RUNTIME/f'images/image_{t+1:04d}.png'),cv2.IMREAD_UNCHANGED)
-    if source is None: raise FileNotFoundError('原RGB图')
-    source=source[...,2::-1].astype(np.float64)/(65535 if source.dtype==np.uint16 else 255)
+    from LIHAN.scripts.static_rgb_light_extract import cameras
+    camera=cameras(I.RUNTIME,'all')[t]
+    source=camera.original_image_train_light.permute(1,2,0).cpu().numpy().astype(np.float64)
     with np.load(root/f'render/linear_{t+1:04d}.npz') as z: image=z['total']
-    if source.shape[:2]!=image.shape[:2]: source=cv2.resize(source,(image.shape[1],image.shape[0]),interpolation=cv2.INTER_AREA)
+    if source.shape!=image.shape: raise ValueError('相机目标与渲染尺寸不一致')
     linear=np.where(source<=.04045,source/12.92,((source+.055)/1.055)**2.4)
     residual=image-linear
     fig,ax=plt.subplots(2,4,figsize=(16,8))
