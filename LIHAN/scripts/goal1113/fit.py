@@ -122,7 +122,20 @@ def run(root, device, resume=None):
         (root/'fitting').mkdir(exist_ok=True)
         a=root/'fitting'/'A'; a.mkdir(exist_ok=False)
         torch.save({'params':{k:v.detach().cpu() for k,v in params.items()},'meta':{k:v for k,v in meta.items() if k!='hashes'}},a/'checkpoint.pt')
-        write(a/'diagnostic.json',diagnostic(data,params,meta))
+        with torch.no_grad():
+            light=P.direction(params['phi'],params['a']); direct=[]; static=[]
+            for j in range(0,data['n'].shape[1],128):
+                sl=slice(j,min(j+128,data['n'].shape[1])); basis=(data['basis'][0][:,sl],data['basis'][1][:,sl])
+                d,s=P.components(data['n'][:,sl],data['v'][:,sl],params['rho'][sl],params['env'],light,meta['K'],basis)
+                direct.append(d); static.append(s)
+            direct=torch.cat(direct,dim=1); static=torch.cat(static,dim=1)
+            sbar=(data['w']*(static@static.new_tensor(P.Y))).sum(0)/data['w'].sum(0)
+            np.savez_compressed(a/'reconstruction.npz',direct=direct.cpu().numpy(),static=static.cpu().numpy(),
+                                total=(direct+static).cpu().numpy(),sbar=sbar.cpu().numpy(),
+                                b_residual=(sbar-data['b']).cpu().numpy())
+            zero=O.objective_backward(data,params,meta['K'],meta['scale'],meta['sign'],backward=False)
+        write(a/'loss.json',zero); write(a/'diagnostic.json',diagnostic(data,params,meta))
+        print('A',json.dumps({k:v for k,v in meta.items() if k!='hashes'},ensure_ascii=False),zero,flush=True)
         if max(0.,meta['e0']-.2)>min(.65,meta['e0']+.2):
             write(root/'fitting'/'status.json',dict(selected=None,status='PRIOR_GUARD_CONFLICT')); return
     else:

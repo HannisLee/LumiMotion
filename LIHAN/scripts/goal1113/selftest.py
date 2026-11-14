@@ -56,7 +56,9 @@ def run(out=None):
     # 边界按闭区间，失败不替补由调用方实现。
     assert P.guard(.3,.3,.1,.25)[0]
     assert not P.guard(.3,.3,.10001,.25)[0]
+    assert P.guard(.65,.9,.0,.0)[1]=='PRIOR_GUARD_CONFLICT'
     assert P.ALPHA == .5
+    assert not v.requires_grad and isinstance(K,float)
     # 分块与整块总损失及全部梯度一致。
     params = {'rho': rho.detach().clone().requires_grad_(), 'env': env.detach().clone().requires_grad_(),
               'phi': phi.clone().requires_grad_(), 'a': a.clone().requires_grad_()}
@@ -76,6 +78,8 @@ def run(out=None):
     O.step(data,params,opt,'B',1,K,.5,1.,1)
     assert all(torch.equal(before[k],params[k]) for k in ('rho','phi','a'))
     assert not torch.equal(before['env'],params['env'])
+    before_lr=opt.param_groups[0]['lr']; O.schedule(opt,'B',1200)
+    assert abs(opt.param_groups[0]['lr']-before_lr*.3)<1e-15
     opt = O.make_optimizer('C3',params,.7)
     O.step(data,params,opt,'C3',1,K,.5,1.,1)
     saved = O.checkpoint(params,opt,'C3',1)
