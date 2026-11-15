@@ -1,0 +1,87 @@
+"""T02-native figures, English-title edition: copy of native_figures.py; ONLY string literals (titles, axis labels, legend labels) and the output dir name differ."""
+import json
+from pathlib import Path
+import numpy as np
+import torch
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+from LIHAN.scripts.goal1113 import inputs as I, physics as P
+from LIHAN.scripts.goal1113_t02 import native_run as NR
+
+
+def run(root,device):
+    root=Path(root); out=root/'figures-en'; out.mkdir(exist_ok=False)
+    status=json.loads((root/'fitting/status.json').read_text()); stage=status.get('selected') or status.get('stage') or 'A'
+    checkpoint=(root/'fitting'/stage/'checkpoint.pt') if stage=='A' else sorted((root/'fitting'/stage).glob('checkpoint_*.pt'))[-1]
+    state=torch.load(checkpoint,map_location=device,weights_only=False); params=state['params']
+    src,data,_,meta=NR.setup(device)
+    for k in params: params[k]=params[k].to(device)
+    t=74
+    from LIHAN.scripts.static_rgb_light_extract import cameras
+    camera=cameras(I.RUNTIME,'all')[t]
+    source=camera.original_image_train_light.permute(1,2,0).cpu().numpy().astype(np.float64)
+    with np.load(root/f'render/linear_{t+1:04d}.npz') as z: image=z['total']
+    if source.shape!=image.shape: raise ValueError('camera target and render size mismatch')
+    linear=np.where(source<=.04045,source/12.92,((source+.055)/1.055)**2.4)
+    residual=image-linear
+    fig,ax=plt.subplots(2,4,figsize=(16,8))
+    from LIHAN.scripts.goal1113.render import srgb
+    ax[0,0].imshow(np.clip(source,0,1)); ax[0,0].set_title('Real RGB')
+    ax[0,1].imshow(np.clip(srgb(image),0,1)); ax[0,1].set_title('Synthesized RGB')
+    ax[0,2].imshow(np.clip(abs(residual)*3,0,1)); ax[0,2].set_title('Linear residual ×3')
+    for i,c in enumerate('RGB'):
+        ax[1,i].imshow(residual[...,i],cmap='coolwarm',vmin=-.2,vmax=.2); ax[1,i].set_title(c+' channel residual')
+    with torch.no_grad():
+        direction=P.direction(params['phi'],params['a']); n=data['n'][t:t+1]; v=data['v'][t:t+1]
+        direct,static=P.components(n,v,params['rho'],params['env'],direction[t:t+1],meta['K'])
+        observed=data['target'][t].cpu().numpy(); predicted=(direct+static)[0].cpu().numpy()
+        valid=(data['w'][t]>0).cpu().numpy()
+    ax[0,3].scatter(observed[valid].reshape(-1),predicted[valid].reshape(-1),s=2,alpha=.2); ax[0,3].set_title('Sampled domain: real vs. synthesized')
+    for i,c in enumerate('RGB'):
+        ax[1,3].hist((predicted-observed)[valid,i],bins=40,histtype='step',label=c)
+    ax[1,3].legend(); ax[1,3].set_title('Sampled-domain linear residual')
+    for a in list(ax[0,:3])+list(ax[1,:3]):a.axis('off')
+    fig.tight_layout(); fig.savefig(out/'01-rgb.png',dpi=130); plt.close(fig)
+    with np.load(root/f'render/linear_{t+1:04d}.npz') as z: maps={k:z[k] for k in ('albedo','normal','direct','static')}
+    fig,ax=plt.subplots(2,3,figsize=(12,8))
+    for i,(k,v) in enumerate(maps.items()):
+        ax.flat[i].imshow(np.clip(srgb(v) if k!='normal' else v,0,1)); ax.flat[i].set_title(k); ax.flat[i].axis('off')
+    diag=json.loads((root/'fitting'/stage/'diagnostic.json').read_text())
+    ax.flat[4].plot(diag['energy_frames']); ax.flat[4].set_title('Static energy fraction (per frame)')
+    ax.flat[5].axis('off'); fig.tight_layout(); fig.savefig(out/'02-components.png',dpi=130); plt.close(fig)
+    with torch.no_grad():
+        l=P.direction(params['phi'],params['a']); parts=[]
+        for j in range(0,data['n'].shape[1],128):
+            sl=slice(j,min(j+128,data['n'].shape[1])); basis=(data['basis'][0][:,sl],data['basis'][1][:,sl])
+            _,s=P.components(data['n'][:,sl],data['v'][:,sl],params['rho'][sl],params['env'],l,meta['K'],basis)
+            parts.append((data['w'][:,sl]*(s@s.new_tensor(P.Y))).sum(0)/data['w'][:,sl].sum(0))
+        sbar=torch.cat(parts).cpu().numpy(); b=data['b'].cpu().numpy()
+    fig,ax=plt.subplots(2,3,figsize=(12,8)); ax[0,0].imshow(np.clip(srgb(params['env'].detach().cpu().numpy().reshape(16,32,3)),0,1)); ax[0,0].set_title(stage+' environment map')
+    for i,name in enumerate(('A','B','C1','C2','C3')):
+        d=root/'fitting'/name/'diagnostic.json'
+        if d.exists():
+            z=json.loads(d.read_text()); ax[0,1].scatter(i,z['energy'],label=name); ax[0,2].scatter(i,z['b_mean'])
+    ax[0,1].set_title('Static energy fraction per stage'); ax[0,2].set_title('Mean b residual per stage')
+    ax[1,0].scatter(b,sbar,s=2,alpha=.3); ax[1,0].set_xlabel('b'); ax[1,0].set_ylabel('Time-averaged S')
+    ax[1,1].hist((sbar-b)/meta['scale'],bins=50); ax[1,1].set_title('Signed b residual / s'); ax[1,2].axis('off')
+    fig.tight_layout(); fig.savefig(out/'03-env-b.png',dpi=130); plt.close(fig)
+    fig,axes=plt.subplots(1,5,figsize=(15,3))
+    for a,name in zip(axes,('A','B','C1','C2','C3')):
+        p=root/'fitting'/name
+        candidates=[p/'checkpoint.pt'] if name=='A' else sorted(p.glob('checkpoint_*.pt'))
+        if candidates and candidates[-1].exists():
+            ck=torch.load(candidates[-1],map_location='cpu',weights_only=False)
+            a.imshow(np.clip(srgb(ck['params']['env'].numpy().reshape(16,32,3)),0,1))
+        a.set_title(name); a.axis('off')
+    fig.tight_layout(); fig.savefig(out/'03-env-stages.png',dpi=130); plt.close(fig)
+    l=l.cpu().numpy(); fig,ax=plt.subplots(2,2,figsize=(12,8))
+    ax[0,0].plot(np.rad2deg(np.unwrap(np.arctan2(l[:,1],l[:,0])))); ax[0,0].set_title('Azimuth (deg)')
+    ax[0,1].plot(np.rad2deg(np.arcsin(np.clip(l[:,2],-1,1)))); ax[0,1].set_title('Elevation (deg)')
+    for name in ('B','C1','C2','C3'):
+        p=root/'fitting'/name/'history.json'
+        if p.exists(): ax[1,0].plot([z['total'] for z in json.loads(p.read_text())],label=name)
+    ax[1,0].legend(); ax[1,0].set_title('Objective convergence')
+    ax[1,1].plot(diag['energy_frames'],label='Environment energy fraction')
+    ax[1,1].set_title(f"Env. energy fraction (informational, no guard)\nb mean={diag['b_mean']:.3f}, P90={diag['b_p90']:.3f}")
+    fig.tight_layout(); fig.savefig(out/'04-trajectory.png',dpi=130); plt.close(fig)
